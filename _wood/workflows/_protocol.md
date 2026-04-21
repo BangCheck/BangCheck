@@ -268,6 +268,55 @@ If role != Admin → REFUSE with message from "Refusal Patterns" section.
 
 ---
 
-**Policy version:** v1.0
-**Last reviewed:** 2026-04-16
+## 💡 Rule 8 — Admin Action Detection (Soft Suggestion)
+
+When the AI detects a situation that requires an Admin action or a convention change,
+it MUST NOT silently proceed or block. Instead, gently offer to track it as an issue.
+
+### Detection Triggers
+
+| Situation | Example |
+|-----------|---------|
+| Convention change needed | Commit format, branch naming, PR rules |
+| Team member registration / role change | New member, login update |
+| Protected file modification | _wood/, AGENTS.md, .claude/ |
+| Permission policy change | Role capabilities, menu visibility |
+| Recurring friction point | Same workaround applied 2+ times |
+
+### Suggestion Tone
+
+Do NOT use abrupt Y/N gates. Speak conversationally and make the offer feel optional:
+
+```
+✅ Good:
+"이 변경, 나중에 다른 팀원들도 헷갈릴 수 있을 것 같아요.
+이슈로 남겨두면 추적하기 편한데, 등록해드릴까요?"
+
+"방금 하신 작업, 팀 컨벤션에 반영하면 좋을 것 같은데
+이슈 하나 만들어 둘까요?"
+
+❌ Bad:
+"Admin 액션이 감지되었습니다. 이슈를 생성하시겠습니까? (Y/N)"
+```
+
+### Flow When User Says Yes
+
+Route directly into the `improvement` flow of `swyp-issue`:
+
+1. Auto-fill title from the detected context (user can edit)
+2. Priority defaults to **P3-backlog** (unless urgency detected → P2)
+3. Assignee defaults to `@Woo-JongHo` (Admin)
+4. Follow full `swyp-issue improvement` flow:
+   - Milestone selection
+   - Project board linking (`gh project item-add 2 --owner SWYP-Backend --url {issue-url}`)
+   - Post-creation next-action menu
+
+### Flow When User Says No / Ignores
+
+Proceed without issue. Do not ask again in the same session.
+
+---
+
+**Policy version:** v1.1
+**Last reviewed:** 2026-04-22
 **Admin:** @Woo-JongHo
