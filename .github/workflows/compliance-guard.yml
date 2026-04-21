@@ -1,0 +1,352 @@
+# ============================================================
+# SWYP Compliance Guard
+# ------------------------------------------------------------
+# Purpose:
+#   Detect PRs that bypass SWYP conventions (commit format,
+#   branch naming, PR template, issue linkage, labels).
+#
+# Rules live in: _wood/workflows/_COMPLIANCE-SPEC.yaml
+# Severity:     error → fail check / warning → comment only
+#
+# Companion workflow:
+#   protected-files.yml  (Admin-only file protection)
+# ============================================================
+
+name: Compliance Guard
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, edited]
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+  checks: write
+
+jobs:
+  compliance:
+    name: Verify SWYP conventions
+    runs-on: ubuntu-latest
+
+    steps:
+      # ────────────────────────────────────────────
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # ────────────────────────────────────────────
+      - name: Setup yq
+        run: |
+          sudo wget -qO /usr/local/bin/yq \
+            https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
+          sudo chmod +x /usr/local/bin/yq
+
+      # ────────────────────────────────────────────
+      - name: Check if skip-compliance label is set
+        id: skip_check
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data: pr } = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number,
+            });
+            const skip = pr.labels.some(l => l.name === 'skip-compliance');
+            core.setOutput('skip', skip ? 'true' : 'false');
+
+      # ────────────────────────────────────────────
+      - name: Run compliance checks
+        id: checks
+        if: steps.skip_check.outputs.skip != 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const { execSync } = require('child_process');
+
+            const prNumber = context.issue.number;
+            const { data: pr } = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: prNumber,
+            });
+
+            const errors = [];
+            const warnings = [];
+
+            // ────── Rule 1: Branch naming ──────
+            const branchPattern = /^(feat|fix|refactor|docs|chore|design)\/\d+-[a-z0-9-]+$/;
+            if (!branchPattern.test(pr.head.ref)) {
+              errors.push({
+                rule: 'branch_naming',
+                message: `브랜치명 '${pr.head.ref}' 이 컨벤션 위반`,
+                expected: '{type}/{issue-number}-{slug}',
+                examples: ['feat/5-login-form', 'fix/12-naver-auth-error'],
+                fix: 'git branch -m {correct-name} && git push --force-with-lease',
+              });
+            }
+
+            // ────── Rule 2: Issue linkage ──────
+            const closePattern = /(closes|fixes|resolves)\s+#\d+/i;
+            if (!closePattern.test(pr.body || '')) {
+              errors.push({
+                rule: 'issue_linkage',
+                message: 'PR body에 `closes #N` 누락',
+                fix: 'PR description 편집 → body에 `closes #{이슈번호}` 추가',
+              });
+            }
+
+            // ────── Rule 3: Commit message ──────
+            const { data: commits } = await github.rest.pulls.listCommits({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: prNumber,
+            });
+            const commitTypePattern = /^(feat|fix|docs|refactor|chore|design|comment|remove):\s+.+/;
+            const badCommits = commits.filter(c => {
+              const firstLine = c.commit.message.split('\n')[0];
+              return !commitTypePattern.test(firstLine) && !firstLine.startsWith('Merge ');
+            });
+            if (badCommits.length > 0) {
+              warnings.push({
+                rule: 'commit_type',
+                message: `${badCommits.length}개 커밋이 컨벤션 위반`,
+                details: badCommits.map(c => `  - ${c.sha.substring(0,7)}: ${c.commit.message.split('\n')[0]}`).join('\n'),
+                fix: 'git rebase -i로 메시지 수정',
+              });
+            }
+
+            // ────── Rule 4: PR template ──────
+            const requiredSections = [/^##\s+What/m, /^##\s+Why/m, /^##\s+Test/m];
+            const missingSections = requiredSections
+              .filter(re => !re.test(pr.body || ''))
+              .map(re => re.source.replace('^##\\s+', '## ').replace('/m', ''));
+            if (missingSections.length > 0) {
+              warnings.push({
+                rule: 'pr_template',
+                message: `PR 템플릿 섹션 누락: ${missingSections.join(', ')}`,
+                fix: 'docs: _wood/workflows/05-pr.md 의 Step 4 템플릿 참조',
+              });
+            }
+
+            // ────── Rule 5: Issue labels ──────
+            const issueRefMatch = (pr.body || '').match(/(closes|fixes|resolves)\s+#(\d+)/i);
+            if (issueRefMatch) {
+              const issueNum = issueRefMatch[2];
+              try {
+                const { data: issue } = await github.rest.issues.get({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: parseInt(issueNum, 10),
+                });
+                const labels = issue.labels.map(l => typeof l === 'string' ? l : l.name);
+                const hasType = labels.some(l => l.startsWith('유형:'));
+                const hasPriority = labels.some(l => l.startsWith('순위:'));
+                const hasStatus = labels.some(l => l.startsWith('상태:'));
+                const missing = [];
+                if (!hasType) missing.push('유형:*');
+                if (!hasPriority) missing.push('순위:*');
+                if (!hasStatus) missing.push('상태:*');
+                if (missing.length > 0) {
+                  warnings.push({
+                    rule: 'issue_labels',
+                    message: `연결된 이슈 #${issueNum} 라벨 누락: ${missing.join(', ')}`,
+                    fix: `gh issue edit ${issueNum} --add-label "..."`,
+                  });
+                }
+              } catch (e) {
+                // issue not found etc. — skip
+              }
+            }
+
+            // ────── Rule 6: PR size ──────
+            const changedLines = (pr.additions || 0) + (pr.deletions || 0);
+            if (changedLines > 800) {
+              warnings.push({
+                rule: 'pr_size',
+                message: `PR 변경 라인 ${changedLines} (권장 <800)`,
+                fix: 'PR을 작은 단위로 분할',
+              });
+            }
+
+            // ────── Rule 7: Forbidden files ──────
+            const { data: files } = await github.rest.pulls.listFiles({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: prNumber,
+              per_page: 300,
+            });
+            const forbiddenPatterns = [
+              /\.env$/, /\.env\.local$/, /\.env\.production$/,
+              /\.(pem|key|p12|pfx)$/,
+              /credentials\.json$/, /secrets\.(json|ya?ml)$/,
+            ];
+            const forbiddenHits = files
+              .filter(f => forbiddenPatterns.some(re => re.test(f.filename)))
+              .map(f => f.filename);
+            if (forbiddenHits.length > 0) {
+              errors.push({
+                rule: 'forbidden_files',
+                message: `금지된 파일 포함: ${forbiddenHits.join(', ')}`,
+                fix: 'git rm --cached {file} && .gitignore에 추가',
+              });
+            }
+
+            // Save results for next step
+            core.setOutput('errors_count', errors.length);
+            core.setOutput('warnings_count', warnings.length);
+            fs.writeFileSync('/tmp/errors.json', JSON.stringify(errors, null, 2));
+            fs.writeFileSync('/tmp/warnings.json', JSON.stringify(warnings, null, 2));
+
+            core.info(`Errors: ${errors.length}, Warnings: ${warnings.length}`);
+
+      # ────────────────────────────────────────────
+      - name: Post/update PR comment
+        if: steps.skip_check.outputs.skip != 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const errors = JSON.parse(fs.readFileSync('/tmp/errors.json', 'utf8'));
+            const warnings = JSON.parse(fs.readFileSync('/tmp/warnings.json', 'utf8'));
+
+            const totalIssues = errors.length + warnings.length;
+
+            let body = `## 🔍 Compliance Check Report\n\n`;
+
+            if (totalIssues === 0) {
+              body += `✅ **모든 컨벤션 준수 — 통과**\n\n`;
+              body += `이 PR은 SWYP 컨벤션을 따르고 있습니다.\n`;
+            } else {
+              body += `이 PR은 SWYP 컨벤션 일부를 따르지 않습니다.\n\n`;
+
+              if (errors.length > 0) {
+                body += `### ❌ Errors (수정 필수, ${errors.length}건)\n\n`;
+                errors.forEach((e, i) => {
+                  body += `**${i+1}. ${e.rule}**\n`;
+                  body += `  ${e.message}\n`;
+                  if (e.expected) body += `  기대: \`${e.expected}\`\n`;
+                  if (e.examples) body += `  예시: ${e.examples.map(x => `\`${x}\``).join(', ')}\n`;
+                  if (e.details) body += `\n\`\`\`\n${e.details}\n\`\`\`\n`;
+                  if (e.fix) body += `  수정: \`${e.fix}\`\n\n`;
+                });
+              }
+
+              if (warnings.length > 0) {
+                body += `### ⚠️ Warnings (권장, ${warnings.length}건)\n\n`;
+                warnings.forEach((w, i) => {
+                  body += `**${i+1}. ${w.rule}**\n`;
+                  body += `  ${w.message}\n`;
+                  if (w.details) body += `\n\`\`\`\n${w.details}\n\`\`\`\n`;
+                  if (w.fix) body += `  수정: ${w.fix}\n\n`;
+                });
+              }
+            }
+
+            body += `\n---\n`;
+            body += `참고: [_CODING-GUIDE.md](../blob/main/_wood/workflows/_CODING-GUIDE.md) · `;
+            body += `[_COMPLIANCE-SPEC.yaml](../blob/main/_wood/workflows/_COMPLIANCE-SPEC.yaml)\n`;
+            body += `이 코멘트는 compliance-guard Action이 자동 생성했습니다.`;
+
+            // Find existing comment to update
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+            const existing = comments.find(c => c.body.includes('🔍 Compliance Check Report'));
+
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existing.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body,
+              });
+            }
+
+      # ────────────────────────────────────────────
+      - name: Apply labels
+        if: steps.skip_check.outputs.skip != 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const errors = JSON.parse(fs.readFileSync('/tmp/errors.json', 'utf8'));
+            const warnings = JSON.parse(fs.readFileSync('/tmp/warnings.json', 'utf8'));
+
+            const ensureLabel = async (name, color, desc) => {
+              try {
+                await github.rest.issues.getLabel({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  name,
+                });
+              } catch {
+                await github.rest.issues.createLabel({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  name, color, description: desc,
+                }).catch(() => {});
+              }
+            };
+
+            const applyLabel = async (name) => {
+              try {
+                await github.rest.issues.addLabels({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: context.issue.number,
+                  labels: [name],
+                });
+              } catch {}
+            };
+
+            const removeLabel = async (name) => {
+              try {
+                await github.rest.issues.removeLabel({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: context.issue.number,
+                  name,
+                });
+              } catch {}
+            };
+
+            await ensureLabel('compliance-violation', 'B60205', 'Compliance errors detected');
+            await ensureLabel('compliance-warning', 'FBCA04', 'Compliance warnings detected');
+
+            if (errors.length > 0) {
+              await applyLabel('compliance-violation');
+            } else {
+              await removeLabel('compliance-violation');
+            }
+
+            if (warnings.length > 0) {
+              await applyLabel('compliance-warning');
+            } else {
+              await removeLabel('compliance-warning');
+            }
+
+      # ────────────────────────────────────────────
+      - name: Fail if errors exist
+        if: steps.skip_check.outputs.skip != 'true' && steps.checks.outputs.errors_count != '0'
+        run: |
+          echo "❌ ${{ steps.checks.outputs.errors_count }}건의 컨벤션 위반이 있습니다."
+          echo "PR 코멘트 확인 후 수정해 주세요."
+          exit 1
+
+      # ────────────────────────────────────────────
+      - name: Skip notice
+        if: steps.skip_check.outputs.skip == 'true'
+        run: |
+          echo "⏭️ skip-compliance 라벨이 있어 검사를 건너뛰었습니다."

@@ -1,0 +1,228 @@
+# ============================================================
+# Protected Files Guard
+# ------------------------------------------------------------
+# Purpose:
+#   Block merging of PRs that modify Admin-protected files
+#   unless the repository Admin (@Woo-JongHo) has APPROVED them.
+#
+# Why this exists:
+#   This repo is private and cannot use GitHub Branch Protection
+#   without Pro/Team plan. This Action provides equivalent
+#   enforcement via PR check status.
+#
+# Behavior:
+#   - On every PR (open/sync/reopen):
+#     1. Detect if any protected file is modified
+#     2. If yes → set status check "Protected Files Approval"
+#     3. Check if Admin has APPROVED the PR
+#     4. If approved → check passes (green)
+#        If not    → check fails (red, blocks merge UI)
+#
+# Maintenance:
+#   - Protected paths are listed in env.PROTECTED_GLOBS
+#   - Admin login is in env.ADMIN_LOGIN
+#   - Both must be kept in sync with AGENTS.md and team-roles.yaml
+# ============================================================
+
+name: Protected Files Approval
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, edited]
+  pull_request_review:
+    types: [submitted, dismissed]
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+  checks: write
+
+env:
+  ADMIN_LOGIN: Woo-JongHo
+  # Glob patterns of protected files (must mirror AGENTS.md + team-roles.yaml)
+  PROTECTED_PATTERNS: |
+    AGENTS.md
+    CLAUDE.md
+    .cursorrules
+    .claude/commands/**
+    .github/CODEOWNERS
+    .github/copilot-instructions.md
+    .github/workflows/protected-files.yml
+    _wood/workflows/**
+    _wood/agents/**
+    _wood/team-roles.yaml
+    _wood/milestone-meta.yaml
+    docs/team-conventions.md
+
+jobs:
+  guard:
+    name: Verify Admin approval for protected file changes
+    runs-on: ubuntu-latest
+
+    steps:
+      # ------------------------------------------------------------
+      # 1. Checkout
+      # ------------------------------------------------------------
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # ------------------------------------------------------------
+      # 2. Detect changed files in this PR
+      # ------------------------------------------------------------
+      - name: Get PR diff
+        id: diff
+        run: |
+          git diff --name-only \
+            "origin/${{ github.event.pull_request.base.ref }}...HEAD" \
+            > changed_files.txt
+          echo "Changed files:"
+          cat changed_files.txt
+
+      # ------------------------------------------------------------
+      # 3. Check if any protected file is modified
+      # ------------------------------------------------------------
+      - name: Match against protected patterns
+        id: match
+        run: |
+          MATCHED=""
+          while IFS= read -r pattern; do
+            [ -z "$pattern" ] && continue
+            # Use git ls-files to expand glob and intersect with diff
+            while IFS= read -r changed; do
+              [ -z "$changed" ] && continue
+              # shellcheck disable=SC2053
+              case "$changed" in
+                $pattern) MATCHED="${MATCHED}${changed}\n" ;;
+              esac
+            done < changed_files.txt
+          done <<< "${{ env.PROTECTED_PATTERNS }}"
+
+          if [ -n "$MATCHED" ]; then
+            echo "has_protected=true" >> "$GITHUB_OUTPUT"
+            echo "matched_files<<EOF" >> "$GITHUB_OUTPUT"
+            echo -e "$MATCHED" >> "$GITHUB_OUTPUT"
+            echo "EOF" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_protected=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      # ------------------------------------------------------------
+      # 4. Skip if no protected files changed
+      # ------------------------------------------------------------
+      - name: No protected files — pass
+        if: steps.match.outputs.has_protected != 'true'
+        run: |
+          echo "✅ No protected files modified. Approval gate skipped."
+
+      # ------------------------------------------------------------
+      # 5. Comment on PR (only first time per push)
+      # ------------------------------------------------------------
+      - name: Comment on PR
+        if: steps.match.outputs.has_protected == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const matched = `${{ steps.match.outputs.matched_files }}`.trim();
+            const body = [
+              '🔒 **Protected Files Detected**',
+              '',
+              'This PR modifies files that require Admin approval:',
+              '',
+              '```',
+              matched,
+              '```',
+              '',
+              `**Required reviewer:** @${process.env.ADMIN_LOGIN}`,
+              '',
+              'See [AGENTS.md](../blob/main/AGENTS.md) for the full policy.',
+              '',
+              '_This check will pass once an Admin reviews and approves._'
+            ].join('\n');
+
+            // Only post once — search existing comments
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+            const exists = comments.some(c => c.body.includes('Protected Files Detected'));
+            if (!exists) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body,
+              });
+            }
+
+      # ------------------------------------------------------------
+      # 6. Verify Admin approval
+      # ------------------------------------------------------------
+      - name: Require Admin approval
+        if: steps.match.outputs.has_protected == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const adminLogin = process.env.ADMIN_LOGIN;
+
+            // Get all reviews on this PR
+            const { data: reviews } = await github.rest.pulls.listReviews({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number,
+            });
+
+            // Filter latest review per user (most recent state wins)
+            const latestByUser = new Map();
+            for (const r of reviews) {
+              latestByUser.set(r.user.login, r);
+            }
+
+            const adminReview = latestByUser.get(adminLogin);
+            const approved =
+              adminReview && adminReview.state === 'APPROVED';
+
+            if (!approved) {
+              core.setFailed(
+                `🔒 This PR requires explicit APPROVED review from @${adminLogin}.\n` +
+                `Current state: ${adminReview ? adminReview.state : 'NO REVIEW'}\n` +
+                `\n` +
+                `Protected file changes cannot be merged without Admin sign-off.`
+              );
+            } else {
+              core.info(`✅ Approved by @${adminLogin}.`);
+            }
+
+      # ------------------------------------------------------------
+      # 7. Add "protected-files-modified" label for visibility
+      # ------------------------------------------------------------
+      - name: Label PR
+        if: steps.match.outputs.has_protected == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            try {
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                labels: ['protected-files-modified']
+              });
+            } catch (e) {
+              // Label might not exist yet — create it
+              await github.rest.issues.createLabel({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                name: 'protected-files-modified',
+                color: 'B60205',
+                description: 'PR modifies Admin-protected files (requires Admin approval)'
+              }).catch(() => {});
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                labels: ['protected-files-modified']
+              });
+            }

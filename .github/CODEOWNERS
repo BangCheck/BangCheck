@@ -1,0 +1,33 @@
+# CODEOWNERS — SWYP
+#
+# Protected files require Admin review before merge.
+# See AGENTS.md for full policy.
+#
+# Format: <pattern> @<github-login>
+
+# Admin — owns all AI governance files
+AGENTS.md                               @Woo-JongHo
+CLAUDE.md                               @Woo-JongHo
+.cursorrules                            @Woo-JongHo
+
+# AI assistant instructions
+/.claude/commands/**                    @Woo-JongHo
+/.claude/agents/**                      @Woo-JongHo
+/.github/copilot-instructions.md        @Woo-JongHo
+/.github/CODEOWNERS                     @Woo-JongHo
+/.github/workflows/protected-files.yml  @Woo-JongHo
+/.github/workflows/compliance-guard.yml @Woo-JongHo
+
+# AI infrastructure (_wood/)
+/_wood/workflows/**                     @Woo-JongHo
+/_wood/agents/**                        @Woo-JongHo
+/_wood/team-roles.yaml                  @Woo-JongHo
+/_wood/milestone-meta.yaml              @Woo-JongHo
+
+# Team conventions (Admin only)
+/docs/team-conventions.md               @Woo-JongHo
+
+# Spec (Admin + PM 편집 가능, PR 리뷰는 Admin)
+# PM GitHub login 확정 후 아래 줄 활성화
+/docs/spec/**                           @Woo-JongHo
+# /docs/spec/**                         @Woo-JongHo @{pm_login}
