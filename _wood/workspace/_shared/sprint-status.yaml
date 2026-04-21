@@ -1,0 +1,114 @@
+# ============================================================
+# SWYP Sprint Status (BMAD flat format)
+# ============================================================
+# generated: 2026-04-16
+# updated: 2026-04-21
+# project: 08_SWYP
+# project_key: 08_SWYP
+# tracking_system: github-issues
+# issue_repo: SWYP-Backend/project
+# story_location: "02_impl/workspace/stories"
+#
+# STATUS DEFINITIONS:
+# ==================
+# Epic:  backlog → in-progress → done
+# Story: backlog → ready-for-dev → in-progress → review → done
+# Pipeline: planned → in-progress → tc-done → done
+# Retro: optional → done
+#
+# RULES:
+# - Epic → in-progress when first story starts
+# - Epic → done when all stories done
+# - Story status updated by dev agent step-07-sync
+# - Pipeline managed separately (QA track)
+
+generated: 2026-04-16
+updated: 2026-04-21
+
+development_status:
+  # ── Epic 0: Infrastructure (done) ──
+  epic-0-infrastructure: done
+  epic-0-retrospective: done
+
+  # ── E01: Home — Room card management ──
+  epic-1: in-progress                    # github #140, SCR-HOME, @Woo-JongHo
+  e01-s01-home-header: backlog           # story file exists
+  e01-s02-status-banner: backlog         # story file exists
+  e01-s03-room-card-list: backlog        # github #138
+  e01-s04-room-card-actions: backlog
+  e01-s05-add-room-limit: backlog
+  epic-1-retrospective: optional
+
+  # ── E02: Login / Sign-up ──
+  epic-2: in-progress                    # github #99, SCR-AUTH
+  e02-s01-social-login-naver: review     # PR #144 (4/5 checked), @dlwldP
+  e02-s02-social-login-google: in-progress  # PR #144 Google test incomplete
+  e02-s03-column-fix: review             # PR #159 (6/6 checked), @dlwldP
+  e02-s04-deploy-connect: backlog        # github #160, deploy env connection
+  epic-2-retrospective: optional
+
+  # ── E03: Checklist creation ──
+  epic-3: backlog                        # github #101, SCR-CHECK-CREATE
+  epic-3-retrospective: optional
+
+  # ── E04: Checklist editing ──
+  epic-4: backlog                        # github #102, SCR-CHECK-EDIT
+  epic-4-retrospective: optional
+
+  # ── E05: Checklist custom settings ──
+  epic-5: backlog                        # github #100, SCR-CHECK-CUSTOM
+  epic-5-retrospective: optional
+
+  # ── E06: Comparison report ──
+  epic-6: backlog                        # github #103, SCR-COMPARE
+  epic-6-retrospective: optional
+
+  # ── E07: Landing page ──
+  epic-7: backlog                        # github #104, SCR-LANDING
+  epic-7-retrospective: optional
+
+  # ── E08: Dashboard ──
+  epic-8: backlog                        # github #105, SCR-DASHBOARD
+  epic-8-retrospective: optional
+
+# ============================================================
+# Pipeline track (QA verification, managed separately)
+# ============================================================
+pipeline_status:
+  P-E01: done
+  P-E02: done
+  P-E03: done
+  P-E04: done
+  P-E05: done
+  P-E06: done
+  P-E07: done
+  P-E08: done
+  P-E09: in-progress
+  P-E10: in-progress         # TC writing done, runtime DEFERRED
+  P-E11: planned
+  P-E12: planned
+  P-E13: planned
+  P-E14: planned
+  P-E15: planned
+  P-E16: tc-done             # PM verification pass:4 defer:3
+  P-E17: tc-done             # FE verification pass:6 defer:3
+  P-E18: tc-done             # BE verification pass:6 defer:2
+  P-E19: tc-done             # Tester verification pass:5 defer:1 fail:1
+  P-E20: tc-done             # E2E defer:11
+
+# ============================================================
+# GitHub Issue Map
+# ============================================================
+github_issue_map:
+  98:  epic-home
+  99:  epic-2               # Login / Sign-up
+  100: epic-5               # Checklist custom settings
+  101: epic-3               # Checklist creation
+  102: epic-4               # Checklist editing
+  103: epic-6               # Comparison report
+  104: epic-7               # Landing page
+  105: epic-8               # Dashboard
+  107: e02-s01              # Social login
+  138: e01-s03              # Room card UI
+  140: epic-1               # [Epic] Home
+  160: e02-s04              # Deploy connection

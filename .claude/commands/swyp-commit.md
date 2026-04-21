@@ -55,7 +55,7 @@ Wait for the user's answer before proceeding.
 ### Format
 
 ```
-type: description
+[type] : 한글 설명
 
 #{issue_number}
 ```
@@ -64,14 +64,14 @@ type: description
 
 | type | Purpose |
 |------|---------|
-| `feat` | Add new feature |
-| `fix` | Bug fix |
-| `docs` | Documentation changes |
-| `refactor` | Code refactoring |
-| `chore` | Package manager updates, misc |
-| `design` | UI design changes |
-| `comment` | Add or modify comments |
-| `remove` | File deletion only |
+| `feat` | 새 기능 추가 |
+| `fix` | 버그 수정 |
+| `docs` | 문서 변경 |
+| `refactor` | 코드 리팩터링 |
+| `chore` | 빌드·설정·패키지 관리 |
+| `design` | UI 디자인 변경 |
+| `comment` | 주석 추가·수정 |
+| `remove` | 파일 삭제 |
 
 ### type Auto-recommendation
 
@@ -92,7 +92,7 @@ type: description
 
 ```
 Commit message:
-  feat: implement login form layout
+  [feat] : 로그인 폼 레이아웃 구현
 
   #12
 
@@ -105,7 +105,7 @@ Proceed? (Y / edit)
 
 ```bash
 git add {files}
-git commit -m "type: description" -m "#{issue}"
+git commit -m "[type] : 한글 설명" -m "#{issue}"
 git push  # (or git push -u origin {branch})
 ```
 
@@ -117,7 +117,7 @@ Skip push with `--no-push` option
 
 ```
 Commit complete
-- {hash} | feat: implement login form layout
+- {hash} | [feat] : 로그인 폼 레이아웃 구현
 - Branch: feat/12-login-page
 - push: ✅
 ```

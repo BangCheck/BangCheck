@@ -1,0 +1,241 @@
+# AI-PROTECTED-FILE v1.0
+# DO NOT MODIFY: Admin-only. Contact @Woo-JongHo for changes.
+#
+# ============================================================
+# SWYP Compliance Specification
+# ============================================================
+#
+# Purpose:
+#   Centralized definition of SWYP compliance rules.
+#   Used by:
+#     - GitHub Actions (.github/workflows/compliance-guard.yml)
+#     - PM audit workflow (_wood/agents/pm/workflows/05-audit.md)
+#     - Human reference (_wood/workflows/_CODING-GUIDE.md)
+#
+# Update policy:
+#   - Admin-only (via PR with CODEOWNERS review)
+#   - Changes affect all PRs from the moment they merge
+#
+# ============================================================
+
+policy:
+  version: "1.0"
+  last_reviewed: "2026-04-16"
+  admin_login: "Woo-JongHo"
+
+# ============================================================
+# Severity Levels
+# ============================================================
+# error:   check fails → merge blocked (UI warning)
+# warning: check passes but comment posted
+# info:    silent pass (logged only)
+# ============================================================
+
+severity_levels:
+  error:
+    label: "compliance-violation"
+    label_color: "B60205"
+    block_merge: true
+  warning:
+    label: "compliance-warning"
+    label_color: "FBCA04"
+    block_merge: false
+  info:
+    block_merge: false
+
+# ============================================================
+# Rules
+# ============================================================
+
+rules:
+
+  # ─────────────────────────────────────────────
+  # Branch naming
+  # ─────────────────────────────────────────────
+
+  branch_naming:
+    severity: error
+    enabled: true
+    pattern: '^(feat|fix|refactor|docs|chore|design)/[0-9]+-[a-z0-9-]+$'
+    description: "Branch name must follow {type}/{issue-number}-{slug} format"
+    examples_good:
+      - feat/5-login-form
+      - fix/12-naver-auth-error
+      - refactor/18-api-retry
+    examples_bad:
+      - fix-login
+      - feature/login
+      - my-branch
+    fix_guide: |
+      git branch -m {correct-name}
+      git push --force-with-lease origin {correct-name}
+      # Delete the old incorrectly named branch
+      git push origin --delete {old-name}
+
+  # ─────────────────────────────────────────────
+  # Issue linkage
+  # ─────────────────────────────────────────────
+
+  issue_linkage:
+    severity: error
+    enabled: true
+    pattern: '(closes|fixes|resolves)\s+#[0-9]+'
+    description: "PR body must include `closes #N` / `fixes #N` / `resolves #N`"
+    fix_guide: |
+      Edit PR → add `closes #{issue-number}` to the body
+
+  # ─────────────────────────────────────────────
+  # Commit message convention
+  # ─────────────────────────────────────────────
+
+  commit_type:
+    severity: warning
+    enabled: true
+    pattern: '^(feat|fix|docs|refactor|chore|design|comment|remove):\s+.+'
+    description: "Each commit message first line must follow `{type}: {summary}` format"
+    types_allowed:
+      - feat
+      - fix
+      - docs
+      - refactor
+      - chore
+      - design
+      - comment
+      - remove
+    fix_guide: |
+      git commit --amend  # Fix the last commit (before push)
+      # If already pushed:
+      git rebase -i {commit_hash}  # Edit the message
+      git push --force-with-lease
+
+  commit_issue_ref:
+    severity: warning
+    enabled: true
+    pattern: '#[0-9]+'
+    description: "Commit body must include an issue number (`#N` format)"
+    location: "body"
+
+  # ─────────────────────────────────────────────
+  # PR body template
+  # ─────────────────────────────────────────────
+
+  pr_template:
+    severity: warning
+    enabled: true
+    required_sections:
+      - "^##\\s+What"
+      - "^##\\s+Why"
+      - "^##\\s+Test"
+    description: "PR body must contain What/Why/Test sections"
+    fix_guide: |
+      Edit PR description → refer to docs template
+      docs: _wood/workflows/05-pr.md
+
+  # ─────────────────────────────────────────────
+  # Linked issue labels
+  # ─────────────────────────────────────────────
+
+  issue_labels:
+    severity: warning
+    enabled: true
+    required_label_prefixes:
+      - "유형:"
+      - "순위:"
+      - "상태:"
+    description: "Linked issues must have all type/priority/status labels assigned"
+    fix_guide: |
+      Add labels on the issue page:
+      gh issue edit {n} --add-label "유형:작업,순위:높음,상태:진행중"
+
+  # ─────────────────────────────────────────────
+  # PR size
+  # ─────────────────────────────────────────────
+
+  pr_size:
+    severity: warning
+    enabled: true
+    thresholds:
+      caution: 400
+      exceed: 800
+    description: "PR changed lines should be ≤400 recommended, warning if >800"
+    exceptions:
+      # Exclude auto-generated files like filename renames
+      - pattern: "package-lock.json"
+      - pattern: "*.generated.*"
+    fix_guide: |
+      Split the PR into smaller units and submit each as a separate PR
+      Reference: _wood/workflows/_CODING-GUIDE.md § PR Convention
+
+  # ─────────────────────────────────────────────
+  # Forbidden paths
+  # ─────────────────────────────────────────────
+
+  forbidden_files:
+    severity: error
+    enabled: true
+    patterns:
+      - "\\.env$"
+      - "\\.env\\.local$"
+      - "\\.env\\.production$"
+      - "\\.pem$"
+      - "\\.key$"
+      - "\\.p12$"
+      - "\\.pfx$"
+      - "credentials\\.json$"
+      - "secrets\\.(json|yaml|yml)$"
+    description: "Sensitive files must not be committed"
+    fix_guide: |
+      git rm --cached {file}
+      echo "{pattern}" >> .gitignore
+      git commit --amend
+
+  # ─────────────────────────────────────────────
+  # Protected files (coordinate with protected-files.yml)
+  # ─────────────────────────────────────────────
+
+  protected_files_mention:
+    severity: info
+    enabled: true
+    description: "When protected files are modified, .github/workflows/protected-files.yml handles it separately"
+    delegate_to: ".github/workflows/protected-files.yml"
+
+# ============================================================
+# Exemptions
+# ============================================================
+
+exemptions:
+  # Admin can be exempt from certain rules (emergency only)
+  admin_override:
+    enabled: false   # Disabled by default (Admin follows the same rules)
+    allowed_roles: [Admin]
+
+  # PRs with specific labels skip checks
+  skip_labels:
+    - "skip-compliance"   # Only when Admin explicitly applies it
+
+# ============================================================
+# Reporting
+# ============================================================
+
+reporting:
+  pr_comment:
+    enabled: true
+    template_file: ".github/templates/compliance-comment.md"
+    update_on_fix: true       # Auto-update comment when fixed
+
+  label_application:
+    enabled: true
+
+  audit_trail:
+    enabled: true
+    retain_days: 90
+
+# ============================================================
+# Human guide
+# ============================================================
+
+references:
+  coding_guide: "_wood/workflows/_CODING-GUIDE.md"
+  pr_workflow: "_wood/workflows/05-pr.md"
+  commit_workflow: "_wood/workflows/04-commit.md"
+  audit_workflow: "_wood/agents/pm/workflows/05-audit.md"

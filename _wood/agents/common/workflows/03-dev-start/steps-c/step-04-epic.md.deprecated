@@ -1,0 +1,122 @@
+---
+step: 4
+title: "Epic/Story 초안 생성 → workspace 저장"
+nextStep: "./step-05-dev.md"
+---
+
+# Step 04 — Epic/Story 생성
+
+READ THIS ENTIRE FILE before executing any action.
+
+---
+
+## 4-1. Epic/Story 자동 초안
+
+코드 현황 + 이슈 완료 기준 기반으로 초안 생성:
+
+```
+## Epic/Story 초안 — #{issue_number} {issue_title}
+
+Epic: {issue_title}
+  목적: {WHY 1 from elicitation or issue body}
+  완료 기준: {issue done_criteria}
+
+  └── Story 1: {구현 단위 1 — "없는 것" 기반}
+       Done when:
+       - [ ] {기준 1}
+       - [ ] {기준 2}
+
+  └── Story 2: {구현 단위 2}
+       Done when:
+       - [ ] {기준 1}
+
+  └── Story 3: {예외처리 / 엣지케이스}
+       Done when:
+       - [ ] {기준 1}
+
+  └── Story 4 (선택): {테스트 / 검증}
+       Done when:
+       - [ ] {기준 1}
+```
+
+---
+
+## 4-2. 미리보기 확인
+
+```
+📋 Epic/Story 미리보기
+
+{위 초안}
+
+[Y] 저장  [E] 수정  [S] 스토리 추가  [N] 스킵 (저장 안 함)
+
+선택:
+```
+
+STOP and WAIT.
+
+---
+
+## 4-3. Workspace 저장 (Y 선택 시)
+
+```bash
+WORKSPACE="_wood/workspace/_{USER_LOGIN}"
+EPIC_FILE="$WORKSPACE/epics/epic-{issue_number}-{slug}.md"
+STORY_DIR="$WORKSPACE/stories"
+
+mkdir -p "$WORKSPACE/epics" "$STORY_DIR"
+
+# Epic 파일 생성
+cat > "$EPIC_FILE" << 'EOF'
+# Epic — #{issue_number} {issue_title}
+
+**이슈:** #{issue_number}
+**마일스톤:** {milestone}
+**작성일:** {today}
+
+## 목적
+{WHY summary}
+
+## 완료 기준
+{done_criteria}
+
+## Stories
+- [ ] story-{issue_number}-s01.md
+- [ ] story-{issue_number}-s02.md
+- [ ] story-{issue_number}-s03.md
+EOF
+
+# Story 파일들 생성
+for i in 1 2 3; do
+  cat > "$STORY_DIR/story-{issue_number}-s0$i.md" << 'EOF'
+# Story {i} — {story_title}
+
+**Epic:** epic-{issue_number}
+**상태:** todo
+
+## 구현 내용
+{description}
+
+## Done When
+- [ ] {criteria}
+
+## 관련 파일
+{related_files}
+EOF
+done
+```
+
+```
+✅ Epic/Story 저장 완료
+
+  📁 {EPIC_FILE}
+  📁 {STORY_DIR}/story-{issue_number}-s01.md
+  📁 {STORY_DIR}/story-{issue_number}-s02.md
+  📁 {STORY_DIR}/story-{issue_number}-s03.md
+```
+
+---
+
+## Completion
+
+저장 완료 또는 스킵 → load `./step-05-dev.md`.

@@ -1,0 +1,50 @@
+---
+step: 4
+title: "Detect Stale PRs"
+nextStep: "./step-05-focus.md"
+---
+
+# Step 04 — Detect Stale PRs
+
+READ THIS ENTIRE FILE before executing any action.
+
+---
+
+## 4-1. Load SLA Threshold
+
+```bash
+SLA=$(yq '.global_defaults.review_sla_hours' _wood/milestone-meta.yaml)
+```
+
+---
+
+## 4-2. Stale PR Filter
+
+```bash
+gh pr list --repo $REPO --state open \
+  --json number,title,author,createdAt,updatedAt,reviews \
+  | jq --argjson sla "$SLA" '
+    .[] | select(
+      (now - (.updatedAt | fromdateiso8601)) / 3600 > $sla
+    )'
+```
+
+---
+
+## 4-3. Render
+
+```
+⏰ Stale PRs ({count} items) — exceeded review SLA of {SLA}h
+
+- [PR #{n} {title}]({url}) — [{author}]({profile}), waiting {hours}h
+  Reviewer: [{reviewer}]({profile}) or "unassigned"
+  [🌐 PR]({url})  [💬 Nudge reviewer →]
+
+(If none: ✅ No stale PRs)
+```
+
+---
+
+## Completion
+
+Save stale PR data → load `./step-05-focus.md`.

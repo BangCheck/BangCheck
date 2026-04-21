@@ -1,0 +1,97 @@
+# AI-PROTECTED-FILE v1.0
+# DO NOT MODIFY: Admin-only. Contact @Woo-JongHo for changes.
+#
+# ============================================================
+# SWYP Milestone Metadata
+# ============================================================
+#
+# Purpose:
+#   Stores additional metadata that does NOT exist in GitHub milestones.
+#   (Milestone core info is queried live from GitHub)
+#
+# What lives in GitHub (not here):
+#   - milestone title, state, due_on, description
+#   - open/closed issue counts
+#   - issue assignees, labels
+#
+# What lives HERE:
+#   - per-milestone kickoff/retrospective document links
+#   - per-milestone risk threshold overrides
+#   - milestone progress calculation weights
+#
+# Key: milestone_number (GitHub milestone's numeric id)
+#
+# Update policy:
+#   - Admin-only (via PR)
+#   - Manual update on milestone create/close
+#   - Agents can only read, never write
+# ============================================================
+
+policy:
+  version: "1.0"
+  last_reviewed: "2026-04-16"
+  admin_login: "Woo-JongHo"
+
+# ============================================================
+# Global Defaults
+# ============================================================
+# Used when no per-milestone override exists
+
+global_defaults:
+  # Risk detection thresholds
+  blocker_alert_days: 1             # Blocked for N days = warning
+  stale_commit_days: 2              # No commit for N+ days = stalled
+  review_sla_hours: 24              # Expected PR review time
+  idle_member_days: 3               # No activity for N days = idle member
+
+  # Health assessment criteria (used by project-view)
+  on_track:
+    progress_vs_schedule_min_pct: 0.8
+    stale_members_max: 1
+  caution:
+    progress_vs_schedule_min_pct: 0.6
+    stale_members_max: 2
+  # If both fail → at_risk
+
+# ============================================================
+# Per-Milestone Metadata
+# ============================================================
+# key = milestone_number (GitHub id)
+# Only additional info for that milestone is recorded here
+# ============================================================
+
+milestones:
+
+  # Example (replace with actual values):
+  #
+  # 1:
+  #   alias: "Page Feature Composition Sprint"
+  #   kickoff_doc: "_wood/agents/pm/sprints/2026-04-10-kickoff.md"
+  #   retrospective: "_wood/agents/pm/retrospectives/2026-04-15-retro.md"
+  #   risk_overrides:
+  #     blocker_alert_days: 2       # More lenient for this milestone only
+  #
+  # 2:
+  #   alias: "Sprint 1 — Login MVP"
+  #   kickoff_doc: null
+  #   retrospective: null
+  #   goal: |
+  #     Login + Landing page MVP
+  #     Naver/Google OAuth integration
+
+# ============================================================
+# Progress Estimation (used by PM Agent 03-progress.md)
+# ============================================================
+
+progress_estimation:
+  weights:
+    checklist_completion: 0.4       # Issue body checklist completion %
+    commit_activity: 0.2            # Recent commit exists
+    test_presence: 0.2              # Test file exists
+    todo_marker_absence: 0.1        # Fewer TODO markers = bonus
+    pr_state: 0.1                   # PR state
+
+  disclaimer: |
+    These figures are for reference only (estimated accuracy ~70%).
+    AI does not judge code quality or bugs;
+    actual completion judgment is the responsibility of PM/reviewers.

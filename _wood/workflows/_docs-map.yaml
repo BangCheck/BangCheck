@@ -1,0 +1,195 @@
+# AI-PROTECTED-FILE v1.0
+# DO NOT MODIFY: Admin-only. Contact @Woo-JongHo for changes.
+#
+# ============================================================
+# SWYP Docs Impact Map
+# ============================================================
+#
+# Purpose:
+#   Maps which docs updates are triggered by code changes.
+#   Referenced by `_wood/workflows/06-docs-update.md`.
+#
+# Rule:
+#   When a diff file path matches a pattern, suggest the corresponding docs update.
+#
+# Scope:
+#   docs/**/*.md are human-facing documents (editable)
+#   _wood/** is AI infrastructure (Admin-only, unrelated to this map)
+#
+# ============================================================
+
+policy:
+  version: "1.0"
+  last_reviewed: "2026-04-16"
+  admin_login: "Woo-JongHo"
+
+# ============================================================
+# Impact Rules
+# ============================================================
+# Each rule:
+#   - pattern: glob pattern (file path)
+#   - docs: list of affected document paths
+#   - reason: update reason (shown to user)
+#   - severity: suggest | strong (strongly recommended)
+# ============================================================
+
+impact_rules:
+
+  # ─── Next.js Routing / Pages ──────────────
+  - pattern: "src/app/**/page.tsx"
+    docs:
+      - docs/architecture.md
+      - docs/getting-started.md
+    reason: "Page added/removed — routing structure changed"
+    severity: suggest
+
+  - pattern: "src/app/**/layout.tsx"
+    docs:
+      - docs/architecture.md
+    reason: "Layout structure changed"
+    severity: suggest
+
+  # ─── API Layer ──────────────────────────
+  - pattern: "src/app/api/**"
+    docs:
+      - docs/architecture.md
+      - docs/spec/                 # spec xlsx update needed
+    reason: "API endpoint changed — update architecture + functional-spec"
+    severity: strong
+
+  - pattern: "src/lib/api/**"
+    docs:
+      - docs/architecture.md
+    reason: "API client changed"
+    severity: suggest
+
+  # ─── Auth / Security ─────────────────────────
+  - pattern: "src/**/auth/**"
+    docs:
+      - docs/architecture.md
+    reason: "Authentication architecture changed"
+    severity: strong
+
+  - pattern: "src/middleware.ts"
+    docs:
+      - docs/architecture.md
+    reason: "Middleware changed — global impact"
+    severity: strong
+
+  # ─── Installation / Dependencies ───────────────────────
+  - pattern: "package.json"
+    docs:
+      - docs/getting-started.md
+    reason: "Dependencies changed — may affect installation steps"
+    severity: suggest
+
+  - pattern: ".env.example"
+    docs:
+      - docs/getting-started.md
+    reason: "Environment variables changed"
+    severity: strong
+
+  # ─── Bug Fixes ───────────────────────────
+  - pattern_branch_prefix: "fix/"
+    docs:
+      - docs/issues.md
+    reason: "Bug fix — candidate for known-issues update"
+    severity: suggest
+
+  # ─── Lib / Utils ─────────────────────────
+  - pattern: "src/lib/**"
+    docs:
+      - docs/architecture.md
+    reason: "Shared util/logic changed — may affect architecture"
+    severity: suggest
+
+  # ─── Types ──────────────────────────────
+  - pattern: "src/types/**"
+    docs:
+      - docs/architecture.md
+    reason: "Type definitions changed"
+    severity: suggest
+
+  # ─── Components (general) ─────────────────────
+  - pattern: "src/components/**"
+    docs: []              # General component changes usually don't affect docs
+    severity: suggest
+    skip_prompt: true     # Skipped by default in 06-docs-update
+
+  # ─── Styles / Design ─────────────────────
+  - pattern: "tailwind.config.*"
+    docs:
+      - docs/architecture.md
+    reason: "Design tokens / theme changed"
+    severity: suggest
+
+  # ─── Tests (no docs impact) ─────────────
+  - pattern: "**/*.test.*"
+    docs: []
+    skip_prompt: true
+
+  - pattern: "**/*.spec.*"
+    docs: []
+    skip_prompt: true
+
+# ============================================================
+# Exclusions (patterns skipped by 06-docs-update)
+# ============================================================
+
+excluded_patterns:
+  - "_wood/**"                 # Admin-only, separate PR
+  - ".claude/**"               # Admin-only
+  - ".github/**"               # Admin-only
+  - "AGENTS.md"
+  - "CLAUDE.md"
+  - ".cursorrules"
+  - "docs/team-conventions.md" # Admin-only
+  - "docs/spec/**"             # PM/Admin-only
+  - "node_modules/**"
+  - "*.lock"
+  - "*.lockb"
+  - "package-lock.json"
+  - "pnpm-lock.yaml"
+
+# ============================================================
+# Per-doc templates (AI generates initial draft when docs are empty)
+# ============================================================
+
+doc_templates:
+
+  "docs/architecture.md":
+    initial_sections:
+      - "# SWYP Architecture"
+      - "## Overview"
+      - "## Tech Stack"
+      - "## Folder Structure"
+      - "## Routing"
+      - "## State Management"
+      - "## API Layer"
+      - "## Authentication"
+      - "## Styling"
+
+  "docs/getting-started.md":
+    initial_sections:
+      - "# Getting Started"
+      - "## Prerequisites"
+      - "## Installation"
+      - "## Environment Variables"
+      - "## Development"
+      - "## Build"
+      - "## Testing"
+
+  "docs/issues.md":
+    initial_sections:
+      - "# Known Issues"
+      - "## Open"
+      - "## Resolved"
+
+# ============================================================
+# Rendering
+# ============================================================
+
+disclaimer: |
+  These update suggestions are based on automated analysis.
+  The user decides whether to apply them.
+  Docs are read by non-AI users (PMs, new team members), so review before finalizing.

@@ -1,0 +1,15 @@
+id,trigger,priority,category,label,handler,context_var,icon
+pr-violation,pr_violation_count > 0,5,pr,Check compliance-violation PR immediately,pr-detail-view.md,violation_prs,🔴
+blocker-comment,blocker_count > 0,10,blocker,Leave a progress check comment for the assignee,../02-activity/workflow.md,blocker_issues,🚫
+blocker-analyze,blocker_count > 0 AND blocker_max_days > 3,15,blocker,Analyze blocking cause and link related issues,../../workflows/02-project.md,blocker_issues,🔍
+pr-stale,pr_stale_count > 0,20,pr,Nudge review on stale PRs,../02-activity/workflow.md,stale_prs,⏰
+assign-recommend,unassigned_count > 0,25,assign,Review issue details and get team member recommendation,assign-recommend.md,unassigned_issues,👤
+pr-no-reviewer,pr_no_reviewer_count > 0,30,pr,Assign reviewers to PRs without reviewers,../../workflows/02-project.md,reviewer_missing_prs,👁️
+pr-incomplete,pr_unchecked_count > 0,35,pr,Check PRs with incomplete checklists,pr-detail-view.md,incomplete_prs,📋
+assign-direct,unassigned_count > 0,40,assign,Assign directly right now,../../workflows/02-project.md,unassigned_issues,✏️
+milestone-stale,milestone_stale_count > 0,8,milestone,Clean up completed milestones (close + create new sprint),milestone-cleanup.md,stale_milestones,📅
+milestone-no-due,milestone_no_due_count > 0,42,milestone,Set milestone due dates,milestone-cleanup.md,no_due_milestones,📅
+gdrive-sync,gdrive_alert != "",45,docs,Check spec changes and sync issues,../05-doc-sync/workflow.md,gdrive_alert,📂
+blocker-defer,blocker_count > 0,80,blocker,Exclude from this sprint and defer to next,../../workflows/02-project.md,blocker_issues,⏭️
+assign-defer,unassigned_count > 0 AND dday > 7,85,assign,Hold outside this sprint,../../workflows/02-project.md,unassigned_issues,⏭️
+all-clear,blocker_count == 0 AND unassigned_count == 0 AND pr_violation_count == 0 AND pr_stale_count == 0,100,none,Team is running well! What would you like to start with?,null,,✅

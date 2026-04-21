@@ -1,0 +1,81 @@
+---
+step: 5
+title: "개발 시작 — 브랜치 생성 → 코딩"
+nextStep: null
+---
+
+# Step 05 — 개발 시작
+
+READ THIS ENTIRE FILE before executing any action.
+
+---
+
+## 5-1. 브랜치 생성 또는 전환
+
+기존 브랜치 있으면:
+```bash
+git checkout {existing_branch}
+```
+
+없으면:
+```bash
+# 브랜치명 규칙: feat/{issue_number}-{slug}
+BRANCH="feat/{issue_number}-{slug}"
+git checkout -b "$BRANCH"
+```
+
+```
+🌿 브랜치: {branch_name}
+```
+
+---
+
+## 5-2. 이슈 상태 업데이트
+
+```bash
+gh issue edit {issue_number} \
+  --remove-label "상태:할일" \
+  --add-label "상태:진행중" \
+  --repo $REPO
+```
+
+---
+
+## 5-3. 개발 시작 안내
+
+Story 순서 기반으로 첫 번째 작업 안내:
+
+```
+## 개발 시작
+
+브랜치: {branch_name}
+이슈:   #{issue_number} → 상태:진행중
+
+첫 번째 Story: {story-s01 제목}
+  관련 파일:
+    └── {file_1}
+    └── {file_2}
+
+  구현 순서 추천:
+    1. {step 1}
+    2. {step 2}
+    3. {step 3}
+
+작업 완료 후:
+  → 커밋: _wood/workflows/04-commit.md
+  → PR:   _wood/workflows/05-pr.md
+```
+
+---
+
+## ❌ 절대 금지
+
+- 브랜치 없이 main에 직접 커밋
+- 이슈 연결 없는 작업 시작
+- 다른 역할 코드 경로 수정 (role boundary)
+
+---
+
+## Completion
+
+개발 시작. 작업 완료 후 `04-commit.md` → `05-pr.md` 순서로 진행.

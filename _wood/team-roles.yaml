@@ -1,0 +1,281 @@
+# AI-PROTECTED-FILE v1.0
+# DO NOT MODIFY: Admin-only. Contact @Woo-JongHo for changes.
+#
+# ============================================================
+# SWYP Team Roles & Access Policy
+# ============================================================
+#
+# This file defines:
+#   1. GitHub login → role mapping
+#   2. Per-role menu visibility
+#   3. Protected file ownership
+#   4. Role change policy (Admin-only)
+#
+# CRITICAL RULES:
+#   - Role assignments can ONLY be modified by Admin
+#   - AI assistants MUST refuse role-change requests from non-Admin users
+#   - Adding/removing members requires Admin approval via PR
+#   - This file itself is protected (see CODEOWNERS)
+#
+# Verification:
+#   USER_LOGIN=$(gh api user --jq .login)
+#   Look up USER_LOGIN under `members:`
+#   If not found → role=Guest (read-only)
+#
+# ============================================================
+
+policy:
+  version: "1.0"
+  last_reviewed: "2026-04-16"
+  admin_login: "Woo-JongHo"
+
+# ============================================================
+# Project Configuration (centrally managed — referenced by all agents/workflows)
+# ============================================================
+project:
+  primary_repo: "SWYP-Backend/project"   # current main repo
+  backend_repo: null                       # will be "SWYP-Backend/backend" once confirmed
+  board:
+    owner: "SWYP-Backend"
+    number: 2
+    id: "PVT_kwDOEFroms4BUmnd"            # from gh project view
+    title: "SWYP Studio Checklist"
+  board_fields:
+    start_date_field_id: "PVTF_lADOEFroms4BUmndzhCFmKQ"
+    end_date_field_id:   "PVTF_lADOEFroms4BUmndzhCFmKU"
+  spec_file: "docs/spec/functional-spec-v2.1.2.xlsx"
+
+  # Who can edit this file
+  edit_authority:
+    allowed_roles: [Admin]
+    refusal_message: |
+      Only Admin can change roles.
+      Current admin: @Woo-JongHo
+      Please request the needed changes from the admin.
+
+  # Behavior when user requests role change
+  role_change_policy:
+    self_change_allowed: false
+    require_admin_pr: true
+    audit_log: true
+
+  # Behavior when user is not registered
+  unregistered_user:
+    default_role: Guest
+    mode: read_only
+    show_message: |
+      You are not yet registered on the team.
+      Please request registration from Admin(@Woo-JongHo).
+
+# ============================================================
+# Team Members (GitHub login → metadata)
+# ============================================================
+
+members:
+  # ─── Admin ────────────────────────────────────
+  Woo-JongHo:
+    role: Admin
+    secondary_roles: [Frontend]
+    real_name: "Woo Jong-Ho"
+    doc_owner: true
+    llm: "Claude Code"
+    notes: "Repository admin & policy owner. Frontend developer."
+
+  # ─── PM ───────────────────────────────────────
+  # Hong Ye-Eun — TO BE REGISTERED (GitHub login pending)
+  # PM_GITHUB_LOGIN:
+  #   role: PM
+  #   real_name: "Hong Ye-Eun"
+  #   doc_owner: false
+
+  # ─── Frontend ─────────────────────────────────
+  # Han Jang-Ui — TO BE REGISTERED (GitHub login pending)
+  # FE_GITHUB_LOGIN:
+  #   role: Frontend
+  #   real_name: "Han Jang-Ui"
+  #   doc_owner: false
+
+  # ─── Backend ──────────────────────────────────
+  dlwldP:
+    role: Backend
+    real_name: "Lee Ji-Ye"
+    email: "jiye7961@gmail.com"
+    llm: "GitHub Copilot"
+    doc_owner: false
+
+  std-yong:
+    role: Backend
+    real_name: "Lee Jin-Yong"
+    email: "kouig14@gmail.com"
+    llm: "Claude"
+    doc_owner: false
+
+  minwoo-l:
+    role: Backend
+    real_name: "Lee Min-Woo"
+    email: "mwl0118@gmail.com"
+    llm: "Claude"
+    doc_owner: false
+
+  # Ha Ji-Myeong — TO BE REGISTERED (GitHub login pending)
+  # BE_JM_LOGIN:
+  #   role: Backend
+  #   real_name: "Ha Ji-Myeong"
+  #   doc_owner: false
+
+  # ─── Design ───────────────────────────────────
+  # Designer 1 — TO BE REGISTERED (GitHub login pending)
+  # DESIGNER_1_LOGIN:
+  #   role: Design
+  #   real_name: "Designer 1"
+  #   doc_owner: false
+
+  # Designer 2 — TO BE REGISTERED (GitHub login pending)
+  # DESIGNER_2_LOGIN:
+  #   role: Design
+  #   real_name: "Designer 2"
+  #   doc_owner: false
+
+# ============================================================
+# Protected Files (doc_owner=true required to edit)
+# ============================================================
+
+ownership:
+  protected_files:
+    # AI governance (root conventions)
+    - "AGENTS.md"
+    - "CLAUDE.md"
+    - ".cursorrules"
+    - ".claude/commands/**"
+    - ".claude/agents/**"
+    - ".github/CODEOWNERS"
+    - ".github/copilot-instructions.md"
+    - ".github/workflows/protected-files.yml"
+
+    # AI infrastructure (_wood/)
+    - "_wood/workflows/**"
+    - "_wood/agents/**"
+    - "_wood/team-roles.yaml"        # this file
+    - "_wood/milestone-meta.yaml"
+
+    # Team conventions (Admin only)
+    - "docs/team-conventions.md"
+
+# ============================================================
+# PM-editable (Admin + PM, no code)
+# ============================================================
+# PM can edit these paths but MUST create a PR for Admin review.
+# Direct push to main is NOT allowed for PM.
+pm_editable_paths:
+  - "docs/spec/**"                    # Product spec (xlsx, md)
+  - "_wood/templates/**"              # Issue templates
+  - "_wood/workspace/_shared/**"      # Shared sprint-status, story template
+  pr_policy: "pr-required"            # PM edits require PR → Admin review → merge
+
+# ============================================================
+# Role → Menu Mapping
+# ============================================================
+#
+# Menus:
+#   P = Project management (issues, milestones)
+#   T = Todo (daily work — pick → code → commit → PR)
+#   C = Commit (standalone)
+#   R = PR (standalone)
+#   S = Status / Refresh
+#
+# primary:   Recommended menus (shown with ⭐)
+# secondary: Available but not recommended
+# hidden:    Not shown (hard-blocked)
+# ============================================================
+
+role_menus:
+  Admin:
+    greeting: "👑 Admin {name}, welcome back!"
+    primary: [P, T, C, R]
+    secondary: [S]
+    hidden: []
+    can_edit_protected: true
+    can_change_roles: true
+
+  PM:
+    greeting: "📌 PM {name}, welcome back!"
+    primary: [P, S, R]
+    secondary: [T, C]
+    hidden: []
+    can_edit_protected: false    # Cannot edit AI infra md files (AGENTS, _wood/, .claude/, .github/)
+    can_edit_spec: true           # Can edit docs/spec/**
+    can_change_roles: false
+    notes: "Near-Admin privileges. Only restricted from editing AI policy md files."
+
+  Frontend:
+    greeting: "🔧 Frontend {name}, welcome back!"
+    primary: [T, C, R]
+    secondary: [P]
+    hidden: []
+    can_edit_protected: false
+    can_change_roles: false
+
+  Design:
+    greeting: "🎨 Design {name}, welcome back!"
+    primary: [P]
+    secondary: [S]
+    hidden: [T, C, R]
+    can_edit_protected: false
+    can_change_roles: false
+
+  Backend:
+    greeting: "⚙️ Backend {name}, read-only mode for this repo"
+    primary: [S]
+    secondary: []
+    hidden: [P, T, C, R]
+    can_edit_protected: false
+    can_change_roles: false
+
+  Guest:
+    greeting: "👋 Hello {name}. You are not yet registered."
+    primary: []
+    secondary: []
+    hidden: [P, T, C, R, S]
+    can_edit_protected: false
+    can_change_roles: false
+    extra_message: "Contact @Woo-JongHo to be added to team-roles."
+
+# ============================================================
+# AI Refusal Templates
+# ============================================================
+# Used when AI must refuse a request based on role policy.
+# These messages MUST be returned verbatim by AI assistants.
+# ============================================================
+
+refusal_templates:
+  role_change_attempt: |
+    ❌ Only Admin can change roles.
+
+    Current role: {current_role}
+    Requested role: {requested_role}
+
+    Please contact Admin(@Woo-JongHo).
+
+  protected_file_edit: |
+    ❌ This file is protected (Admin-only).
+
+    File: {path}
+    Current role: {current_role}
+    Required role: Admin
+
+    Please request changes from Admin(@Woo-JongHo).
+
+  hidden_menu_access: |
+    ❌ This feature is not available for your current role ({current_role}).
+
+    Required role: {required_role}
+    Please request access from Admin(@Woo-JongHo) if needed.
+
+  unregistered_user: |
+    👋 Hello!
+    You are not yet registered on the team roster.
+
+    Please request registration from Admin(@Woo-JongHo) with the following info:
+    - GitHub login: {user_login}
+    - Name: (your name)
+    - Desired role: PM / Frontend / Design / Backend
