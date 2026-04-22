@@ -1,8 +1,9 @@
 ---
-step: 8
-title: "Share with assignee and menu"
-nextStep: null
+name: step-08-share
+description: "Share with assignee and menu"
+nextStepFile: "null"
 ---
+
 
 # Step 08 — Share and Menu
 

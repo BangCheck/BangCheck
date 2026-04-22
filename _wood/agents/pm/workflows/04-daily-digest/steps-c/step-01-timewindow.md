@@ -1,8 +1,9 @@
 ---
-step: 1
-title: "Set Query Time Window"
-nextStep: "./step-02-fetch.md"
+name: step-01-timewindow
+description: "Set Query Time Window"
+nextStepFile: "./step-02-fetch.md"
 ---
+
 
 # Step 01 — Set Query Time Window
 

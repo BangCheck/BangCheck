@@ -1,8 +1,9 @@
 ---
-step: 4
-title: "Update Google Docs Completion Status"
-nextStep: "./step-05-menu.md"
+name: step-04-update-docs
+description: "Update Google Docs Completion Status"
+nextStepFile: "./step-05-menu.md"
 ---
+
 
 # Step 04 — Update Google Docs Completion Status
 

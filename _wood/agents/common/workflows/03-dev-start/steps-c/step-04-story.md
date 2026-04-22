@@ -1,8 +1,9 @@
 ---
-step: 4
-title: "Story creation → save to workspace/stories"
-nextStep: "./step-05-branch.md"
+name: step-04-story
+description: "Story creation → save to workspace/stories"
+nextStepFile: "./step-05-branch.md"
 ---
+
 
 # Step 04 — Story Creation
 

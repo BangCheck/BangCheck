@@ -1,8 +1,9 @@
 ---
-step: 1
-title: "Regression Scope Selection"
-nextStep: "./step-02-run.md"
+name: step-01-scope
+description: "Regression Scope Selection"
+nextStepFile: "./step-02-run.md"
 ---
+
 
 # Step 01 — Scope Selection
 

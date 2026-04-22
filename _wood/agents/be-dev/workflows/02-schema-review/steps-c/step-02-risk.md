@@ -1,8 +1,9 @@
 ---
-step: 2
-title: "Check 5 risk areas"
-nextStep: "./step-03-rollback.md"
+name: step-02-risk
+description: "Check 5 risk areas"
+nextStepFile: "./step-03-rollback.md"
 ---
+
 
 # Step 02 — Risk Checklist
 

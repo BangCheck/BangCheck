@@ -1,8 +1,9 @@
 ---
-step: 3
-title: "Record Result (issue body + bug registration)"
-nextStep: "./step-02-execute.md"
+name: step-03-record
+description: "Record Result (issue body + bug registration)"
+nextStepFile: "./step-02-execute.md"
 ---
+
 
 # Step 03 — Record Result
 

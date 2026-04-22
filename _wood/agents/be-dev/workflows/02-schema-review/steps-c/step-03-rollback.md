@@ -1,8 +1,9 @@
 ---
-step: 3
-title: "Confirm rollback plan"
-nextStep: "./step-04-report.md"
+name: step-03-rollback
+description: "Confirm rollback plan"
+nextStepFile: "./step-04-report.md"
 ---
+
 
 # Step 03 — Rollback Plan
 

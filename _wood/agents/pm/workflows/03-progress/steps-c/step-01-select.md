@@ -1,8 +1,9 @@
 ---
-step: 1
-title: "Select target issue for analysis"
-nextStep: "./step-02-parse.md"
+name: step-01-select
+description: "Select target issue for analysis"
+nextStepFile: "./step-02-parse.md"
 ---
+
 
 # Step 01 — Select Analysis Target
 

@@ -1,8 +1,9 @@
 ---
-step: 4
-title: "Detect Stale PRs"
-nextStep: "./step-05-focus.md"
+name: step-04-stale-pr
+description: "Detect Stale PRs"
+nextStepFile: "./step-05-focus.md"
 ---
+
 
 # Step 04 — Detect Stale PRs
 

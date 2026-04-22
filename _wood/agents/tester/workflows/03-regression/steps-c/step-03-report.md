@@ -1,8 +1,9 @@
 ---
-step: 3
-title: "Regression Report + Recommendation"
-nextStep: null
+name: step-03-report
+description: "Regression Report + Recommendation"
+nextStepFile: "null"
 ---
+
 
 # Step 03 — Regression Report
 

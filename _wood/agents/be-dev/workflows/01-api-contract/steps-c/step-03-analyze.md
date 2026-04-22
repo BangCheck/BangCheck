@@ -1,8 +1,9 @@
 ---
-step: 3
-title: "Diff analysis + impact table"
-nextStep: "./step-04-communicate.md"
+name: step-03-analyze
+description: "Diff analysis + impact table"
+nextStepFile: "./step-04-communicate.md"
 ---
+
 
 # Step 03 — Analyze Diff
 

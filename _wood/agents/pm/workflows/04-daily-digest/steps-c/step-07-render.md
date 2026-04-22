@@ -1,8 +1,9 @@
 ---
-step: 7
-title: "Render Full Digest"
-nextStep: "./step-08-actions.md"
+name: step-07-render
+description: "Render Full Digest"
+nextStepFile: "./step-08-actions.md"
 ---
+
 
 # Step 07 — Render Digest
 

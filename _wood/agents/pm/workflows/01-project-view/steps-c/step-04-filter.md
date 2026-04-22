@@ -1,8 +1,9 @@
 ---
-step: 4
-title: "Filter / Zoom"
-nextStep: "./step-05-actions.md"
+name: step-04-filter
+description: "Filter / Zoom"
+nextStepFile: "./step-05-actions.md"
 ---
+
 
 # Step 04 — Filter / Zoom
 

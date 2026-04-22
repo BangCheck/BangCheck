@@ -1,8 +1,9 @@
 ---
-step: 1
-title: "Detect API-related file changes"
-nextStep: "./step-02-classify.md"
+name: step-01-detect
+description: "Detect API-related file changes"
+nextStepFile: "./step-02-classify.md"
 ---
+
 
 # Step 01 — Detect API Changes
 

@@ -1,8 +1,9 @@
 ---
-step: 3
-title: "Comment writing flow"
-nextStep: "./step-05-menu.md"
+name: step-03-comment
+description: "Comment writing flow"
+nextStepFile: "./step-05-menu.md"
 ---
+
 
 # Step 03 — Comment Writing Flow
 

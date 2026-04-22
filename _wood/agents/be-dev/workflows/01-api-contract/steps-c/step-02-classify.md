@@ -1,8 +1,9 @@
 ---
-step: 2
-title: "Classify changes"
-nextStep: "./step-03-analyze.md"
+name: step-02-classify
+description: "Classify changes"
+nextStepFile: "./step-03-analyze.md"
 ---
+
 
 # Step 02 — Classify Changes
 

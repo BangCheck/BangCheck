@@ -1,8 +1,9 @@
 ---
-step: 3
-title: "Branch search"
-nextStep: "./step-04-analyze.md"
+name: step-03-branch
+description: "Branch search"
+nextStepFile: "./step-04-analyze.md"
 ---
+
 
 # Step 03 — Branch Search
 

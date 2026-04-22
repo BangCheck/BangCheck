@@ -1,8 +1,9 @@
 ---
-step: 3
-title: "Detect Escalations"
-nextStep: "./step-04-stale-pr.md"
+name: step-03-escalations
+description: "Detect Escalations"
+nextStepFile: "./step-04-stale-pr.md"
 ---
+
 
 # Step 03 — Detect Escalations
 

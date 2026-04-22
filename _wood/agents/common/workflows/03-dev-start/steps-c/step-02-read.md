@@ -1,8 +1,9 @@
 ---
-step: 2
-title: "Code reading (FE/BE branch)"
-nextStep: "./step-03-fact.md"
+name: step-02-read
+description: "Code reading (FE/BE branch)"
+nextStepFile: "./step-03-fact.md"
 ---
+
 
 # Step 02 — Code Reading
 

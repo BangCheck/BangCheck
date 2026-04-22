@@ -1,8 +1,9 @@
 ---
-step: 7
-title: "Progress report render"
-nextStep: "./step-08-share.md"
+name: step-07-render
+description: "Progress report render"
+nextStepFile: "./step-08-share.md"
 ---
+
 
 # Step 07 — Report Render
 

@@ -1,8 +1,9 @@
 ---
-step: 7
-title: "Completion sync — issue checklist + Story status + FE↔BE comments"
-nextStep: null
+name: step-07-sync
+description: "Completion sync — issue checklist + Story status + FE↔BE comments"
+nextStepFile: "null"
 ---
+
 
 # Step 07 — Completion Sync
 

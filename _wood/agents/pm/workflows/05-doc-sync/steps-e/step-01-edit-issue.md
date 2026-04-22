@@ -1,8 +1,8 @@
 ---
-step: 1
-title: "Edit Issue"
-mode: edit
+name: step-01-edit-issue
+description: "Edit Issue"
 ---
+
 
 # Edit Step 01 — Edit Existing Issue
 

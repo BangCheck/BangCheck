@@ -1,8 +1,9 @@
 ---
-step: 5
-title: "Final report + next recommendation"
-nextStep: null
+name: step-05-report
+description: "Final report + next recommendation"
+nextStepFile: "null"
 ---
+
 
 # Step 05 — Report
 

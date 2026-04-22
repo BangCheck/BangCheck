@@ -1,8 +1,9 @@
 ---
-step: 2
-title: "Accessibility Check"
-nextStep: "./step-03-state.md"
+name: step-02-a11y
+description: "Accessibility Check"
+nextStepFile: "./step-03-state.md"
 ---
+
 
 # Step 02 — Accessibility Check
 

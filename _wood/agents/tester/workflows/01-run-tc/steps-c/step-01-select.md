@@ -1,8 +1,9 @@
 ---
-step: 1
-title: "Page Selection + TC Parsing"
-nextStep: "./step-02-execute.md"
+name: step-01-select
+description: "Page Selection + TC Parsing"
+nextStepFile: "./step-02-execute.md"
 ---
+
 
 # Step 01 — Select Page + Parse TC
 

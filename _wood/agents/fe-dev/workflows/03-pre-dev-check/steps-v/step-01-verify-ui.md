@@ -1,8 +1,8 @@
 ---
-step: 1
-title: "UI Consistency Verification"
-mode: validate
+name: step-01-verify-ui
+description: "UI Consistency Verification"
 ---
+
 
 # Validate — UI Consistency Verification
 

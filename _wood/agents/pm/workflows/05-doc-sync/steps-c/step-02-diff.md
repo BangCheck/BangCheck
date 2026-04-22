@@ -1,8 +1,9 @@
 ---
-step: 2
-title: "Compare spec with GitHub Issues + Render Sync Status Table"
-nextStep: "./step-03-create-issues.md"
+name: step-02-diff
+description: "Compare spec with GitHub Issues + Render Sync Status Table"
+nextStepFile: "./step-03-create-issues.md"
 ---
+
 
 # Step 02 — Spec ↔ GitHub Sync Status
 

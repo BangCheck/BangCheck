@@ -1,8 +1,9 @@
 ---
-step: 8
-title: "Quick Action Menu"
-nextStep: null
+name: step-08-actions
+description: "Quick Action Menu"
+nextStepFile: "null"
 ---
+
 
 # Step 08 — Quick Actions
 

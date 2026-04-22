@@ -1,8 +1,9 @@
 ---
-step: 5
-title: "Checklist vs code cross-check"
-nextStep: "./step-06-score.md"
+name: step-05-crosscheck
+description: "Checklist vs code cross-check"
+nextStepFile: "./step-06-score.md"
 ---
+
 
 # Step 05 — Cross-Check
 

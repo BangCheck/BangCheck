@@ -1,8 +1,9 @@
 ---
-step: 5
-title: "Branch creation + issue status update"
-nextStep: "./step-06-dev.md"
+name: step-05-branch
+description: "Branch creation + issue status update"
+nextStepFile: "./step-06-dev.md"
 ---
+
 
 # Step 05 — Branch Creation
 

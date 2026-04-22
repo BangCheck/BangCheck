@@ -1,8 +1,8 @@
 ---
-step: 1
-title: "Specification → Issue Chain Validation"
-mode: validate
+name: step-01-validate-chain
+description: "Specification → Issue Chain Validation"
 ---
+
 
 # Validate Step 01 — Specification ↔ Issue Chain Validation
 

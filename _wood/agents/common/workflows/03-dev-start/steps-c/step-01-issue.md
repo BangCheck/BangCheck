@@ -1,8 +1,9 @@
 ---
-step: 1
-title: "Issue load + API contract parsing + checklist status"
-nextStep: "./step-02-read.md"
+name: step-01-issue
+description: "Issue load + API contract parsing + checklist status"
+nextStepFile: "./step-02-read.md"
 ---
+
 
 # Step 01 — Issue + Related File Collection
 

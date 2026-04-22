@@ -1,8 +1,8 @@
 ---
-step: 1
-title: "Compare issue API contract vs actual code"
-mode: validate
+name: step-01-verify
+description: "Compare issue API contract vs actual code"
 ---
+
 
 # Validate — API Contract Verification
 

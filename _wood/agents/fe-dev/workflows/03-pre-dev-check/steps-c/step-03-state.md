@@ -1,8 +1,9 @@
 ---
-step: 3
-title: "State Management Pattern Check"
-nextStep: null
+name: step-03-state
+description: "State Management Pattern Check"
+nextStepFile: "null"
 ---
+
 
 # Step 03 — State Management Check
 

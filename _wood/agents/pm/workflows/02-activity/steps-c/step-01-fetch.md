@@ -1,8 +1,9 @@
 ---
-step: 1
-title: "Collect and render 24h activity data"
-nextStep: "./step-05-menu.md"
+name: step-01-fetch
+description: "Collect and render 24h activity data"
+nextStepFile: "./step-05-menu.md"
 ---
+
 
 # Step 01 — Collect 24h Activity Data
 

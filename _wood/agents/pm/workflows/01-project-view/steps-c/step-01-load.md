@@ -1,8 +1,9 @@
 ---
-step: 1
-title: "Collect GitHub Data"
-nextStep: "./step-02-build.md"
+name: step-01-load
+description: "Collect GitHub Data"
+nextStepFile: "./step-02-build.md"
 ---
+
 
 # Step 01 — Collect GitHub Data
 

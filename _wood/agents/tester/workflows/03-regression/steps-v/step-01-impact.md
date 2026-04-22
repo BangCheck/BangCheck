@@ -1,8 +1,8 @@
 ---
-step: 1
-title: "PR change-based impact scope analysis"
-mode: validate
+name: step-01-impact
+description: "PR change-based impact scope analysis"
 ---
+
 
 # Validate — Impact Analysis
 

@@ -1,8 +1,9 @@
 ---
-step: 1
-title: "Read feature specification from Google Sheets (시트22)"
-nextStep: "./step-02-diff.md"
+name: step-01-read-drive
+description: "Read feature specification from Google Sheets (시트22)"
+nextStepFile: "./step-02-diff.md"
 ---
+
 
 # Step 01 — Read Feature Specification
 

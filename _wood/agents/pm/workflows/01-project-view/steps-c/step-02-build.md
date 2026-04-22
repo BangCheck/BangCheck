@@ -1,8 +1,9 @@
 ---
-step: 2
-title: "Build Tree Structure"
-nextStep: "./step-03-render.md"
+name: step-02-build
+description: "Build Tree Structure"
+nextStepFile: "./step-03-render.md"
 ---
+
 
 # Step 02 — Build Tree Structure
 

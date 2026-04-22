@@ -1,8 +1,9 @@
 ---
-step: 2
-title: "Parse issue checklist"
-nextStep: "./step-03-branch.md"
+name: step-02-parse
+description: "Parse issue checklist"
+nextStepFile: "./step-03-branch.md"
 ---
+
 
 # Step 02 — Issue Parsing
 

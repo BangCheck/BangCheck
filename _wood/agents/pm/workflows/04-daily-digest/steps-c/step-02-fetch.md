@@ -1,8 +1,9 @@
 ---
-step: 2
-title: "Collect Raw Data"
-nextStep: "./step-03-escalations.md"
+name: step-02-fetch
+description: "Collect Raw Data"
+nextStepFile: "./step-03-escalations.md"
 ---
+
 
 # Step 02 — Collect Raw Data
 

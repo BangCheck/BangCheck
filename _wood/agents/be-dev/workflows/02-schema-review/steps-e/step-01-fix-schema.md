@@ -1,8 +1,8 @@
 ---
-step: 1
-title: "Apply fixes for detected issues"
-mode: edit
+name: step-01-fix-schema
+description: "Apply fixes for detected issues"
 ---
+
 
 # Edit — Fix Schema Issues
 

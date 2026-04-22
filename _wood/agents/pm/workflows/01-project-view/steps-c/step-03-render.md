@@ -1,8 +1,9 @@
 ---
-step: 3
-title: "Render Tree + Summary"
-nextStep: "./step-04-filter.md"
+name: step-03-render
+description: "Render Tree + Summary"
+nextStepFile: "./step-04-filter.md"
 ---
+
 
 # Step 03 — Render Tree + Summary
 

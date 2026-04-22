@@ -1,8 +1,9 @@
 ---
-step: 2
-title: "Per-issue activity view"
-nextStep: "./step-05-menu.md"
+name: step-02-issue-view
+description: "Per-issue activity view"
+nextStepFile: "./step-05-menu.md"
 ---
+
 
 # Step 02 — Per-Issue Activity View
 

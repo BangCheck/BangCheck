@@ -1,8 +1,9 @@
 ---
-step: 6
-title: "Weighted score calculation"
-nextStep: "./step-07-render.md"
+name: step-06-score
+description: "Weighted score calculation"
+nextStepFile: "./step-07-render.md"
 ---
+
 
 # Step 06 — Score Calculation
 

@@ -1,8 +1,9 @@
 ---
-step: 2
-title: "Re-execute TCs for selected scope"
-nextStep: "./step-03-report.md"
+name: step-02-run
+description: "Re-execute TCs for selected scope"
+nextStepFile: "./step-03-report.md"
 ---
+
 
 # Step 02 — Run Regression TCs
 

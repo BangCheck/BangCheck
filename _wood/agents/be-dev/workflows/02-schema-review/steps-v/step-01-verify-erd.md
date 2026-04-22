@@ -1,8 +1,8 @@
 ---
-step: 1
-title: "Compare ERD document vs actual entities"
-mode: validate
+name: step-01-verify-erd
+description: "Compare ERD document vs actual entities"
 ---
+
 
 # Validate — ERD Verification
 

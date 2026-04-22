@@ -1,8 +1,9 @@
 ---
-step: 5
-title: "Action Menu"
-nextStep: null
+name: step-05-menu
+description: "Action Menu"
+nextStepFile: "null"
 ---
+
 
 # Step 05 — Action Menu
 

@@ -1,8 +1,8 @@
 ---
-step: 1
-title: "TC Coverage Validation"
-mode: validate
+name: step-01-coverage
+description: "TC Coverage Validation"
 ---
+
 
 # Validate — TC Coverage
 

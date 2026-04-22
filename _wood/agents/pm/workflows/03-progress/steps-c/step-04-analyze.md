@@ -1,8 +1,9 @@
 ---
-step: 4
-title: "Branch code analysis"
-nextStep: "./step-05-crosscheck.md"
+name: step-04-analyze
+description: "Branch code analysis"
+nextStepFile: "./step-05-crosscheck.md"
 ---
+
 
 # Step 04 — Branch Analysis
 

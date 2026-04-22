@@ -1,8 +1,8 @@
 ---
-step: 1
-title: "TC Result Edit (Retest)"
-mode: edit
+name: step-01-retest
+description: "TC Result Edit (Retest)"
 ---
+
 
 # Edit — TC Retest
 

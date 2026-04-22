@@ -1,8 +1,9 @@
 ---
-step: 6
-title: "Change Summary Aggregation"
-nextStep: "./step-07-render.md"
+name: step-06-summary
+description: "Change Summary Aggregation"
+nextStepFile: "./step-07-render.md"
 ---
+
 
 # Step 06 — Change Summary
 

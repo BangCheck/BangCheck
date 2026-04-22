@@ -1,8 +1,9 @@
 ---
-step: 3
-title: "Issue Creation Wizard"
-nextStep: "./step-04-update-docs.md"
+name: step-03-create-issues
+description: "Issue Creation Wizard"
+nextStepFile: "./step-04-update-docs.md"
 ---
+
 
 # Step 03 — Issue Creation Wizard
 

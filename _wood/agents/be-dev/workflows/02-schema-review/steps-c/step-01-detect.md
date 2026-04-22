@@ -1,8 +1,9 @@
 ---
-step: 1
-title: "Detect schema change files"
-nextStep: "./step-02-risk.md"
+name: step-01-detect
+description: "Detect schema change files"
+nextStepFile: "./step-02-risk.md"
 ---
+
 
 # Step 01 — Detect Schema Changes
 

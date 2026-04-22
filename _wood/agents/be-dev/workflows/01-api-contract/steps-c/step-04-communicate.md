@@ -1,8 +1,9 @@
 ---
-step: 4
-title: "FE comment + spec update"
-nextStep: "./step-05-report.md"
+name: step-04-communicate
+description: "FE comment + spec update"
+nextStepFile: "./step-05-report.md"
 ---
+
 
 # Step 04 — FE Communication + Spec Update
 

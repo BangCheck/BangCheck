@@ -1,8 +1,9 @@
 ---
-step: 2
-title: "TC Execution Loop"
-nextStep: "./step-03-record.md"
+name: step-02-execute
+description: "TC Execution Loop"
+nextStepFile: "./step-03-record.md"
 ---
+
 
 # Step 02 — TC Execution Loop
 

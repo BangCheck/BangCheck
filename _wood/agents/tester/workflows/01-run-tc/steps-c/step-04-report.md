@@ -1,8 +1,9 @@
 ---
-step: 4
-title: "Session Report + Next Recommendation"
-nextStep: null
+name: step-04-report
+description: "Session Report + Next Recommendation"
+nextStepFile: "null"
 ---
+
 
 # Step 04 — Session Report
 

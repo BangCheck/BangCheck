@@ -1,8 +1,9 @@
 ---
-step: 4
-title: "Pending reply tracking"
-nextStep: "./step-05-menu.md"
+name: step-04-followup
+description: "Pending reply tracking"
+nextStepFile: "./step-05-menu.md"
 ---
+
 
 # Step 04 — Pending Reply Tracking
 

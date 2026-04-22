@@ -1,8 +1,9 @@
 ---
-step: 5
-title: "Today's Focus"
-nextStep: "./step-06-summary.md"
+name: step-05-focus
+description: "Today's Focus"
+nextStepFile: "./step-06-summary.md"
 ---
+
 
 # Step 05 — Today's Focus
 

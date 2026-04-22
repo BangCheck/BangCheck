@@ -1,8 +1,8 @@
 ---
-step: 1
-title: "Update issue API contract + notify FE"
-mode: edit
+name: step-01-update-contract
+description: "Update issue API contract + notify FE"
 ---
+
 
 # Edit — Update API Contract
 

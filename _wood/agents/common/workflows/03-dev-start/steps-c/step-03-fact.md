@@ -1,8 +1,9 @@
 ---
-step: 3
-title: "Fact check table output"
-nextStep: "./step-04-story.md"
+name: step-03-fact
+description: "Fact check table output"
+nextStepFile: "./step-04-story.md"
 ---
+
 
 # Step 03 — Fact Check
 

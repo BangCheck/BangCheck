@@ -1,8 +1,9 @@
 ---
-step: 6
-title: "Development guide + code analysis + specific recommendations"
-nextStep: "./step-07-sync.md"
+name: step-06-dev
+description: "Development guide + code analysis + specific recommendations"
+nextStepFile: "./step-07-sync.md"
 ---
+
 
 # Step 06 — Start Development
 

@@ -1,8 +1,9 @@
 ---
-step: 1
-title: "Responsive Check (360px~)"
-nextStep: "./step-02-a11y.md"
+name: step-01-responsive
+description: "Responsive Check (360px~)"
+nextStepFile: "./step-02-a11y.md"
 ---
+
 
 # Step 01 — Responsive Check
 
