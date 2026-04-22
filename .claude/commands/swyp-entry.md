@@ -66,6 +66,48 @@ gh pr list --repo {repo} --author @me --state open --json number,title,reviewDec
 
 After assessing the situation, guide through template-based questions instead of a simple yes/no.
 
+#### Step 0 — Project Init Check (FIRST, before all other steps)
+
+Before assessing individual work status, check whether the project itself has started:
+
+```bash
+gh api repos/{repo}/milestones --jq 'length'
+gh issue list --repo {repo} --state open --json number --limit 1 | jq length
+```
+
+| Condition | Flow |
+|-----------|------|
+| milestone = 0 AND open issues = 0 | → Step E (project init flow) |
+| milestone = 0 AND open issues > 0 | → Step E (sprint scope flow) |
+| milestone > 0 | → Step 1 (normal situation assessment) |
+
+#### Step E — Project Init Flow
+
+When no milestones and no issues exist:
+
+```
+아직 프로젝트가 시작 전이에요.
+
+보통 이 순서로 시작해요:
+  1. 기능명세서 연동 → 이슈 자동 생성
+  2. 마일스톤(스프린트) 생성 → 이슈 배분
+  3. 팀원 할당 → 작업 시작
+
+기능명세서 연동부터 시작해볼까요?
+```
+
+→ If yes: route to `swyp-project` doc-sync flow
+→ If no: ask what they'd like to start with (manual issue creation / milestone first)
+
+When milestones = 0 but issues exist:
+
+```
+이슈는 있는데 아직 스프린트(마일스톤)가 없어요.
+이슈들을 묶어서 첫 스프린트 범위를 정해볼까요?
+```
+
+→ Route to milestone creation flow
+
 #### Step 1 — Situation Assessment
 
 | Situation | Flow |

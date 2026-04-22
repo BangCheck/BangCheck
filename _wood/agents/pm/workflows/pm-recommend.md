@@ -126,8 +126,8 @@ Generate natural introductory sentences per category:
 
 | category | Introductory sentence pattern |
 |----------|-------------------------------|
-| init (no milestone & no issue) | "아직 프로젝트가 시작 전이에요. 기능명세서를 연동해서 첫 스프린트를 열어볼까요?" |
-| init (no milestone, issues exist) | "이슈는 있는데 마일스톤(스프린트)이 없어요. 범위를 정리해볼까요?" |
+| init (no milestone & no issue) | "The project hasn't started yet. Let's sync the feature spec and kick off the first sprint." |
+| init (no milestone, issues exist) | "Issues exist but no milestone is set. Let's define the sprint scope." |
 | pr (violation) | "There are {count} PRs with the compliance-violation label. They need review before merge." |
 | blocker | "There are {count} blocking issues, stalled for {max_days} days." |
 | pr (stale) | "There are {count} PRs waiting for review for over {hours} hours." |
