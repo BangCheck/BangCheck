@@ -21,67 +21,81 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex-1 container-center p-4 bg-white overflow-x-hidden">
-      <div className="login-card w-full max-w-[400px]">
-        {/* Logo & Welcome */}
-        <div className="flex flex-col items-center gap-6 mb-10 w-full">
-          <LogoWithText size={40} textClassName="text-[24px] md:text-[27px]" />
-          <div className="text-center w-full px-2">
-            <h1 className="text-text-main text-xl md:text-2xl font-semibold leading-tight mb-2 break-keep">
-              방체크에 오신 걸 환영해요.
-            </h1>
-            <p className="text-text-main text-lg md:text-xl font-light leading-tight break-keep">
-              소셜 계정으로 간편하게 시작하세요
-            </p>
+    <div className="flex-1 container-center bg-white min-h-[600px]">
+      {/* Login Card (99:103) */}
+      <div className="w-[400px] h-[484px] border border-border-light rounded-[6px] flex flex-col items-center justify-center px-8 bg-white">
+        <div className="flex flex-col items-center gap-[24px]">
+          <div className="flex flex-col items-center gap-[38px]">
+            {/* Logo & Welcome (99:106) */}
+            <div className="flex flex-col items-center gap-[18px]">
+              <LogoWithText size={34} textClassName="text-[27px]" />
+              <div className="text-center">
+                <h1 className="text-[#232527] text-[24px] font-semibold leading-tight whitespace-nowrap">
+                  방체크에 오신 걸 환영해요.
+                </h1>
+                <p className="text-[#232527] text-[24px] font-light leading-tight whitespace-nowrap">
+                  소셜 계정으로 간편하게 시작하세요
+                </p>
+              </div>
+            </div>
+
+            {/* Social Buttons (99:122) */}
+            <div className="flex flex-col gap-[10px]">
+              <button 
+                onClick={() => handleLogin('naver')} 
+                disabled={!!isLoading}
+                className={cn(
+                  "flex items-center justify-center gap-[6px] w-[320px] py-[12px] bg-[#f5f5f5] rounded-[16px] transition-all cursor-pointer hover:bg-gray-200 active:scale-[0.98]",
+                  isLoading === 'naver' && "opacity-50 cursor-wait"
+                )}
+                aria-label="네이버로 시작하기"
+              >
+                <div className="w-[20px] h-[20px] relative overflow-hidden shrink-0">
+                  <Image 
+                    src="/images/naver-logo.png" 
+                    alt="" 
+                    fill
+                    className="object-contain"
+                  />
+                </div>
+                <span className="text-[#232527] text-[12px] font-medium leading-tight">
+                  {isLoading === 'naver' ? '연결 중...' : '네이버로 시작하기'}
+                </span>
+              </button>
+              
+              <button 
+                onClick={() => handleLogin('google')} 
+                disabled={!!isLoading}
+                className={cn(
+                  "flex items-center justify-center gap-[6px] w-[320px] py-[12px] bg-[#f5f5f5] rounded-[16px] transition-all cursor-pointer hover:bg-gray-200 active:scale-[0.98]",
+                  isLoading === 'google' && "opacity-50 cursor-wait"
+                )}
+                aria-label="Google로 시작하기"
+              >
+                <div className="w-[20px] h-[20px] relative shrink-0">
+                  <Image 
+                    src="/images/google-logo.png" 
+                    alt="" 
+                    fill
+                    className="object-contain"
+                  />
+                </div>
+                <span className="text-[#232527] text-[12px] font-medium leading-tight">
+                  {isLoading === 'google' ? '연결 중...' : 'Google로 시작하기'}
+                </span>
+              </button>
+            </div>
           </div>
-        </div>
 
-        {/* Social Buttons */}
-        <div className="flex flex-col gap-2.5 w-full mb-6 px-2">
-          <button 
-            onClick={() => handleLogin('naver')} 
-            disabled={!!isLoading}
-            className={cn("social-button w-full", isLoading === 'naver' && "opacity-50 cursor-wait")}
-            aria-label="네이버 계정으로 로그인하기"
-          >
-            <div className="w-5 h-5 relative overflow-hidden shrink-0">
-               <Image 
-                  src="/images/naver-logo.png" 
-                  alt="" 
-                  width={20} 
-                  height={20}
-                  className="object-contain"
-               />
-            </div>
-            <span className="truncate">{isLoading === 'naver' ? '연결 중...' : '네이버로 시작하기'}</span>
-          </button>
-          <button 
-            onClick={() => handleLogin('google')} 
-            disabled={!!isLoading}
-            className={cn("social-button w-full", isLoading === 'google' && "opacity-50 cursor-wait")}
-            aria-label="구글 계정으로 로그인하기"
-          >
-            <div className="w-5 h-5 relative shrink-0">
-               <Image 
-                  src="/images/google-logo.png" 
-                  alt="" 
-                  width={20} 
-                  height={20}
-                  className="object-contain"
-               />
-            </div>
-            <span className="truncate">{isLoading === 'google' ? '연결 중...' : 'Google로 시작하기'}</span>
-          </button>
+          {/* Legal Notice (99:132) */}
+          <p className="text-[#a0a0a0] text-[12px] text-center leading-tight whitespace-nowrap">
+            시작하기를 누르면{' '}
+            <Link href="/terms" className="text-[#232527] font-regular">이용약관</Link>
+            {' '}및{' '}
+            <Link href="/privacy" className="text-[#232527] font-regular">개인정보 처리방침</Link>
+            에 동의하게 됩니다.
+          </p>
         </div>
-
-        {/* Legal Notice */}
-        <p className="text-text-caption text-[11px] md:text-[12px] text-center leading-relaxed px-4 break-keep">
-          시작하기를 누르면{' '}
-          <Link href="/terms" className="text-text-main font-medium underline underline-offset-2">이용약관</Link>
-          {' '}및{' '}
-          <Link href="/privacy" className="text-text-main font-medium underline underline-offset-2">개인정보 처리방침</Link>
-          에 동의하게 됩니다.
-        </p>
       </div>
     </div>
   );
