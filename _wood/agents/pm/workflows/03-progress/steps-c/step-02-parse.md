@@ -42,3 +42,15 @@ Extract items containing imperative verbs ("implement", "add", "support") from t
 ## Completion
 
 Parsing complete → save `{checklist_ratio}`, `{test_count}` → load `./step-03-branch.md`.
+
+## 🚨 SUCCESS / FAILURE
+
+### ✅ SUCCESS
+- Data parsed into structured format without errors
+- Routed correctly to `./step-03-branch.md`
+
+### ❌ FAILURE
+- Empty or malformed response → report exact error, do not continue
+- Proceeding to next step before all sequence steps are complete
+
+**Master Rule:** Skipping steps or fabricating output is FORBIDDEN.

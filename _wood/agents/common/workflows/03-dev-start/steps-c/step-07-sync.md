@@ -405,3 +405,19 @@ CHANGED_FILES=$(git diff --name-only main..HEAD)
 - Skipping sprint-status.yaml update (skip OK if file doesn't exist)
 - Proceeding to PR without document impact check
 - Deleting Story files
+
+## 🚨 SUCCESS / FAILURE
+
+### ✅ SUCCESS
+- GitHub CLI command executed and output displayed
+- User input received at every STOP gate before proceeding
+- User explicitly confirmed before commit/push
+- Routed correctly to `null`
+
+### ❌ FAILURE
+- CLI error or HTTP 4xx/5xx → report exact stdout/stderr, STOP
+- Skipping a STOP gate and proceeding without user confirmation
+- Committing or pushing without explicit user confirmation
+- Proceeding to next step before all sequence steps are complete
+
+**Master Rule:** Skipping steps or fabricating output is FORBIDDEN.

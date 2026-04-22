@@ -45,3 +45,17 @@ git for-each-ref --format='%(refname:short)' refs/remotes/origin/ \
 ## Completion
 
 Collection complete → load `./step-03-escalations.md`.
+
+## 🚨 SUCCESS / FAILURE
+
+### ✅ SUCCESS
+- GitHub CLI command executed and output displayed
+- User explicitly confirmed before commit/push
+- Routed correctly to `./step-03-escalations.md`
+
+### ❌ FAILURE
+- CLI error or HTTP 4xx/5xx → report exact stdout/stderr, STOP
+- Committing or pushing without explicit user confirmation
+- Proceeding to next step before all sequence steps are complete
+
+**Master Rule:** Skipping steps or fabricating output is FORBIDDEN.

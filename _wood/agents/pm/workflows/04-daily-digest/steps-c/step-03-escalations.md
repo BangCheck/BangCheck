@@ -67,3 +67,13 @@ Events `assigned` / `unassigned`:
 ## Completion
 
 Save escalation data → load `./step-04-stale-pr.md`.
+
+## 🚨 SUCCESS / FAILURE
+
+### ✅ SUCCESS
+- Routed correctly to `./step-04-stale-pr.md`
+
+### ❌ FAILURE
+- Proceeding to next step before all sequence steps are complete
+
+**Master Rule:** Skipping steps or fabricating output is FORBIDDEN.

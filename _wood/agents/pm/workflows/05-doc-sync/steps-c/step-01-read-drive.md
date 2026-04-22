@@ -76,3 +76,19 @@ for row in sheet_rows:
 ## Completion
 
 Save as `{spec_screens}`, `{spec_modified_time}` → load `./step-02-diff.md`.
+
+## 🚨 SUCCESS / FAILURE
+
+### ✅ SUCCESS
+- Data read successfully from MCP/API
+- Data parsed into structured format without errors
+- User input received at every STOP gate before proceeding
+- Routed correctly to `./step-02-diff.md`
+
+### ❌ FAILURE
+- MCP not authenticated or unavailable → STOP, guide user to connect
+- Empty or malformed response → report exact error, do not continue
+- Skipping a STOP gate and proceeding without user confirmation
+- Proceeding to next step before all sequence steps are complete
+
+**Master Rule:** Skipping steps or fabricating output is FORBIDDEN.

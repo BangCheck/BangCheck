@@ -45,3 +45,13 @@ Per item:
 ## Completion
 
 Save cross-check results → load `./step-06-score.md`.
+
+## 🚨 SUCCESS / FAILURE
+
+### ✅ SUCCESS
+- Routed correctly to `./step-06-score.md`
+
+### ❌ FAILURE
+- Proceeding to next step before all sequence steps are complete
+
+**Master Rule:** Skipping steps or fabricating output is FORBIDDEN.

@@ -49,3 +49,17 @@ gh pr list --repo $REPO --state open \
 ## Completion
 
 Save stale PR data → load `./step-05-focus.md`.
+
+## 🚨 SUCCESS / FAILURE
+
+### ✅ SUCCESS
+- GitHub CLI command executed and output displayed
+- Output rendered in the exact specified format
+- Routed correctly to `./step-05-focus.md`
+
+### ❌ FAILURE
+- CLI error or HTTP 4xx/5xx → report exact stdout/stderr, STOP
+- Rendering with missing or partial data — wait for complete data first
+- Proceeding to next step before all sequence steps are complete
+
+**Master Rule:** Skipping steps or fabricating output is FORBIDDEN.

@@ -97,3 +97,15 @@ Instead of hardcoded A/B/C options, invoke the `pm-recommend.md` engine to gener
 ## Completion
 
 After rendering is complete → load `./step-04-filter.md` and follow all instructions.
+
+## 🚨 SUCCESS / FAILURE
+
+### ✅ SUCCESS
+- Output rendered in the exact specified format
+- Routed correctly to `./step-04-filter.md`
+
+### ❌ FAILURE
+- Rendering with missing or partial data — wait for complete data first
+- Proceeding to next step before all sequence steps are complete
+
+**Master Rule:** Skipping steps or fabricating output is FORBIDDEN.

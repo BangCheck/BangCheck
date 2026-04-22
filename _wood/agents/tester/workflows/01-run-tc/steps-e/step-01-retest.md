@@ -71,3 +71,14 @@ Result after re-execution:
 
 > 🛑 **STOP** — Wait for user input before continuing.
 
+## 🚨 SUCCESS / FAILURE
+
+### ✅ SUCCESS
+- Output rendered in the exact specified format
+- User input received at every STOP gate before proceeding
+
+### ❌ FAILURE
+- Rendering with missing or partial data — wait for complete data first
+- Skipping a STOP gate and proceeding without user confirmation
+
+**Master Rule:** Skipping steps or fabricating output is FORBIDDEN.

@@ -93,3 +93,19 @@ updateGoogleSheet / updateGoogleDoc
 ## Completion
 
 After update or cancellation → load `./step-05-menu.md`.
+
+## 🚨 SUCCESS / FAILURE
+
+### ✅ SUCCESS
+- Data read successfully from MCP/API
+- GitHub CLI command executed and output displayed
+- User input received at every STOP gate before proceeding
+- Routed correctly to `./step-05-menu.md`
+
+### ❌ FAILURE
+- MCP not authenticated or unavailable → STOP, guide user to connect
+- CLI error or HTTP 4xx/5xx → report exact stdout/stderr, STOP
+- Skipping a STOP gate and proceeding without user confirmation
+- Proceeding to next step before all sequence steps are complete
+
+**Master Rule:** Skipping steps or fabricating output is FORBIDDEN.

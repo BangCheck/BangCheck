@@ -50,3 +50,12 @@ grep -rn '"[가-힣]' frontend/src/components/ --include="*.tsx" | wc -l
 
 > 🛑 **STOP** — Wait for user input before continuing.
 
+## 🚨 SUCCESS / FAILURE
+
+### ✅ SUCCESS
+- User input received at every STOP gate before proceeding
+
+### ❌ FAILURE
+- Skipping a STOP gate and proceeding without user confirmation
+
+**Master Rule:** Skipping steps or fabricating output is FORBIDDEN.

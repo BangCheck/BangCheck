@@ -65,3 +65,13 @@ STOP and WAIT. Proceed to next item after selection.
 
   Candid recommendation: A — running it again after fixes ensures everything is safe.
 ```
+
+## 🚨 SUCCESS / FAILURE
+
+### ✅ SUCCESS
+- User input received at every STOP gate before proceeding
+
+### ❌ FAILURE
+- Skipping a STOP gate and proceeding without user confirmation
+
+**Master Rule:** Skipping steps or fabricating output is FORBIDDEN.

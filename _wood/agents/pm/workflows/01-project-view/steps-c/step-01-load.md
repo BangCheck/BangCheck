@@ -88,3 +88,19 @@ Save `global_defaults.on_track_threshold` and `caution_threshold`.
 ## Completion
 
 After all data collection is complete → load `./step-02-build.md` and follow all instructions.
+
+## 🚨 SUCCESS / FAILURE
+
+### ✅ SUCCESS
+- Data parsed into structured format without errors
+- GitHub CLI command executed and output displayed
+- User input received at every STOP gate before proceeding
+- Routed correctly to `./step-02-build.md`
+
+### ❌ FAILURE
+- Empty or malformed response → report exact error, do not continue
+- CLI error or HTTP 4xx/5xx → report exact stdout/stderr, STOP
+- Skipping a STOP gate and proceeding without user confirmation
+- Proceeding to next step before all sequence steps are complete
+
+**Master Rule:** Skipping steps or fabricating output is FORBIDDEN.

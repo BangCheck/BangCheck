@@ -70,3 +70,19 @@ grep -rn "router\.\(get\|post\|put\|delete\)" backend/src/ | head -30
 
 
 → Return to dashboard after completion.
+
+## 🚨 SUCCESS / FAILURE
+
+### ✅ SUCCESS
+- Data parsed into structured format without errors
+- GitHub CLI command executed and output displayed
+- Output rendered in the exact specified format
+- User input received at every STOP gate before proceeding
+
+### ❌ FAILURE
+- Empty or malformed response → report exact error, do not continue
+- CLI error or HTTP 4xx/5xx → report exact stdout/stderr, STOP
+- Rendering with missing or partial data — wait for complete data first
+- Skipping a STOP gate and proceeding without user confirmation
+
+**Master Rule:** Skipping steps or fabricating output is FORBIDDEN.

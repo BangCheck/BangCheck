@@ -87,3 +87,15 @@ milestones[]
 ## Completion
 
 After tree structure is built → load `./step-03-render.md` and follow all instructions.
+
+## 🚨 SUCCESS / FAILURE
+
+### ✅ SUCCESS
+- Output rendered in the exact specified format
+- Routed correctly to `./step-03-render.md`
+
+### ❌ FAILURE
+- Rendering with missing or partial data — wait for complete data first
+- Proceeding to next step before all sequence steps are complete
+
+**Master Rule:** Skipping steps or fabricating output is FORBIDDEN.

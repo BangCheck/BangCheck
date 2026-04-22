@@ -67,3 +67,19 @@ After selection, automatically collect sub-issue list.
 ## Completion
 
 Issue selection complete → save `{selected_issue}` → load `./step-02-parse.md`.
+
+## 🚨 SUCCESS / FAILURE
+
+### ✅ SUCCESS
+- Data parsed into structured format without errors
+- GitHub CLI command executed and output displayed
+- User input received at every STOP gate before proceeding
+- Routed correctly to `./step-02-parse.md`
+
+### ❌ FAILURE
+- Empty or malformed response → report exact error, do not continue
+- CLI error or HTTP 4xx/5xx → report exact stdout/stderr, STOP
+- Skipping a STOP gate and proceeding without user confirmation
+- Proceeding to next step before all sequence steps are complete
+
+**Master Rule:** Skipping steps or fabricating output is FORBIDDEN.

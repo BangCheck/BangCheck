@@ -361,3 +361,17 @@ If structure changed mid-implementation, re-run 6-2 to assess current state.
   (Reading is allowed. Create an issue if a problem is found)
 - Recommending without reading code (guessing-based recommendations prohibited)
 - Presenting only a single direction without A/B/C/D options
+
+## 🚨 SUCCESS / FAILURE
+
+### ✅ SUCCESS
+- User input received at every STOP gate before proceeding
+- User explicitly confirmed before commit/push
+- Routed correctly to `./step-07-sync.md`
+
+### ❌ FAILURE
+- Skipping a STOP gate and proceeding without user confirmation
+- Committing or pushing without explicit user confirmation
+- Proceeding to next step before all sequence steps are complete
+
+**Master Rule:** Skipping steps or fabricating output is FORBIDDEN.

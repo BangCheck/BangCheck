@@ -115,3 +115,19 @@ Example (do NOT copy verbatim — speak naturally based on actual data):
 ## Completion
 
 Save results as `{sync_status}`, `{missing_by_screen}` → load `./step-03-create-issues.md`.
+
+## 🚨 SUCCESS / FAILURE
+
+### ✅ SUCCESS
+- GitHub CLI command executed and output displayed
+- Output rendered in the exact specified format
+- User input received at every STOP gate before proceeding
+- Routed correctly to `./step-03-create-issues.md`
+
+### ❌ FAILURE
+- CLI error or HTTP 4xx/5xx → report exact stdout/stderr, STOP
+- Rendering with missing or partial data — wait for complete data first
+- Skipping a STOP gate and proceeding without user confirmation
+- Proceeding to next step before all sequence steps are complete
+
+**Master Rule:** Skipping steps or fabricating output is FORBIDDEN.

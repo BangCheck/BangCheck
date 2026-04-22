@@ -70,3 +70,14 @@ nextStepFile: "./step-03-rollback.md"
 
 > 🛑 **STOP** — Wait for user input before continuing.
 
+## 🚨 SUCCESS / FAILURE
+
+### ✅ SUCCESS
+- User input received at every STOP gate before proceeding
+- Routed correctly to `./step-03-rollback.md`
+
+### ❌ FAILURE
+- Skipping a STOP gate and proceeding without user confirmation
+- Proceeding to next step before all sequence steps are complete
+
+**Master Rule:** Skipping steps or fabricating output is FORBIDDEN.

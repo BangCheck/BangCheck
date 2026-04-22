@@ -50,3 +50,13 @@ done
 ```
 
 → step-03 state management.
+
+## 🚨 SUCCESS / FAILURE
+
+### ✅ SUCCESS
+- Routed correctly to `./step-03-state.md`
+
+### ❌ FAILURE
+- Proceeding to next step before all sequence steps are complete
+
+**Master Rule:** Skipping steps or fabricating output is FORBIDDEN.

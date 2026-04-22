@@ -45,3 +45,14 @@ Severity:
 
 > 🛑 **STOP** — Wait for user input before continuing.
 
+## 🚨 SUCCESS / FAILURE
+
+### ✅ SUCCESS
+- GitHub CLI command executed and output displayed
+- User input received at every STOP gate before proceeding
+
+### ❌ FAILURE
+- CLI error or HTTP 4xx/5xx → report exact stdout/stderr, STOP
+- Skipping a STOP gate and proceeding without user confirmation
+
+**Master Rule:** Skipping steps or fabricating output is FORBIDDEN.

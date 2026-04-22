@@ -75,3 +75,15 @@ Save as `{code_status}`.
 ## Completion
 
 Code status assessment complete → load `./step-03-fact.md`.
+
+## 🚨 SUCCESS / FAILURE
+
+### ✅ SUCCESS
+- User explicitly confirmed before commit/push
+- Routed correctly to `./step-03-fact.md`
+
+### ❌ FAILURE
+- Committing or pushing without explicit user confirmation
+- Proceeding to next step before all sequence steps are complete
+
+**Master Rule:** Skipping steps or fabricating output is FORBIDDEN.

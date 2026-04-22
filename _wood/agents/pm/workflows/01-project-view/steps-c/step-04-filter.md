@@ -109,3 +109,21 @@ Return to PM Dashboard (agent.md menu).
 ---
 
 After filter selection, display the result → show the 4-1 menu again (loop). Exit only on `[N]` or `[B]` input.
+
+## 🚨 SUCCESS / FAILURE
+
+### ✅ SUCCESS
+- GitHub CLI command executed and output displayed
+- Output rendered in the exact specified format
+- User input received at every STOP gate before proceeding
+- User explicitly confirmed before commit/push
+- Routed correctly to `./step-05-actions.md`
+
+### ❌ FAILURE
+- CLI error or HTTP 4xx/5xx → report exact stdout/stderr, STOP
+- Rendering with missing or partial data — wait for complete data first
+- Skipping a STOP gate and proceeding without user confirmation
+- Committing or pushing without explicit user confirmation
+- Proceeding to next step before all sequence steps are complete
+
+**Master Rule:** Skipping steps or fabricating output is FORBIDDEN.

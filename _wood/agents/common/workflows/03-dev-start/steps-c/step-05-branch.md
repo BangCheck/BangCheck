@@ -63,3 +63,15 @@ sed -i '' 's/| Status | ready/| Status | in-progress/' \
 ```
 
 → load `./step-06-dev.md`
+
+## 🚨 SUCCESS / FAILURE
+
+### ✅ SUCCESS
+- GitHub CLI command executed and output displayed
+- Routed correctly to `./step-06-dev.md`
+
+### ❌ FAILURE
+- CLI error or HTTP 4xx/5xx → report exact stdout/stderr, STOP
+- Proceeding to next step before all sequence steps are complete
+
+**Master Rule:** Skipping steps or fabricating output is FORBIDDEN.

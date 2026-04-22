@@ -39,3 +39,17 @@ score = max(0, min(score, 1)) * 100  # 0~100%
 ## Completion
 
 Save `{final_score}` → load `./step-07-render.md`.
+
+## 🚨 SUCCESS / FAILURE
+
+### ✅ SUCCESS
+- Output rendered in the exact specified format
+- User explicitly confirmed before commit/push
+- Routed correctly to `./step-07-render.md`
+
+### ❌ FAILURE
+- Rendering with missing or partial data — wait for complete data first
+- Committing or pushing without explicit user confirmation
+- Proceeding to next step before all sequence steps are complete
+
+**Master Rule:** Skipping steps or fabricating output is FORBIDDEN.

@@ -39,3 +39,13 @@ REPOS=$(git diff --name-only main..HEAD | grep -E 'Repository\.java')
   → Proceed to risk check
 {/if}
 ```
+
+## 🚨 SUCCESS / FAILURE
+
+### ✅ SUCCESS
+- Routed correctly to `./step-02-risk.md`
+
+### ❌ FAILURE
+- Proceeding to next step before all sequence steps are complete
+
+**Master Rule:** Skipping steps or fabricating output is FORBIDDEN.

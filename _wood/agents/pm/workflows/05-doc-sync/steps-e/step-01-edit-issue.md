@@ -126,3 +126,17 @@ If there is an FE integration issue:
 ## 🔙 Return
 
 After editing → Return to step-05-menu.md or PM dashboard.
+
+## 🚨 SUCCESS / FAILURE
+
+### ✅ SUCCESS
+- GitHub CLI command executed and output displayed
+- User input received at every STOP gate before proceeding
+- Template filled completely with no placeholder variables remaining
+
+### ❌ FAILURE
+- CLI error or HTTP 4xx/5xx → report exact stdout/stderr, STOP
+- Skipping a STOP gate and proceeding without user confirmation
+- Leaving unfilled `{placeholder}` variables in the output
+
+**Master Rule:** Skipping steps or fabricating output is FORBIDDEN.

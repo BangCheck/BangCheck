@@ -46,3 +46,15 @@ Based on collected data:
 ## Completion
 
 Save summary data → load `./step-07-render.md`.
+
+## 🚨 SUCCESS / FAILURE
+
+### ✅ SUCCESS
+- Output rendered in the exact specified format
+- Routed correctly to `./step-07-render.md`
+
+### ❌ FAILURE
+- Rendering with missing or partial data — wait for complete data first
+- Proceeding to next step before all sequence steps are complete
+
+**Master Rule:** Skipping steps or fabricating output is FORBIDDEN.

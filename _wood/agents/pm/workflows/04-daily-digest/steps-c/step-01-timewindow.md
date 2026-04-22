@@ -50,3 +50,15 @@ SINCE_ISO="{user_input}T00:00:00Z"
 ## Completion
 
 Save `{SINCE_ISO}` → load `./step-02-fetch.md`.
+
+## 🚨 SUCCESS / FAILURE
+
+### ✅ SUCCESS
+- User input received at every STOP gate before proceeding
+- Routed correctly to `./step-02-fetch.md`
+
+### ❌ FAILURE
+- Skipping a STOP gate and proceeding without user confirmation
+- Proceeding to next step before all sequence steps are complete
+
+**Master Rule:** Skipping steps or fabricating output is FORBIDDEN.

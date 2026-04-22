@@ -55,3 +55,13 @@ done
 ```
 
 → step-02 accessibility.
+
+## 🚨 SUCCESS / FAILURE
+
+### ✅ SUCCESS
+- Routed correctly to `./step-02-a11y.md`
+
+### ❌ FAILURE
+- Proceeding to next step before all sequence steps are complete
+
+**Master Rule:** Skipping steps or fabricating output is FORBIDDEN.

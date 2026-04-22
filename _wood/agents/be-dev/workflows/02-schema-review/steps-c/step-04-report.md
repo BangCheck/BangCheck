@@ -49,3 +49,16 @@ nextStepFile: "null"
 
 > 🛑 **STOP** — Wait for user input before continuing.
 
+## 🚨 SUCCESS / FAILURE
+
+### ✅ SUCCESS
+- Output rendered in the exact specified format
+- User input received at every STOP gate before proceeding
+- Routed correctly to `null`
+
+### ❌ FAILURE
+- Rendering with missing or partial data — wait for complete data first
+- Skipping a STOP gate and proceeding without user confirmation
+- Proceeding to next step before all sequence steps are complete
+
+**Master Rule:** Skipping steps or fabricating output is FORBIDDEN.

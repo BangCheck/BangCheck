@@ -150,3 +150,15 @@ After validation → Return to step-05-menu.md or PM dashboard.
 
 **Admin:** @Woo-JongHo
 **Last reviewed:** 2026-04-21
+
+## 🚨 SUCCESS / FAILURE
+
+### ✅ SUCCESS
+- Data parsed into structured format without errors
+- GitHub CLI command executed and output displayed
+
+### ❌ FAILURE
+- Empty or malformed response → report exact error, do not continue
+- CLI error or HTTP 4xx/5xx → report exact stdout/stderr, STOP
+
+**Master Rule:** Skipping steps or fabricating output is FORBIDDEN.

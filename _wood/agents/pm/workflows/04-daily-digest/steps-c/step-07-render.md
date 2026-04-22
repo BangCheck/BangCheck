@@ -55,3 +55,15 @@ If immediate action items are 0, show at the top:
 ## Completion
 
 Render complete → load `./step-08-actions.md`.
+
+## 🚨 SUCCESS / FAILURE
+
+### ✅ SUCCESS
+- Output rendered in the exact specified format
+- Routed correctly to `./step-08-actions.md`
+
+### ❌ FAILURE
+- Rendering with missing or partial data — wait for complete data first
+- Proceeding to next step before all sequence steps are complete
+
+**Master Rule:** Skipping steps or fabricating output is FORBIDDEN.

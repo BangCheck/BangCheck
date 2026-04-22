@@ -81,3 +81,17 @@ This change needs to be reflected in docs/spec/ or docs/be/api-spec.md.
 
 
 → step-05 report.
+
+## 🚨 SUCCESS / FAILURE
+
+### ✅ SUCCESS
+- User input received at every STOP gate before proceeding
+- Template filled completely with no placeholder variables remaining
+- Routed correctly to `./step-05-report.md`
+
+### ❌ FAILURE
+- Skipping a STOP gate and proceeding without user confirmation
+- Leaving unfilled `{placeholder}` variables in the output
+- Proceeding to next step before all sequence steps are complete
+
+**Master Rule:** Skipping steps or fabricating output is FORBIDDEN.

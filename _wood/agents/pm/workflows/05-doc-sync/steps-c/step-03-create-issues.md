@@ -415,3 +415,23 @@ On error → warning only, issue creation is preserved.
 ## Completion
 
 After creation or cancellation → load `./step-04-update-docs.md`.
+
+## 🚨 SUCCESS / FAILURE
+
+### ✅ SUCCESS
+- GitHub CLI command executed and output displayed
+- Output rendered in the exact specified format
+- User input received at every STOP gate before proceeding
+- Template filled completely with no placeholder variables remaining
+- Issue created with correct labels, assignee, and project board link
+- Routed correctly to `./step-04-update-docs.md`
+
+### ❌ FAILURE
+- CLI error or HTTP 4xx/5xx → report exact stdout/stderr, STOP
+- Rendering with missing or partial data — wait for complete data first
+- Skipping a STOP gate and proceeding without user confirmation
+- Leaving unfilled `{placeholder}` variables in the output
+- Creating issues without user confirmation preview
+- Proceeding to next step before all sequence steps are complete
+
+**Master Rule:** Skipping steps or fabricating output is FORBIDDEN.
