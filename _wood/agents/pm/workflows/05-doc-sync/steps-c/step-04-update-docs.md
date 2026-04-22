@@ -1,9 +1,8 @@
 ---
-name: step-04-update-docs
-description: "Update Google Docs Completion Status"
-nextStepFile: "./step-05-menu.md"
+step: 4
+title: "Update Google Docs Completion Status"
+nextStep: "./step-05-menu.md"
 ---
-
 
 # Step 04 — Update Google Docs Completion Status
 
@@ -11,28 +10,7 @@ READ THIS ENTIRE FILE before executing any action.
 
 ---
 
-
-## YOUR TASK
-
-Update Google Docs Completion Status
-
-## MANDATORY EXECUTION RULES
-
-### Universal Rules
-- 📖 Read this entire file before taking any action
-- 🎯 YOU ARE AN EDITOR — modify only what user confirms, never auto-apply
-- 🛑 NEVER fabricate command output or API data
-- 🚫 Do NOT proceed past a STOP gate without user input
-
-## CONTEXT BOUNDARIES
-
-- Data sources: Google Sheets MCP (시트22) + GitHub Issues API
-- Scope: This step only — do not pre-fetch data for future steps
-- Dependencies: previous step output must be complete before proceeding
-
-## MANDATORY SEQUENCE
-
-### 4-1. Collect Completed Issues
+## 4-1. Collect Completed Issues
 
 Based on `{completed_items}` from step-02 + additional query:
 
@@ -46,7 +24,7 @@ gh issue list --repo $REPO --state closed \
 
 ---
 
-### 4-2. Select Target Document for Update
+## 4-2. Select Target Document for Update
 
 ```
 Select the Google Docs progress sheet:
@@ -58,13 +36,11 @@ Select the Google Docs progress sheet:
 Number:
 ```
 
-
-> 🛑 **STOP** — Wait for user input before continuing.
-
+STOP and WAIT for user input.
 
 ---
 
-### 4-3. Update Content Preview (MANDATORY)
+## 4-3. Update Content Preview (MANDATORY)
 
 ```
 📝 Google Docs Update Preview
@@ -80,13 +56,11 @@ Items to add/modify ({n} items):
 [Y] Update  [E] Edit  [N] Cancel
 ```
 
-
-> 🛑 **STOP** — Wait for user input before continuing.
-
+STOP and WAIT for user input.
 
 ---
 
-### 4-4. Update Docs (When Y is Selected)
+## 4-4. Update Docs (When Y is Selected)
 
 Update the target sheet/document using MCP `google-drive` tools:
 
@@ -114,19 +88,3 @@ updateGoogleSheet / updateGoogleDoc
 ## Completion
 
 After update or cancellation → load `./step-05-menu.md`.
-
-## 🚨 SUCCESS / FAILURE
-
-### ✅ SUCCESS
-- Data read successfully from MCP/API
-- GitHub CLI command executed and output displayed
-- User input received at every STOP gate before proceeding
-- Routed correctly to `./step-05-menu.md`
-
-### ❌ FAILURE
-- MCP not authenticated or unavailable → STOP, guide user to connect
-- CLI error or HTTP 4xx/5xx → report exact stdout/stderr, STOP
-- Skipping a STOP gate and proceeding without user confirmation
-- Proceeding to next step before all sequence steps are complete
-
-**Master Rule:** Skipping steps or fabricating output is FORBIDDEN.

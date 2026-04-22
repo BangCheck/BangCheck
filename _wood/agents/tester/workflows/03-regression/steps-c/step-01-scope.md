@@ -1,24 +1,10 @@
 ---
-name: step-01-scope
-description: "Regression Scope Selection"
-nextStepFile: "./step-02-run.md"
+step: 1
+title: "Regression Scope Selection"
+nextStep: "./step-02-run.md"
 ---
 
-
 # Step 01 — Scope Selection
-
-
-## YOUR TASK
-
-Regression Scope Selection
-
-## MANDATORY EXECUTION RULES
-
-### Universal Rules
-- 📖 Read this entire file before taking any action
-- 🎯 YOU ARE A FACILITATOR — guide the user, never act autonomously
-- 🛑 NEVER fabricate command output or API data
-- 🚫 Do NOT proceed past a STOP gate without user input
 
 ```
 Select regression test scope:
@@ -37,11 +23,7 @@ Recommendation: 2 — If there's no recently merged PR, run key TCs for all page
 {/if}
 ```
 
-
-> 🛑 **STOP** — Wait for user input before continuing.
-
-
-## MANDATORY SEQUENCE
+STOP and WAIT.
 
 ### [3] Smart Scope
 
@@ -71,22 +53,6 @@ Proceed with this scope for regression testing?
 [Y] Proceed  [E] Adjust scope  [B] Cancel
 ```
 
-
-> 🛑 **STOP** — Wait for user input before continuing.
-
+STOP and WAIT.
 
 → step-02 execution.
-
-## 🚨 SUCCESS / FAILURE
-
-### ✅ SUCCESS
-- GitHub CLI command executed and output displayed
-- User input received at every STOP gate before proceeding
-- Routed correctly to `./step-02-run.md`
-
-### ❌ FAILURE
-- CLI error or HTTP 4xx/5xx → report exact stdout/stderr, STOP
-- Skipping a STOP gate and proceeding without user confirmation
-- Proceeding to next step before all sequence steps are complete
-
-**Master Rule:** Skipping steps or fabricating output is FORBIDDEN.

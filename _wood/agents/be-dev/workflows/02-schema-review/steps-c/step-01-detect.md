@@ -1,24 +1,10 @@
 ---
-name: step-01-detect
-description: "Detect schema change files"
-nextStepFile: "./step-02-risk.md"
+step: 1
+title: "Detect schema change files"
+nextStep: "./step-02-risk.md"
 ---
 
-
 # Step 01 — Detect Schema Changes
-
-
-## YOUR TASK
-
-Detect schema change files
-
-## MANDATORY EXECUTION RULES
-
-### Universal Rules
-- 📖 Read this entire file before taking any action
-- 🎯 YOU ARE AN AUDITOR — report findings accurately, never skip checks
-- 🛑 NEVER fabricate command output or API data
-- 🚫 Do NOT proceed past a STOP gate without user input
 
 ```bash
 # Migration files
@@ -32,8 +18,6 @@ REPOS=$(git diff --name-only main..HEAD | grep -E 'Repository\.java')
 ```
 
 ```
-## MANDATORY SEQUENCE
-
 ## Schema Change Detection
 
 | Type | Count | Details |
@@ -54,13 +38,3 @@ REPOS=$(git diff --name-only main..HEAD | grep -E 'Repository\.java')
   → Proceed to risk check
 {/if}
 ```
-
-## 🚨 SUCCESS / FAILURE
-
-### ✅ SUCCESS
-- Routed correctly to `./step-02-risk.md`
-
-### ❌ FAILURE
-- Proceeding to next step before all sequence steps are complete
-
-**Master Rule:** Skipping steps or fabricating output is FORBIDDEN.

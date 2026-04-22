@@ -1,9 +1,8 @@
 ---
-name: step-06-dev
-description: "Development guide + code analysis + specific recommendations"
-nextStepFile: "./step-07-sync.md"
+step: 6
+title: "Development guide + code analysis + specific recommendations"
+nextStep: "./step-07-sync.md"
 ---
-
 
 # Step 06 — Start Development
 
@@ -11,22 +10,7 @@ READ THIS ENTIRE FILE before executing any action.
 
 ---
 
-
-## YOUR TASK
-
-Development guide + code analysis + specific recommendations
-
-## MANDATORY EXECUTION RULES
-
-### Universal Rules
-- 📖 Read this entire file before taking any action
-- 🎯 YOU ARE A FACILITATOR — guide the user, never act autonomously
-- 🛑 NEVER fabricate command output or API data
-- 🚫 Do NOT proceed past a STOP gate without user input
-
-## MANDATORY SEQUENCE
-
-### 6-1. Development Guide Based on Current Story
+## 6-1. Development Guide Based on Current Story
 
 ```
 ## Start Development
@@ -40,7 +24,7 @@ Current Story: {story_title} (S{n})
 
 ---
 
-### 6-2. Deep Code Analysis (MANDATORY)
+## 6-2. Deep Code Analysis (MANDATORY)
 
 ### 6-2a. Read All Related Code
 
@@ -98,7 +82,7 @@ Identify the following from the code read:
 
 ---
 
-### 6-3. Specific Recommendations (A/B/C/D Pattern)
+## 6-3. Specific Recommendations (A/B/C/D Pattern)
 
 Propose **specific modification directions** based on code analysis results.
 
@@ -140,9 +124,7 @@ Propose **specific modification directions** based on code analysis results.
   Which direction?
 ```
 
-
-> 🛑 **STOP** — Wait for user input before continuing.
-
+STOP and WAIT.
 
 ### After Selection
 
@@ -280,7 +262,7 @@ STOP and WAIT. → When A/B/C/D selected, start implementation.
 
 ---
 
-### 6-4. Code Boundary Detection (real-time during development)
+## 6-4. Code Boundary Detection (real-time during development)
 
 ### Role Boundary (_safety.md §6)
 
@@ -315,9 +297,7 @@ If a problem is found by **reading** another role's code during development:
   Recommendation: A — needs to be tracked as an issue.
 ```
 
-
-> 🛑 **STOP** — Wait for user input before continuing.
-
+STOP and WAIT.
 
 ### When Modifying Common Code (common/)
 
@@ -334,7 +314,7 @@ If a problem is found by **reading** another role's code during development:
 
 ---
 
-### 6-5. In-Development Menu
+## 6-5. In-Development Menu
 
 ```
 Development help:
@@ -349,9 +329,7 @@ Development help:
 Number:
 ```
 
-
-> 🛑 **STOP** — Wait for user input before continuing.
-
+STOP and WAIT.
 
 ### [S] Move to Next Story
 
@@ -376,17 +354,3 @@ If structure changed mid-implementation, re-run 6-2 to assess current state.
   (Reading is allowed. Create an issue if a problem is found)
 - Recommending without reading code (guessing-based recommendations prohibited)
 - Presenting only a single direction without A/B/C/D options
-
-## 🚨 SUCCESS / FAILURE
-
-### ✅ SUCCESS
-- User input received at every STOP gate before proceeding
-- User explicitly confirmed before commit/push
-- Routed correctly to `./step-07-sync.md`
-
-### ❌ FAILURE
-- Skipping a STOP gate and proceeding without user confirmation
-- Committing or pushing without explicit user confirmation
-- Proceeding to next step before all sequence steps are complete
-
-**Master Rule:** Skipping steps or fabricating output is FORBIDDEN.

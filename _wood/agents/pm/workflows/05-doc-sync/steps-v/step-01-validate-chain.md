@@ -1,37 +1,16 @@
 ---
-name: step-01-validate-chain
-description: "Specification → Issue Chain Validation"
+step: 1
+title: "Specification → Issue Chain Validation"
+mode: validate
 ---
 
-
 # Validate Step 01 — Specification ↔ Issue Chain Validation
-
-
-## YOUR TASK
-
-Specification → Issue Chain Validation
-
-## MANDATORY EXECUTION RULES
-
-### Universal Rules
-- 📖 Read this entire file before taking any action
-- 🎯 YOU ARE AN AUDITOR — report findings accurately, never skip checks
-- 🛑 NEVER fabricate command output or API data
-- 🚫 Do NOT proceed past a STOP gate without user input
 
 > Validate that the tracking keys in the Specification → PM → Issue → Backend chain are not broken.
 
 ---
 
-## CONTEXT BOUNDARIES
-
-- Data sources: Google Sheets MCP (시트22) + GitHub Issues API
-- Scope: This step only — do not pre-fetch data for future steps
-- Dependencies: previous step output must be complete before proceeding
-
-## MANDATORY SEQUENCE
-
-### V1-1. Collect All Issues
+## V1-1. Collect All Issues
 
 ```bash
 # All task issues
@@ -47,7 +26,7 @@ ALL_PAGES=$(gh issue list --repo $REPO --state all \
 
 ---
 
-### V1-2. Tracking Key Validation
+## V1-2. Tracking Key Validation
 
 Parse each task issue's body to check tracking key presence:
 
@@ -68,7 +47,7 @@ Verdict criteria:
 
 ---
 
-### V1-3. Orphan Issue Detection
+## V1-3. Orphan Issue Detection
 
 Issues with no Parent, no WBS, and no related issue links:
 
@@ -95,7 +74,7 @@ What would you like to do?
 
 ---
 
-### V1-4. FE↔BE Integration Validation
+## V1-4. FE↔BE Integration Validation
 
 Check whether issue pairs created as Both are cross-linked:
 
@@ -116,7 +95,7 @@ Check whether issue pairs created as Both are cross-linked:
 
 ---
 
-### V1-5. BE API Contract Validation
+## V1-5. BE API Contract Validation
 
 BE-labeled issues missing an API contract section:
 
@@ -138,7 +117,7 @@ BE-labeled issues missing an API contract section:
 
 ---
 
-### V1-6. Validation Summary
+## V1-6. Validation Summary
 
 ```
 ## 📋 Chain Validation Summary
@@ -171,15 +150,3 @@ After validation → Return to step-05-menu.md or PM dashboard.
 
 **Admin:** @Woo-JongHo
 **Last reviewed:** 2026-04-21
-
-## 🚨 SUCCESS / FAILURE
-
-### ✅ SUCCESS
-- Data parsed into structured format without errors
-- GitHub CLI command executed and output displayed
-
-### ❌ FAILURE
-- Empty or malformed response → report exact error, do not continue
-- CLI error or HTTP 4xx/5xx → report exact stdout/stderr, STOP
-
-**Master Rule:** Skipping steps or fabricating output is FORBIDDEN.

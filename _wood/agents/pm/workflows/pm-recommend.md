@@ -64,10 +64,6 @@ for body in $(echo "$ALL_PRS" | jq -r '.[].body // ""' | base64); do
   [ "$unchecked" -gt 0 ] && pr_unchecked_count=$((pr_unchecked_count + 1))
 done
 
-# Project init state
-milestone_count=$(gh api repos/$REPO/milestones --jq 'length' 2>/dev/null || echo 0)
-total_issue_count=$(gh issue list --repo $REPO --state open --json number --limit 1000 | jq length 2>/dev/null || echo 0)
-
 # GDrive
 gdrive_alert=""  # Check docs/spec/ directory — empty string if absent
 ```
@@ -126,8 +122,6 @@ Generate natural introductory sentences per category:
 
 | category | Introductory sentence pattern |
 |----------|-------------------------------|
-| init (no milestone & no issue) | "The project hasn't started yet. Let's sync the feature spec and kick off the first sprint." |
-| init (no milestone, issues exist) | "Issues exist but no milestone is set. Let's define the sprint scope." |
 | pr (violation) | "There are {count} PRs with the compliance-violation label. They need review before merge." |
 | blocker | "There are {count} blocking issues, stalled for {max_days} days." |
 | pr (stale) | "There are {count} PRs waiting for review for over {hours} hours." |

@@ -1,9 +1,8 @@
 ---
-name: step-02-read
-description: "Code reading (FE/BE branch)"
-nextStepFile: "./step-03-fact.md"
+step: 2
+title: "Code reading (FE/BE branch)"
+nextStep: "./step-03-fact.md"
 ---
-
 
 # Step 02 — Code Reading
 
@@ -11,22 +10,7 @@ READ THIS ENTIRE FILE before executing any action.
 
 ---
 
-
-## YOUR TASK
-
-Code reading (FE/BE branch)
-
-## MANDATORY EXECUTION RULES
-
-### Universal Rules
-- 📖 Read this entire file before taking any action
-- 🎯 YOU ARE A DATA READER — report exact API/MCP response, never fabricate
-- 🛑 NEVER fabricate command output or API data
-- 🚫 Do NOT proceed past a STOP gate without user input
-
-## MANDATORY SEQUENCE
-
-### 2-1. Determine Reading Path Based on Role
+## 2-1. Determine Reading Path Based on Role
 
 ```python
 if USER_ROLE in ["Frontend", "Admin"]:
@@ -39,7 +23,7 @@ If Admin, determine by issue nature (FE/BE).
 
 ---
 
-### 2-2. Read Related Files
+## 2-2. Read Related Files
 
 Read the top 5 files from `{related_files}` in order:
 
@@ -60,7 +44,7 @@ find . -name "*.test.*" -o -name "*.spec.*" | \
 
 ---
 
-### 2-3. Branch Status
+## 2-3. Branch Status
 
 ```bash
 # Check if related branch exists
@@ -72,7 +56,7 @@ git log --oneline --all | grep -i "{keyword}" | head -5
 
 ---
 
-### 2-4. Implementation Gap Analysis
+## 2-4. Implementation Gap Analysis
 
 Assess based on code read:
 
@@ -90,15 +74,3 @@ Save as `{code_status}`.
 ## Completion
 
 Code status assessment complete → load `./step-03-fact.md`.
-
-## 🚨 SUCCESS / FAILURE
-
-### ✅ SUCCESS
-- User explicitly confirmed before commit/push
-- Routed correctly to `./step-03-fact.md`
-
-### ❌ FAILURE
-- Committing or pushing without explicit user confirmation
-- Proceeding to next step before all sequence steps are complete
-
-**Master Rule:** Skipping steps or fabricating output is FORBIDDEN.

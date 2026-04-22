@@ -1,9 +1,8 @@
 ---
-name: step-06-score
-description: "Weighted score calculation"
-nextStepFile: "./step-07-render.md"
+step: 6
+title: "Weighted score calculation"
+nextStep: "./step-07-render.md"
 ---
-
 
 # Step 06 — Score Calculation
 
@@ -11,28 +10,7 @@ READ THIS ENTIRE FILE before executing any action.
 
 ---
 
-
-## YOUR TASK
-
-Weighted score calculation
-
-## MANDATORY EXECUTION RULES
-
-### Universal Rules
-- 📖 Read this entire file before taking any action
-- 🎯 YOU ARE A FACILITATOR — guide the user, never act autonomously
-- 🛑 NEVER fabricate command output or API data
-- 🚫 Do NOT proceed past a STOP gate without user input
-
-## CONTEXT BOUNDARIES
-
-- Data sources: GitHub Issues API + PR API + Branch data
-- Scope: This step only — do not pre-fetch data for future steps
-- Dependencies: previous step output must be complete before proceeding
-
-## MANDATORY SEQUENCE
-
-### 6-1. Load Weights
+## 6-1. Load Weights
 
 ```bash
 yq '.progress_estimation.weights' _wood/milestone-meta.yaml
@@ -40,7 +18,7 @@ yq '.progress_estimation.weights' _wood/milestone-meta.yaml
 
 ---
 
-### 6-2. Weighted Sum
+## 6-2. Weighted Sum
 
 ```python
 score = (checklist_ratio         * weights.checklist_completion)
@@ -60,17 +38,3 @@ score = max(0, min(score, 1)) * 100  # 0~100%
 ## Completion
 
 Save `{final_score}` → load `./step-07-render.md`.
-
-## 🚨 SUCCESS / FAILURE
-
-### ✅ SUCCESS
-- Output rendered in the exact specified format
-- User explicitly confirmed before commit/push
-- Routed correctly to `./step-07-render.md`
-
-### ❌ FAILURE
-- Rendering with missing or partial data — wait for complete data first
-- Committing or pushing without explicit user confirmation
-- Proceeding to next step before all sequence steps are complete
-
-**Master Rule:** Skipping steps or fabricating output is FORBIDDEN.

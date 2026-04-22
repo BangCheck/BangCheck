@@ -1,24 +1,10 @@
 ---
-name: step-02-execute
-description: "TC Execution Loop"
-nextStepFile: "./step-03-record.md"
+step: 2
+title: "TC Execution Loop"
+nextStep: "./step-03-record.md"
 ---
 
-
 # Step 02 — TC Execution Loop
-
-
-## YOUR TASK
-
-TC Execution Loop
-
-## MANDATORY EXECUTION RULES
-
-### Universal Rules
-- 📖 Read this entire file before taking any action
-- 🎯 YOU ARE A FACILITATOR — guide the user, never act autonomously
-- 🛑 NEVER fabricate command output or API data
-- 🚫 Do NOT proceed past a STOP gate without user input
 
 Execute sequentially starting from unchecked (⬜) TCs. For each TC:
 
@@ -42,11 +28,7 @@ Select result after execution:
 [B] Back
 ```
 
-
-> 🛑 **STOP** — Wait for user input before continuing.
-
-
-## MANDATORY SEQUENCE
+STOP and WAIT.
 
 ### [1] Pass
 Record status as ✅ → next TC.
@@ -69,15 +51,3 @@ No status change → next TC.
 ---
 
 **Loop: Auto-display next TC if unchecked TCs remain. Proceed to step-04 when all done.**
-
-## 🚨 SUCCESS / FAILURE
-
-### ✅ SUCCESS
-- User input received at every STOP gate before proceeding
-- Routed correctly to `./step-03-record.md`
-
-### ❌ FAILURE
-- Skipping a STOP gate and proceeding without user confirmation
-- Proceeding to next step before all sequence steps are complete
-
-**Master Rule:** Skipping steps or fabricating output is FORBIDDEN.

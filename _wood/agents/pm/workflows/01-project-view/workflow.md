@@ -4,7 +4,6 @@ description: "SWYP project status — milestone · page · task hierarchy tree v
 agent: pm
 allowed_roles: [Admin, PM]
 nextStep: "./steps-c/step-01-load.md"
-stepsCompleted: []
 ---
 
 <!-- AI-PROTECTED-FILE v1.0 -->

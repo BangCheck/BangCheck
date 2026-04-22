@@ -1,27 +1,12 @@
 ---
-name: step-01-retest
-description: "TC Result Edit (Retest)"
+step: 1
+title: "TC Result Edit (Retest)"
+mode: edit
 ---
-
 
 # Edit — TC Retest
 
-
-## YOUR TASK
-
-TC Result Edit (Retest)
-
-## MANDATORY EXECUTION RULES
-
-### Universal Rules
-- 📖 Read this entire file before taking any action
-- 🎯 YOU ARE A FACILITATOR — guide the user, never act autonomously
-- 🛑 NEVER fabricate command output or API data
-- 🚫 Do NOT proceed past a STOP gate without user input
-
-## MANDATORY SEQUENCE
-
-### E1-1. Select target TC
+## E1-1. Select target TC
 
 ```
 Select a TC to retest:
@@ -34,11 +19,9 @@ Select a TC to retest:
 Enter TC ID:
 ```
 
+STOP and WAIT.
 
-> 🛑 **STOP** — Wait for user input before continuing.
-
-
-### E1-2. Re-execute
+## E1-2. Re-execute
 
 ```
 ▶️ Retest: {TC_ID}: {case_name}
@@ -61,11 +44,9 @@ Result after re-execution:
 [3] ⏭️ Change to Skip
 ```
 
+STOP and WAIT.
 
-> 🛑 **STOP** — Wait for user input before continuing.
-
-
-### E1-3. Update
+## E1-3. Update
 
 - Change TC status in issue body
 - Update bug issue status (if ❌→✅, suggest closing the bug)
@@ -83,17 +64,4 @@ Result after re-execution:
   Recommendation: {A if more retestable, else B}
 ```
 
-
-> 🛑 **STOP** — Wait for user input before continuing.
-
-## 🚨 SUCCESS / FAILURE
-
-### ✅ SUCCESS
-- Output rendered in the exact specified format
-- User input received at every STOP gate before proceeding
-
-### ❌ FAILURE
-- Rendering with missing or partial data — wait for complete data first
-- Skipping a STOP gate and proceeding without user confirmation
-
-**Master Rule:** Skipping steps or fabricating output is FORBIDDEN.
+STOP and WAIT.

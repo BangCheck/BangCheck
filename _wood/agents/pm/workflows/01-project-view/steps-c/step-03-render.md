@@ -1,9 +1,8 @@
 ---
-name: step-03-render
-description: "Render Tree + Summary"
-nextStepFile: "./step-04-filter.md"
+step: 3
+title: "Render Tree + Summary"
+nextStep: "./step-04-filter.md"
 ---
-
 
 # Step 03 — Render Tree + Summary
 
@@ -11,28 +10,7 @@ READ THIS ENTIRE FILE before executing any action.
 
 ---
 
-
-## YOUR TASK
-
-Render Tree + Summary
-
-## MANDATORY EXECUTION RULES
-
-### Universal Rules
-- 📖 Read this entire file before taking any action
-- 🎯 YOU ARE A REPORTER — present data as-is, never add unverified information
-- 🛑 NEVER fabricate command output or API data
-- 🚫 Do NOT proceed past a STOP gate without user input
-
-## CONTEXT BOUNDARIES
-
-- Data sources: GitHub Issues API + Milestones API + Project Board
-- Scope: This step only — do not pre-fetch data for future steps
-- Dependencies: previous step output must be complete before proceeding
-
-## MANDATORY SEQUENCE
-
-### 3-1. Intro Narrative (Non-developer PM Friendly)
+## 3-1. Intro Narrative (Non-developer PM Friendly)
 
 Summarize with natural sentences based on the data:
 
@@ -76,7 +54,7 @@ If there are no active milestones:
 
 ---
 
-### 3-2. Per-Page Progress (Tree)
+## 3-2. Per-Page Progress (Tree)
 
 Render each page issue as a human-friendly block:
 
@@ -96,7 +74,7 @@ Render each page issue as a human-friendly block:
 
 ---
 
-### 3-3. Attention Items — Dynamic Recommendations (pm-recommend engine)
+## 3-3. Attention Items — Dynamic Recommendations (pm-recommend engine)
 
 Instead of hardcoded A/B/C options, invoke the `pm-recommend.md` engine to generate dynamic recommendations.
 
@@ -118,15 +96,3 @@ Instead of hardcoded A/B/C options, invoke the `pm-recommend.md` engine to gener
 ## Completion
 
 After rendering is complete → load `./step-04-filter.md` and follow all instructions.
-
-## 🚨 SUCCESS / FAILURE
-
-### ✅ SUCCESS
-- Output rendered in the exact specified format
-- Routed correctly to `./step-04-filter.md`
-
-### ❌ FAILURE
-- Rendering with missing or partial data — wait for complete data first
-- Proceeding to next step before all sequence steps are complete
-
-**Master Rule:** Skipping steps or fabricating output is FORBIDDEN.

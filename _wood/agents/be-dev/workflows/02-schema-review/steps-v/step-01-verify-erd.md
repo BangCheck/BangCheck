@@ -1,34 +1,19 @@
 ---
-name: step-01-verify-erd
-description: "Compare ERD document vs actual entities"
+step: 1
+title: "Compare ERD document vs actual entities"
+mode: validate
 ---
-
 
 # Validate — ERD Verification
 
-
-## YOUR TASK
-
-Compare ERD document vs actual entities
-
-## MANDATORY EXECUTION RULES
-
-### Universal Rules
-- 📖 Read this entire file before taking any action
-- 🎯 YOU ARE AN AUDITOR — report findings accurately, never skip checks
-- 🛑 NEVER fabricate command output or API data
-- 🚫 Do NOT proceed past a STOP gate without user input
-
-## MANDATORY SEQUENCE
-
-### V1-1. Load ERD Document
+## V1-1. Load ERD Document
 
 ```bash
 ERD_FILE="docs/be/erd.md"
 [ -f "$ERD_FILE" ] && cat "$ERD_FILE" || echo "❌ ERD document not found"
 ```
 
-### V1-2. Scan Actual Entities
+## V1-2. Scan Actual Entities
 
 ```bash
 # JPA Entity class list
@@ -40,7 +25,7 @@ for entity in $(entities); do
 done
 ```
 
-### V1-3. Comparison Table
+## V1-3. Comparison Table
 
 ```
 ## 📊 ERD vs Entity Comparison
@@ -70,17 +55,4 @@ done
 {/if}
 ```
 
-
-> 🛑 **STOP** — Wait for user input before continuing.
-
-## 🚨 SUCCESS / FAILURE
-
-### ✅ SUCCESS
-- Output rendered in the exact specified format
-- User input received at every STOP gate before proceeding
-
-### ❌ FAILURE
-- Rendering with missing or partial data — wait for complete data first
-- Skipping a STOP gate and proceeding without user confirmation
-
-**Master Rule:** Skipping steps or fabricating output is FORBIDDEN.
+STOP and WAIT.

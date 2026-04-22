@@ -195,7 +195,7 @@ Examples:
 ### Format
 
 ```
-[type] : 한글 설명 (<50자)
+{type}: {summary in Korean, <50 chars}
 
 #{issue-number}
 ```
@@ -204,35 +204,35 @@ Examples:
 
 | Type | When |
 |------|------|
-| `feat` | 새 기능 추가 |
-| `fix` | 버그 수정 |
-| `docs` | 문서 변경 |
-| `refactor` | 동작 변경 없는 코드 구조 개선 |
-| `chore` | 빌드·의존성·설정 관리 |
-| `design` | UI 스타일·레이아웃 변경 (로직 무변경) |
-| `comment` | 주석 추가·수정 |
-| `remove` | 파일 삭제 |
+| `feat` | New feature or capability |
+| `fix` | Bug fix |
+| `docs` | Documentation only |
+| `refactor` | Code restructure without behavior change |
+| `chore` | Build, deps, config |
+| `design` | UI styling/layout without logic change |
+| `comment` | Comments added/changed |
+| `remove` | Pure deletions |
 
 ### Rules
 
-- **Subject**: 한국어, ≤50자
-- **Body**: 선택사항, 한국어 bullet
-- **Footer**: 추적을 위해 항상 `#{issue_number}` 포함
-- **원자성**: 커밋 1개 = 논리 단위 1개
-- 혼합 변경은 커밋 분리
+- **Subject**: imperative, Korean, ≤50 chars
+- **Body**: optional, bullet points in Korean
+- **Footer**: always `#{issue_number}` for traceability
+- **Atomicity**: one logical change per commit
+- Split mixed changes into separate commits
 
 ### Examples
 
 ✅ Good:
 ```
-[feat] : 로그인 폼 레이아웃 및 입력 유효성 검사 추가
+feat: 로그인 폼 레이아웃 및 입력 유효성 검사 추가
 
 #5
 ```
 
 ✅ Good (with body):
 ```
-[fix] : 네이버 OAuth 콜백 시 토큰 저장 실패 수정
+fix: 네이버 OAuth 콜백 시 토큰 저장 실패 수정
 
 - 쿠키 도메인 설정 오류로 저장 실패
 - 로컬 개발 환경 localhost 대응 추가
@@ -242,9 +242,9 @@ Examples:
 
 ❌ Bad:
 ```
-update code          (type 없음, 영어, 모호)
-fix: 다양한 버그 수정  (대괄호 형식 미사용, 너무 막연)
-feat: 로그인 + 회원가입 + 토큰  (3개 논리 단위 혼합)
+update code    (no type, English, vague)
+fix: 다양한 버그 수정 (너무 막연)
+feat: 로그인 + 회원가입 + 토큰 (3개 논리 단위 섞임)
 ```
 
 ---

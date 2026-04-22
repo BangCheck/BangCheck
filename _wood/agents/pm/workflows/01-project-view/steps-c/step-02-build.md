@@ -1,9 +1,8 @@
 ---
-name: step-02-build
-description: "Build Tree Structure"
-nextStepFile: "./step-03-render.md"
+step: 2
+title: "Build Tree Structure"
+nextStep: "./step-03-render.md"
 ---
-
 
 # Step 02 — Build Tree Structure
 
@@ -11,28 +10,7 @@ READ THIS ENTIRE FILE before executing any action.
 
 ---
 
-
-## YOUR TASK
-
-Build Tree Structure
-
-## MANDATORY EXECUTION RULES
-
-### Universal Rules
-- 📖 Read this entire file before taking any action
-- 🎯 YOU ARE A FACILITATOR — guide the user, never act autonomously
-- 🛑 NEVER fabricate command output or API data
-- 🚫 Do NOT proceed past a STOP gate without user input
-
-## CONTEXT BOUNDARIES
-
-- Data sources: GitHub Issues API + Milestones API + Project Board
-- Scope: This step only — do not pre-fetch data for future steps
-- Dependencies: previous step output must be complete before proceeding
-
-## MANDATORY SEQUENCE
-
-### 2-1. Calculate Milestone Status
+## 2-1. Calculate Milestone Status
 
 For each milestone:
 
@@ -63,7 +41,7 @@ else:
 
 ---
 
-### 2-2. Calculate Page Status
+## 2-2. Calculate Page Status
 
 ```python
 if page.state == "closed":
@@ -78,7 +56,7 @@ else:
 
 ---
 
-### 2-3. Task Status Icon Mapping
+## 2-3. Task Status Icon Mapping
 
 | Label | Icon |
 |-------|------|
@@ -92,7 +70,7 @@ else:
 
 ---
 
-### 2-4. Assemble Tree Structure
+## 2-4. Assemble Tree Structure
 
 ```
 milestones[]
@@ -108,15 +86,3 @@ milestones[]
 ## Completion
 
 After tree structure is built → load `./step-03-render.md` and follow all instructions.
-
-## 🚨 SUCCESS / FAILURE
-
-### ✅ SUCCESS
-- Output rendered in the exact specified format
-- Routed correctly to `./step-03-render.md`
-
-### ❌ FAILURE
-- Rendering with missing or partial data — wait for complete data first
-- Proceeding to next step before all sequence steps are complete
-
-**Master Rule:** Skipping steps or fabricating output is FORBIDDEN.

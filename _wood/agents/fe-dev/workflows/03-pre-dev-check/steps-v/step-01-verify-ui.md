@@ -1,27 +1,12 @@
 ---
-name: step-01-verify-ui
-description: "UI Consistency Verification"
+step: 1
+title: "UI Consistency Verification"
+mode: validate
 ---
-
 
 # Validate — UI Consistency Verification
 
-
-## YOUR TASK
-
-UI Consistency Verification
-
-## MANDATORY EXECUTION RULES
-
-### Universal Rules
-- 📖 Read this entire file before taking any action
-- 🎯 YOU ARE AN AUDITOR — report findings accurately, never skip checks
-- 🛑 NEVER fabricate command output or API data
-- 🚫 Do NOT proceed past a STOP gate without user input
-
-## MANDATORY SEQUENCE
-
-### V1-1. Design Token Consistency
+## V1-1. Design Token Consistency
 
 ```bash
 # Detect hardcoded Tailwind custom colors
@@ -31,7 +16,7 @@ grep -rn "bg-\[#\|text-\[#\|border-\[#" frontend/src/ --include="*.tsx" | head -
 grep -rn "p-\[.*px\]\|m-\[.*px\]\|gap-\[.*px\]" frontend/src/ --include="*.tsx" | head -20
 ```
 
-### V1-2. Korean UI Consistency
+## V1-2. Korean UI Consistency
 
 ```bash
 # Search for Korean text (check if hardcoded)
@@ -39,7 +24,7 @@ grep -rn '"[가-힣]' frontend/src/components/ --include="*.tsx" | wc -l
 # → Check whether separated into i18n or constants file
 ```
 
-### V1-3. Results
+## V1-3. Results
 
 ```
 ## UI Consistency Verification
@@ -62,15 +47,4 @@ grep -rn '"[가-힣]' frontend/src/components/ --include="*.tsx" | wc -l
 {/if}
 ```
 
-
-> 🛑 **STOP** — Wait for user input before continuing.
-
-## 🚨 SUCCESS / FAILURE
-
-### ✅ SUCCESS
-- User input received at every STOP gate before proceeding
-
-### ❌ FAILURE
-- Skipping a STOP gate and proceeding without user confirmation
-
-**Master Rule:** Skipping steps or fabricating output is FORBIDDEN.
+STOP and WAIT.

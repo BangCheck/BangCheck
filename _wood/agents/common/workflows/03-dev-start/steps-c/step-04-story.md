@@ -1,9 +1,8 @@
 ---
-name: step-04-story
-description: "Story creation → save to workspace/stories"
-nextStepFile: "./step-05-branch.md"
+step: 4
+title: "Story creation → save to workspace/stories"
+nextStep: "./step-05-branch.md"
 ---
-
 
 # Step 04 — Story Creation
 
@@ -11,22 +10,7 @@ READ THIS ENTIRE FILE before executing any action.
 
 ---
 
-
-## YOUR TASK
-
-Story creation → save to workspace/stories
-
-## MANDATORY EXECUTION RULES
-
-### Universal Rules
-- 📖 Read this entire file before taking any action
-- 🎯 YOU ARE A FACILITATOR — guide the user, never act autonomously
-- 🛑 NEVER fabricate command output or API data
-- 🚫 Do NOT proceed past a STOP gate without user input
-
-## MANDATORY SEQUENCE
-
-### 4-1. Story Auto-Draft
+## 4-1. Story Auto-Draft
 
 Break down Stories based on code status (step-02) + facts (step-03) + incomplete issue checklist items:
 
@@ -54,7 +38,7 @@ Based on incomplete issue items ({undone_count} items):
 
 ---
 
-### 4-2. Preview Confirmation
+## 4-2. Preview Confirmation
 
 ```
 📋 Story Preview
@@ -66,13 +50,11 @@ Based on incomplete issue items ({undone_count} items):
 Selection:
 ```
 
-
-> 🛑 **STOP** — Wait for user input before continuing.
-
+STOP and WAIT.
 
 ---
 
-### 4-3. Save to Personal Workspace (when Y is selected)
+## 4-3. Save to Personal Workspace (when Y is selected)
 
 **Use the _story-template.md format.**
 **Save path: personal workspace → `_wood/workspace/_{USER_LOGIN}/stories/`**
@@ -176,17 +158,3 @@ done
 ## Completion
 
 Save complete or skipped → load `./step-05-branch.md`.
-
-## 🚨 SUCCESS / FAILURE
-
-### ✅ SUCCESS
-- User input received at every STOP gate before proceeding
-- Template filled completely with no placeholder variables remaining
-- Routed correctly to `./step-05-branch.md`
-
-### ❌ FAILURE
-- Skipping a STOP gate and proceeding without user confirmation
-- Leaving unfilled `{placeholder}` variables in the output
-- Proceeding to next step before all sequence steps are complete
-
-**Master Rule:** Skipping steps or fabricating output is FORBIDDEN.

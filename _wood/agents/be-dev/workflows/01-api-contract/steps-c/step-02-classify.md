@@ -1,28 +1,12 @@
 ---
-name: step-02-classify
-description: "Classify changes"
-nextStepFile: "./step-03-analyze.md"
+step: 2
+title: "Classify changes"
+nextStep: "./step-03-analyze.md"
 ---
-
 
 # Step 02 — Classify Changes
 
-
-## YOUR TASK
-
-Classify changes
-
-## MANDATORY EXECUTION RULES
-
-### Universal Rules
-- 📖 Read this entire file before taking any action
-- 🎯 YOU ARE AN API ANALYST — present contract as-is, flag breaking changes
-- 🛑 NEVER fabricate command output or API data
-- 🚫 Do NOT proceed past a STOP gate without user input
-
 Classify each changed file into 3 levels:
-
-## MANDATORY SEQUENCE
 
 ### 🟢 Additive (backward compatible)
 
@@ -66,15 +50,3 @@ Summary: 🟢 {n} · 🟡 {n} · 🔴 {n}
 ```
 
 → step-03 analysis.
-
-## 🚨 SUCCESS / FAILURE
-
-### ✅ SUCCESS
-- Output rendered in the exact specified format
-- Routed correctly to `./step-03-analyze.md`
-
-### ❌ FAILURE
-- Rendering with missing or partial data — wait for complete data first
-- Proceeding to next step before all sequence steps are complete
-
-**Master Rule:** Skipping steps or fabricating output is FORBIDDEN.

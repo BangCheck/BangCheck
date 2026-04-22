@@ -1,57 +1,22 @@
 ---
-name: step-03-create-issues
-description: "Issue Creation Wizard"
-nextStepFile: "./step-04-update-docs.md"
+step: 3
+title: "Issue Creation Wizard"
+nextStep: "./step-04-update-docs.md"
 ---
-
 
 # Step 03 — Issue Creation Wizard
 
 READ THIS ENTIRE FILE before executing any action.
 
-
-## YOUR TASK
-
-Issue Creation Wizard
-
-## MANDATORY EXECUTION RULES
-
-### Universal Rules
-- 📖 Read this entire file before taking any action
-- 🎯 YOU ARE AN ISSUE CREATOR — preview before creating, never auto-create
-- 🛑 NEVER fabricate command output or API data
-- 🚫 Do NOT proceed past a STOP gate without user input
-
 **Principles:**
 - FE tasks → Assignee: Woo Jong-ho (FE Team Lead)
 - BE tasks → Assignee: Ha Ji-myung (BE Team Lead)
 - Both → Create 2 separate issues: FE issue + BE issue
-- **MANDATORY: Always confirm before any issue or project creation — no silent auto-creation**
-- **MANDATORY: Always show a recommendation before asking — never present a blank prompt**
-
-### Confirmation Rule (applies to ALL issue/project creation in this workflow)
-
-Before creating ANY issue or project item:
-1. Show what will be created (preview)
-2. Offer a natural recommendation on what to prioritize
-3. Ask conversationally — not with a Y/N gate
-
-```
-✅ Good:
-"SCR-HOME 미연동 기능이 6개예요. 우선순위 높은 것부터 3개만 먼저 생성할까요,
-아니면 전체 다 올릴까요?"
-
-❌ Bad:
-"이슈를 생성하시겠습니까? (Y/N)"
-```
-
-If user confirms → create.
-If user modifies scope → adjust and re-preview.
-If user declines → skip this screen, move to next.
+- All issues require preview → Y confirmation before creation
 
 ---
 
-### 3-0. Entry Branch
+## 3-0. Entry Branch
 
 ```
 [A] Create missing specification items   → 3-A (auto-draft)
@@ -61,9 +26,7 @@ If user declines → skip this screen, move to next.
 Select:
 ```
 
-
-> 🛑 **STOP** — Wait for user input before continuing.
-
+STOP and WAIT for user input.
 
 ---
 
@@ -128,14 +91,6 @@ Recommended period:
 
 When the PM describes what they want to build, the agent guides through each step.
 
-## CONTEXT BOUNDARIES
-
-- Data sources: Google Sheets MCP (시트22) + GitHub Issues API
-- Scope: This step only — do not pre-fetch data for future steps
-- Dependencies: previous step output must be complete before proceeding
-
-## MANDATORY SEQUENCE
-
 ### Q1. Which screen?
 
 ```
@@ -148,9 +103,7 @@ Currently registered screens:
 Enter screen name or number (enter directly for a new screen):
 ```
 
-
-> 🛑 **STOP** — Wait for user input before continuing.
-
+STOP and WAIT.
 
 ### Q2. Issue Title
 
@@ -161,9 +114,7 @@ e.g.) "Room card delete button", "Add Google social login"
 Title:
 ```
 
-
-> 🛑 **STOP** — Wait for user input before continuing.
-
+STOP and WAIT.
 
 ### Q3. FE / BE Recommendation
 
@@ -178,9 +129,7 @@ Auto-determine based on the entered title/description, then recommend:
 Select:
 ```
 
-
-> 🛑 **STOP** — Wait for user input before continuing.
-
+STOP and WAIT.
 
 **If Both is selected → Mark as 2 separate FE/BE issues to be created.**
 
@@ -200,9 +149,7 @@ Recommended: Priority:{recommended}
 Select:
 ```
 
-
-> 🛑 **STOP** — Wait for user input before continuing.
-
+STOP and WAIT.
 
 ### Q5. Sprint + Date Recommendation
 
@@ -224,9 +171,7 @@ Recommended period: {start_date} ~ {end_date}
 Select:
 ```
 
-
-> 🛑 **STOP** — Wait for user input before continuing.
-
+STOP and WAIT.
 
 ### Q6. Additional Details (Optional)
 
@@ -236,9 +181,7 @@ Enter additional description if any. (Press Enter to skip)
 Description:
 ```
 
-
-> 🛑 **STOP** — Wait for user input before continuing.
-
+STOP and WAIT.
 
 ---
 
@@ -293,9 +236,7 @@ Sprint:    {milestone}
 Select:
 ```
 
-
-> 🛑 **STOP** — Wait for user input before continuing.
-
+STOP and WAIT.
 
 ### Assignee Decision Logic (No Hardcoding)
 
@@ -436,23 +377,3 @@ On error → warning only, issue creation is preserved.
 ## Completion
 
 After creation or cancellation → load `./step-04-update-docs.md`.
-
-## 🚨 SUCCESS / FAILURE
-
-### ✅ SUCCESS
-- GitHub CLI command executed and output displayed
-- Output rendered in the exact specified format
-- User input received at every STOP gate before proceeding
-- Template filled completely with no placeholder variables remaining
-- Issue created with correct labels, assignee, and project board link
-- Routed correctly to `./step-04-update-docs.md`
-
-### ❌ FAILURE
-- CLI error or HTTP 4xx/5xx → report exact stdout/stderr, STOP
-- Rendering with missing or partial data — wait for complete data first
-- Skipping a STOP gate and proceeding without user confirmation
-- Leaving unfilled `{placeholder}` variables in the output
-- Creating issues without user confirmation preview
-- Proceeding to next step before all sequence steps are complete
-
-**Master Rule:** Skipping steps or fabricating output is FORBIDDEN.

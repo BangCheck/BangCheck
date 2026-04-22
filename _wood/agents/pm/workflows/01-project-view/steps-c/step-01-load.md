@@ -1,9 +1,8 @@
 ---
-name: step-01-load
-description: "Collect GitHub Data"
-nextStepFile: "./step-02-build.md"
+step: 1
+title: "Collect GitHub Data"
+nextStep: "./step-02-build.md"
 ---
-
 
 # Step 01 — Collect GitHub Data
 
@@ -11,28 +10,7 @@ READ THIS ENTIRE FILE before executing any action.
 
 ---
 
-
-## YOUR TASK
-
-Collect GitHub Data
-
-## MANDATORY EXECUTION RULES
-
-### Universal Rules
-- 📖 Read this entire file before taking any action
-- 🎯 YOU ARE A DATA READER — report exact API/MCP response, never fabricate
-- 🛑 NEVER fabricate command output or API data
-- 🚫 Do NOT proceed past a STOP gate without user input
-
-## CONTEXT BOUNDARIES
-
-- Data sources: GitHub Issues API + Milestones API + Project Board
-- Scope: This step only — do not pre-fetch data for future steps
-- Dependencies: previous step output must be complete before proceeding
-
-## MANDATORY SEQUENCE
-
-### 1-1. Open Milestones
+## 1-1. Open Milestones
 
 ```bash
 gh api "repos/$REPO/milestones?state=open&per_page=30" \
@@ -49,7 +27,7 @@ Wait for user input, then STOP.
 
 ---
 
-### 1-2. Page Issues (유형:페이지)
+## 1-2. Page Issues (유형:페이지)
 
 For each milestone:
 ```bash
@@ -62,7 +40,7 @@ gh issue list --repo $REPO \
 
 ---
 
-### 1-3. Task Issues (유형:작업)
+## 1-3. Task Issues (유형:작업)
 
 ```bash
 gh issue list --repo $REPO \
@@ -74,7 +52,7 @@ gh issue list --repo $REPO \
 
 ---
 
-### 1-4. Parent-Child Relationships
+## 1-4. Parent-Child Relationships
 
 Priority:
 1. GitHub sub-issues API
@@ -85,7 +63,7 @@ Priority:
 
 ---
 
-### 1-5. Bug Issues (유형:버그)
+## 1-5. Bug Issues (유형:버그)
 
 ```bash
 gh issue list --repo $REPO \
@@ -96,7 +74,7 @@ gh issue list --repo $REPO \
 
 ---
 
-### 1-6. Milestone Meta
+## 1-6. Milestone Meta
 
 ```bash
 cat _wood/milestone-meta.yaml
@@ -109,19 +87,3 @@ Save `global_defaults.on_track_threshold` and `caution_threshold`.
 ## Completion
 
 After all data collection is complete → load `./step-02-build.md` and follow all instructions.
-
-## 🚨 SUCCESS / FAILURE
-
-### ✅ SUCCESS
-- Data parsed into structured format without errors
-- GitHub CLI command executed and output displayed
-- User input received at every STOP gate before proceeding
-- Routed correctly to `./step-02-build.md`
-
-### ❌ FAILURE
-- Empty or malformed response → report exact error, do not continue
-- CLI error or HTTP 4xx/5xx → report exact stdout/stderr, STOP
-- Skipping a STOP gate and proceeding without user confirmation
-- Proceeding to next step before all sequence steps are complete
-
-**Master Rule:** Skipping steps or fabricating output is FORBIDDEN.

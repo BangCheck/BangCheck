@@ -3,7 +3,6 @@ name: dev-start
 description: "Dev entry — Issue identification → Code reading → Fact check → Story creation → Development → Completion sync"
 allowed_roles: [Admin, Frontend, Backend]
 nextStep: "./steps-c/step-01-issue.md"
-stepsCompleted: []
 ---
 
 <!-- AI-PROTECTED-FILE v1.0 -->

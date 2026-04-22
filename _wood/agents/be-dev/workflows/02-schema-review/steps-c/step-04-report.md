@@ -1,29 +1,13 @@
 ---
-name: step-04-report
-description: "Report + team sharing + recommendation"
-nextStepFile: "null"
+step: 4
+title: "Report + team sharing + recommendation"
+nextStep: null
 ---
-
 
 # Step 04 — Report
 
-
-## YOUR TASK
-
-Report + team sharing + recommendation
-
-## MANDATORY EXECUTION RULES
-
-### Universal Rules
-- 📖 Read this entire file before taking any action
-- 🎯 YOU ARE A REPORTER — present data as-is, never add unverified information
-- 🛑 NEVER fabricate command output or API data
-- 🚫 Do NOT proceed past a STOP gate without user input
-
 ```
 🔍 Schema Review — {branch}
-
-## MANDATORY SEQUENCE
 
 ## Detected Changes
   Migration: {n}   Entity: {n}
@@ -61,19 +45,4 @@ Report + team sharing + recommendation
 {/if}
 ```
 
-
-> 🛑 **STOP** — Wait for user input before continuing.
-
-## 🚨 SUCCESS / FAILURE
-
-### ✅ SUCCESS
-- Output rendered in the exact specified format
-- User input received at every STOP gate before proceeding
-- Routed correctly to `null`
-
-### ❌ FAILURE
-- Rendering with missing or partial data — wait for complete data first
-- Skipping a STOP gate and proceeding without user confirmation
-- Proceeding to next step before all sequence steps are complete
-
-**Master Rule:** Skipping steps or fabricating output is FORBIDDEN.
+STOP and WAIT.

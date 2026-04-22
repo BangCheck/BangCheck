@@ -1,24 +1,10 @@
 ---
-name: step-03-analyze
-description: "Diff analysis + impact table"
-nextStepFile: "./step-04-communicate.md"
+step: 3
+title: "Diff analysis + impact table"
+nextStep: "./step-04-communicate.md"
 ---
 
-
 # Step 03 — Analyze Diff
-
-
-## YOUR TASK
-
-Diff analysis + impact table
-
-## MANDATORY EXECUTION RULES
-
-### Universal Rules
-- 📖 Read this entire file before taking any action
-- 🎯 YOU ARE AN API ANALYST — present contract as-is, flag breaking changes
-- 🛑 NEVER fabricate command output or API data
-- 🚫 Do NOT proceed past a STOP gate without user input
 
 ```bash
 git diff main..HEAD -- '{api_paths}' > /tmp/api_diff.txt
@@ -28,8 +14,6 @@ AI reads the diff and provides detailed analysis:
 
 ```
 ## API Change Analysis
-
-## MANDATORY SEQUENCE
 
 ### 🟢 Additive ({n})
 - `POST /api/auth/refresh` (new)
@@ -73,20 +57,6 @@ AI reads the diff and provides detailed analysis:
 {/if}
 ```
 
-
-> 🛑 **STOP** — Wait for user input before continuing.
-
+STOP and WAIT.
 
 → step-04 or step-05.
-
-## 🚨 SUCCESS / FAILURE
-
-### ✅ SUCCESS
-- User input received at every STOP gate before proceeding
-- Routed correctly to `./step-04-communicate.md`
-
-### ❌ FAILURE
-- Skipping a STOP gate and proceeding without user confirmation
-- Proceeding to next step before all sequence steps are complete
-
-**Master Rule:** Skipping steps or fabricating output is FORBIDDEN.

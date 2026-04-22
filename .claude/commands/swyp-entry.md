@@ -66,40 +66,6 @@ gh pr list --repo {repo} --author @me --state open --json number,title,reviewDec
 
 After assessing the situation, guide through template-based questions instead of a simple yes/no.
 
-#### Step 0 — Project Init Check (FIRST, before all other steps)
-
-Before assessing individual work status, check whether the project itself has started:
-
-```bash
-gh api repos/{repo}/milestones --jq 'length'
-gh issue list --repo {repo} --state open --json number --limit 1 | jq length
-```
-
-| Condition | Flow |
-|-----------|------|
-| milestone = 0 AND open issues = 0 | → Step E (project init flow) |
-| milestone = 0 AND open issues > 0 | → Step E (sprint scope flow) |
-| milestone > 0 | → Step 1 (normal situation assessment) |
-
-#### Step E — Project Init Flow
-
-Do NOT display a fixed script or numbered list. Assess the situation and speak naturally.
-
-**Conditions and judgment basis:**
-
-| Condition | What to convey | Available actions |
-|-----------|---------------|-------------------|
-| milestone = 0 AND issue = 0 | Project hasn't started — nothing is set up yet | doc-sync, manual issue creation, milestone creation |
-| milestone = 0 AND issue > 0 | Issues exist but no sprint structure yet | milestone creation, issue grouping |
-
-**How to respond:**
-- Describe the current state in one natural sentence
-- Recommend the single most logical next step based on context
-- Ask conversationally — do not list all options upfront
-- Let the conversation guide what comes next
-
-→ Route based on user's reply, not a preset menu.
-
 #### Step 1 — Situation Assessment
 
 | Situation | Flow |
