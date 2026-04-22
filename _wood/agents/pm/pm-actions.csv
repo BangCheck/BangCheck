@@ -1,4 +1,6 @@
 id,trigger,priority,category,label,handler,context_var,icon
+project-init,milestone_count == 0 AND total_issue_count == 0,1,init,기능명세서 연동으로 첫 스프린트 시작하기,../05-doc-sync/workflow.md,,🚀
+milestone-init,milestone_count == 0 AND total_issue_count > 0,2,init,마일스톤(스프린트)이 없어요 — 첫 스프린트 범위를 잡아볼까요?,../../workflows/02-project.md,,📌
 pr-violation,pr_violation_count > 0,5,pr,Check compliance-violation PR immediately,pr-detail-view.md,violation_prs,🔴
 blocker-comment,blocker_count > 0,10,blocker,Leave a progress check comment for the assignee,../02-activity/workflow.md,blocker_issues,🚫
 blocker-analyze,blocker_count > 0 AND blocker_max_days > 3,15,blocker,Analyze blocking cause and link related issues,../../workflows/02-project.md,blocker_issues,🔍
