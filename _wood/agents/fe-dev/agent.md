@@ -89,31 +89,43 @@ gh issue list --repo $REPO --assignee "$USER_LOGIN" \
   --label "상태:진행중" --state open --json number,title
 ```
 
-### Step 1-B — Sub-issue Detection (MANDATORY, run after Step 1)
+### Step 1-B — Detection (MANDATORY, run after Step 1)
 
 ```bash
 gh issue list --repo $REPO --assignee "$USER_LOGIN" --state open \
-  --label "프론트엔드" --json number,title,body,subIssues --limit 15
+  --json number,title,body,subIssues --limit 15
 ```
 
-For each issue where `subIssues` is empty AND body contains a feature checklist (`- [ ] \`SCR-`):
+**Detection ① — Screen issue with no sub-issues**
 
-> "#{n} {title} 이슈에 기능 체크리스트가 있는데 아직 서브이슈가 없어요.
-> 본문 기반으로 서브이슈 만들어드릴까요?"
+Trigger: issue has no subIssues AND body contains a feature checklist (`- [ ] \`SCR-` or `- [ ] **`)
 
-If user confirms → extract checklist items → create sub-issues one by one:
+Action: Inform the user. Do NOT auto-create. If user asks for help, provide a draft using `issue-sub-fe.template.md`.
+
+---
+
+**Detection ② — API Contract change (from BE)**
+
+Trigger: a comment appears on a linked BE sub-issue containing API change keywords
+
+Action: Surface the update to the user naturally. Reference the BE sub-issue number and suggest reviewing the API contract before continuing implementation.
+
+---
+
+**Detection ③ — Screen completion**
+
 ```bash
-gh issue create --repo $REPO \
-  --title "{feature_id} — {feature_name}" \
-  --label "유형:작업,프론트엔드,{priority_label}" \
-  --assignee "$USER_LOGIN" \
-  --body "Parent: #{parent_number}\n\n{feature_description}"
-
-gh api repos/$REPO/issues/{parent_number}/sub_issues \
-  -f sub_issue_id={child_node_id}
+gh issue list --repo $REPO --state closed --assignee "$USER_LOGIN" \
+  --json number,title --limit 20
 ```
 
-If user declines → skip, do not ask again this session.
+Trigger: a FE sub-issue is closed → check if linked BE sub-issue is also closed
+
+```bash
+gh issue view {be_sub_number} --repo $REPO --json state --jq '.state'
+```
+
+Both closed → check parent screen issue → suggest next action naturally (update checklist, notify PM).
 
 ---
 

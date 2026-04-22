@@ -87,33 +87,53 @@ gh pr list --repo $REPO --author "$USER_LOGIN" --state open \
   --json number,title,state,reviews
 ```
 
-### Step 1-B — Sub-issue Detection (MANDATORY, run after Step 1)
+### Step 1-B — Detection (MANDATORY, run after Step 1)
 
 ```bash
-# Fetch assigned screen issues without sub-issues
 gh issue list --repo $REPO --assignee "$USER_LOGIN" --state open \
-  --label "백엔드" --json number,title,body,subIssues --limit 15
+  --json number,title,body,subIssues --limit 15
 ```
 
-For each issue where `subIssues` is empty AND body contains a feature checklist (`- [ ] \`SCR-`):
+**Detection ① — Screen issue with no sub-issues**
 
-> "#{n} {title} 이슈에 기능 체크리스트가 있는데 아직 서브이슈가 없어요.
-> 본문 기반으로 서브이슈 만들어드릴까요?"
+Trigger: issue has no subIssues AND body contains a feature checklist (`- [ ] \`SCR-` or `- [ ] **`)
 
-If user confirms → extract checklist items → create sub-issues one by one:
+Action: Inform the user. Do NOT auto-create. If user asks for help, provide a draft using `issue-sub-be.template.md`.
+
+---
+
+**Detection ② — API Contract change**
+
 ```bash
-gh issue create --repo $REPO \
-  --title "{feature_id} — {feature_name}" \
-  --label "유형:작업,백엔드,{priority_label}" \
-  --assignee "$USER_LOGIN" \
-  --body "Parent: #{parent_number}\n\n{feature_description}"
-
-# Link as sub-issue
-gh api repos/$REPO/issues/{parent_number}/sub_issues \
-  -f sub_issue_id={child_node_id}
+gh issue list --repo $REPO --assignee "$USER_LOGIN" --state open \
+  --json number,title,comments --limit 15 \
+  | jq '.[] | select(.comments[].body | test("API|endpoint|변경|수정|breaking"; "i"))'
 ```
 
-If user declines → skip, do not ask again this session.
+Trigger: recent comment on a BE sub-issue contains API change keywords
+
+Action: Find linked FE sub-issue from the issue body. Post a comment notifying of the change.
+
+```bash
+gh issue comment {fe_sub_number} --repo $REPO --body "{natural message}"
+```
+
+---
+
+**Detection ③ — Screen completion**
+
+```bash
+gh issue list --repo $REPO --state closed --assignee "$USER_LOGIN" \
+  --json number,title --limit 20
+```
+
+Trigger: a BE sub-issue is closed → check if linked FE sub-issue is also closed
+
+```bash
+gh issue view {fe_sub_number} --repo $REPO --json state --jq '.state'
+```
+
+Both closed → check parent screen issue → suggest next action naturally (update checklist, notify PM).
 
 ---
 
