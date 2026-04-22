@@ -83,30 +83,22 @@ gh issue list --repo {repo} --state open --json number --limit 1 | jq length
 
 #### Step E — Project Init Flow
 
-When no milestones and no issues exist:
+Do NOT display a fixed script or numbered list. Assess the situation and speak naturally.
 
-```
-아직 프로젝트가 시작 전이에요.
+**Conditions and judgment basis:**
 
-보통 이 순서로 시작해요:
-  1. 기능명세서 연동 → 이슈 자동 생성
-  2. 마일스톤(스프린트) 생성 → 이슈 배분
-  3. 팀원 할당 → 작업 시작
+| Condition | What to convey | Available actions |
+|-----------|---------------|-------------------|
+| milestone = 0 AND issue = 0 | Project hasn't started — nothing is set up yet | doc-sync, manual issue creation, milestone creation |
+| milestone = 0 AND issue > 0 | Issues exist but no sprint structure yet | milestone creation, issue grouping |
 
-기능명세서 연동부터 시작해볼까요?
-```
+**How to respond:**
+- Describe the current state in one natural sentence
+- Recommend the single most logical next step based on context
+- Ask conversationally — do not list all options upfront
+- Let the conversation guide what comes next
 
-→ If yes: route to `swyp-project` doc-sync flow
-→ If no: ask what they'd like to start with (manual issue creation / milestone first)
-
-When milestones = 0 but issues exist:
-
-```
-이슈는 있는데 아직 스프린트(마일스톤)가 없어요.
-이슈들을 묶어서 첫 스프린트 범위를 정해볼까요?
-```
-
-→ Route to milestone creation flow
+→ Route based on user's reply, not a preset menu.
 
 #### Step 1 — Situation Assessment
 
