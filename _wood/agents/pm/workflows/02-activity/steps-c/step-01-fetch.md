@@ -1,9 +1,8 @@
 ---
-name: step-01-fetch
-description: "Collect and render 24h activity data"
-nextStepFile: "./step-05-menu.md"
+step: 1
+title: "Collect and render 24h activity data"
+nextStep: "./step-05-menu.md"
 ---
-
 
 # Step 01 — Collect 24h Activity Data
 
@@ -11,28 +10,7 @@ READ THIS ENTIRE FILE before executing any action.
 
 ---
 
-
-## YOUR TASK
-
-Collect and render 24h activity data
-
-## MANDATORY EXECUTION RULES
-
-### Universal Rules
-- 📖 Read this entire file before taking any action
-- 🎯 YOU ARE A DATA READER — report exact API/MCP response, never fabricate
-- 🛑 NEVER fabricate command output or API data
-- 🚫 Do NOT proceed past a STOP gate without user input
-
-## CONTEXT BOUNDARIES
-
-- Data sources: GitHub Issues API + PR API + Comments
-- Scope: This step only — do not pre-fetch data for future steps
-- Dependencies: previous step output must be complete before proceeding
-
-## MANDATORY SEQUENCE
-
-### 1-1. Set Time Baseline
+## 1-1. Set Time Baseline
 
 ```bash
 SINCE_ISO=$(date -u -v-24H +"%Y-%m-%dT%H:%M:%SZ" 2>/dev/null \
@@ -41,7 +19,7 @@ SINCE_ISO=$(date -u -v-24H +"%Y-%m-%dT%H:%M:%SZ" 2>/dev/null \
 
 ---
 
-### 1-2. Collect Data (Parallel)
+## 1-2. Collect Data (Parallel)
 
 ```bash
 # Issue comments
@@ -66,7 +44,7 @@ gh pr list --repo $REPO --state merged \
 
 ---
 
-### 1-3. Render
+## 1-3. Render
 
 ```
 ## 🔥 Last 24 Hours Activity
@@ -96,19 +74,3 @@ Consider running a daily standup.
 ## Completion
 
 After rendering is complete → load `./step-05-menu.md` and follow all instructions.
-
-## 🚨 SUCCESS / FAILURE
-
-### ✅ SUCCESS
-- GitHub CLI command executed and output displayed
-- Output rendered in the exact specified format
-- User explicitly confirmed before commit/push
-- Routed correctly to `./step-05-menu.md`
-
-### ❌ FAILURE
-- CLI error or HTTP 4xx/5xx → report exact stdout/stderr, STOP
-- Rendering with missing or partial data — wait for complete data first
-- Committing or pushing without explicit user confirmation
-- Proceeding to next step before all sequence steps are complete
-
-**Master Rule:** Skipping steps or fabricating output is FORBIDDEN.

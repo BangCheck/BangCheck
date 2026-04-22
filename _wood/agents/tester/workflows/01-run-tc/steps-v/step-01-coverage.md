@@ -1,27 +1,12 @@
 ---
-name: step-01-coverage
-description: "TC Coverage Validation"
+step: 1
+title: "TC Coverage Validation"
+mode: validate
 ---
-
 
 # Validate — TC Coverage
 
-
-## YOUR TASK
-
-TC Coverage Validation
-
-## MANDATORY EXECUTION RULES
-
-### Universal Rules
-- 📖 Read this entire file before taking any action
-- 🎯 YOU ARE AN AUDITOR — report findings accurately, never skip checks
-- 🛑 NEVER fabricate command output or API data
-- 🚫 Do NOT proceed past a STOP gate without user input
-
-## MANDATORY SEQUENCE
-
-### V1-1. TC count vs feature count per page
+## V1-1. TC count vs feature count per page
 
 ```bash
 # Query feature (sub-issue) count from page issues
@@ -32,7 +17,7 @@ for page in $(gh issue list --repo $REPO --label "유형:페이지" --state open
 done
 ```
 
-### V1-2. Coverage table
+## V1-2. Coverage table
 
 ```
 ## 📊 TC Coverage
@@ -72,19 +57,4 @@ Verdict criteria:
 {/if}
 ```
 
-
-> 🛑 **STOP** — Wait for user input before continuing.
-
-## 🚨 SUCCESS / FAILURE
-
-### ✅ SUCCESS
-- GitHub CLI command executed and output displayed
-- Output rendered in the exact specified format
-- User input received at every STOP gate before proceeding
-
-### ❌ FAILURE
-- CLI error or HTTP 4xx/5xx → report exact stdout/stderr, STOP
-- Rendering with missing or partial data — wait for complete data first
-- Skipping a STOP gate and proceeding without user confirmation
-
-**Master Rule:** Skipping steps or fabricating output is FORBIDDEN.
+STOP and WAIT.

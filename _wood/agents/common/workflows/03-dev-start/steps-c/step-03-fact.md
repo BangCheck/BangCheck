@@ -1,9 +1,8 @@
 ---
-name: step-03-fact
-description: "Fact check table output"
-nextStepFile: "./step-04-story.md"
+step: 3
+title: "Fact check table output"
+nextStep: "./step-04-story.md"
 ---
-
 
 # Step 03 — Fact Check
 
@@ -11,22 +10,7 @@ READ THIS ENTIRE FILE before executing any action.
 
 ---
 
-
-## YOUR TASK
-
-Fact check table output
-
-## MANDATORY EXECUTION RULES
-
-### Universal Rules
-- 📖 Read this entire file before taking any action
-- 🎯 YOU ARE A FACILITATOR — guide the user, never act autonomously
-- 🛑 NEVER fabricate command output or API data
-- 🚫 Do NOT proceed past a STOP gate without user input
-
-## MANDATORY SEQUENCE
-
-### 3-1. Fact Check Output
+## 3-1. Fact Check Output
 
 All collected information at a glance:
 
@@ -59,7 +43,7 @@ All collected information at a glance:
 
 ---
 
-### 3-2. Options + Candid Recommendation
+## 3-2. Options + Candid Recommendation
 
 Auto-generated based on code status:
 
@@ -87,15 +71,3 @@ STOP and WAIT for user selection.
 ## Completion
 
 After selection confirmed → load `./step-04-story.md`.
-
-## 🚨 SUCCESS / FAILURE
-
-### ✅ SUCCESS
-- User input received at every STOP gate before proceeding
-- Routed correctly to `./step-04-story.md`
-
-### ❌ FAILURE
-- Skipping a STOP gate and proceeding without user confirmation
-- Proceeding to next step before all sequence steps are complete
-
-**Master Rule:** Skipping steps or fabricating output is FORBIDDEN.

@@ -87,56 +87,6 @@ gh pr list --repo $REPO --author "$USER_LOGIN" --state open \
   --json number,title,state,reviews
 ```
 
-### Step 1-B — Detection (MANDATORY, run after Step 1)
-
-```bash
-gh issue list --repo $REPO --assignee "$USER_LOGIN" --state open \
-  --json number,title,body,subIssues --limit 15
-```
-
-**Detection ① — Screen issue with no sub-issues**
-
-Trigger: issue has no subIssues AND body contains a feature checklist (`- [ ] \`SCR-` or `- [ ] **`)
-
-Action: Inform the user. Do NOT auto-create. If user asks for help, provide a draft using `issue-sub-be.template.md`.
-
----
-
-**Detection ② — API Contract change**
-
-```bash
-gh issue list --repo $REPO --assignee "$USER_LOGIN" --state open \
-  --json number,title,comments --limit 15 \
-  | jq '.[] | select(.comments[].body | test("API|endpoint|변경|수정|breaking"; "i"))'
-```
-
-Trigger: recent comment on a BE sub-issue contains API change keywords
-
-Action: Find linked FE sub-issue from the issue body. Post a comment notifying of the change.
-
-```bash
-gh issue comment {fe_sub_number} --repo $REPO --body "{natural message}"
-```
-
----
-
-**Detection ③ — Screen completion**
-
-```bash
-gh issue list --repo $REPO --state closed --assignee "$USER_LOGIN" \
-  --json number,title --limit 20
-```
-
-Trigger: a BE sub-issue is closed → check if linked FE sub-issue is also closed
-
-```bash
-gh issue view {fe_sub_number} --repo $REPO --json state --jq '.state'
-```
-
-Both closed → check parent screen issue → suggest next action naturally (update checklist, notify PM).
-
----
-
 ### Step 2 — Render dashboard
 
 ```markdown

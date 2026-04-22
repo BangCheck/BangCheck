@@ -1,9 +1,8 @@
 ---
-name: step-04-filter
-description: "Filter / Zoom"
-nextStepFile: "./step-05-actions.md"
+step: 4
+title: "Filter / Zoom"
+nextStep: "./step-05-actions.md"
 ---
-
 
 # Step 04 — Filter / Zoom
 
@@ -11,28 +10,7 @@ READ THIS ENTIRE FILE before executing any action.
 
 ---
 
-
-## YOUR TASK
-
-Filter / Zoom
-
-## MANDATORY EXECUTION RULES
-
-### Universal Rules
-- 📖 Read this entire file before taking any action
-- 🎯 YOU ARE A FACILITATOR — guide the user, never act autonomously
-- 🛑 NEVER fabricate command output or API data
-- 🚫 Do NOT proceed past a STOP gate without user input
-
-## CONTEXT BOUNDARIES
-
-- Data sources: GitHub Issues API + Milestones API + Project Board
-- Scope: This step only — do not pre-fetch data for future steps
-- Dependencies: previous step output must be complete before proceeding
-
-## MANDATORY SEQUENCE
-
-### 4-1. Display Filter Menu
+## 4-1. Display Filter Menu
 
 ```
 ## Filter / Zoom
@@ -49,13 +27,11 @@ Filter / Zoom
 Enter a number or keyword:
 ```
 
-
-> 🛑 **STOP** — Wait for user input before continuing.
-
+STOP and WAIT for user input.
 
 ---
 
-### 4-2. Input Handlers
+## 4-2. Input Handlers
 
 ### [M] Milestone Zoom
 
@@ -130,21 +106,3 @@ Return to PM Dashboard (agent.md menu).
 ---
 
 After filter selection, display the result → show the 4-1 menu again (loop). Exit only on `[N]` or `[B]` input.
-
-## 🚨 SUCCESS / FAILURE
-
-### ✅ SUCCESS
-- GitHub CLI command executed and output displayed
-- Output rendered in the exact specified format
-- User input received at every STOP gate before proceeding
-- User explicitly confirmed before commit/push
-- Routed correctly to `./step-05-actions.md`
-
-### ❌ FAILURE
-- CLI error or HTTP 4xx/5xx → report exact stdout/stderr, STOP
-- Rendering with missing or partial data — wait for complete data first
-- Skipping a STOP gate and proceeding without user confirmation
-- Committing or pushing without explicit user confirmation
-- Proceeding to next step before all sequence steps are complete
-
-**Master Rule:** Skipping steps or fabricating output is FORBIDDEN.

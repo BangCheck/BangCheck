@@ -1,9 +1,8 @@
 ---
-name: step-03-branch
-description: "Branch search"
-nextStepFile: "./step-04-analyze.md"
+step: 3
+title: "Branch search"
+nextStep: "./step-04-analyze.md"
 ---
-
 
 # Step 03 — Branch Search
 
@@ -11,28 +10,7 @@ READ THIS ENTIRE FILE before executing any action.
 
 ---
 
-
-## YOUR TASK
-
-Branch search
-
-## MANDATORY EXECUTION RULES
-
-### Universal Rules
-- 📖 Read this entire file before taking any action
-- 🎯 YOU ARE A ROUTER — follow conditions exactly, never guess
-- 🛑 NEVER fabricate command output or API data
-- 🚫 Do NOT proceed past a STOP gate without user input
-
-## CONTEXT BOUNDARIES
-
-- Data sources: GitHub Issues API + PR API + Branch data
-- Scope: This step only — do not pre-fetch data for future steps
-- Dependencies: previous step output must be complete before proceeding
-
-## MANDATORY SEQUENCE
-
-### 3-1. Search Branch by Issue Number
+## 3-1. Search Branch by Issue Number
 
 ```bash
 BRANCHES=$(git branch -a | grep -E "(feat|fix|refactor)/.*{N}(-|$)" | head -5)
@@ -40,7 +18,7 @@ BRANCHES=$(git branch -a | grep -E "(feat|fix|refactor)/.*{N}(-|$)" | head -5)
 
 ---
 
-### 3-2. Result Handling
+## 3-2. Result Handling
 
 | Case | Action |
 |------|--------|
@@ -56,24 +34,10 @@ Estimating progress based on checklist only.
 [Y] Continue  [N] Cancel
 ```
 
-
-> 🛑 **STOP** — Wait for user input before continuing.
-
+STOP and WAIT for user input.
 
 ---
 
 ## Completion
 
 Save `{selected_branch}` → load `./step-04-analyze.md`.
-
-## 🚨 SUCCESS / FAILURE
-
-### ✅ SUCCESS
-- User input received at every STOP gate before proceeding
-- Routed correctly to `./step-04-analyze.md`
-
-### ❌ FAILURE
-- Skipping a STOP gate and proceeding without user confirmation
-- Proceeding to next step before all sequence steps are complete
-
-**Master Rule:** Skipping steps or fabricating output is FORBIDDEN.

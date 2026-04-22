@@ -1,29 +1,13 @@
 ---
-name: step-05-report
-description: "Final report + next recommendation"
-nextStepFile: "null"
+step: 5
+title: "Final report + next recommendation"
+nextStep: null
 ---
-
 
 # Step 05 — Report
 
-
-## YOUR TASK
-
-Final report + next recommendation
-
-## MANDATORY EXECUTION RULES
-
-### Universal Rules
-- 📖 Read this entire file before taking any action
-- 🎯 YOU ARE A REPORTER — present data as-is, never add unverified information
-- 🛑 NEVER fabricate command output or API data
-- 🚫 Do NOT proceed past a STOP gate without user input
-
 ```
 🔍 API Contract Check — {branch}
-
-## MANDATORY SEQUENCE
 
 ## Change Summary
   🟢 Additive:     {n}
@@ -44,20 +28,6 @@ Final report + next recommendation
   Suggestion: if there were breaking changes, also B — DB schema and API may have changed together.
 ```
 
-
-> 🛑 **STOP** — Wait for user input before continuing.
-
+STOP and WAIT.
 
 → After selection, load the corresponding workflow or return to dashboard.
-
-## 🚨 SUCCESS / FAILURE
-
-### ✅ SUCCESS
-- User input received at every STOP gate before proceeding
-- Routed correctly to `null`
-
-### ❌ FAILURE
-- Skipping a STOP gate and proceeding without user confirmation
-- Proceeding to next step before all sequence steps are complete
-
-**Master Rule:** Skipping steps or fabricating output is FORBIDDEN.

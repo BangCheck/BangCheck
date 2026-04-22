@@ -1,29 +1,14 @@
 ---
-name: step-01-fix-schema
-description: "Apply fixes for detected issues"
+step: 1
+title: "Apply fixes for detected issues"
+mode: edit
 ---
-
 
 # Edit — Fix Schema Issues
 
-
-## YOUR TASK
-
-Apply fixes for detected issues
-
-## MANDATORY EXECUTION RULES
-
-### Universal Rules
-- 📖 Read this entire file before taking any action
-- 🎯 YOU ARE AN EDITOR — modify only what user confirms, never auto-apply
-- 🛑 NEVER fabricate command output or API data
-- 🚫 Do NOT proceed past a STOP gate without user input
-
 Address items flagged as ❌ fix needed in the risk check.
 
-## MANDATORY SEQUENCE
-
-### E1-1. Fix Target List
+## E1-1. Fix Target List
 
 ```
 ## Items Needing Fix
@@ -40,11 +25,9 @@ Which item to fix first?
 [B] Return to dashboard
 ```
 
+STOP and WAIT.
 
-> 🛑 **STOP** — Wait for user input before continuing.
-
-
-### E1-2. Fix Guidance
+## E1-2. Fix Guidance
 
 For each item:
 
@@ -67,7 +50,7 @@ Fix approach:
 
 STOP and WAIT. Proceed to next item after selection.
 
-### E1-3. Completion
+## E1-3. Completion
 
 ```
 ✅ Schema fixes complete
@@ -80,13 +63,3 @@ STOP and WAIT. Proceed to next item after selection.
 
   Candid recommendation: A — running it again after fixes ensures everything is safe.
 ```
-
-## 🚨 SUCCESS / FAILURE
-
-### ✅ SUCCESS
-- User input received at every STOP gate before proceeding
-
-### ❌ FAILURE
-- Skipping a STOP gate and proceeding without user confirmation
-
-**Master Rule:** Skipping steps or fabricating output is FORBIDDEN.

@@ -1,28 +1,12 @@
 ---
-name: step-04-communicate
-description: "FE comment + spec update"
-nextStepFile: "./step-05-report.md"
+step: 4
+title: "FE comment + spec update"
+nextStep: "./step-05-report.md"
 ---
-
 
 # Step 04 — FE Communication + Spec Update
 
-
-## YOUR TASK
-
-FE comment + spec update
-
-## MANDATORY EXECUTION RULES
-
-### Universal Rules
-- 📖 Read this entire file before taking any action
-- 🎯 YOU ARE A COMMUNICATOR — surface findings clearly, do not interpret beyond facts
-- 🛑 NEVER fabricate command output or API data
-- 🚫 Do NOT proceed past a STOP gate without user input
-
-## MANDATORY SEQUENCE
-
-### 4-1. Write FE Comment
+## 4-1. Write FE Comment
 
 ```
 💬 Frontend Team Sharing Draft
@@ -69,7 +53,7 @@ STOP and WAIT. **_safety.md § Comment Safety required.**
 
 ---
 
-### 4-2. Spec Update Check
+## 4-2. Spec Update Check
 
 ```
 This change needs to be reflected in docs/spec/ or docs/be/api-spec.md.
@@ -91,22 +75,6 @@ This change needs to be reflected in docs/spec/ or docs/be/api-spec.md.
 {/if}
 ```
 
-
-> 🛑 **STOP** — Wait for user input before continuing.
-
+STOP and WAIT.
 
 → step-05 report.
-
-## 🚨 SUCCESS / FAILURE
-
-### ✅ SUCCESS
-- User input received at every STOP gate before proceeding
-- Template filled completely with no placeholder variables remaining
-- Routed correctly to `./step-05-report.md`
-
-### ❌ FAILURE
-- Skipping a STOP gate and proceeding without user confirmation
-- Leaving unfilled `{placeholder}` variables in the output
-- Proceeding to next step before all sequence steps are complete
-
-**Master Rule:** Skipping steps or fabricating output is FORBIDDEN.

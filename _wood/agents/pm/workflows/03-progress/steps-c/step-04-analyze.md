@@ -1,9 +1,8 @@
 ---
-name: step-04-analyze
-description: "Branch code analysis"
-nextStepFile: "./step-05-crosscheck.md"
+step: 4
+title: "Branch code analysis"
+nextStep: "./step-05-crosscheck.md"
 ---
-
 
 # Step 04 — Branch Analysis
 
@@ -11,28 +10,7 @@ READ THIS ENTIRE FILE before executing any action.
 
 ---
 
-
-## YOUR TASK
-
-Branch code analysis
-
-## MANDATORY EXECUTION RULES
-
-### Universal Rules
-- 📖 Read this entire file before taking any action
-- 🎯 YOU ARE AN API ANALYST — present contract as-is, flag breaking changes
-- 🛑 NEVER fabricate command output or API data
-- 🚫 Do NOT proceed past a STOP gate without user input
-
-## CONTEXT BOUNDARIES
-
-- Data sources: GitHub Issues API + PR API + Branch data
-- Scope: This step only — do not pre-fetch data for future steps
-- Dependencies: previous step output must be complete before proceeding
-
-## MANDATORY SEQUENCE
-
-### 4-1. Commit Analysis
+## 4-1. Commit Analysis
 
 ```bash
 git log --format="%h|%an|%s|%ar" main..{selected_branch}
@@ -47,7 +25,7 @@ stale = days_since_last > stale_commit_days  # based on milestone-meta.yaml
 
 ---
 
-### 4-2. Changed File Analysis
+## 4-2. Changed File Analysis
 
 ```bash
 git diff --stat main..{selected_branch}
@@ -55,7 +33,7 @@ git diff --stat main..{selected_branch}
 
 ---
 
-### 4-3. Test File Presence
+## 4-3. Test File Presence
 
 ```bash
 git diff --name-only main..{selected_branch} | grep -E "\.(test|spec)\." | wc -l
@@ -69,7 +47,7 @@ If test scenarios are specified but test_files = 0 → flag as `🔴 No tests`.
 
 ---
 
-### 4-4. TODO/FIXME Markers
+## 4-4. TODO/FIXME Markers
 
 ```bash
 git diff main..{selected_branch} | grep -E "^\+.*//.*(TODO|FIXME)" | wc -l
@@ -79,7 +57,7 @@ Save `todo_count`. Higher count means more deductions.
 
 ---
 
-### 4-5. PR Status
+## 4-5. PR Status
 
 ```bash
 gh pr list --repo $REPO --search "closes #{N}" --state all \
@@ -100,17 +78,3 @@ gh pr list --repo $REPO --search "closes #{N}" --state all \
 ## Completion
 
 Save analysis values → load `./step-05-crosscheck.md`.
-
-## 🚨 SUCCESS / FAILURE
-
-### ✅ SUCCESS
-- GitHub CLI command executed and output displayed
-- User explicitly confirmed before commit/push
-- Routed correctly to `./step-05-crosscheck.md`
-
-### ❌ FAILURE
-- CLI error or HTTP 4xx/5xx → report exact stdout/stderr, STOP
-- Committing or pushing without explicit user confirmation
-- Proceeding to next step before all sequence steps are complete
-
-**Master Rule:** Skipping steps or fabricating output is FORBIDDEN.

@@ -1,28 +1,12 @@
 ---
-name: step-03-state
-description: "State Management Pattern Check"
-nextStepFile: "null"
+step: 3
+title: "State Management Pattern Check"
+nextStep: null
 ---
-
 
 # Step 03 — State Management Check
 
-
-## YOUR TASK
-
-State Management Pattern Check
-
-## MANDATORY EXECUTION RULES
-
-### Universal Rules
-- 📖 Read this entire file before taking any action
-- 🎯 YOU ARE A FACILITATOR — guide the user, never act autonomously
-- 🛑 NEVER fabricate command output or API data
-- 🚫 Do NOT proceed past a STOP gate without user input
-
-## MANDATORY SEQUENCE
-
-### 3-1. State Management Pattern Scan
+## 3-1. State Management Pattern Scan
 
 ```bash
 # TanStack Query usage
@@ -41,7 +25,7 @@ for file in {related_files}; do
 done
 ```
 
-### 3-2. Data Flow in Related Files
+## 3-2. Data Flow in Related Files
 
 ```
 ## State Management Overview
@@ -67,7 +51,7 @@ Recommended pattern for this issue:
 {/if}
 ```
 
-### 3-3. Final Recommendation
+## 3-3. Final Recommendation
 
 ```
 ## Pre-Dev Check Complete
@@ -83,17 +67,4 @@ Recommended pattern for this issue:
   Blunt recommendation: A — Check complete. Address ⚠️ items as you develop.
 ```
 
-
-> 🛑 **STOP** — Wait for user input before continuing.
-
-## 🚨 SUCCESS / FAILURE
-
-### ✅ SUCCESS
-- User input received at every STOP gate before proceeding
-- Routed correctly to `null`
-
-### ❌ FAILURE
-- Skipping a STOP gate and proceeding without user confirmation
-- Proceeding to next step before all sequence steps are complete
-
-**Master Rule:** Skipping steps or fabricating output is FORBIDDEN.
+STOP and WAIT.

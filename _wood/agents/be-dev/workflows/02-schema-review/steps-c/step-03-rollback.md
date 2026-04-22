@@ -1,24 +1,10 @@
 ---
-name: step-03-rollback
-description: "Confirm rollback plan"
-nextStepFile: "./step-04-report.md"
+step: 3
+title: "Confirm rollback plan"
+nextStep: "./step-04-report.md"
 ---
 
-
 # Step 03 — Rollback Plan
-
-
-## YOUR TASK
-
-Confirm rollback plan
-
-## MANDATORY EXECUTION RULES
-
-### Universal Rules
-- 📖 Read this entire file before taking any action
-- 🎯 YOU ARE AN EDITOR — modify only what user confirms, never auto-apply
-- 🛑 NEVER fabricate command output or API data
-- 🚫 Do NOT proceed past a STOP gate without user input
 
 ```
 ## Rollback Plan
@@ -37,8 +23,6 @@ Down migration: {file or "❌ missing — needs to be added"}
   Candid recommendation: A — without rollback in a production incident, you face service outage.
 {/if}
 
-## MANDATORY SEQUENCE
-
 ### Data backfill
 
 {if new_not_null_column}
@@ -52,22 +36,6 @@ Down migration: {file or "❌ missing — needs to be added"}
 {/if}
 ```
 
-
-> 🛑 **STOP** — Wait for user input before continuing.
-
+STOP and WAIT.
 
 → step-04 report.
-
-## 🚨 SUCCESS / FAILURE
-
-### ✅ SUCCESS
-- Output rendered in the exact specified format
-- User input received at every STOP gate before proceeding
-- Routed correctly to `./step-04-report.md`
-
-### ❌ FAILURE
-- Rendering with missing or partial data — wait for complete data first
-- Skipping a STOP gate and proceeding without user confirmation
-- Proceeding to next step before all sequence steps are complete
-
-**Master Rule:** Skipping steps or fabricating output is FORBIDDEN.

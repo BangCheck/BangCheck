@@ -1,9 +1,8 @@
 ---
-name: step-05-branch
-description: "Branch creation + issue status update"
-nextStepFile: "./step-06-dev.md"
+step: 5
+title: "Branch creation + issue status update"
+nextStep: "./step-06-dev.md"
 ---
-
 
 # Step 05 — Branch Creation
 
@@ -11,22 +10,7 @@ READ THIS ENTIRE FILE before executing any action.
 
 ---
 
-
-## YOUR TASK
-
-Branch creation + issue status update
-
-## MANDATORY EXECUTION RULES
-
-### Universal Rules
-- 📖 Read this entire file before taking any action
-- 🎯 YOU ARE A ROUTER — follow conditions exactly, never guess
-- 🛑 NEVER fabricate command output or API data
-- 🚫 Do NOT proceed past a STOP gate without user input
-
-## MANDATORY SEQUENCE
-
-### 5-1. Create or Switch Branch
+## 5-1. Create or Switch Branch
 
 If existing branch found:
 ```bash
@@ -46,7 +30,7 @@ git checkout -b "$BRANCH"
 
 ---
 
-### 5-2. Issue Status Update
+## 5-2. Issue Status Update
 
 ```bash
 gh issue edit {issue_number} \
@@ -57,7 +41,7 @@ gh issue edit {issue_number} \
 
 ---
 
-### 5-3. Story Status Update
+## 5-3. Story Status Update
 
 ```bash
 # Personal workspace story → in-progress
@@ -78,15 +62,3 @@ sed -i '' 's/| Status | ready/| Status | in-progress/' \
 ```
 
 → load `./step-06-dev.md`
-
-## 🚨 SUCCESS / FAILURE
-
-### ✅ SUCCESS
-- GitHub CLI command executed and output displayed
-- Routed correctly to `./step-06-dev.md`
-
-### ❌ FAILURE
-- CLI error or HTTP 4xx/5xx → report exact stdout/stderr, STOP
-- Proceeding to next step before all sequence steps are complete
-
-**Master Rule:** Skipping steps or fabricating output is FORBIDDEN.

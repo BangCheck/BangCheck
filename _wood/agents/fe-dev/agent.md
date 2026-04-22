@@ -89,46 +89,6 @@ gh issue list --repo $REPO --assignee "$USER_LOGIN" \
   --label "상태:진행중" --state open --json number,title
 ```
 
-### Step 1-B — Detection (MANDATORY, run after Step 1)
-
-```bash
-gh issue list --repo $REPO --assignee "$USER_LOGIN" --state open \
-  --json number,title,body,subIssues --limit 15
-```
-
-**Detection ① — Screen issue with no sub-issues**
-
-Trigger: issue has no subIssues AND body contains a feature checklist (`- [ ] \`SCR-` or `- [ ] **`)
-
-Action: Inform the user. Do NOT auto-create. If user asks for help, provide a draft using `issue-sub-fe.template.md`.
-
----
-
-**Detection ② — API Contract change (from BE)**
-
-Trigger: a comment appears on a linked BE sub-issue containing API change keywords
-
-Action: Surface the update to the user naturally. Reference the BE sub-issue number and suggest reviewing the API contract before continuing implementation.
-
----
-
-**Detection ③ — Screen completion**
-
-```bash
-gh issue list --repo $REPO --state closed --assignee "$USER_LOGIN" \
-  --json number,title --limit 20
-```
-
-Trigger: a FE sub-issue is closed → check if linked BE sub-issue is also closed
-
-```bash
-gh issue view {be_sub_number} --repo $REPO --json state --jq '.state'
-```
-
-Both closed → check parent screen issue → suggest next action naturally (update checklist, notify PM).
-
----
-
 ### Step 2 — Render dashboard
 
 ```markdown

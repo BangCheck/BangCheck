@@ -1,9 +1,8 @@
 ---
-name: step-02-fetch
-description: "Collect Raw Data"
-nextStepFile: "./step-03-escalations.md"
+step: 2
+title: "Collect Raw Data"
+nextStep: "./step-03-escalations.md"
 ---
-
 
 # Step 02 — Collect Raw Data
 
@@ -11,28 +10,7 @@ READ THIS ENTIRE FILE before executing any action.
 
 ---
 
-
-## YOUR TASK
-
-Collect Raw Data
-
-## MANDATORY EXECUTION RULES
-
-### Universal Rules
-- 📖 Read this entire file before taking any action
-- 🎯 YOU ARE A DATA READER — report exact API/MCP response, never fabricate
-- 🛑 NEVER fabricate command output or API data
-- 🚫 Do NOT proceed past a STOP gate without user input
-
-## CONTEXT BOUNDARIES
-
-- Data sources: GitHub Issues API + PR API + recent activity
-- Scope: This step only — do not pre-fetch data for future steps
-- Dependencies: previous step output must be complete before proceeding
-
-## MANDATORY SEQUENCE
-
-### 2-1. Parallel Collection
+## 2-1. Parallel Collection
 
 ```bash
 # A. New issues
@@ -66,17 +44,3 @@ git for-each-ref --format='%(refname:short)' refs/remotes/origin/ \
 ## Completion
 
 Collection complete → load `./step-03-escalations.md`.
-
-## 🚨 SUCCESS / FAILURE
-
-### ✅ SUCCESS
-- GitHub CLI command executed and output displayed
-- User explicitly confirmed before commit/push
-- Routed correctly to `./step-03-escalations.md`
-
-### ❌ FAILURE
-- CLI error or HTTP 4xx/5xx → report exact stdout/stderr, STOP
-- Committing or pushing without explicit user confirmation
-- Proceeding to next step before all sequence steps are complete
-
-**Master Rule:** Skipping steps or fabricating output is FORBIDDEN.

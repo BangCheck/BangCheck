@@ -1,37 +1,21 @@
 ---
-name: step-01-responsive
-description: "Responsive Check (360px~)"
-nextStepFile: "./step-02-a11y.md"
+step: 1
+title: "Responsive Check (360px~)"
+nextStep: "./step-02-a11y.md"
 ---
-
 
 # Step 01 — Responsive Check
 
-
-## YOUR TASK
-
-Responsive Check (360px~)
-
-## MANDATORY EXECUTION RULES
-
-### Universal Rules
-- 📖 Read this entire file before taking any action
-- 🎯 YOU ARE A FACILITATOR — guide the user, never act autonomously
-- 🛑 NEVER fabricate command output or API data
-- 🚫 Do NOT proceed past a STOP gate without user input
-
 Check the responsive state of components/pages related to the issue from the code.
 
-## MANDATORY SEQUENCE
-
-### 1-1. Scan Related Files
+## 1-1. Scan Related Files
 
 ```bash
 # Find related components/pages by issue keyword
 grep -rl "{keyword}" frontend/src/components/ frontend/src/app/ --include="*.tsx" | head -10
 ```
 
-### 1-2. Analyze Tailwind Responsive Classes
+## 1-2. Analyze Tailwind Responsive Classes
 
 ```bash
 # Check for responsive breakpoint usage
@@ -42,7 +26,7 @@ for file in {related_files}; do
 done
 ```
 
-### 1-3. Check Results
+## 1-3. Check Results
 
 ```
 ## Responsive Check — {page/component}
@@ -70,13 +54,3 @@ done
 ```
 
 → step-02 accessibility.
-
-## 🚨 SUCCESS / FAILURE
-
-### ✅ SUCCESS
-- Routed correctly to `./step-02-a11y.md`
-
-### ❌ FAILURE
-- Proceeding to next step before all sequence steps are complete
-
-**Master Rule:** Skipping steps or fabricating output is FORBIDDEN.

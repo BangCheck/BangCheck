@@ -1,37 +1,16 @@
 ---
-name: step-01-edit-issue
-description: "Edit Issue"
+step: 1
+title: "Edit Issue"
+mode: edit
 ---
 
-
 # Edit Step 01 — Edit Existing Issue
-
-
-## YOUR TASK
-
-Edit Issue
-
-## MANDATORY EXECUTION RULES
-
-### Universal Rules
-- 📖 Read this entire file before taking any action
-- 🎯 YOU ARE AN EDITOR — modify only what user confirms, never auto-apply
-- 🛑 NEVER fabricate command output or API data
-- 🚫 Do NOT proceed past a STOP gate without user input
 
 > Modify tracking info, assignee, API contract, and body of an already-created issue.
 
 ---
 
-## CONTEXT BOUNDARIES
-
-- Data sources: Google Sheets MCP (시트22) + GitHub Issues API
-- Scope: This step only — do not pre-fetch data for future steps
-- Dependencies: previous step output must be complete before proceeding
-
-## MANDATORY SEQUENCE
-
-### E1-1. Select Edit Target
+## E1-1. Select Edit Target
 
 ```
 Select the issue to edit:
@@ -43,13 +22,11 @@ Select the issue to edit:
 Select:
 ```
 
-
-> 🛑 **STOP** — Wait for user input before continuing.
-
+STOP and WAIT.
 
 ---
 
-### E1-2. Load Current Issue
+## E1-2. Load Current Issue
 
 ```bash
 gh issue view {number} --repo $REPO \
@@ -75,7 +52,7 @@ Tracking info:
 
 ---
 
-### E1-3. Edit Menu
+## E1-3. Edit Menu
 
 ```
 What would you like to modify?
@@ -92,13 +69,11 @@ What would you like to modify?
 Select:
 ```
 
-
-> 🛑 **STOP** — Wait for user input before continuing.
-
+STOP and WAIT.
 
 ---
 
-### E1-4. Enhance Tracking Info [K]
+## E1-4. Enhance Tracking Info [K]
 
 When an existing issue is missing tracking keys:
 
@@ -124,7 +99,7 @@ gh issue edit {number} --repo $REPO --body "{updated_body}"
 
 ---
 
-### E1-5. Add/Edit API Contract [C]
+## E1-5. Add/Edit API Contract [C]
 
 ```
 Enter the API contract:
@@ -147,17 +122,3 @@ If there is an FE integration issue:
 ## 🔙 Return
 
 After editing → Return to step-05-menu.md or PM dashboard.
-
-## 🚨 SUCCESS / FAILURE
-
-### ✅ SUCCESS
-- GitHub CLI command executed and output displayed
-- User input received at every STOP gate before proceeding
-- Template filled completely with no placeholder variables remaining
-
-### ❌ FAILURE
-- CLI error or HTTP 4xx/5xx → report exact stdout/stderr, STOP
-- Skipping a STOP gate and proceeding without user confirmation
-- Leaving unfilled `{placeholder}` variables in the output
-
-**Master Rule:** Skipping steps or fabricating output is FORBIDDEN.

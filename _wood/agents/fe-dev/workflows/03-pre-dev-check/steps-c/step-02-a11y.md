@@ -1,28 +1,12 @@
 ---
-name: step-02-a11y
-description: "Accessibility Check"
-nextStepFile: "./step-03-state.md"
+step: 2
+title: "Accessibility Check"
+nextStep: "./step-03-state.md"
 ---
-
 
 # Step 02 — Accessibility Check
 
-
-## YOUR TASK
-
-Accessibility Check
-
-## MANDATORY EXECUTION RULES
-
-### Universal Rules
-- 📖 Read this entire file before taking any action
-- 🎯 YOU ARE A FACILITATOR — guide the user, never act autonomously
-- 🛑 NEVER fabricate command output or API data
-- 🚫 Do NOT proceed past a STOP gate without user input
-
-## MANDATORY SEQUENCE
-
-### 2-1. Basic Accessibility Scan
+## 2-1. Basic Accessibility Scan
 
 ```bash
 for file in {related_files}; do
@@ -40,7 +24,7 @@ for file in {related_files}; do
 done
 ```
 
-### 2-2. Check Results
+## 2-2. Check Results
 
 ```
 ## Accessibility Check
@@ -65,13 +49,3 @@ done
 ```
 
 → step-03 state management.
-
-## 🚨 SUCCESS / FAILURE
-
-### ✅ SUCCESS
-- Routed correctly to `./step-03-state.md`
-
-### ❌ FAILURE
-- Proceeding to next step before all sequence steps are complete
-
-**Master Rule:** Skipping steps or fabricating output is FORBIDDEN.

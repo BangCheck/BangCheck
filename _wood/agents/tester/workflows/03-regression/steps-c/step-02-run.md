@@ -1,30 +1,14 @@
 ---
-name: step-02-run
-description: "Re-execute TCs for selected scope"
-nextStepFile: "./step-03-report.md"
+step: 2
+title: "Re-execute TCs for selected scope"
+nextStep: "./step-03-report.md"
 ---
-
 
 # Step 02 — Run Regression TCs
 
-
-## YOUR TASK
-
-Re-execute TCs for selected scope
-
-## MANDATORY EXECUTION RULES
-
-### Universal Rules
-- 📖 Read this entire file before taking any action
-- 🎯 YOU ARE A FACILITATOR — guide the user, never act autonomously
-- 🛑 NEVER fabricate command output or API data
-- 🚫 Do NOT proceed past a STOP gate without user input
-
 Re-execute **already passed (✅) TCs** for selected pages.
 
-## MANDATORY SEQUENCE
-
-### 2-1. Extract target TCs
+## 2-1. Extract target TCs
 
 ```
 ## Regression Test Targets
@@ -41,11 +25,9 @@ Total {total_regression_tcs} to re-execute.
 [Y] Start  [S] Select subset  [B] Cancel
 ```
 
+STOP and WAIT.
 
-> 🛑 **STOP** — Wait for user input before continuing.
-
-
-### 2-2. Execution loop
+## 2-2. Execution loop
 
 Same approach as 01-run-tc/steps-c/step-02-execute.md:
 
@@ -78,20 +60,6 @@ Result:
              Notifying the author immediately speeds up the hotfix.
 ```
 
-
-> 🛑 **STOP** — Wait for user input before continuing.
-
+STOP and WAIT.
 
 → Proceed to step-03 report when all TCs complete.
-
-## 🚨 SUCCESS / FAILURE
-
-### ✅ SUCCESS
-- User input received at every STOP gate before proceeding
-- Routed correctly to `./step-03-report.md`
-
-### ❌ FAILURE
-- Skipping a STOP gate and proceeding without user confirmation
-- Proceeding to next step before all sequence steps are complete
-
-**Master Rule:** Skipping steps or fabricating output is FORBIDDEN.

@@ -1,35 +1,20 @@
 ---
-name: step-01-impact
-description: "PR change-based impact scope analysis"
+step: 1
+title: "PR change-based impact scope analysis"
+mode: validate
 ---
-
 
 # Validate — Impact Analysis
 
-
-## YOUR TASK
-
-PR change-based impact scope analysis
-
-## MANDATORY EXECUTION RULES
-
-### Universal Rules
-- 📖 Read this entire file before taking any action
-- 🎯 YOU ARE A FACILITATOR — guide the user, never act autonomously
-- 🛑 NEVER fabricate command output or API data
-- 🚫 Do NOT proceed past a STOP gate without user input
-
 Pre-analyze impact scope before PR merge. Identify in advance which regression tests will be needed after merge.
 
-## MANDATORY SEQUENCE
-
-### V1-1. PR diff analysis
+## V1-1. PR diff analysis
 
 ```bash
 gh pr diff {pr_num} --name-only --repo $REPO
 ```
 
-### V1-2. Impact mapping
+## V1-2. Impact mapping
 
 ```
 ## 📊 PR #{pr_num} Impact Analysis
@@ -57,17 +42,4 @@ Severity:
   Recommendation: A — Running regression immediately after merge is the most reliable approach.
 ```
 
-
-> 🛑 **STOP** — Wait for user input before continuing.
-
-## 🚨 SUCCESS / FAILURE
-
-### ✅ SUCCESS
-- GitHub CLI command executed and output displayed
-- User input received at every STOP gate before proceeding
-
-### ❌ FAILURE
-- CLI error or HTTP 4xx/5xx → report exact stdout/stderr, STOP
-- Skipping a STOP gate and proceeding without user confirmation
-
-**Master Rule:** Skipping steps or fabricating output is FORBIDDEN.
+STOP and WAIT.

@@ -1,9 +1,8 @@
 ---
-name: step-02-issue-view
-description: "Per-issue activity view"
-nextStepFile: "./step-05-menu.md"
+step: 2
+title: "Per-issue activity view"
+nextStep: "./step-05-menu.md"
 ---
-
 
 # Step 02 — Per-Issue Activity View
 
@@ -11,28 +10,7 @@ READ THIS ENTIRE FILE before executing any action.
 
 ---
 
-
-## YOUR TASK
-
-Per-issue activity view
-
-## MANDATORY EXECUTION RULES
-
-### Universal Rules
-- 📖 Read this entire file before taking any action
-- 🎯 YOU ARE A FACILITATOR — guide the user, never act autonomously
-- 🛑 NEVER fabricate command output or API data
-- 🚫 Do NOT proceed past a STOP gate without user input
-
-## CONTEXT BOUNDARIES
-
-- Data sources: GitHub Issues API + PR API + Comments
-- Scope: This step only — do not pre-fetch data for future steps
-- Dependencies: previous step output must be complete before proceeding
-
-## MANDATORY SEQUENCE
-
-### 2-1. Query Active Sprint Issues
+## 2-1. Query Active Sprint Issues
 
 ```bash
 gh issue list --repo $REPO \
@@ -43,7 +21,7 @@ gh issue list --repo $REPO \
 
 ---
 
-### 2-2. Aggregate Recent Activity Per Issue
+## 2-2. Aggregate Recent Activity Per Issue
 
 For each issue:
 
@@ -63,7 +41,7 @@ gh pr list --repo $REPO --search "closes #$ISSUE_NUM" \
 
 ---
 
-### 2-3. Render
+## 2-3. Render
 
 ```
 ## 📋 In-Progress Issue Activity
@@ -90,19 +68,3 @@ Blocking issues are highlighted at the top:
 ## Completion
 
 After rendering is complete → load `./step-05-menu.md` and follow all instructions.
-
-## 🚨 SUCCESS / FAILURE
-
-### ✅ SUCCESS
-- GitHub CLI command executed and output displayed
-- Output rendered in the exact specified format
-- User explicitly confirmed before commit/push
-- Routed correctly to `./step-05-menu.md`
-
-### ❌ FAILURE
-- CLI error or HTTP 4xx/5xx → report exact stdout/stderr, STOP
-- Rendering with missing or partial data — wait for complete data first
-- Committing or pushing without explicit user confirmation
-- Proceeding to next step before all sequence steps are complete
-
-**Master Rule:** Skipping steps or fabricating output is FORBIDDEN.

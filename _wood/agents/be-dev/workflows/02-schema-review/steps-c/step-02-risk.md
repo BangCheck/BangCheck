@@ -1,30 +1,14 @@
 ---
-name: step-02-risk
-description: "Check 5 risk areas"
-nextStepFile: "./step-03-rollback.md"
+step: 2
+title: "Check 5 risk areas"
+nextStep: "./step-03-rollback.md"
 ---
-
 
 # Step 02 — Risk Checklist
 
-
-## YOUR TASK
-
-Check 5 risk areas
-
-## MANDATORY EXECUTION RULES
-
-### Universal Rules
-- 📖 Read this entire file before taking any action
-- 🎯 YOU ARE A FACILITATOR — guide the user, never act autonomously
-- 🛑 NEVER fabricate command output or API data
-- 🚫 Do NOT proceed past a STOP gate without user input
-
 **Actually read** the code and check each item.
 
-## MANDATORY SEQUENCE
-
-### 2-1. Migration Safety
+## 2-1. Migration Safety
 
 | Check | Item | Result |
 |-------|------|--------|
@@ -33,7 +17,7 @@ Check 5 risk areas
 | {✅/❌} | DROP COLUMN → 2-phase deployment? (deprecate → remove) | {analysis} |
 | {✅/❌} | Default provided when adding NOT NULL column? | {analysis} |
 
-### 2-2. Query Performance
+## 2-2. Query Performance
 
 | Check | Item | Result |
 |-------|------|--------|
@@ -41,7 +25,7 @@ Check 5 risk areas
 | {✅/❌} | N+1 query risk? | {analysis} |
 | {✅/❌} | Cursor-based instead of OFFSET? | {analysis} |
 
-### 2-3. Data Integrity
+## 2-3. Data Integrity
 
 | Check | Item | Result |
 |-------|------|--------|
@@ -49,7 +33,7 @@ Check 5 risk areas
 | {✅/❌} | ON DELETE/UPDATE policy specified | {analysis} |
 | {✅/❌} | Unique constraints (e.g. email) | {analysis} |
 
-### 2-4. Security
+## 2-4. Security
 
 | Check | Item | Result |
 |-------|------|--------|
@@ -57,7 +41,7 @@ Check 5 risk areas
 | {✅/❌} | PII column encryption/masking | {analysis} |
 | {✅/❌} | Audit log (created_by, updated_by) | {analysis} |
 
-### 2-5. API Impact
+## 2-5. API Impact
 
 | Check | Item | Result |
 |-------|------|--------|
@@ -82,17 +66,4 @@ Check 5 risk areas
 {/if}
 ```
 
-
-> 🛑 **STOP** — Wait for user input before continuing.
-
-## 🚨 SUCCESS / FAILURE
-
-### ✅ SUCCESS
-- User input received at every STOP gate before proceeding
-- Routed correctly to `./step-03-rollback.md`
-
-### ❌ FAILURE
-- Skipping a STOP gate and proceeding without user confirmation
-- Proceeding to next step before all sequence steps are complete
-
-**Master Rule:** Skipping steps or fabricating output is FORBIDDEN.
+STOP and WAIT.

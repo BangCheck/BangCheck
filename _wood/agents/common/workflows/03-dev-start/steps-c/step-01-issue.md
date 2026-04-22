@@ -1,9 +1,8 @@
 ---
-name: step-01-issue
-description: "Issue load + API contract parsing + checklist status"
-nextStepFile: "./step-02-read.md"
+step: 1
+title: "Issue load + API contract parsing + checklist status"
+nextStep: "./step-02-read.md"
 ---
-
 
 # Step 01 — Issue + Related File Collection
 
@@ -11,22 +10,7 @@ READ THIS ENTIRE FILE before executing any action.
 
 ---
 
-
-## YOUR TASK
-
-Issue load + API contract parsing + checklist status
-
-## MANDATORY EXECUTION RULES
-
-### Universal Rules
-- 📖 Read this entire file before taking any action
-- 🎯 YOU ARE A FACILITATOR — guide the user, never act autonomously
-- 🛑 NEVER fabricate command output or API data
-- 🚫 Do NOT proceed past a STOP gate without user input
-
-## MANDATORY SEQUENCE
-
-### 1-1. Issue Check
+## 1-1. Issue Check
 
 If `{issue_number}` already exists, use it directly. Otherwise:
 
@@ -42,13 +26,11 @@ Request issue number selection:
 Enter the issue number to work on: #___
 ```
 
-
-> 🛑 **STOP** — Wait for user input before continuing.
-
+STOP and WAIT.
 
 ---
 
-### 1-2. Load Issue Details
+## 1-2. Load Issue Details
 
 ```bash
 gh issue view {issue_number} --repo $REPO \
@@ -62,7 +44,7 @@ Extract the following:
 
 ---
 
-### 1-3. Issue Body Parsing — Tracking Keys + API Contract + Checklist
+## 1-3. Issue Body Parsing — Tracking Keys + API Contract + Checklist
 
 Parse the following sections from the issue body:
 
@@ -118,7 +100,7 @@ Checklist: {done}/{total} ({pct}%)
 
 ---
 
-### 1-4. Related File Discovery
+## 1-4. Related File Discovery
 
 Infer related files from issue title + body keywords + API endpoint:
 
@@ -142,7 +124,7 @@ Save collected file list as `{related_files}`.
 
 ---
 
-### 1-5. Existing Story Check
+## 1-5. Existing Story Check
 
 Check if a Story file already exists for this issue:
 
@@ -166,21 +148,3 @@ Continue with this?
 ## Completion
 
 Issue info + API contract + checklist + related files + Story check → load `./step-02-read.md`.
-
-## 🚨 SUCCESS / FAILURE
-
-### ✅ SUCCESS
-- Data parsed into structured format without errors
-- GitHub CLI command executed and output displayed
-- Output rendered in the exact specified format
-- User input received at every STOP gate before proceeding
-- Routed correctly to `./step-02-read.md`
-
-### ❌ FAILURE
-- Empty or malformed response → report exact error, do not continue
-- CLI error or HTTP 4xx/5xx → report exact stdout/stderr, STOP
-- Rendering with missing or partial data — wait for complete data first
-- Skipping a STOP gate and proceeding without user confirmation
-- Proceeding to next step before all sequence steps are complete
-
-**Master Rule:** Skipping steps or fabricating output is FORBIDDEN.

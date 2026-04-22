@@ -4,7 +4,6 @@ description: "Google Drive ↔ GitHub Issues ↔ Google Docs document synchroniz
 agent: pm
 allowed_roles: [Admin, PM]
 nextStep: "./steps-c/step-01-read-drive.md"
-stepsCompleted: []
 ---
 
 <!-- AI-PROTECTED-FILE v1.0 -->
