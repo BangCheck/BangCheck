@@ -1,6 +1,6 @@
 ---
 step: 1
-title: "Read feature specification from spreadsheet"
+title: "Read feature specification from Google Sheets (시트22)"
 nextStep: "./step-02-diff.md"
 ---
 
@@ -10,98 +10,64 @@ READ THIS ENTIRE FILE before executing any action.
 
 ---
 
-## 1-1. Locate the Specification File
+## 1-1. Access via Google Sheets MCP
 
-Search Google Drive for the feature specification spreadsheet:
+Use `mcp__claude_ai_Google_Sheets` to read the spec directly.
 
-```
-Search keywords: "기능명세서" AND mimeType = "application/vnd.google-apps.spreadsheet"
-```
+Target:
+- File: 매물 체크리스트 서비스_기능명세서 (search by name if ID unknown)
+- Sheet: **시트22**
 
-If multiple results found → display list and STOP. Wait for user to select one.
+If MCP is not authenticated:
+> "Google Sheets MCP 연결이 필요해요. claude.ai → 설정 → Integrations → Google Sheets에서 연동해주세요."
 
-Record:
-- `{spec_file_id}` — Drive file ID
-- `{spec_modified_time}` — Drive file `modifiedTime`
-- `{spec_title}` — file name
+STOP if auth fails.
 
 ---
 
-## 1-2. Read the Target Sheet
-
-The specification is a spreadsheet with multiple sheets.
-Default target sheet: **시트22** (confirmed template for BangCheck).
-
-If the file cannot be read via MCP:
-> "파일을 직접 공유해 주시면 바로 파싱할게요. 로컬 경로나 다운로드 파일을 알려주세요."
-
-Parse using the following column mapping (1-indexed):
+## 1-2. Column Mapping (1-indexed)
 
 | Column | Field |
 |--------|-------|
-| B | 화면 ID (screen group) |
+| B | 화면 ID |
 | C | 화면명 |
-| D | 섹션 |
-| E | 기능 ID (atomic unit — e.g. SCR-HOME-001) |
-| F | 상태 |
+| E | 기능 ID (e.g. SCR-HOME-001) |
 | G | 필드명 (feature name) |
 | H | 기능 설명 |
 | N | 담당 (FE/BE) |
 | O | 우선순위 |
 
+Skip rows where both B and E are empty.
+
 ---
 
-## 1-3. Parse into Structured Data
-
-Group by 화면 ID. Skip rows where both B and E are empty.
+## 1-3. Parse — Group by 화면 ID
 
 ```python
 screens = {}
 current_screen_id = None
-current_screen_name = None
 
-for row in sheet.iter_rows(values_only=True):
-    screen_id   = row[1]   # col B
-    screen_name = row[2]   # col C
-    feature_id  = row[4]   # col E
-    feature_name = row[6]  # col G
-    assignee    = row[13]  # col N
-    priority    = row[14]  # col O
-
-    if screen_id:
-        current_screen_id = screen_id
-        current_screen_name = screen_name
-        screens[screen_id] = {
-            "name": screen_name,
-            "features": []
-        }
-
-    if feature_id and current_screen_id:
+for row in sheet_rows:
+    if row[B]: current_screen_id = row[B]; screens[row[B]] = {"name": row[C], "features": []}
+    if row[E] and current_screen_id:
         screens[current_screen_id]["features"].append({
-            "id": feature_id,
-            "name": feature_name,
-            "assignee": assignee,
-            "priority": priority
+            "id": row[E], "name": row[G], "assignee": row[N], "priority": row[O]
         })
 ```
 
 ---
 
-## 1-4. Output Parsing Summary
+## 1-4. Output Summary
 
 ```
 📄 기능명세서 파싱 완료
-파일: {spec_title}
-최종 수정: {spec_modified_time}
-시트: 시트22
+파일: {spec_title}  |  시트: 시트22  |  최종 수정: {spec_modified_time}
 
 | 화면 ID | 화면명 | 기능 수 |
 |---------|--------|--------|
-| SCR-LANDING | 랜딩페이지 | {n} |
-| SCR-HOME | 방 카드 관리 | {n} |
-| ...     | ...    | ... |
+| ...     | ...    | ...    |
 
-총 {n}개 화면, {n}개 기능 항목
+총 {n}개 화면, {n}개 기능
 ```
 
 ---

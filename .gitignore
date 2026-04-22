@@ -39,3 +39,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# 기능명세서 xlsx (로컬 다운로드용 — 커밋 금지)
+*.xlsx
+*.xls

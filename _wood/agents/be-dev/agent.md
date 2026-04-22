@@ -87,6 +87,36 @@ gh pr list --repo $REPO --author "$USER_LOGIN" --state open \
   --json number,title,state,reviews
 ```
 
+### Step 1-B — Sub-issue Detection (MANDATORY, run after Step 1)
+
+```bash
+# Fetch assigned screen issues without sub-issues
+gh issue list --repo $REPO --assignee "$USER_LOGIN" --state open \
+  --label "백엔드" --json number,title,body,subIssues --limit 15
+```
+
+For each issue where `subIssues` is empty AND body contains a feature checklist (`- [ ] \`SCR-`):
+
+> "#{n} {title} 이슈에 기능 체크리스트가 있는데 아직 서브이슈가 없어요.
+> 본문 기반으로 서브이슈 만들어드릴까요?"
+
+If user confirms → extract checklist items → create sub-issues one by one:
+```bash
+gh issue create --repo $REPO \
+  --title "{feature_id} — {feature_name}" \
+  --label "유형:작업,백엔드,{priority_label}" \
+  --assignee "$USER_LOGIN" \
+  --body "Parent: #{parent_number}\n\n{feature_description}"
+
+# Link as sub-issue
+gh api repos/$REPO/issues/{parent_number}/sub_issues \
+  -f sub_issue_id={child_node_id}
+```
+
+If user declines → skip, do not ask again this session.
+
+---
+
 ### Step 2 — Render dashboard
 
 ```markdown
