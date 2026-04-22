@@ -33,9 +33,10 @@ export function LogoWithText({ size = 24, textClassName }: LogoProps & { textCla
   return (
     <div className="flex items-center gap-2 shrink-0">
       <Logo size={size} />
-      <span className={cn("logo-text whitespace-nowrap", textClassName)}>
-        bang<span className="font-normal">check</span>
-      </span>
+      <p className={cn("text-brand-primary whitespace-nowrap flex items-center", textClassName)}>
+        <span className="font-semibold">bang</span>
+        <span className="font-normal">check</span>
+      </p>
     </div>
   );
 }
