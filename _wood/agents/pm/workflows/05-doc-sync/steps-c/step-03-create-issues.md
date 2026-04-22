@@ -12,7 +12,28 @@ READ THIS ENTIRE FILE before executing any action.
 - FE tasks → Assignee: Woo Jong-ho (FE Team Lead)
 - BE tasks → Assignee: Ha Ji-myung (BE Team Lead)
 - Both → Create 2 separate issues: FE issue + BE issue
-- All issues require preview → Y confirmation before creation
+- **MANDATORY: Always confirm before any issue or project creation — no silent auto-creation**
+- **MANDATORY: Always show a recommendation before asking — never present a blank prompt**
+
+### Confirmation Rule (applies to ALL issue/project creation in this workflow)
+
+Before creating ANY issue or project item:
+1. Show what will be created (preview)
+2. Offer a natural recommendation on what to prioritize
+3. Ask conversationally — not with a Y/N gate
+
+```
+✅ Good:
+"SCR-HOME 미연동 기능이 6개예요. 우선순위 높은 것부터 3개만 먼저 생성할까요,
+아니면 전체 다 올릴까요?"
+
+❌ Bad:
+"이슈를 생성하시겠습니까? (Y/N)"
+```
+
+If user confirms → create.
+If user modifies scope → adjust and re-preview.
+If user declines → skip this screen, move to next.
 
 ---
 
