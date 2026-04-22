@@ -32,7 +32,15 @@ public class AuthService {
     @Transactional
     public OAuthCallbackResult handleOAuthCallback(String provider, String code, String state) {
         OAuthCallbackUserInfoResponseDTO oauthInfo = oAuthService.handleCallback(provider, code, state);
+
+        if (oauthInfo.email() == null || oauthInfo.email().isBlank()) {
+            throw new GeneralException(AuthErrorCode.OAUTH_EMAIL_NOT_PROVIDED);
+        }
+
         Provider providerEnum = Provider.valueOf(oauthInfo.provider().toUpperCase());
+
+        userRepository.findByEmailAndProviderNotAndIsDeletedFalse(oauthInfo.email(), providerEnum)
+                .ifPresent(u -> { throw new GeneralException(AuthErrorCode.DUPLICATE_EMAIL_DIFFERENT_PROVIDER); });
 
         Optional<User> activeUser = userRepository.findByProviderAndProviderIdAndIsDeletedFalse(
                 providerEnum,

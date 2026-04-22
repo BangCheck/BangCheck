@@ -18,6 +18,9 @@ public enum AuthErrorCode implements BaseErrorCode {
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "AUTH_40401", "User not found."),
 
     OAUTH_USER_DENIED(HttpStatus.BAD_REQUEST, "AUTH_40005", "OAuth login was denied by the user."),
+    OAUTH_EMAIL_NOT_PROVIDED(HttpStatus.BAD_REQUEST, "AUTH_40006", "Email is required but was not provided by the OAuth provider."),
+
+    DUPLICATE_EMAIL_DIFFERENT_PROVIDER(HttpStatus.CONFLICT, "AUTH_40901", "An account with this email already exists using a different social provider."),
 
     OAUTH_TOKEN_REQUEST_FAILED(HttpStatus.BAD_GATEWAY, "AUTH_50201", "OAuth token request failed."),
     OAUTH_USERINFO_REQUEST_FAILED(HttpStatus.BAD_GATEWAY, "AUTH_50202", "OAuth user info request failed.");
