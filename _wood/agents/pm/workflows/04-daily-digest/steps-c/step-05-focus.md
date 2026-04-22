@@ -11,7 +11,7 @@ READ THIS ENTIRE FILE before executing any action.
 
 ---
 
-## 5-1. Issues In Review
+### 5-1. Issues In Review
 
 ```bash
 gh issue list --repo $REPO --state open \
@@ -20,13 +20,13 @@ gh issue list --repo $REPO --state open \
 
 ---
 
-## 5-2. Approaching Deadline Issues (within D-3)
+### 5-2. Approaching Deadline Issues (within D-3)
 
 Issues where the active milestone's `due_on` is within today + 3 days.
 
 ---
 
-## 5-3. Merge-Ready PRs (APPROVED)
+### 5-3. Merge-Ready PRs (APPROVED)
 
 ```bash
 gh pr list --repo $REPO --state open \
@@ -36,7 +36,7 @@ gh pr list --repo $REPO --state open \
 
 ---
 
-## 5-4. Render
+### 5-4. Render
 
 ```
 🎯 Today's Focus

@@ -6,7 +6,7 @@ description: "TC Result Edit (Retest)"
 
 # Edit — TC Retest
 
-## E1-1. Select target TC
+### E1-1. Select target TC
 
 ```
 Select a TC to retest:
@@ -19,9 +19,11 @@ Select a TC to retest:
 Enter TC ID:
 ```
 
-STOP and WAIT.
 
-## E1-2. Re-execute
+> 🛑 **STOP** — Wait for user input before continuing.
+
+
+### E1-2. Re-execute
 
 ```
 ▶️ Retest: {TC_ID}: {case_name}
@@ -44,9 +46,11 @@ Result after re-execution:
 [3] ⏭️ Change to Skip
 ```
 
-STOP and WAIT.
 
-## E1-3. Update
+> 🛑 **STOP** — Wait for user input before continuing.
+
+
+### E1-3. Update
 
 - Change TC status in issue body
 - Update bug issue status (if ❌→✅, suggest closing the bug)
@@ -64,4 +68,6 @@ STOP and WAIT.
   Recommendation: {A if more retestable, else B}
 ```
 
-STOP and WAIT.
+
+> 🛑 **STOP** — Wait for user input before continuing.
+

@@ -6,15 +6,17 @@ description: "Update issue API contract + notify FE"
 
 # Edit — Update API Contract
 
-## E1-1. Select Target Issue
+### E1-1. Select Target Issue
 
 ```
 Issue number containing the API contract to update: #___
 ```
 
-STOP and WAIT.
 
-## E1-2. Load Current API Contract
+> 🛑 **STOP** — Wait for user input before continuing.
+
+
+### E1-2. Load Current API Contract
 
 ```bash
 gh issue view {number} --repo $REPO --json body --jq .body
@@ -29,7 +31,7 @@ Current API Contract:
   Auth:     {auth}
 ```
 
-## E1-3. Input Changes
+### E1-3. Input Changes
 
 ```
 Fields to update (press Enter to keep current value):
@@ -40,9 +42,11 @@ Fields to update (press Enter to keep current value):
   Auth:     {current} → ___
 ```
 
-STOP and WAIT.
 
-## E1-4. Preview + Confirm
+> 🛑 **STOP** — Wait for user input before continuing.
+
+
+### E1-4. Preview + Confirm
 
 ```
 📋 API Contract Update Preview
@@ -55,9 +59,11 @@ STOP and WAIT.
 [Y] Update  [E] Revise  [N] Cancel
 ```
 
-STOP and WAIT.
 
-## E1-5. Update Issue Body + Notify FE
+> 🛑 **STOP** — Wait for user input before continuing.
+
+
+### E1-5. Update Issue Body + Notify FE
 
 ```bash
 gh issue edit {number} --repo $REPO --body "$UPDATED_BODY"

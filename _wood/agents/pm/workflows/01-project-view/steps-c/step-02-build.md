@@ -11,7 +11,7 @@ READ THIS ENTIRE FILE before executing any action.
 
 ---
 
-## 2-1. Calculate Milestone Status
+### 2-1. Calculate Milestone Status
 
 For each milestone:
 
@@ -42,7 +42,7 @@ else:
 
 ---
 
-## 2-2. Calculate Page Status
+### 2-2. Calculate Page Status
 
 ```python
 if page.state == "closed":
@@ -57,7 +57,7 @@ else:
 
 ---
 
-## 2-3. Task Status Icon Mapping
+### 2-3. Task Status Icon Mapping
 
 | Label | Icon |
 |-------|------|
@@ -71,7 +71,7 @@ else:
 
 ---
 
-## 2-4. Assemble Tree Structure
+### 2-4. Assemble Tree Structure
 
 ```
 milestones[]

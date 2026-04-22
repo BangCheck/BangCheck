@@ -29,7 +29,9 @@ Select result after execution:
 [B] Back
 ```
 
-STOP and WAIT.
+
+> 🛑 **STOP** — Wait for user input before continuing.
+
 
 ### [1] Pass
 Record status as ✅ → next TC.

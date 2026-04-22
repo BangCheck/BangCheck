@@ -29,6 +29,8 @@ nextStepFile: "null"
   Suggestion: if there were breaking changes, also B — DB schema and API may have changed together.
 ```
 
-STOP and WAIT.
+
+> 🛑 **STOP** — Wait for user input before continuing.
+
 
 → After selection, load the corresponding workflow or return to dashboard.

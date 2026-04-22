@@ -11,7 +11,7 @@ READ THIS ENTIRE FILE before executing any action.
 
 ---
 
-## 3-1. Intro Narrative (Non-developer PM Friendly)
+### 3-1. Intro Narrative (Non-developer PM Friendly)
 
 Summarize with natural sentences based on the data:
 
@@ -55,7 +55,7 @@ If there are no active milestones:
 
 ---
 
-## 3-2. Per-Page Progress (Tree)
+### 3-2. Per-Page Progress (Tree)
 
 Render each page issue as a human-friendly block:
 
@@ -75,7 +75,7 @@ Render each page issue as a human-friendly block:
 
 ---
 
-## 3-3. Attention Items — Dynamic Recommendations (pm-recommend engine)
+### 3-3. Attention Items — Dynamic Recommendations (pm-recommend engine)
 
 Instead of hardcoded A/B/C options, invoke the `pm-recommend.md` engine to generate dynamic recommendations.
 

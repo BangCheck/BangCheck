@@ -11,7 +11,7 @@ READ THIS ENTIRE FILE before executing any action.
 
 ---
 
-## 1-1. Set Time Baseline
+### 1-1. Set Time Baseline
 
 ```bash
 SINCE_ISO=$(date -u -v-24H +"%Y-%m-%dT%H:%M:%SZ" 2>/dev/null \
@@ -20,7 +20,7 @@ SINCE_ISO=$(date -u -v-24H +"%Y-%m-%dT%H:%M:%SZ" 2>/dev/null \
 
 ---
 
-## 1-2. Collect Data (Parallel)
+### 1-2. Collect Data (Parallel)
 
 ```bash
 # Issue comments
@@ -45,7 +45,7 @@ gh pr list --repo $REPO --state merged \
 
 ---
 
-## 1-3. Render
+### 1-3. Render
 
 ```
 ## 🔥 Last 24 Hours Activity

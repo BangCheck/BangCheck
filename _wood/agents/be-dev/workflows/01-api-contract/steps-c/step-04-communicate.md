@@ -7,7 +7,7 @@ nextStepFile: "./step-05-report.md"
 
 # Step 04 — FE Communication + Spec Update
 
-## 4-1. Write FE Comment
+### 4-1. Write FE Comment
 
 ```
 💬 Frontend Team Sharing Draft
@@ -54,7 +54,7 @@ STOP and WAIT. **_safety.md § Comment Safety required.**
 
 ---
 
-## 4-2. Spec Update Check
+### 4-2. Spec Update Check
 
 ```
 This change needs to be reflected in docs/spec/ or docs/be/api-spec.md.
@@ -76,6 +76,8 @@ This change needs to be reflected in docs/spec/ or docs/be/api-spec.md.
 {/if}
 ```
 
-STOP and WAIT.
+
+> 🛑 **STOP** — Wait for user input before continuing.
+
 
 → step-05 report.

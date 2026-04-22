@@ -11,7 +11,7 @@ READ THIS ENTIRE FILE before executing any action.
 
 ---
 
-## 2-1. Check Spec Change Since Last Sync
+### 2-1. Check Spec Change Since Last Sync
 
 Load last sync timestamp from `_wood/workspace/_shared/sprint-status.yaml` (key: `spec_last_synced`).
 
@@ -33,7 +33,7 @@ Do NOT alert mechanically. Example:
 
 ---
 
-## 2-2. Fetch GitHub Issues
+### 2-2. Fetch GitHub Issues
 
 ```bash
 gh issue list --repo $REPO --state all \
@@ -56,7 +56,7 @@ for screen_id, screen in spec_screens.items():
 
 ---
 
-## 2-3. Render Sync Status Table
+### 2-3. Render Sync Status Table
 
 **Always display this table before any action is taken.**
 
@@ -91,7 +91,7 @@ for screen_id, screen in spec_screens.items():
 
 ---
 
-## 2-4. Recommendation (Always Show)
+### 2-4. Recommendation (Always Show)
 
 After the table, always offer one natural recommendation based on the situation.
 Do NOT list all options. Assess and suggest the most logical next step:
@@ -106,7 +106,9 @@ Assess in order:
 Example (do NOT copy verbatim — speak naturally based on actual data):
 > "SCR-HOME 명세가 업데이트됐고 아직 67%만 연동됐어요. 변경된 기능부터 동기화할까요?"
 
-STOP and WAIT for user input.
+
+> 🛑 **STOP** — Wait for user input before continuing.
+
 
 ---
 

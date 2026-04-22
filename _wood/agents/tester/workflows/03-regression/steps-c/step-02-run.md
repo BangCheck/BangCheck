@@ -9,7 +9,7 @@ nextStepFile: "./step-03-report.md"
 
 Re-execute **already passed (✅) TCs** for selected pages.
 
-## 2-1. Extract target TCs
+### 2-1. Extract target TCs
 
 ```
 ## Regression Test Targets
@@ -26,9 +26,11 @@ Total {total_regression_tcs} to re-execute.
 [Y] Start  [S] Select subset  [B] Cancel
 ```
 
-STOP and WAIT.
 
-## 2-2. Execution loop
+> 🛑 **STOP** — Wait for user input before continuing.
+
+
+### 2-2. Execution loop
 
 Same approach as 01-run-tc/steps-c/step-02-execute.md:
 
@@ -61,6 +63,8 @@ Result:
              Notifying the author immediately speeds up the hotfix.
 ```
 
-STOP and WAIT.
+
+> 🛑 **STOP** — Wait for user input before continuing.
+
 
 → Proceed to step-03 report when all TCs complete.

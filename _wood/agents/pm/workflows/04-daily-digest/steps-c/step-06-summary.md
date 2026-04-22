@@ -11,7 +11,7 @@ READ THIS ENTIRE FILE before executing any action.
 
 ---
 
-## 6-1. Aggregate by Category
+### 6-1. Aggregate by Category
 
 Based on collected data:
 
@@ -26,7 +26,7 @@ Based on collected data:
 
 ---
 
-## 6-2. Build Summary Table
+### 6-2. Build Summary Table
 
 ```
 ## 📊 {period} Summary

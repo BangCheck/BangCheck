@@ -11,7 +11,7 @@ READ THIS ENTIRE FILE before executing any action.
 
 ---
 
-## 1-1. Access via Google Sheets MCP
+### 1-1. Access via Google Sheets MCP
 
 Use `mcp__claude_ai_Google_Sheets` to read the spec directly.
 
@@ -22,11 +22,11 @@ Target:
 If MCP is not authenticated:
 > "Google Sheets MCP 연결이 필요해요. claude.ai → 설정 → Integrations → Google Sheets에서 연동해주세요."
 
-STOP if auth fails.
+> ⚠️ STOP if auth fails.
 
 ---
 
-## 1-2. Column Mapping (1-indexed)
+### 1-2. Column Mapping (1-indexed)
 
 | Column | Field |
 |--------|-------|
@@ -42,7 +42,7 @@ Skip rows where both B and E are empty.
 
 ---
 
-## 1-3. Parse — Group by 화면 ID
+### 1-3. Parse — Group by 화면 ID
 
 ```python
 screens = {}
@@ -58,7 +58,7 @@ for row in sheet_rows:
 
 ---
 
-## 1-4. Output Summary
+### 1-4. Output Summary
 
 ```
 📄 기능명세서 파싱 완료

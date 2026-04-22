@@ -13,7 +13,7 @@ READ THIS ENTIRE FILE before executing any action.
 
 ---
 
-## 5-1. Checklist Item vs Diff Pattern Mapping
+### 5-1. Checklist Item vs Diff Pattern Mapping
 
 For each incomplete (`- [ ]`) item:
 
@@ -29,7 +29,7 @@ Found → bonus points / Not found → penalty.
 
 ---
 
-## 5-2. Result Summary
+### 5-2. Result Summary
 
 Per item:
 ```

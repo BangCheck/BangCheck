@@ -13,7 +13,7 @@ READ THIS ENTIRE FILE before executing any action.
 
 ---
 
-## 3-1. Select Target
+### 3-1. Select Target
 
 ```
 Specify the target issue for the comment:
@@ -25,11 +25,13 @@ Or select from the list:
   ...
 ```
 
-STOP and WAIT for user input.
+
+> 🛑 **STOP** — Wait for user input before continuing.
+
 
 ---
 
-## 3-2. Write Message
+### 3-2. Write Message
 
 ```
 Write a comment on [#{n} {title}].
@@ -38,13 +40,15 @@ Auto-mention for assignees: entering {assignee} will be replaced with @{github_l
 Content:
 ```
 
-STOP and WAIT for user input.
+
+> 🛑 **STOP** — Wait for user input before continuing.
+
 
 Replace `{assignee}` → `@{github_login}` (based on team-roles.yaml).
 
 ---
 
-## 3-3. Preview (MANDATORY)
+### 3-3. Preview (MANDATORY)
 
 ```
 💬 Comment Preview
@@ -62,11 +66,13 @@ Content:
 [N] Cancel
 ```
 
-STOP and WAIT for user input.
+
+> 🛑 **STOP** — Wait for user input before continuing.
+
 
 ---
 
-## 3-4. Send (when Y is selected)
+### 3-4. Send (when Y is selected)
 
 ```bash
 gh issue comment {n} --repo $REPO --body "{composed_message}"
@@ -79,7 +85,7 @@ gh issue comment {n} --repo $REPO --body "{composed_message}"
 
 ---
 
-## 3-5. Edit / Cancel
+### 3-5. Edit / Cancel
 
 - `E` → Return to 3-2 with existing content preserved for re-editing
 - `N` → Cancel, navigate to step-05-menu

@@ -11,7 +11,7 @@ READ THIS ENTIRE FILE before executing any action.
 
 ---
 
-## 3-1. Fact Check Output
+### 3-1. Fact Check Output
 
 All collected information at a glance:
 
@@ -44,7 +44,7 @@ All collected information at a glance:
 
 ---
 
-## 3-2. Options + Candid Recommendation
+### 3-2. Options + Candid Recommendation
 
 Auto-generated based on code status:
 

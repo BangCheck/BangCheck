@@ -11,7 +11,7 @@ READ THIS ENTIRE FILE before executing any action.
 
 ---
 
-## 1-1. Selection Menu
+### 1-1. Selection Menu
 
 ```
 🔍 Which feature's progress would you like to analyze?
@@ -24,11 +24,13 @@ READ THIS ENTIRE FILE before executing any action.
 Number:
 ```
 
-STOP and WAIT for user input.
+
+> 🛑 **STOP** — Wait for user input before continuing.
+
 
 ---
 
-## 1-2. Input A — Issue Number
+### 1-2. Input A — Issue Number
 
 ```bash
 gh issue view {N} --repo $REPO \
@@ -37,7 +39,7 @@ gh issue view {N} --repo $REPO \
 
 ---
 
-## 1-3. Input B — Active Issue List
+### 1-3. Input B — Active Issue List
 
 ```bash
 gh issue list --repo $REPO \
@@ -49,7 +51,7 @@ Display the list, then wait for number input.
 
 ---
 
-## 1-4. Input C — Page Comprehensive
+### 1-4. Input C — Page Comprehensive
 
 Select a `유형:페이지` issue → automatically include that issue + all sub-issues.
 

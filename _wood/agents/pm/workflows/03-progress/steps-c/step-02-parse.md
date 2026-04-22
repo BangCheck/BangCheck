@@ -11,7 +11,7 @@ READ THIS ENTIRE FILE before executing any action.
 
 ---
 
-## 2-1. Checklist Item Count
+### 2-1. Checklist Item Count
 
 From the issue body:
 
@@ -26,14 +26,14 @@ checklist_ratio = completed_checklist / total_checklist if total_checklist > 0 e
 
 ---
 
-## 2-2. Test Scenario Count
+### 2-2. Test Scenario Count
 
 Count items in the `### Test Scenarios` or `## Test Cases` section.
 → Save as expected test case count.
 
 ---
 
-## 2-3. Implementation Requirement Extraction
+### 2-3. Implementation Requirement Extraction
 
 Extract items containing imperative verbs ("implement", "add", "support") from the body → use for scope estimation.
 

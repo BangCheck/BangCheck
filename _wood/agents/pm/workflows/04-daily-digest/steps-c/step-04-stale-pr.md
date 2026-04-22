@@ -11,7 +11,7 @@ READ THIS ENTIRE FILE before executing any action.
 
 ---
 
-## 4-1. Load SLA Threshold
+### 4-1. Load SLA Threshold
 
 ```bash
 SLA=$(yq '.global_defaults.review_sla_hours' _wood/milestone-meta.yaml)
@@ -19,7 +19,7 @@ SLA=$(yq '.global_defaults.review_sla_hours' _wood/milestone-meta.yaml)
 
 ---
 
-## 4-2. Stale PR Filter
+### 4-2. Stale PR Filter
 
 ```bash
 gh pr list --repo $REPO --state open \
@@ -32,7 +32,7 @@ gh pr list --repo $REPO --state open \
 
 ---
 
-## 4-3. Render
+### 4-3. Render
 
 ```
 ⏰ Stale PRs ({count} items) — exceeded review SLA of {SLA}h

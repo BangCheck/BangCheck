@@ -11,7 +11,7 @@ READ THIS ENTIRE FILE before executing any action.
 
 ---
 
-## 1-1. Time Window Selection Menu
+### 1-1. Time Window Selection Menu
 
 ```
 Select the query time window:
@@ -28,7 +28,7 @@ STOP and WAIT for user input. If no input, apply 24h default.
 
 ---
 
-## 1-2. Set SINCE Variable
+### 1-2. Set SINCE Variable
 
 ```bash
 # 24h default

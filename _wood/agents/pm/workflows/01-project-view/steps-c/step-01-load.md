@@ -11,7 +11,7 @@ READ THIS ENTIRE FILE before executing any action.
 
 ---
 
-## 1-1. Open Milestones
+### 1-1. Open Milestones
 
 ```bash
 gh api "repos/$REPO/milestones?state=open&per_page=30" \
@@ -28,7 +28,7 @@ Wait for user input, then STOP.
 
 ---
 
-## 1-2. Page Issues (유형:페이지)
+### 1-2. Page Issues (유형:페이지)
 
 For each milestone:
 ```bash
@@ -41,7 +41,7 @@ gh issue list --repo $REPO \
 
 ---
 
-## 1-3. Task Issues (유형:작업)
+### 1-3. Task Issues (유형:작업)
 
 ```bash
 gh issue list --repo $REPO \
@@ -53,7 +53,7 @@ gh issue list --repo $REPO \
 
 ---
 
-## 1-4. Parent-Child Relationships
+### 1-4. Parent-Child Relationships
 
 Priority:
 1. GitHub sub-issues API
@@ -64,7 +64,7 @@ Priority:
 
 ---
 
-## 1-5. Bug Issues (유형:버그)
+### 1-5. Bug Issues (유형:버그)
 
 ```bash
 gh issue list --repo $REPO \
@@ -75,7 +75,7 @@ gh issue list --repo $REPO \
 
 ---
 
-## 1-6. Milestone Meta
+### 1-6. Milestone Meta
 
 ```bash
 cat _wood/milestone-meta.yaml

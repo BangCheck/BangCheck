@@ -8,13 +8,13 @@ description: "PR change-based impact scope analysis"
 
 Pre-analyze impact scope before PR merge. Identify in advance which regression tests will be needed after merge.
 
-## V1-1. PR diff analysis
+### V1-1. PR diff analysis
 
 ```bash
 gh pr diff {pr_num} --name-only --repo $REPO
 ```
 
-## V1-2. Impact mapping
+### V1-2. Impact mapping
 
 ```
 ## 📊 PR #{pr_num} Impact Analysis
@@ -42,4 +42,6 @@ Severity:
   Recommendation: A — Running regression immediately after merge is the most reliable approach.
 ```
 
-STOP and WAIT.
+
+> 🛑 **STOP** — Wait for user input before continuing.
+

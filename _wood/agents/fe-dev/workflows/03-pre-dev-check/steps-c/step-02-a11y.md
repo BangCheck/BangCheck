@@ -7,7 +7,7 @@ nextStepFile: "./step-03-state.md"
 
 # Step 02 — Accessibility Check
 
-## 2-1. Basic Accessibility Scan
+### 2-1. Basic Accessibility Scan
 
 ```bash
 for file in {related_files}; do
@@ -25,7 +25,7 @@ for file in {related_files}; do
 done
 ```
 
-## 2-2. Check Results
+### 2-2. Check Results
 
 ```
 ## Accessibility Check

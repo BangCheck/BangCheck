@@ -6,7 +6,7 @@ description: "UI Consistency Verification"
 
 # Validate — UI Consistency Verification
 
-## V1-1. Design Token Consistency
+### V1-1. Design Token Consistency
 
 ```bash
 # Detect hardcoded Tailwind custom colors
@@ -16,7 +16,7 @@ grep -rn "bg-\[#\|text-\[#\|border-\[#" frontend/src/ --include="*.tsx" | head -
 grep -rn "p-\[.*px\]\|m-\[.*px\]\|gap-\[.*px\]" frontend/src/ --include="*.tsx" | head -20
 ```
 
-## V1-2. Korean UI Consistency
+### V1-2. Korean UI Consistency
 
 ```bash
 # Search for Korean text (check if hardcoded)
@@ -24,7 +24,7 @@ grep -rn '"[가-힣]' frontend/src/components/ --include="*.tsx" | wc -l
 # → Check whether separated into i18n or constants file
 ```
 
-## V1-3. Results
+### V1-3. Results
 
 ```
 ## UI Consistency Verification
@@ -47,4 +47,6 @@ grep -rn '"[가-힣]' frontend/src/components/ --include="*.tsx" | wc -l
 {/if}
 ```
 
-STOP and WAIT.
+
+> 🛑 **STOP** — Wait for user input before continuing.
+

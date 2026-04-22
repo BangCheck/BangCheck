@@ -11,7 +11,7 @@ READ THIS ENTIRE FILE before executing any action.
 
 ---
 
-## 4-1. Collect Completed Issues
+### 4-1. Collect Completed Issues
 
 Based on `{completed_items}` from step-02 + additional query:
 
@@ -25,7 +25,7 @@ gh issue list --repo $REPO --state closed \
 
 ---
 
-## 4-2. Select Target Document for Update
+### 4-2. Select Target Document for Update
 
 ```
 Select the Google Docs progress sheet:
@@ -37,11 +37,13 @@ Select the Google Docs progress sheet:
 Number:
 ```
 
-STOP and WAIT for user input.
+
+> 🛑 **STOP** — Wait for user input before continuing.
+
 
 ---
 
-## 4-3. Update Content Preview (MANDATORY)
+### 4-3. Update Content Preview (MANDATORY)
 
 ```
 📝 Google Docs Update Preview
@@ -57,11 +59,13 @@ Items to add/modify ({n} items):
 [Y] Update  [E] Edit  [N] Cancel
 ```
 
-STOP and WAIT for user input.
+
+> 🛑 **STOP** — Wait for user input before continuing.
+
 
 ---
 
-## 4-4. Update Docs (When Y is Selected)
+### 4-4. Update Docs (When Y is Selected)
 
 Update the target sheet/document using MCP `google-drive` tools:
 

@@ -8,7 +8,7 @@ description: "Apply fixes for detected issues"
 
 Address items flagged as ❌ fix needed in the risk check.
 
-## E1-1. Fix Target List
+### E1-1. Fix Target List
 
 ```
 ## Items Needing Fix
@@ -25,9 +25,11 @@ Which item to fix first?
 [B] Return to dashboard
 ```
 
-STOP and WAIT.
 
-## E1-2. Fix Guidance
+> 🛑 **STOP** — Wait for user input before continuing.
+
+
+### E1-2. Fix Guidance
 
 For each item:
 
@@ -50,7 +52,7 @@ Fix approach:
 
 STOP and WAIT. Proceed to next item after selection.
 
-## E1-3. Completion
+### E1-3. Completion
 
 ```
 ✅ Schema fixes complete

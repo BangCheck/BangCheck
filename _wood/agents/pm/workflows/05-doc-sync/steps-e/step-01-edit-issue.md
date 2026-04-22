@@ -10,7 +10,7 @@ description: "Edit Issue"
 
 ---
 
-## E1-1. Select Edit Target
+### E1-1. Select Edit Target
 
 ```
 Select the issue to edit:
@@ -22,11 +22,13 @@ Select the issue to edit:
 Select:
 ```
 
-STOP and WAIT.
+
+> 🛑 **STOP** — Wait for user input before continuing.
+
 
 ---
 
-## E1-2. Load Current Issue
+### E1-2. Load Current Issue
 
 ```bash
 gh issue view {number} --repo $REPO \
@@ -52,7 +54,7 @@ Tracking info:
 
 ---
 
-## E1-3. Edit Menu
+### E1-3. Edit Menu
 
 ```
 What would you like to modify?
@@ -69,11 +71,13 @@ What would you like to modify?
 Select:
 ```
 
-STOP and WAIT.
+
+> 🛑 **STOP** — Wait for user input before continuing.
+
 
 ---
 
-## E1-4. Enhance Tracking Info [K]
+### E1-4. Enhance Tracking Info [K]
 
 When an existing issue is missing tracking keys:
 
@@ -99,7 +103,7 @@ gh issue edit {number} --repo $REPO --body "{updated_body}"
 
 ---
 
-## E1-5. Add/Edit API Contract [C]
+### E1-5. Add/Edit API Contract [C]
 
 ```
 Enter the API contract:

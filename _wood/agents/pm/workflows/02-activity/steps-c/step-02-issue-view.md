@@ -11,7 +11,7 @@ READ THIS ENTIRE FILE before executing any action.
 
 ---
 
-## 2-1. Query Active Sprint Issues
+### 2-1. Query Active Sprint Issues
 
 ```bash
 gh issue list --repo $REPO \
@@ -22,7 +22,7 @@ gh issue list --repo $REPO \
 
 ---
 
-## 2-2. Aggregate Recent Activity Per Issue
+### 2-2. Aggregate Recent Activity Per Issue
 
 For each issue:
 
@@ -42,7 +42,7 @@ gh pr list --repo $REPO --search "closes #$ISSUE_NUM" \
 
 ---
 
-## 2-3. Render
+### 2-3. Render
 
 ```
 ## 📋 In-Progress Issue Activity

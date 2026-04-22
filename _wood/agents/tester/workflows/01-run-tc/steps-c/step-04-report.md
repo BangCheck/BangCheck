@@ -51,4 +51,6 @@ Page: [#{n} {title}]({url})
   [X] Return to dashboard
 ```
 
-STOP and WAIT.
+
+> 🛑 **STOP** — Wait for user input before continuing.
+

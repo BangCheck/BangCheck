@@ -7,7 +7,7 @@ nextStepFile: "./step-02-execute.md"
 
 # Step 03 — Record Result
 
-## 3-1. Issue body update
+### 3-1. Issue body update
 
 ```bash
 BODY=$(gh issue view {page_num} --json body --jq .body)
@@ -20,13 +20,15 @@ echo "  ${TC_ID}: ⬜ → ${new_status}"
 echo "[Y] Update  [N] Cancel"
 ```
 
-STOP and WAIT.
+
+> 🛑 **STOP** — Wait for user input before continuing.
+
 
 ```bash
 gh issue edit {page_num} --body "$UPDATED" --repo $REPO
 ```
 
-## 3-2. Bug registration on failure
+### 3-2. Bug registration on failure
 
 When ❌ is selected:
 
@@ -48,12 +50,14 @@ Actual result: ___
 Error log (if any): ___
 ```
 
-STOP and WAIT.
+
+> 🛑 **STOP** — Wait for user input before continuing.
+
 
 → Delegate to `_wood/workflows/02-project/steps-c/case-04-bug.md`
 → Add bug number to TC row: `❌ (#{bug_number})`
 
-## 3-3. Progress update
+### 3-3. Progress update
 
 ```bash
 # Update bottom of issue body

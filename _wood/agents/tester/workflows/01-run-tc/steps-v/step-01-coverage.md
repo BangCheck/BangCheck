@@ -6,7 +6,7 @@ description: "TC Coverage Validation"
 
 # Validate — TC Coverage
 
-## V1-1. TC count vs feature count per page
+### V1-1. TC count vs feature count per page
 
 ```bash
 # Query feature (sub-issue) count from page issues
@@ -17,7 +17,7 @@ for page in $(gh issue list --repo $REPO --label "유형:페이지" --state open
 done
 ```
 
-## V1-2. Coverage table
+### V1-2. Coverage table
 
 ```
 ## 📊 TC Coverage
@@ -57,4 +57,6 @@ Verdict criteria:
 {/if}
 ```
 
-STOP and WAIT.
+
+> 🛑 **STOP** — Wait for user input before continuing.
+

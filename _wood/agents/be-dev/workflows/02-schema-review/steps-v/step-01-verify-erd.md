@@ -6,14 +6,14 @@ description: "Compare ERD document vs actual entities"
 
 # Validate — ERD Verification
 
-## V1-1. Load ERD Document
+### V1-1. Load ERD Document
 
 ```bash
 ERD_FILE="docs/be/erd.md"
 [ -f "$ERD_FILE" ] && cat "$ERD_FILE" || echo "❌ ERD document not found"
 ```
 
-## V1-2. Scan Actual Entities
+### V1-2. Scan Actual Entities
 
 ```bash
 # JPA Entity class list
@@ -25,7 +25,7 @@ for entity in $(entities); do
 done
 ```
 
-## V1-3. Comparison Table
+### V1-3. Comparison Table
 
 ```
 ## 📊 ERD vs Entity Comparison
@@ -55,4 +55,6 @@ done
 {/if}
 ```
 
-STOP and WAIT.
+
+> 🛑 **STOP** — Wait for user input before continuing.
+

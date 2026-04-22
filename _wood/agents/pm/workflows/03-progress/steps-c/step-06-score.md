@@ -11,7 +11,7 @@ READ THIS ENTIRE FILE before executing any action.
 
 ---
 
-## 6-1. Load Weights
+### 6-1. Load Weights
 
 ```bash
 yq '.progress_estimation.weights' _wood/milestone-meta.yaml
@@ -19,7 +19,7 @@ yq '.progress_estimation.weights' _wood/milestone-meta.yaml
 
 ---
 
-## 6-2. Weighted Sum
+### 6-2. Weighted Sum
 
 ```python
 score = (checklist_ratio         * weights.checklist_completion)

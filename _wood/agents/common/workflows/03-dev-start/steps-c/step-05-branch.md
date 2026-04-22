@@ -11,7 +11,7 @@ READ THIS ENTIRE FILE before executing any action.
 
 ---
 
-## 5-1. Create or Switch Branch
+### 5-1. Create or Switch Branch
 
 If existing branch found:
 ```bash
@@ -31,7 +31,7 @@ git checkout -b "$BRANCH"
 
 ---
 
-## 5-2. Issue Status Update
+### 5-2. Issue Status Update
 
 ```bash
 gh issue edit {issue_number} \
@@ -42,7 +42,7 @@ gh issue edit {issue_number} \
 
 ---
 
-## 5-3. Story Status Update
+### 5-3. Story Status Update
 
 ```bash
 # Personal workspace story → in-progress

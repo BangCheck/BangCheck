@@ -58,6 +58,8 @@ AI reads the diff and provides detailed analysis:
 {/if}
 ```
 
-STOP and WAIT.
+
+> 🛑 **STOP** — Wait for user input before continuing.
+
 
 → step-04 or step-05.

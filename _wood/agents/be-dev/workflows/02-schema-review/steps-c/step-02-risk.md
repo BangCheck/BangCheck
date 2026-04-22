@@ -9,7 +9,7 @@ nextStepFile: "./step-03-rollback.md"
 
 **Actually read** the code and check each item.
 
-## 2-1. Migration Safety
+### 2-1. Migration Safety
 
 | Check | Item | Result |
 |-------|------|--------|
@@ -18,7 +18,7 @@ nextStepFile: "./step-03-rollback.md"
 | {✅/❌} | DROP COLUMN → 2-phase deployment? (deprecate → remove) | {analysis} |
 | {✅/❌} | Default provided when adding NOT NULL column? | {analysis} |
 
-## 2-2. Query Performance
+### 2-2. Query Performance
 
 | Check | Item | Result |
 |-------|------|--------|
@@ -26,7 +26,7 @@ nextStepFile: "./step-03-rollback.md"
 | {✅/❌} | N+1 query risk? | {analysis} |
 | {✅/❌} | Cursor-based instead of OFFSET? | {analysis} |
 
-## 2-3. Data Integrity
+### 2-3. Data Integrity
 
 | Check | Item | Result |
 |-------|------|--------|
@@ -34,7 +34,7 @@ nextStepFile: "./step-03-rollback.md"
 | {✅/❌} | ON DELETE/UPDATE policy specified | {analysis} |
 | {✅/❌} | Unique constraints (e.g. email) | {analysis} |
 
-## 2-4. Security
+### 2-4. Security
 
 | Check | Item | Result |
 |-------|------|--------|
@@ -42,7 +42,7 @@ nextStepFile: "./step-03-rollback.md"
 | {✅/❌} | PII column encryption/masking | {analysis} |
 | {✅/❌} | Audit log (created_by, updated_by) | {analysis} |
 
-## 2-5. API Impact
+### 2-5. API Impact
 
 | Check | Item | Result |
 |-------|------|--------|
@@ -67,4 +67,6 @@ nextStepFile: "./step-03-rollback.md"
 {/if}
 ```
 
-STOP and WAIT.
+
+> 🛑 **STOP** — Wait for user input before continuing.
+

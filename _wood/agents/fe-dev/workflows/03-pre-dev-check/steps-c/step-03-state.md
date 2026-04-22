@@ -7,7 +7,7 @@ nextStepFile: "null"
 
 # Step 03 — State Management Check
 
-## 3-1. State Management Pattern Scan
+### 3-1. State Management Pattern Scan
 
 ```bash
 # TanStack Query usage
@@ -26,7 +26,7 @@ for file in {related_files}; do
 done
 ```
 
-## 3-2. Data Flow in Related Files
+### 3-2. Data Flow in Related Files
 
 ```
 ## State Management Overview
@@ -52,7 +52,7 @@ Recommended pattern for this issue:
 {/if}
 ```
 
-## 3-3. Final Recommendation
+### 3-3. Final Recommendation
 
 ```
 ## Pre-Dev Check Complete
@@ -68,4 +68,6 @@ Recommended pattern for this issue:
   Blunt recommendation: A — Check complete. Address ⚠️ items as you develop.
 ```
 
-STOP and WAIT.
+
+> 🛑 **STOP** — Wait for user input before continuing.
+

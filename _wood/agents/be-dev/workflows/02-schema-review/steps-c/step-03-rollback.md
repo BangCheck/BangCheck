@@ -37,6 +37,8 @@ Down migration: {file or "❌ missing — needs to be added"}
 {/if}
 ```
 
-STOP and WAIT.
+
+> 🛑 **STOP** — Wait for user input before continuing.
+
 
 → step-04 report.

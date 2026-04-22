@@ -38,7 +38,7 @@ If user declines → skip this screen, move to next.
 
 ---
 
-## 3-0. Entry Branch
+### 3-0. Entry Branch
 
 ```
 [A] Create missing specification items   → 3-A (auto-draft)
@@ -48,7 +48,9 @@ If user declines → skip this screen, move to next.
 Select:
 ```
 
-STOP and WAIT for user input.
+
+> 🛑 **STOP** — Wait for user input before continuing.
+
 
 ---
 
@@ -125,7 +127,9 @@ Currently registered screens:
 Enter screen name or number (enter directly for a new screen):
 ```
 
-STOP and WAIT.
+
+> 🛑 **STOP** — Wait for user input before continuing.
+
 
 ### Q2. Issue Title
 
@@ -136,7 +140,9 @@ e.g.) "Room card delete button", "Add Google social login"
 Title:
 ```
 
-STOP and WAIT.
+
+> 🛑 **STOP** — Wait for user input before continuing.
+
 
 ### Q3. FE / BE Recommendation
 
@@ -151,7 +157,9 @@ Auto-determine based on the entered title/description, then recommend:
 Select:
 ```
 
-STOP and WAIT.
+
+> 🛑 **STOP** — Wait for user input before continuing.
+
 
 **If Both is selected → Mark as 2 separate FE/BE issues to be created.**
 
@@ -171,7 +179,9 @@ Recommended: Priority:{recommended}
 Select:
 ```
 
-STOP and WAIT.
+
+> 🛑 **STOP** — Wait for user input before continuing.
+
 
 ### Q5. Sprint + Date Recommendation
 
@@ -193,7 +203,9 @@ Recommended period: {start_date} ~ {end_date}
 Select:
 ```
 
-STOP and WAIT.
+
+> 🛑 **STOP** — Wait for user input before continuing.
+
 
 ### Q6. Additional Details (Optional)
 
@@ -203,7 +215,9 @@ Enter additional description if any. (Press Enter to skip)
 Description:
 ```
 
-STOP and WAIT.
+
+> 🛑 **STOP** — Wait for user input before continuing.
+
 
 ---
 
@@ -258,7 +272,9 @@ Sprint:    {milestone}
 Select:
 ```
 
-STOP and WAIT.
+
+> 🛑 **STOP** — Wait for user input before continuing.
+
 
 ### Assignee Decision Logic (No Hardcoding)
 

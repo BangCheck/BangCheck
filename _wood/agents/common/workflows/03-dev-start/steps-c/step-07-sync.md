@@ -13,7 +13,7 @@ READ THIS ENTIRE FILE before executing any action.
 
 ---
 
-## 7-1. Confirm Completed Items
+### 7-1. Confirm Completed Items
 
 ```
 ## Completion Sync — #{issue_number} {issue_title}
@@ -30,7 +30,7 @@ STOP and WAIT — user confirms completed items.
 
 ---
 
-## 7-2. Update GitHub Issue Checklist
+### 7-2. Update GitHub Issue Checklist
 
 Reflect user-confirmed items in the issue body:
 
@@ -49,7 +49,9 @@ echo ""
 echo "[Y] Update  [N] Cancel"
 ```
 
-STOP and WAIT.
+
+> 🛑 **STOP** — Wait for user input before continuing.
+
 
 ```bash
 gh issue edit {issue_number} --repo $REPO --body "$UPDATED_BODY"
@@ -57,7 +59,7 @@ gh issue edit {issue_number} --repo $REPO --body "$UPDATED_BODY"
 
 ---
 
-## 7-3. Story Status Update
+### 7-3. Story Status Update
 
 Update completed Story files' Status → done:
 
@@ -71,7 +73,7 @@ done
 
 ---
 
-## 7-4. API Contract Finalization (BE issues only)
+### 7-4. API Contract Finalization (BE issues only)
 
 ```
 {if role contains "Backend" AND api_contract exists}
@@ -83,7 +85,9 @@ Did the API contract change during implementation?
 [S] No API contract (not applicable)
 ```
 
-STOP and WAIT.
+
+> 🛑 **STOP** — Wait for user input before continuing.
+
 
 ### [Y] Changed
 
@@ -145,7 +149,7 @@ Implementation completed as originally drafted. Please review once PR is up.
 
 ---
 
-## 7-5. Sprint Status Update (personal + shared simultaneously)
+### 7-5. Sprint Status Update (personal + shared simultaneously)
 
 Reflect completed Story/Issue in **both personal and shared** sprint-status simultaneously.
 
@@ -208,13 +212,15 @@ if [ -f "$SHARED_SPRINT" ]; then
 fi
 ```
 
-STOP and WAIT.
+
+> 🛑 **STOP** — Wait for user input before continuing.
+
 
 **Both locations must be updated so PM can check the shared sprint-status and assess overall team progress.**
 
 ---
 
-## 7-6. FE↔BE Communication Proposal (MANDATORY on development completion)
+### 7-6. FE↔BE Communication Proposal (MANDATORY on development completion)
 
 When development is complete, propose specifically how to communicate with FE.
 
@@ -297,7 +303,7 @@ fi
 
 ---
 
-## 7-7. Document Impact Check
+### 7-7. Document Impact Check
 
 Check if this change may impact docs/.
 
@@ -337,7 +343,7 @@ CHANGED_FILES=$(git diff --name-only main..HEAD)
 
 ---
 
-## 7-8. Next Action Recommendation
+### 7-8. Next Action Recommendation
 
 ```
 ✅ Sync complete
@@ -369,7 +375,9 @@ CHANGED_FILES=$(git diff --name-only main..HEAD)
 {/if}
 ```
 
-STOP and WAIT.
+
+> 🛑 **STOP** — Wait for user input before continuing.
+
 
 | Input | Action |
 |-------|--------|

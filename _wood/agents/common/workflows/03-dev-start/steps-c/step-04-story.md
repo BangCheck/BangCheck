@@ -11,7 +11,7 @@ READ THIS ENTIRE FILE before executing any action.
 
 ---
 
-## 4-1. Story Auto-Draft
+### 4-1. Story Auto-Draft
 
 Break down Stories based on code status (step-02) + facts (step-03) + incomplete issue checklist items:
 
@@ -39,7 +39,7 @@ Based on incomplete issue items ({undone_count} items):
 
 ---
 
-## 4-2. Preview Confirmation
+### 4-2. Preview Confirmation
 
 ```
 📋 Story Preview
@@ -51,11 +51,13 @@ Based on incomplete issue items ({undone_count} items):
 Selection:
 ```
 
-STOP and WAIT.
+
+> 🛑 **STOP** — Wait for user input before continuing.
+
 
 ---
 
-## 4-3. Save to Personal Workspace (when Y is selected)
+### 4-3. Save to Personal Workspace (when Y is selected)
 
 **Use the _story-template.md format.**
 **Save path: personal workspace → `_wood/workspace/_{USER_LOGIN}/stories/`**

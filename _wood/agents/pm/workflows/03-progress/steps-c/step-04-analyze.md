@@ -11,7 +11,7 @@ READ THIS ENTIRE FILE before executing any action.
 
 ---
 
-## 4-1. Commit Analysis
+### 4-1. Commit Analysis
 
 ```bash
 git log --format="%h|%an|%s|%ar" main..{selected_branch}
@@ -26,7 +26,7 @@ stale = days_since_last > stale_commit_days  # based on milestone-meta.yaml
 
 ---
 
-## 4-2. Changed File Analysis
+### 4-2. Changed File Analysis
 
 ```bash
 git diff --stat main..{selected_branch}
@@ -34,7 +34,7 @@ git diff --stat main..{selected_branch}
 
 ---
 
-## 4-3. Test File Presence
+### 4-3. Test File Presence
 
 ```bash
 git diff --name-only main..{selected_branch} | grep -E "\.(test|spec)\." | wc -l
@@ -48,7 +48,7 @@ If test scenarios are specified but test_files = 0 → flag as `🔴 No tests`.
 
 ---
 
-## 4-4. TODO/FIXME Markers
+### 4-4. TODO/FIXME Markers
 
 ```bash
 git diff main..{selected_branch} | grep -E "^\+.*//.*(TODO|FIXME)" | wc -l
@@ -58,7 +58,7 @@ Save `todo_count`. Higher count means more deductions.
 
 ---
 
-## 4-5. PR Status
+### 4-5. PR Status
 
 ```bash
 gh pr list --repo $REPO --search "closes #{N}" --state all \

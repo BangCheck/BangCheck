@@ -11,7 +11,7 @@ READ THIS ENTIRE FILE before executing any action.
 
 ---
 
-## 3-1. Blocking Declarations
+### 3-1. Blocking Declarations
 
 From events where `event=="labeled"` AND `label.name=="상태:블로킹"`:
 
@@ -24,7 +24,7 @@ From events where `event=="labeled"` AND `label.name=="상태:블로킹"`:
 
 ---
 
-## 3-2. PM Mentions
+### 3-2. PM Mentions
 
 ```bash
 PM_LOGIN=$(yq '.members | to_entries | map(select(.value.role == "PM")) | .[0].key' _wood/team-roles.yaml)
@@ -41,7 +41,7 @@ Comments containing `@{PM_LOGIN}` in body:
 
 ---
 
-## 3-3. New Bugs
+### 3-3. New Bugs
 
 Label `유형:버그` + created date >= SINCE:
 
@@ -53,7 +53,7 @@ Label `유형:버그` + created date >= SINCE:
 
 ---
 
-## 3-4. Assignee Changes
+### 3-4. Assignee Changes
 
 Events `assigned` / `unassigned`:
 

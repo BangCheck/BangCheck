@@ -11,7 +11,7 @@ READ THIS ENTIRE FILE before executing any action.
 
 ---
 
-## 5-1. Display Action Menu
+### 5-1. Display Action Menu
 
 ```
 ## Next Actions
@@ -26,11 +26,13 @@ READ THIS ENTIRE FILE before executing any action.
 Enter a number or keyword:
 ```
 
-STOP and WAIT for user input.
+
+> 🛑 **STOP** — Wait for user input before continuing.
+
 
 ---
 
-## 5-2. Input Handlers
+### 5-2. Input Handlers
 
 | Input | Action |
 |-------|--------|

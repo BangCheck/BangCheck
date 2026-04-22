@@ -11,7 +11,7 @@ READ THIS ENTIRE FILE before executing any action.
 
 ---
 
-## 2-1. Determine Reading Path Based on Role
+### 2-1. Determine Reading Path Based on Role
 
 ```python
 if USER_ROLE in ["Frontend", "Admin"]:
@@ -24,7 +24,7 @@ If Admin, determine by issue nature (FE/BE).
 
 ---
 
-## 2-2. Read Related Files
+### 2-2. Read Related Files
 
 Read the top 5 files from `{related_files}` in order:
 
@@ -45,7 +45,7 @@ find . -name "*.test.*" -o -name "*.spec.*" | \
 
 ---
 
-## 2-3. Branch Status
+### 2-3. Branch Status
 
 ```bash
 # Check if related branch exists
@@ -57,7 +57,7 @@ git log --oneline --all | grep -i "{keyword}" | head -5
 
 ---
 
-## 2-4. Implementation Gap Analysis
+### 2-4. Implementation Gap Analysis
 
 Assess based on code read:
 

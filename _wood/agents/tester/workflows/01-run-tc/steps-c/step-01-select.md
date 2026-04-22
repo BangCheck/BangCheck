@@ -7,7 +7,7 @@ nextStepFile: "./step-02-execute.md"
 
 # Step 01 — Select Page + Parse TC
 
-## 1-1. Page list
+### 1-1. Page list
 
 ```bash
 gh issue list --repo $REPO --label "유형:페이지" \
@@ -33,9 +33,11 @@ Recommendation: {page with most unchecked or failed} —
 Enter number:
 ```
 
-STOP and WAIT.
 
-## 1-2. TC Parsing
+> 🛑 **STOP** — Wait for user input before continuing.
+
+
+### 1-2. TC Parsing
 
 Parse TC table from the selected page issue body:
 

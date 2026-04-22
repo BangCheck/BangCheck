@@ -23,7 +23,9 @@ READ THIS ENTIRE FILE before executing any action.
 Enter a number:
 ```
 
-STOP and WAIT for user input.
+
+> 🛑 **STOP** — Wait for user input before continuing.
+
 
 ---
 

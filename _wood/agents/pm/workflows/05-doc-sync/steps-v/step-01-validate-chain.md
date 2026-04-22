@@ -10,7 +10,7 @@ description: "Specification → Issue Chain Validation"
 
 ---
 
-## V1-1. Collect All Issues
+### V1-1. Collect All Issues
 
 ```bash
 # All task issues
@@ -26,7 +26,7 @@ ALL_PAGES=$(gh issue list --repo $REPO --state all \
 
 ---
 
-## V1-2. Tracking Key Validation
+### V1-2. Tracking Key Validation
 
 Parse each task issue's body to check tracking key presence:
 
@@ -47,7 +47,7 @@ Verdict criteria:
 
 ---
 
-## V1-3. Orphan Issue Detection
+### V1-3. Orphan Issue Detection
 
 Issues with no Parent, no WBS, and no related issue links:
 
@@ -74,7 +74,7 @@ What would you like to do?
 
 ---
 
-## V1-4. FE↔BE Integration Validation
+### V1-4. FE↔BE Integration Validation
 
 Check whether issue pairs created as Both are cross-linked:
 
@@ -95,7 +95,7 @@ Check whether issue pairs created as Both are cross-linked:
 
 ---
 
-## V1-5. BE API Contract Validation
+### V1-5. BE API Contract Validation
 
 BE-labeled issues missing an API contract section:
 
@@ -117,7 +117,7 @@ BE-labeled issues missing an API contract section:
 
 ---
 
-## V1-6. Validation Summary
+### V1-6. Validation Summary
 
 ```
 ## 📋 Chain Validation Summary

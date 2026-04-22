@@ -6,7 +6,7 @@ description: "Compare issue API contract vs actual code"
 
 # Validate — API Contract Verification
 
-## V1-1. Collect Issue API Contracts
+### V1-1. Collect Issue API Contracts
 
 ```bash
 # Parse API contract sections from backend-labeled issues
@@ -16,7 +16,7 @@ BE_ISSUES=$(gh issue list --repo $REPO --state open --label "backend" \
 # Extract ### API Contract table from each issue body
 ```
 
-## V1-2. Extract Endpoints from Actual Code
+### V1-2. Extract Endpoints from Actual Code
 
 ```bash
 # Spring Boot Controller patterns
@@ -27,7 +27,7 @@ grep -rn "@\(Get\|Post\|Put\|Delete\|Patch\)Mapping" backend/src/ | \
 grep -rn "router\.\(get\|post\|put\|delete\)" backend/src/ | head -30
 ```
 
-## V1-3. Comparison Table
+### V1-3. Comparison Table
 
 ```
 ## 📊 API Contract vs Code Comparison
@@ -51,7 +51,7 @@ grep -rn "router\.\(get\|post\|put\|delete\)" backend/src/ | head -30
   Unimplemented:  {n} (exists in issues but not in code)
 ```
 
-## V1-4. Recommendation
+### V1-4. Recommendation
 
 ```
 {if mismatch > 0 or unlinked > 0}
@@ -65,6 +65,8 @@ grep -rn "router\.\(get\|post\|put\|delete\)" backend/src/ | head -30
 {/if}
 ```
 
-STOP and WAIT.
+
+> 🛑 **STOP** — Wait for user input before continuing.
+
 
 → Return to dashboard after completion.

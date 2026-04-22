@@ -11,7 +11,7 @@ READ THIS ENTIRE FILE before executing any action.
 
 ---
 
-## 2-1. Parallel Collection
+### 2-1. Parallel Collection
 
 ```bash
 # A. New issues

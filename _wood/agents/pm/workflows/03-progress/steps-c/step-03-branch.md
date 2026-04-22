@@ -11,7 +11,7 @@ READ THIS ENTIRE FILE before executing any action.
 
 ---
 
-## 3-1. Search Branch by Issue Number
+### 3-1. Search Branch by Issue Number
 
 ```bash
 BRANCHES=$(git branch -a | grep -E "(feat|fix|refactor)/.*{N}(-|$)" | head -5)
@@ -19,7 +19,7 @@ BRANCHES=$(git branch -a | grep -E "(feat|fix|refactor)/.*{N}(-|$)" | head -5)
 
 ---
 
-## 3-2. Result Handling
+### 3-2. Result Handling
 
 | Case | Action |
 |------|--------|
@@ -35,7 +35,9 @@ Estimating progress based on checklist only.
 [Y] Continue  [N] Cancel
 ```
 
-STOP and WAIT for user input.
+
+> 🛑 **STOP** — Wait for user input before continuing.
+
 
 ---
 

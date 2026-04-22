@@ -11,7 +11,7 @@ READ THIS ENTIRE FILE before executing any action.
 
 ---
 
-## 1-1. Issue Check
+### 1-1. Issue Check
 
 If `{issue_number}` already exists, use it directly. Otherwise:
 
@@ -27,11 +27,13 @@ Request issue number selection:
 Enter the issue number to work on: #___
 ```
 
-STOP and WAIT.
+
+> 🛑 **STOP** — Wait for user input before continuing.
+
 
 ---
 
-## 1-2. Load Issue Details
+### 1-2. Load Issue Details
 
 ```bash
 gh issue view {issue_number} --repo $REPO \
@@ -45,7 +47,7 @@ Extract the following:
 
 ---
 
-## 1-3. Issue Body Parsing — Tracking Keys + API Contract + Checklist
+### 1-3. Issue Body Parsing — Tracking Keys + API Contract + Checklist
 
 Parse the following sections from the issue body:
 
@@ -101,7 +103,7 @@ Checklist: {done}/{total} ({pct}%)
 
 ---
 
-## 1-4. Related File Discovery
+### 1-4. Related File Discovery
 
 Infer related files from issue title + body keywords + API endpoint:
 
@@ -125,7 +127,7 @@ Save collected file list as `{related_files}`.
 
 ---
 
-## 1-5. Existing Story Check
+### 1-5. Existing Story Check
 
 Check if a Story file already exists for this issue:
 

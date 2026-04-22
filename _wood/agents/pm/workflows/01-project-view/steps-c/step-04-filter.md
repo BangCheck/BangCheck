@@ -11,7 +11,7 @@ READ THIS ENTIRE FILE before executing any action.
 
 ---
 
-## 4-1. Display Filter Menu
+### 4-1. Display Filter Menu
 
 ```
 ## Filter / Zoom
@@ -28,11 +28,13 @@ READ THIS ENTIRE FILE before executing any action.
 Enter a number or keyword:
 ```
 
-STOP and WAIT for user input.
+
+> 🛑 **STOP** — Wait for user input before continuing.
+
 
 ---
 
-## 4-2. Input Handlers
+### 4-2. Input Handlers
 
 ### [M] Milestone Zoom
 

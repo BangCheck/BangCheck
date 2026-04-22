@@ -24,7 +24,9 @@ Recommendation: 2 — If there's no recently merged PR, run key TCs for all page
 {/if}
 ```
 
-STOP and WAIT.
+
+> 🛑 **STOP** — Wait for user input before continuing.
+
 
 ### [3] Smart Scope
 
@@ -54,6 +56,8 @@ Proceed with this scope for regression testing?
 [Y] Proceed  [E] Adjust scope  [B] Cancel
 ```
 
-STOP and WAIT.
+
+> 🛑 **STOP** — Wait for user input before continuing.
+
 
 → step-02 execution.

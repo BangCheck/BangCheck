@@ -11,7 +11,7 @@ READ THIS ENTIRE FILE before executing any action.
 
 ---
 
-## 4-1. Query Unanswered Comments Sent by Me
+### 4-1. Query Unanswered Comments Sent by Me
 
 ```bash
 PM_LOGIN=$(gh api user --jq .login)
@@ -29,7 +29,7 @@ For each comment → check whether a reply has been received on the correspondin
 
 ---
 
-## 4-2. Render
+### 4-2. Render
 
 ```
 ## 📮 Comments Awaiting Reply
