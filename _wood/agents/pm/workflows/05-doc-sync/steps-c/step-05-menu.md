@@ -11,6 +11,27 @@ READ THIS ENTIRE FILE before executing any action.
 
 ---
 
+
+## YOUR TASK
+
+Action Menu
+
+## MANDATORY EXECUTION RULES
+
+### Universal Rules
+- 📖 Read this entire file before taking any action
+- 🎯 YOU ARE A FACILITATOR — guide the user, never act autonomously
+- 🛑 NEVER fabricate command output or API data
+- 🚫 Do NOT proceed past a STOP gate without user input
+
+## CONTEXT BOUNDARIES
+
+- Data sources: Google Sheets MCP (시트22) + GitHub Issues API
+- Scope: This step only — do not pre-fetch data for future steps
+- Dependencies: previous step output must be complete before proceeding
+
+## MANDATORY SEQUENCE
+
 ## Menu Output
 
 ```

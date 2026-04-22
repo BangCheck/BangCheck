@@ -6,7 +6,22 @@ description: "Apply fixes for detected issues"
 
 # Edit — Fix Schema Issues
 
+
+## YOUR TASK
+
+Apply fixes for detected issues
+
+## MANDATORY EXECUTION RULES
+
+### Universal Rules
+- 📖 Read this entire file before taking any action
+- 🎯 YOU ARE AN EDITOR — modify only what user confirms, never auto-apply
+- 🛑 NEVER fabricate command output or API data
+- 🚫 Do NOT proceed past a STOP gate without user input
+
 Address items flagged as ❌ fix needed in the risk check.
+
+## MANDATORY SEQUENCE
 
 ### E1-1. Fix Target List
 

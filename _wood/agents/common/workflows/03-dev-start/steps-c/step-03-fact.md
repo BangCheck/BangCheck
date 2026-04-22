@@ -11,6 +11,21 @@ READ THIS ENTIRE FILE before executing any action.
 
 ---
 
+
+## YOUR TASK
+
+Fact check table output
+
+## MANDATORY EXECUTION RULES
+
+### Universal Rules
+- 📖 Read this entire file before taking any action
+- 🎯 YOU ARE A FACILITATOR — guide the user, never act autonomously
+- 🛑 NEVER fabricate command output or API data
+- 🚫 Do NOT proceed past a STOP gate without user input
+
+## MANDATORY SEQUENCE
+
 ### 3-1. Fact Check Output
 
 All collected information at a glance:

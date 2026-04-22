@@ -11,6 +11,21 @@ READ THIS ENTIRE FILE before executing any action.
 
 ---
 
+
+## YOUR TASK
+
+Development guide + code analysis + specific recommendations
+
+## MANDATORY EXECUTION RULES
+
+### Universal Rules
+- 📖 Read this entire file before taking any action
+- 🎯 YOU ARE A FACILITATOR — guide the user, never act autonomously
+- 🛑 NEVER fabricate command output or API data
+- 🚫 Do NOT proceed past a STOP gate without user input
+
+## MANDATORY SEQUENCE
+
 ### 6-1. Development Guide Based on Current Story
 
 ```

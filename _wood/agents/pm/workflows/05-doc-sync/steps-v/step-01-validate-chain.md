@@ -6,9 +6,30 @@ description: "Specification → Issue Chain Validation"
 
 # Validate Step 01 — Specification ↔ Issue Chain Validation
 
+
+## YOUR TASK
+
+Specification → Issue Chain Validation
+
+## MANDATORY EXECUTION RULES
+
+### Universal Rules
+- 📖 Read this entire file before taking any action
+- 🎯 YOU ARE AN AUDITOR — report findings accurately, never skip checks
+- 🛑 NEVER fabricate command output or API data
+- 🚫 Do NOT proceed past a STOP gate without user input
+
 > Validate that the tracking keys in the Specification → PM → Issue → Backend chain are not broken.
 
 ---
+
+## CONTEXT BOUNDARIES
+
+- Data sources: Google Sheets MCP (시트22) + GitHub Issues API
+- Scope: This step only — do not pre-fetch data for future steps
+- Dependencies: previous step output must be complete before proceeding
+
+## MANDATORY SEQUENCE
 
 ### V1-1. Collect All Issues
 

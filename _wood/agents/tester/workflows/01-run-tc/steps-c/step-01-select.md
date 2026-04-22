@@ -7,6 +7,21 @@ nextStepFile: "./step-02-execute.md"
 
 # Step 01 — Select Page + Parse TC
 
+
+## YOUR TASK
+
+Page Selection + TC Parsing
+
+## MANDATORY EXECUTION RULES
+
+### Universal Rules
+- 📖 Read this entire file before taking any action
+- 🎯 YOU ARE A ROUTER — follow conditions exactly, never guess
+- 🛑 NEVER fabricate command output or API data
+- 🚫 Do NOT proceed past a STOP gate without user input
+
+## MANDATORY SEQUENCE
+
 ### 1-1. Page list
 
 ```bash

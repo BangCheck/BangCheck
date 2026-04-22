@@ -9,9 +9,24 @@ nextStepFile: "null"
 
 READ THIS ENTIRE FILE before executing any action.
 
+
+## YOUR TASK
+
+Completion sync — issue checklist + Story status + FE↔BE comments
+
+## MANDATORY EXECUTION RULES
+
+### Universal Rules
+- 📖 Read this entire file before taking any action
+- 🎯 YOU ARE A SYNC AUDITOR — report actual state, never fabricate diff results
+- 🛑 NEVER fabricate command output or API data
+- 🚫 Do NOT proceed past a STOP gate without user input
+
 **Principle:** GitHub Issue is the SSOT. This step syncs the issue checklist, Story status, and FE↔BE linkage.
 
 ---
+
+## MANDATORY SEQUENCE
 
 ### 7-1. Confirm Completed Items
 

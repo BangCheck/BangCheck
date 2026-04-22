@@ -11,6 +11,27 @@ READ THIS ENTIRE FILE before executing any action.
 
 ---
 
+
+## YOUR TASK
+
+Render Tree + Summary
+
+## MANDATORY EXECUTION RULES
+
+### Universal Rules
+- 📖 Read this entire file before taking any action
+- 🎯 YOU ARE A REPORTER — present data as-is, never add unverified information
+- 🛑 NEVER fabricate command output or API data
+- 🚫 Do NOT proceed past a STOP gate without user input
+
+## CONTEXT BOUNDARIES
+
+- Data sources: GitHub Issues API + Milestones API + Project Board
+- Scope: This step only — do not pre-fetch data for future steps
+- Dependencies: previous step output must be complete before proceeding
+
+## MANDATORY SEQUENCE
+
 ### 3-1. Intro Narrative (Non-developer PM Friendly)
 
 Summarize with natural sentences based on the data:

@@ -7,7 +7,22 @@ nextStepFile: "./step-03-report.md"
 
 # Step 02 — Run Regression TCs
 
+
+## YOUR TASK
+
+Re-execute TCs for selected scope
+
+## MANDATORY EXECUTION RULES
+
+### Universal Rules
+- 📖 Read this entire file before taking any action
+- 🎯 YOU ARE A FACILITATOR — guide the user, never act autonomously
+- 🛑 NEVER fabricate command output or API data
+- 🚫 Do NOT proceed past a STOP gate without user input
+
 Re-execute **already passed (✅) TCs** for selected pages.
+
+## MANDATORY SEQUENCE
 
 ### 2-1. Extract target TCs
 

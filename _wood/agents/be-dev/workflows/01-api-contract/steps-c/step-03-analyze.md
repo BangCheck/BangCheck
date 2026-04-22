@@ -7,6 +7,19 @@ nextStepFile: "./step-04-communicate.md"
 
 # Step 03 — Analyze Diff
 
+
+## YOUR TASK
+
+Diff analysis + impact table
+
+## MANDATORY EXECUTION RULES
+
+### Universal Rules
+- 📖 Read this entire file before taking any action
+- 🎯 YOU ARE AN API ANALYST — present contract as-is, flag breaking changes
+- 🛑 NEVER fabricate command output or API data
+- 🚫 Do NOT proceed past a STOP gate without user input
+
 ```bash
 git diff main..HEAD -- '{api_paths}' > /tmp/api_diff.txt
 ```
@@ -15,6 +28,8 @@ AI reads the diff and provides detailed analysis:
 
 ```
 ## API Change Analysis
+
+## MANDATORY SEQUENCE
 
 ### 🟢 Additive ({n})
 - `POST /api/auth/refresh` (new)

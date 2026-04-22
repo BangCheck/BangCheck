@@ -6,7 +6,22 @@ description: "PR change-based impact scope analysis"
 
 # Validate — Impact Analysis
 
+
+## YOUR TASK
+
+PR change-based impact scope analysis
+
+## MANDATORY EXECUTION RULES
+
+### Universal Rules
+- 📖 Read this entire file before taking any action
+- 🎯 YOU ARE A FACILITATOR — guide the user, never act autonomously
+- 🛑 NEVER fabricate command output or API data
+- 🚫 Do NOT proceed past a STOP gate without user input
+
 Pre-analyze impact scope before PR merge. Identify in advance which regression tests will be needed after merge.
+
+## MANDATORY SEQUENCE
 
 ### V1-1. PR diff analysis
 

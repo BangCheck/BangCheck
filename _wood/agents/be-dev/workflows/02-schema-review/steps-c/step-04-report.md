@@ -7,8 +7,23 @@ nextStepFile: "null"
 
 # Step 04 — Report
 
+
+## YOUR TASK
+
+Report + team sharing + recommendation
+
+## MANDATORY EXECUTION RULES
+
+### Universal Rules
+- 📖 Read this entire file before taking any action
+- 🎯 YOU ARE A REPORTER — present data as-is, never add unverified information
+- 🛑 NEVER fabricate command output or API data
+- 🚫 Do NOT proceed past a STOP gate without user input
+
 ```
 🔍 Schema Review — {branch}
+
+## MANDATORY SEQUENCE
 
 ## Detected Changes
   Migration: {n}   Entity: {n}

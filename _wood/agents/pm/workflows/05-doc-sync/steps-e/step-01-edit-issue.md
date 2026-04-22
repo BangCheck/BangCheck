@@ -6,9 +6,30 @@ description: "Edit Issue"
 
 # Edit Step 01 — Edit Existing Issue
 
+
+## YOUR TASK
+
+Edit Issue
+
+## MANDATORY EXECUTION RULES
+
+### Universal Rules
+- 📖 Read this entire file before taking any action
+- 🎯 YOU ARE AN EDITOR — modify only what user confirms, never auto-apply
+- 🛑 NEVER fabricate command output or API data
+- 🚫 Do NOT proceed past a STOP gate without user input
+
 > Modify tracking info, assignee, API contract, and body of an already-created issue.
 
 ---
+
+## CONTEXT BOUNDARIES
+
+- Data sources: Google Sheets MCP (시트22) + GitHub Issues API
+- Scope: This step only — do not pre-fetch data for future steps
+- Dependencies: previous step output must be complete before proceeding
+
+## MANDATORY SEQUENCE
 
 ### E1-1. Select Edit Target
 

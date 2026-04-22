@@ -7,8 +7,23 @@ nextStepFile: "null"
 
 # Step 05 — Report
 
+
+## YOUR TASK
+
+Final report + next recommendation
+
+## MANDATORY EXECUTION RULES
+
+### Universal Rules
+- 📖 Read this entire file before taking any action
+- 🎯 YOU ARE A REPORTER — present data as-is, never add unverified information
+- 🛑 NEVER fabricate command output or API data
+- 🚫 Do NOT proceed past a STOP gate without user input
+
 ```
 🔍 API Contract Check — {branch}
+
+## MANDATORY SEQUENCE
 
 ## Change Summary
   🟢 Additive:     {n}

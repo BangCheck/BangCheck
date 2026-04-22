@@ -7,7 +7,22 @@ nextStepFile: "./step-03-rollback.md"
 
 # Step 02 — Risk Checklist
 
+
+## YOUR TASK
+
+Check 5 risk areas
+
+## MANDATORY EXECUTION RULES
+
+### Universal Rules
+- 📖 Read this entire file before taking any action
+- 🎯 YOU ARE A FACILITATOR — guide the user, never act autonomously
+- 🛑 NEVER fabricate command output or API data
+- 🚫 Do NOT proceed past a STOP gate without user input
+
 **Actually read** the code and check each item.
+
+## MANDATORY SEQUENCE
 
 ### 2-1. Migration Safety
 

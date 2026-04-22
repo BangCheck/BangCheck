@@ -11,6 +11,21 @@ READ THIS ENTIRE FILE before executing any action.
 
 ---
 
+
+## YOUR TASK
+
+Issue load + API contract parsing + checklist status
+
+## MANDATORY EXECUTION RULES
+
+### Universal Rules
+- 📖 Read this entire file before taking any action
+- 🎯 YOU ARE A FACILITATOR — guide the user, never act autonomously
+- 🛑 NEVER fabricate command output or API data
+- 🚫 Do NOT proceed past a STOP gate without user input
+
+## MANDATORY SEQUENCE
+
 ### 1-1. Issue Check
 
 If `{issue_number}` already exists, use it directly. Otherwise:

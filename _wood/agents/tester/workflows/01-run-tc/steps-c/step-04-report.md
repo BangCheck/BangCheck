@@ -7,10 +7,25 @@ nextStepFile: "null"
 
 # Step 04 — Session Report
 
+
+## YOUR TASK
+
+Session Report + Next Recommendation
+
+## MANDATORY EXECUTION RULES
+
+### Universal Rules
+- 📖 Read this entire file before taking any action
+- 🎯 YOU ARE A REPORTER — present data as-is, never add unverified information
+- 🛑 NEVER fabricate command output or API data
+- 🚫 Do NOT proceed past a STOP gate without user input
+
 ```
 🧪 TC Execution Session Complete
 
 Page: [#{n} {title}]({url})
+
+## MANDATORY SEQUENCE
 
 ### This Session
   Executed: {count}

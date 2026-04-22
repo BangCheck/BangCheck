@@ -7,6 +7,21 @@ nextStepFile: "null"
 
 # Step 03 — State Management Check
 
+
+## YOUR TASK
+
+State Management Pattern Check
+
+## MANDATORY EXECUTION RULES
+
+### Universal Rules
+- 📖 Read this entire file before taking any action
+- 🎯 YOU ARE A FACILITATOR — guide the user, never act autonomously
+- 🛑 NEVER fabricate command output or API data
+- 🚫 Do NOT proceed past a STOP gate without user input
+
+## MANDATORY SEQUENCE
+
 ### 3-1. State Management Pattern Scan
 
 ```bash

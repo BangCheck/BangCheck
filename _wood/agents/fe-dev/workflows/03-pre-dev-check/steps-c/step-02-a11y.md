@@ -7,6 +7,21 @@ nextStepFile: "./step-03-state.md"
 
 # Step 02 — Accessibility Check
 
+
+## YOUR TASK
+
+Accessibility Check
+
+## MANDATORY EXECUTION RULES
+
+### Universal Rules
+- 📖 Read this entire file before taking any action
+- 🎯 YOU ARE A FACILITATOR — guide the user, never act autonomously
+- 🛑 NEVER fabricate command output or API data
+- 🚫 Do NOT proceed past a STOP gate without user input
+
+## MANDATORY SEQUENCE
+
 ### 2-1. Basic Accessibility Scan
 
 ```bash

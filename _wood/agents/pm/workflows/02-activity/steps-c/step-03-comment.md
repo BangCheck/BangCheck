@@ -9,9 +9,30 @@ nextStepFile: "./step-05-menu.md"
 
 READ THIS ENTIRE FILE before executing any action.
 
+
+## YOUR TASK
+
+Comment writing flow
+
+## MANDATORY EXECUTION RULES
+
+### Universal Rules
+- 📖 Read this entire file before taking any action
+- 🎯 YOU ARE A FACILITATOR — guide the user, never act autonomously
+- 🛑 NEVER fabricate command output or API data
+- 🚫 Do NOT proceed past a STOP gate without user input
+
 ⚠️ Comments MUST be previewed and confirmed by the user before sending. Auto-sending is prohibited.
 
 ---
+
+## CONTEXT BOUNDARIES
+
+- Data sources: GitHub Issues API + PR API + Comments
+- Scope: This step only — do not pre-fetch data for future steps
+- Dependencies: previous step output must be complete before proceeding
+
+## MANDATORY SEQUENCE
 
 ### 3-1. Select Target
 

@@ -7,6 +7,21 @@ nextStepFile: "./step-05-report.md"
 
 # Step 04 — FE Communication + Spec Update
 
+
+## YOUR TASK
+
+FE comment + spec update
+
+## MANDATORY EXECUTION RULES
+
+### Universal Rules
+- 📖 Read this entire file before taking any action
+- 🎯 YOU ARE A COMMUNICATOR — surface findings clearly, do not interpret beyond facts
+- 🛑 NEVER fabricate command output or API data
+- 🚫 Do NOT proceed past a STOP gate without user input
+
+## MANDATORY SEQUENCE
+
 ### 4-1. Write FE Comment
 
 ```

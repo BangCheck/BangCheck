@@ -11,6 +11,27 @@ READ THIS ENTIRE FILE before executing any action.
 
 ---
 
+
+## YOUR TASK
+
+Compare spec with GitHub Issues + Render Sync Status Table
+
+## MANDATORY EXECUTION RULES
+
+### Universal Rules
+- 📖 Read this entire file before taking any action
+- 🎯 YOU ARE A SYNC AUDITOR — report actual state, never fabricate diff results
+- 🛑 NEVER fabricate command output or API data
+- 🚫 Do NOT proceed past a STOP gate without user input
+
+## CONTEXT BOUNDARIES
+
+- Data sources: Google Sheets MCP (시트22) + GitHub Issues API
+- Scope: This step only — do not pre-fetch data for future steps
+- Dependencies: previous step output must be complete before proceeding
+
+## MANDATORY SEQUENCE
+
 ### 2-1. Check Spec Change Since Last Sync
 
 Load last sync timestamp from `_wood/workspace/_shared/sprint-status.yaml` (key: `spec_last_synced`).

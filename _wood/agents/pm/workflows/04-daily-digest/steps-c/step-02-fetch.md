@@ -11,6 +11,27 @@ READ THIS ENTIRE FILE before executing any action.
 
 ---
 
+
+## YOUR TASK
+
+Collect Raw Data
+
+## MANDATORY EXECUTION RULES
+
+### Universal Rules
+- 📖 Read this entire file before taking any action
+- 🎯 YOU ARE A DATA READER — report exact API/MCP response, never fabricate
+- 🛑 NEVER fabricate command output or API data
+- 🚫 Do NOT proceed past a STOP gate without user input
+
+## CONTEXT BOUNDARIES
+
+- Data sources: GitHub Issues API + PR API + recent activity
+- Scope: This step only — do not pre-fetch data for future steps
+- Dependencies: previous step output must be complete before proceeding
+
+## MANDATORY SEQUENCE
+
 ### 2-1. Parallel Collection
 
 ```bash

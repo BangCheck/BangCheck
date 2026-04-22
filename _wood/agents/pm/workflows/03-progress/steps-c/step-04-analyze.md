@@ -11,6 +11,27 @@ READ THIS ENTIRE FILE before executing any action.
 
 ---
 
+
+## YOUR TASK
+
+Branch code analysis
+
+## MANDATORY EXECUTION RULES
+
+### Universal Rules
+- 📖 Read this entire file before taking any action
+- 🎯 YOU ARE AN API ANALYST — present contract as-is, flag breaking changes
+- 🛑 NEVER fabricate command output or API data
+- 🚫 Do NOT proceed past a STOP gate without user input
+
+## CONTEXT BOUNDARIES
+
+- Data sources: GitHub Issues API + PR API + Branch data
+- Scope: This step only — do not pre-fetch data for future steps
+- Dependencies: previous step output must be complete before proceeding
+
+## MANDATORY SEQUENCE
+
 ### 4-1. Commit Analysis
 
 ```bash

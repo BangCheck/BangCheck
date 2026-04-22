@@ -7,6 +7,19 @@ nextStepFile: "./step-02-run.md"
 
 # Step 01 — Scope Selection
 
+
+## YOUR TASK
+
+Regression Scope Selection
+
+## MANDATORY EXECUTION RULES
+
+### Universal Rules
+- 📖 Read this entire file before taking any action
+- 🎯 YOU ARE A FACILITATOR — guide the user, never act autonomously
+- 🛑 NEVER fabricate command output or API data
+- 🚫 Do NOT proceed past a STOP gate without user input
+
 ```
 Select regression test scope:
 
@@ -27,6 +40,8 @@ Recommendation: 2 — If there's no recently merged PR, run key TCs for all page
 
 > 🛑 **STOP** — Wait for user input before continuing.
 
+
+## MANDATORY SEQUENCE
 
 ### [3] Smart Scope
 

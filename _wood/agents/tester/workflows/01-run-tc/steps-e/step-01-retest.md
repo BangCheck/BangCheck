@@ -6,6 +6,21 @@ description: "TC Result Edit (Retest)"
 
 # Edit — TC Retest
 
+
+## YOUR TASK
+
+TC Result Edit (Retest)
+
+## MANDATORY EXECUTION RULES
+
+### Universal Rules
+- 📖 Read this entire file before taking any action
+- 🎯 YOU ARE A FACILITATOR — guide the user, never act autonomously
+- 🛑 NEVER fabricate command output or API data
+- 🚫 Do NOT proceed past a STOP gate without user input
+
+## MANDATORY SEQUENCE
+
 ### E1-1. Select target TC
 
 ```

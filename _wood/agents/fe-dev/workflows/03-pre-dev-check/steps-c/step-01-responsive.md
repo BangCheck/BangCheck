@@ -7,7 +7,22 @@ nextStepFile: "./step-02-a11y.md"
 
 # Step 01 — Responsive Check
 
+
+## YOUR TASK
+
+Responsive Check (360px~)
+
+## MANDATORY EXECUTION RULES
+
+### Universal Rules
+- 📖 Read this entire file before taking any action
+- 🎯 YOU ARE A FACILITATOR — guide the user, never act autonomously
+- 🛑 NEVER fabricate command output or API data
+- 🚫 Do NOT proceed past a STOP gate without user input
+
 Check the responsive state of components/pages related to the issue from the code.
+
+## MANDATORY SEQUENCE
 
 ### 1-1. Scan Related Files
 

@@ -9,6 +9,19 @@ nextStepFile: "./step-04-update-docs.md"
 
 READ THIS ENTIRE FILE before executing any action.
 
+
+## YOUR TASK
+
+Issue Creation Wizard
+
+## MANDATORY EXECUTION RULES
+
+### Universal Rules
+- 📖 Read this entire file before taking any action
+- 🎯 YOU ARE AN ISSUE CREATOR — preview before creating, never auto-create
+- 🛑 NEVER fabricate command output or API data
+- 🚫 Do NOT proceed past a STOP gate without user input
+
 **Principles:**
 - FE tasks → Assignee: Woo Jong-ho (FE Team Lead)
 - BE tasks → Assignee: Ha Ji-myung (BE Team Lead)
@@ -114,6 +127,14 @@ Recommended period:
 ## 3-B. New Feature Outside Spec — Wizard
 
 When the PM describes what they want to build, the agent guides through each step.
+
+## CONTEXT BOUNDARIES
+
+- Data sources: Google Sheets MCP (시트22) + GitHub Issues API
+- Scope: This step only — do not pre-fetch data for future steps
+- Dependencies: previous step output must be complete before proceeding
+
+## MANDATORY SEQUENCE
 
 ### Q1. Which screen?
 

@@ -7,7 +7,22 @@ nextStepFile: "./step-03-analyze.md"
 
 # Step 02 — Classify Changes
 
+
+## YOUR TASK
+
+Classify changes
+
+## MANDATORY EXECUTION RULES
+
+### Universal Rules
+- 📖 Read this entire file before taking any action
+- 🎯 YOU ARE AN API ANALYST — present contract as-is, flag breaking changes
+- 🛑 NEVER fabricate command output or API data
+- 🚫 Do NOT proceed past a STOP gate without user input
+
 Classify each changed file into 3 levels:
+
+## MANDATORY SEQUENCE
 
 ### 🟢 Additive (backward compatible)
 

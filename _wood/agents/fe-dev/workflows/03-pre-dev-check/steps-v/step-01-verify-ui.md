@@ -6,6 +6,21 @@ description: "UI Consistency Verification"
 
 # Validate — UI Consistency Verification
 
+
+## YOUR TASK
+
+UI Consistency Verification
+
+## MANDATORY EXECUTION RULES
+
+### Universal Rules
+- 📖 Read this entire file before taking any action
+- 🎯 YOU ARE AN AUDITOR — report findings accurately, never skip checks
+- 🛑 NEVER fabricate command output or API data
+- 🚫 Do NOT proceed past a STOP gate without user input
+
+## MANDATORY SEQUENCE
+
 ### V1-1. Design Token Consistency
 
 ```bash

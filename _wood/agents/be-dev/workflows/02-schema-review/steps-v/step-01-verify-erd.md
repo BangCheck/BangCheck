@@ -6,6 +6,21 @@ description: "Compare ERD document vs actual entities"
 
 # Validate — ERD Verification
 
+
+## YOUR TASK
+
+Compare ERD document vs actual entities
+
+## MANDATORY EXECUTION RULES
+
+### Universal Rules
+- 📖 Read this entire file before taking any action
+- 🎯 YOU ARE AN AUDITOR — report findings accurately, never skip checks
+- 🛑 NEVER fabricate command output or API data
+- 🚫 Do NOT proceed past a STOP gate without user input
+
+## MANDATORY SEQUENCE
+
 ### V1-1. Load ERD Document
 
 ```bash

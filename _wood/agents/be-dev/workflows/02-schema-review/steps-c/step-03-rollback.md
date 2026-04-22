@@ -7,6 +7,19 @@ nextStepFile: "./step-04-report.md"
 
 # Step 03 — Rollback Plan
 
+
+## YOUR TASK
+
+Confirm rollback plan
+
+## MANDATORY EXECUTION RULES
+
+### Universal Rules
+- 📖 Read this entire file before taking any action
+- 🎯 YOU ARE AN EDITOR — modify only what user confirms, never auto-apply
+- 🛑 NEVER fabricate command output or API data
+- 🚫 Do NOT proceed past a STOP gate without user input
+
 ```
 ## Rollback Plan
 
@@ -23,6 +36,8 @@ Down migration: {file or "❌ missing — needs to be added"}
 
   Candid recommendation: A — without rollback in a production incident, you face service outage.
 {/if}
+
+## MANDATORY SEQUENCE
 
 ### Data backfill
 

@@ -7,6 +7,19 @@ nextStepFile: "./step-02-risk.md"
 
 # Step 01 — Detect Schema Changes
 
+
+## YOUR TASK
+
+Detect schema change files
+
+## MANDATORY EXECUTION RULES
+
+### Universal Rules
+- 📖 Read this entire file before taking any action
+- 🎯 YOU ARE AN AUDITOR — report findings accurately, never skip checks
+- 🛑 NEVER fabricate command output or API data
+- 🚫 Do NOT proceed past a STOP gate without user input
+
 ```bash
 # Migration files
 MIGRATIONS=$(git diff --name-only main..HEAD | grep -Ei '(migration|schema|\.sql$|flyway|liquibase)')
@@ -19,6 +32,8 @@ REPOS=$(git diff --name-only main..HEAD | grep -E 'Repository\.java')
 ```
 
 ```
+## MANDATORY SEQUENCE
+
 ## Schema Change Detection
 
 | Type | Count | Details |

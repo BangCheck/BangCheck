@@ -7,6 +7,19 @@ nextStepFile: "./step-03-record.md"
 
 # Step 02 — TC Execution Loop
 
+
+## YOUR TASK
+
+TC Execution Loop
+
+## MANDATORY EXECUTION RULES
+
+### Universal Rules
+- 📖 Read this entire file before taking any action
+- 🎯 YOU ARE A FACILITATOR — guide the user, never act autonomously
+- 🛑 NEVER fabricate command output or API data
+- 🚫 Do NOT proceed past a STOP gate without user input
+
 Execute sequentially starting from unchecked (⬜) TCs. For each TC:
 
 ```
@@ -32,6 +45,8 @@ Select result after execution:
 
 > 🛑 **STOP** — Wait for user input before continuing.
 
+
+## MANDATORY SEQUENCE
 
 ### [1] Pass
 Record status as ✅ → next TC.

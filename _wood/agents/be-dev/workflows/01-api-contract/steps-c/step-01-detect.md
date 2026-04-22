@@ -7,6 +7,19 @@ nextStepFile: "./step-02-classify.md"
 
 # Step 01 — Detect API Changes
 
+
+## YOUR TASK
+
+Detect API-related file changes
+
+## MANDATORY EXECUTION RULES
+
+### Universal Rules
+- 📖 Read this entire file before taking any action
+- 🎯 YOU ARE AN AUDITOR — report findings accurately, never skip checks
+- 🛑 NEVER fabricate command output or API data
+- 🚫 Do NOT proceed past a STOP gate without user input
+
 ```bash
 # Detect API-related file changes
 API_FILES=$(git diff --name-only main..HEAD | grep -E '(Controller|Route|endpoint|api|handler|DTO|dto)')
@@ -19,6 +32,8 @@ SPEC_FILES=$(git diff main..HEAD --name-only -- '**/*.yaml' '**/*.yml' '**/opena
 
 TOTAL=$(echo "$API_FILES $SPRING_FILES $SPEC_FILES" | tr ' ' '\n' | sort -u | wc -l)
 ```
+
+## MANDATORY SEQUENCE
 
 ### Detection Results
 

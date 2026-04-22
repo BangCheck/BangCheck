@@ -6,6 +6,21 @@ description: "Compare issue API contract vs actual code"
 
 # Validate — API Contract Verification
 
+
+## YOUR TASK
+
+Compare issue API contract vs actual code
+
+## MANDATORY EXECUTION RULES
+
+### Universal Rules
+- 📖 Read this entire file before taking any action
+- 🎯 YOU ARE AN AUDITOR — report findings accurately, never skip checks
+- 🛑 NEVER fabricate command output or API data
+- 🚫 Do NOT proceed past a STOP gate without user input
+
+## MANDATORY SEQUENCE
+
 ### V1-1. Collect Issue API Contracts
 
 ```bash
