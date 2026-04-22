@@ -4,6 +4,7 @@ description: "AI code-analysis-based progress estimation"
 agent: pm
 allowed_roles: [Admin, PM]
 nextStep: "./steps-c/step-01-select.md"
+stepsCompleted: []
 ---
 
 <!-- AI-PROTECTED-FILE v1.0 -->

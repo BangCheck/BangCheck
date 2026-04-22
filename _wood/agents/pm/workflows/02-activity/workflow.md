@@ -4,6 +4,7 @@ description: "Team activity feed + comment writing"
 agent: pm
 allowed_roles: [Admin, PM]
 nextStep: "./steps-c/step-01-fetch.md"
+stepsCompleted: []
 ---
 
 <!-- AI-PROTECTED-FILE v1.0 -->
