@@ -275,13 +275,38 @@ it MUST NOT silently proceed or block. Instead, gently offer to track it as an i
 
 ### Detection Triggers
 
-| Situation | Example |
-|-----------|---------|
-| Convention change needed | Commit format, branch naming, PR rules |
-| Team member registration / role change | New member, login update |
-| Protected file modification | _wood/, AGENTS.md, .claude/ |
-| Permission policy change | Role capabilities, menu visibility |
-| Recurring friction point | Same workaround applied 2+ times |
+| Situation | Example | Patch candidate |
+|-----------|---------|-----------------|
+| Convention change needed | Commit format, branch naming, PR rules | ✅ |
+| Team member registration / role change | New member, login update | ❌ (project-specific) |
+| Protected file modification under `_wood/` | Workflow logic, agent behavior, protocol rules | ✅ |
+| Permission policy change | Role capabilities, menu visibility | ✅ |
+| Recurring friction point | Same workaround applied 2+ times | ✅ |
+| Protected file modification outside `_wood/` | AGENTS.md, .claude/, .github/ | ❌ (project-specific) |
+
+### Patch Detection
+
+When a trigger is marked **Patch candidate ✅**, the AI MUST also check:
+
+> "Did this change modify a file under `_wood/`?"
+
+If yes → after completing the action, offer conversationally:
+
+```
+"방금 변경, 나중에 템플릿에도 반영할 만한 것 같아요.
+패치노트 하나 만들어둘까요?"
+```
+
+If user says yes:
+1. Determine the next patch number from `_wood/patches/CHANGELOG.md`
+2. Create `_wood/patches/PATCH-{NNN}.md` with:
+   - Summary of what changed and why
+   - Target file(s)
+   - Template notes (what is generic vs. BangCheck-specific)
+3. Add one line to `_wood/patches/CHANGELOG.md` index
+4. Commit both files together with the original change (or as a follow-up)
+
+If user says no → proceed without patch. Do not ask again in the same session.
 
 ### Suggestion Tone
 
