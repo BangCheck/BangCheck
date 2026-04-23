@@ -42,7 +42,7 @@ public class User extends BaseEntity {
     @Column(name = "provider", nullable = false)
     private Provider provider;
 
-    @Column(name = "provider_id", nullable = false, length = 255)
+    @Column(name = "social_provider_id", nullable = false, length = 255)
     private String providerId;
 
  
