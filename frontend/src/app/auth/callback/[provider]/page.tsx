@@ -39,7 +39,8 @@ export default function AuthCallbackPage() {
     },
     onSuccess: (data) => {
       setAuth(data.accessToken, data.user);
-      router.replace('/');
+      const callbackUrl = searchParams.get('callbackUrl') || '/';
+      router.replace(callbackUrl);
     },
     onError: (error) => {
       console.error('Login Error:', error);
