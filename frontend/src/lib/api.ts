@@ -17,40 +17,39 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// 응답 인터셉터: 401 에러 시 토큰 갱신 로직
+// 응답 인터셉터: 에러 처리 및 토큰 갱신
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
+    const status = error.response?.status;
 
-    // 401 에러 발생 시 (토큰 만료)
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    // 401: 토큰 만료 처리
+    if (status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
-
       try {
-        // 토큰 갱신 API 호출
-        const response = await axios.post(
-          `${API_BASE_URL}/api/v1/auth/jwt/refresh`,
-          {},
-          { withCredentials: true }
-        );
-
+        const response = await axios.post(`${API_BASE_URL}/api/v1/auth/jwt/refresh`, {}, { withCredentials: true });
         const newAccessToken = response.headers['authorization']?.replace('Bearer ', '');
-        
         if (newAccessToken) {
-          // 스토어 업데이트
           useAuthStore.getState().setAuth(newAccessToken, useAuthStore.getState().user!);
-          
-          // 기존 요청 재시도
           originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
           return api(originalRequest);
         }
       } catch (refreshError) {
-        // 갱신 실패 시 로그아웃 처리
         useAuthStore.getState().logout();
-        window.location.href = '/login?error=expired';
+        if (typeof window !== 'undefined') window.location.href = '/login?error=expired';
         return Promise.reject(refreshError);
       }
+    }
+
+    // 403: 권한 부족
+    if (status === 403) {
+      console.error('[API Error] Forbidden: Access denied.');
+    }
+
+    // 500 이상: 서버 오류
+    if (status >= 500) {
+      console.error('[API Error] Server Internal Error.');
     }
 
     return Promise.reject(error);
