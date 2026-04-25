@@ -28,12 +28,20 @@ export default function AuthCallbackPage() {
         throw new Error('토큰 정보가 없습니다.');
       }
 
+      const profileImg = 
+        result.data?.profileImageUrl || 
+        result.data?.profile_image || 
+        result.data?.picture || 
+        result.data?.image || 
+        '';
+
       return {
         accessToken,
         user: {
           id: result.data?.id || 'unknown',
           email: result.data?.email || '',
-          nickname: result.data?.nickname || result.data?.name || '',
+          nickname: result.data?.nickname || result.data?.name || 'User',
+          profileImageUrl: profileImg,
         },
       };
     },

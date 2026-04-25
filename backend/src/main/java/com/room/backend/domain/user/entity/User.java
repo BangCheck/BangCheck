@@ -45,24 +45,31 @@ public class User extends BaseEntity {
     @Column(name = "social_provider_id", nullable = false, length = 255)
     private String providerId;
 
- 
     @Column(name = "is_onboarding_done", nullable = false)
     private boolean isOnboardingDone = false;
 
     @Column(name = "email", length = 100)
     private String email;
 
-    public static User signUpUser(Provider provider, String providerId, String email, String nickname) {
+    @Column(name = "profile_image_url", length = 500)
+    private String profileImageUrl;
+
+    public static User signUpUser(Provider provider, String providerId, String email, String nickname, String profileImageUrl) {
         User user = new User();
         user.provider = provider;
         user.providerId = providerId;
         user.email = email;
         user.nickname = nickname;
+        user.profileImageUrl = profileImageUrl;
         return user;
     }
 
     public void reactivate() {
         this.status = Status.ACTIVE;
         this.restore();
+    }
+
+    public void updateProfileImageUrl(String profileImageUrl) {
+        this.profileImageUrl = profileImageUrl;
     }
 }

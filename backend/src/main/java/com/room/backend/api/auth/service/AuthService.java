@@ -48,7 +48,12 @@ public class AuthService {
         );
 
         if (activeUser.isPresent()) {
-            return issueJwtAndReturn(activeUser.get(), "Existing user login success", false, false);
+            User user = activeUser.get();
+            // 최신 프로필 정보로 업데이트
+            if (oauthInfo.profileImageUrl() != null && !oauthInfo.profileImageUrl().isBlank()) {
+                user.updateProfileImageUrl(oauthInfo.profileImageUrl());
+            }
+            return issueJwtAndReturn(user, "Existing user login success", false, false);
         }
 
         Optional<User> deletedUser = userRepository.findByProviderAndProviderIdAndIsDeletedTrue(
@@ -59,11 +64,18 @@ public class AuthService {
         if (deletedUser.isPresent()) {
             User user = deletedUser.get();
             user.reactivate();
+            // 최신 프로필 정보로 업데이트
+            if (oauthInfo.profileImageUrl() != null && !oauthInfo.profileImageUrl().isBlank()) {
+                user.updateProfileImageUrl(oauthInfo.profileImageUrl());
+            }
             return issueJwtAndReturn(user, "Deleted user reactivated and login success", false, true);
         }
 
-        String nickname = buildDefaultNickname(providerEnum, oauthInfo.providerUserId());
-        User newUser = User.signUpUser(providerEnum, oauthInfo.providerUserId(), oauthInfo.email(), nickname);
+        String nickname = oauthInfo.nickname() != null && !oauthInfo.nickname().isBlank() 
+                ? oauthInfo.nickname() 
+                : buildDefaultNickname(providerEnum, oauthInfo.providerUserId());
+        
+        User newUser = User.signUpUser(providerEnum, oauthInfo.providerUserId(), oauthInfo.email(), nickname, oauthInfo.profileImageUrl());
         userRepository.save(newUser);
 
         return issueJwtAndReturn(newUser, "New social user auto-registered and login success", true, false);
@@ -109,10 +121,10 @@ public class AuthService {
         log.info("{} - userId: {}", logMessage, user.getId());
 
         OAuthCallbackResponseDTO response = isNew
-                ? OAuthCallbackResponseDTO.registered()
+                ? OAuthCallbackResponseDTO.registered(user.getId().toString(), user.getEmail(), user.getNickname(), user.getProfileImageUrl())
                 : isReactivated
-                        ? OAuthCallbackResponseDTO.reactivated()
-                        : OAuthCallbackResponseDTO.login();
+                        ? OAuthCallbackResponseDTO.reactivated(user.getId().toString(), user.getEmail(), user.getNickname(), user.getProfileImageUrl())
+                        : OAuthCallbackResponseDTO.login(user.getId().toString(), user.getEmail(), user.getNickname(), user.getProfileImageUrl());
 
         return new OAuthCallbackResult(isNew, accessToken, refreshToken, response);
     }
