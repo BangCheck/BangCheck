@@ -4,7 +4,7 @@ import type { NextRequest } from 'next/server';
 /**
  * 인증이 필요한 경로 목록
  */
-const protectedRoutes = ['/report', '/settings', '/checklist'];
+const protectedRoutes = ['/report', '/settings'];
 
 /**
  * 인증이 되어있을 때 접근하면 안되는 경로 (로그인/회원가입 등)
@@ -27,10 +27,12 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
+  /*
   // 2. 이미 로그인된 사용자가 로그인 페이지에 접근할 경우 홈으로 리다이렉트
   if (publicOnlyRoutes.includes(pathname) && token) {
     return NextResponse.redirect(new URL('/', request.url));
   }
+  */
 
   return NextResponse.next();
 }

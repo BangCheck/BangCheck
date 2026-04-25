@@ -112,6 +112,8 @@ public class OAuthService {
                 "naver",
                 userInfo.response().id(),
                 userInfo.response().email(),
+                userInfo.response().nickname(),
+                userInfo.response().profileImage(),
                 LocalDateTime.now()
         );
     }
@@ -135,6 +137,8 @@ public class OAuthService {
                 "google",
                 userInfo.sub(),
                 userInfo.email(),
+                userInfo.name(),
+                userInfo.picture(),
                 LocalDateTime.now()
         );
     }
