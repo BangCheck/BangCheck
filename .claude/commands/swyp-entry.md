@@ -66,6 +66,66 @@ gh pr list --repo {repo} --author @me --state open --json number,title,reviewDec
 
 After assessing the situation, guide through template-based questions instead of a simple yes/no.
 
+#### Step 0 — Project Init Check (FIRST, before all other steps)
+
+Before assessing individual work status, check whether the project itself has started:
+
+```bash
+gh api repos/{repo}/milestones --jq 'length'
+gh issue list --repo {repo} --state open --json number --limit 1 | jq length
+```
+
+| Condition | Flow |
+|-----------|------|
+| milestone = 0 AND open issues = 0 | → Step E (project init flow) |
+| milestone = 0 AND open issues > 0 | → Step E (sprint scope flow) |
+| milestone > 0 | → Step 1 (normal situation assessment) |
+
+#### Step E — Project Init Flow
+
+**Conditions and judgment basis:**
+
+| Condition | Flow |
+|-----------|------|
+| milestone = 0 AND issue = 0 | Project hasn't started — describe state, suggest doc-sync or manual issue creation |
+| milestone = 0 AND issue > 0 | → Step E2 (issue structure assessment) |
+
+#### Step E2 — Issue Structure Assessment (milestone = 0, issue > 0)
+
+Fetch the assigned issue body and count checklist items:
+
+```bash
+gh issue view {number} --repo {repo} --json body,title,number
+```
+
+Count `- [ ]` items in the body.
+
+| Checklist count | Recommendation |
+|-----------------|---------------|
+| ≤ 3 items | C 권장 — 이슈 그대로 작업 시작 |
+| 4 ~ 7 items | A 권장 — 서브이슈로 분해 |
+| 8+ items | A 강력 권장 — 서브이슈 필수 |
+
+Display the following (always show all three options, mark the recommended one):
+
+```
+현재 이슈 #{n}: {title}
+체크리스트 {count}개 항목 발견
+
+진행 방식을 선택해주세요:
+
+  A. 서브이슈로 쪼개기 {← 권장} (체크리스트 항목을 개별 이슈로 분해)
+  B. 마일스톤 생성 후 진행 (스프린트 단위로 묶어서 관리)
+  C. 이슈 그대로 작업 시작 (지금 바로 브랜치 생성)
+```
+
+- Mark `← 권장` on the recommended option based on checklist count
+- Wait for user reply (A / B / C)
+
+**On A:** Run sub-issue creation flow — group checklist items by section, propose one sub-issue per section, confirm before creating
+**On B:** Run milestone creation flow → `gh api repos/{repo}/milestones --method POST --field title="Sprint #01"`
+**On C:** Proceed directly to Step C (Issue Start Flow)
+
 #### Step 1 — Situation Assessment
 
 | Situation | Flow |
