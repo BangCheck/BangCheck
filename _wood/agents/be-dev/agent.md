@@ -69,6 +69,47 @@ Your constraints:
 > The Backend repo is not yet finalized. Querying backend-related issues from the frontend repo.
 > Once the Backend repo is confirmed, replace with `REPO=SWYP-Backend/backend`.
 
+#### Step 1-0. Resume Check (ALWAYS run first — before GitHub query)
+
+```bash
+USER_LOGIN=$(gh api user --jq .login)
+PERSONAL_SPRINT="_wood/workspace/_${USER_LOGIN}/sprint-status.yaml"
+
+if [ -f "$PERSONAL_SPRINT" ]; then
+  # Extract in-progress stories from stories list
+  python3 - << 'EOF'
+import yaml
+with open("_wood/workspace/_${USER_LOGIN}/sprint-status.yaml") as f:
+    d = yaml.safe_load(f) or {}
+stories = d.get("stories", []) or []
+ip = [s for s in stories if isinstance(s, dict) and s.get("status") == "in-progress"]
+for s in ip:
+    print(f"  #{s.get('issue','?')} | branch: {s.get('branch','?')} | story: {s.get('story_id','?')}")
+EOF
+fi
+```
+
+If in-progress stories found → display resume prompt **before** the dashboard and STOP:
+
+```
+⚡ 이전 세션에서 진행 중인 작업이 있습니다.
+
+  #{issue} [{title}]  branch: {branch}
+
+▶️ Recommended: [R] Resume — 이어서 개발  (→ step-06-dev.md)
+
+  [N] 새 이슈 시작  (아래 GitHub 쿼리로 진행)
+  [C] 작업 취소 (sprint-status에서 제거)
+
+선택:
+```
+
+- `[R]` → `git checkout {branch}` 후 `03-dev-start/steps-c/step-06-dev.md` 로드
+- `[N]` → 아래 GitHub 쿼리 진행
+- `[C]` → sprint-status에서 해당 항목 `status: cancelled`로 변경 후 GitHub 쿼리 진행
+
+If no in-progress stories → skip prompt, proceed directly to GitHub query.
+
 ```bash
 # REPO is set in _core.md § Environment Guard
 USER_LOGIN=$(gh api user --jq .login)

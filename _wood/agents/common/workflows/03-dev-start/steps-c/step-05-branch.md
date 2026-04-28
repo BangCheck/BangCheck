@@ -51,6 +51,39 @@ sed -i '' 's/| Status | ready/| Status | in-progress/' \
 
 ---
 
+## 5-4. Sprint Status — in-progress 기록 (MANDATORY)
+
+개발 시작 시점을 personal sprint-status에 기록한다.
+
+```bash
+PERSONAL_DIR="_wood/workspace/_${USER_LOGIN}"
+PERSONAL_SPRINT="$PERSONAL_DIR/sprint-status.yaml"
+
+mkdir -p "$PERSONAL_DIR/stories" "$PERSONAL_DIR/epics"
+
+if [ ! -f "$PERSONAL_SPRINT" ]; then
+  cat > "$PERSONAL_SPRINT" << EOF
+# Sprint Status
+login: ${USER_LOGIN}
+stories: []
+EOF
+fi
+
+# Add in-progress entry (AI: append to stories list)
+# Entry format:
+# - story_id: {story_id}
+#   issue: {issue_number}
+#   branch: {branch_name}
+#   status: in-progress
+#   started: {YYYY-MM-DD}
+```
+
+**규칙:**
+- 이미 동일 `issue` 항목이 존재하면 `status`만 `in-progress`로 갱신 (중복 추가 금지)
+- `story_id`는 step-04에서 생성한 Story 파일명 기준 (없으면 `issue-{issue_number}` 형식)
+
+---
+
 ## Completion
 
 ```

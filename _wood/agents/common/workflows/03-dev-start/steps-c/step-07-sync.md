@@ -167,11 +167,18 @@ EOF
   echo "📁 Personal sprint-status created: $PERSONAL_SPRINT"
 fi
 
-# Add completed story
-# Add {story_id}: done to stories list
+# Update story status: in-progress → done
+# Find entry with matching story_id or issue number, set status: done
+# If entry does not exist, append:
+#   - story_id: {story_id}
+#     issue: {issue_number}
+#     branch: {branch_name}
+#     status: done
+#     started: {started_at or today}
+#     completed: {today}
 echo "📊 Personal sprint-status update:"
 echo "  stories:"
-echo "    + {story_id}: done"
+echo "    {story_id}: in-progress → done"
 ```
 
 ### 7-5b. Personal Story File Status → done
