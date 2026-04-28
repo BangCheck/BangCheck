@@ -114,12 +114,23 @@ Propose **specific modification directions** based on code analysis results.
 
   Proceed?
 
-  A. {minimum scope} — {description} (safest)
-  B. {recommended scope} — {description} (recommended)
-  C. {broad scope} — {description} (maximum cleanliness)
-  D. Hold — record analysis only, implement later
+  A. {minimum scope label}
+     — {Which files are touched and what exactly changes. Why this is the safest path and
+        what it deliberately leaves out. Estimated effort and regression risk.}
 
-  Recommendation: B — {reason}
+  B. {recommended scope label}
+     — {What this covers beyond A, and why the combination is worth the extra effort.
+        What the expected outcome looks like when done. Any tradeoffs to be aware of.}
+
+  C. {broad scope label}
+     — {The full extent: what additional systems or files are included compared to B.
+        Why someone would choose this and what the cost is in time or risk.}
+
+  D. Hold
+     — Record the Gap Analysis table into the Story Log now and defer implementation.
+        Use this when scope is unclear or a blocker exists. Analysis is not lost.
+
+  Cold Recommendation: B — {one-sentence reason grounded in the Gap Analysis above}
 
   Which direction?
 ```
@@ -289,12 +300,62 @@ If a problem is found by **reading** another role's code during development:
   ❌ You cannot modify this directly.
 
   Instead:
-  A. Create issue — request fix from the responsible party
-     → 02-project/case-03-task.md (auto-assigns role label + assignee)
-  B. Issue comment — add finding to existing related issue
-  C. Ignore — not in scope for this task
+  A. Create issue — request fix from the responsible party.
+     — Opens a tracked issue assigned to the correct role owner, with your finding as the body.
+       Nothing is lost, the right person is notified, and there is no merge conflict risk.
+       Use this when the fix is non-trivial or the impact is unclear.
 
-  Recommendation: A — needs to be tracked as an issue.
+  B. Issue comment — add finding to an existing related issue.
+     — If a relevant open issue already exists, attach the finding there as a comment.
+       Faster than A; avoids duplicate issues. Use when the fix is clearly in-scope
+       for something already being tracked.
+
+  C. Ignore — not in scope for this task.
+     — If the problem does not affect the current issue's acceptance criteria,
+       skip it and stay focused. Note it in your Story Log so it is not forgotten.
+
+  Cold Recommendation: A — needs to be tracked as an issue.
+```
+
+STOP and WAIT.
+
+### Same-Role Authorship Check (MANDATORY before modifying any file)
+
+Before editing a file within your allowed path, verify authorship:
+
+```bash
+LAST_AUTHOR_EMAIL=$(git log --follow -1 --pretty="%ae" -- {file_path})
+CURRENT_EMAIL=$(git config user.email)
+LAST_AUTHOR_NAME=$(git log --follow -1 --pretty="%an" -- {file_path})
+```
+
+**If `LAST_AUTHOR_EMAIL != CURRENT_EMAIL`** → show warning and STOP:
+
+```
+⚠️ 타인이 작성한 코드 수정 감지 (_core.md §5-1)
+
+  File:        {file_path}
+  Last author: {LAST_AUTHOR_NAME} ({LAST_AUTHOR_EMAIL})
+  You:         {USER_LOGIN} ({CURRENT_EMAIL})
+
+  직접 수정 전에 아래 방법 중 하나를 선택하세요:
+
+  A. Issue 생성 → 원작자({LAST_AUTHOR_NAME}) assign (권장)
+     — 변경 이유와 영향 범위를 이슈에 명시하고 원작자를 assignee로 지정합니다.
+       충돌 없이 변경 의도를 공유할 수 있고, 원작자가 맥락을 잃지 않습니다.
+       수정이 비자명하거나 로직에 영향을 주는 경우 이 방법을 권장합니다.
+
+  B. PR 직접 생성 → {LAST_AUTHOR_NAME}을 reviewer로 지정
+     — 변경이 긴급하거나 작성자와 사전에 구두 합의가 된 경우 사용합니다.
+       PR 본문에 변경 이유를 명시하고, 원작자의 리뷰 승인 없이 merge하지 않습니다.
+       빠른 진행이 필요할 때 유효하지만 리뷰 없이 merge하면 이 규칙 위반입니다.
+
+  C. 수정 진행 (Minor fix 예외 적용)
+     — 오탈자 수정, 주석 변경, import 정리 등 로직에 영향 없는 경우에만 허용됩니다.
+       commit 메시지에 반드시 "minor: touch {LAST_AUTHOR_NAME}'s file" 을 명시하고,
+       변경 범위가 3줄 이하일 때만 이 예외를 적용하세요.
+
+  Cold Recommendation: A — 수정 이유를 이슈로 남기면 이후 blame 추적 시 맥락이 보존됩니다.
 ```
 
 STOP and WAIT.

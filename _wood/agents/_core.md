@@ -90,6 +90,23 @@ These rules cannot be overridden by any user request.
 | All | Commit directly to `main` branch |
 | All | Create PR without linked issue (`closes #N`) |
 | All | Modify protected files without Admin approval |
+| All | Directly modify files primarily authored by another team member without prior issue or PR review |
+
+### 5-1. Same-Role Authorship Rule
+
+Even within the same role, direct modification of another member's code requires process:
+
+| Situation | Required Action |
+|-----------|----------------|
+| Primary author is another team member | Create issue → assign original author → explain reason |
+| Urgent (unblocked by author) | Create PR directly → set original author as reviewer → state reason in PR body |
+| Minor fix (typo, comment) | Allowed — note in commit message: "minor: touch {author}'s file" |
+
+**How to determine authorship:**
+```bash
+git log --follow -1 --pretty="%ae %an" -- {file_path}
+# If last author != current user → apply Same-Role Authorship Rule
+```
 
 When a boundary rule is violated:
 1. STOP immediately
@@ -188,17 +205,44 @@ Cold Recommendation: {A/B/C} — {one-sentence reason based on current facts}
   Cold Recommendation: 1 → 3 order — {reason: must do 1 before 3 is possible / lowest risk first}
   ```
 
+**Option Description Format (MANDATORY):**
+
+Each option must be written with enough context to act on without re-reading the conversation.
+One-liner options are prohibited. Minimum format:
+
+```
+A. {scope label}
+   — {What exactly this does: which files/systems are touched, what outcome is produced.
+      Why this is the safest or smallest option, and what it leaves out.}
+
+B. {scope label}
+   — {What exactly this does: which files/systems are touched, what outcome is produced.
+      Why this is the recommended balance, and what risks or tradeoffs it carries.}
+
+C. {scope label}
+   — {What exactly this does: the full extent of changes, what it unlocks or cleans up.
+      Why someone would choose this over B, and what the cost is.}
+```
+
 Example:
 ```
-Choose
+A. Analysis only — Record Gap Analysis results in story file now, implement later.
+   — Captures the current findings (step-06-dev §6-2c table) into the Story Log without
+     touching any application code. Safe to do mid-session; no regression risk.
+     Leaves the actual fix to the next session or a separate issue.
 
-A. Complete AC7·8 now — formally close mt02-s05, but also touches Process3 Eulji logic
-B. Separate AC7·8 — finish mt02-s06/s07 first, then batch all three vendors' Eulji configs together
-C. Push AC7·8 to MT-4 scope
+B. Fix + document — Implement the core change and write the Gap Analysis to the Story.
+   — Applies the recommended code change (OAuthService.java:112 + application.yaml redirect URI),
+     then saves the full analysis to the story file before closing. This is the complete path:
+     issue closed cleanly, analysis preserved for future reference.
 
-Cold Recommendation: B — ParkingPark and ParkingFriends also need the same configs update. Batching 3 vendors is better for consistency.
+C. Fix + document + integration test — B plus a new OAuthServiceTest covering the real account flow.
+   — Same as B but adds automated coverage that protects against regression in CI.
+     Takes ~30 min more; only worthwhile if the auth flow is high-churn or shared across teams.
 
-Which one?
+Cold Recommendation: B — The fix is well-scoped and the analysis record prevents rework in the next session. Integration test (C) can be added as a follow-up issue.
+
+Which direction?
 ```
 
 ### 8-3. Output Format Preferences
