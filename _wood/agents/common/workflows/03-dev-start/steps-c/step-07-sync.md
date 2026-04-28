@@ -181,14 +181,31 @@ echo "  stories:"
 echo "    {story_id}: in-progress → done"
 ```
 
-### 7-5b. Personal Story File Status → done
+### 7-5b. Personal Story File — Gap Analysis 저장 + Status → done
+
+**Gap Analysis를 먼저 저장하고, 그 다음 Status를 업데이트한다.**
 
 ```bash
 # Update story files in personal workspace
 for story_file in $(completed_stories); do
-  sed -i '' 's/| Status | in-progress/| Status | done/' \
-    "$PERSONAL_DIR/stories/$story_file"
-  echo "| $(date +%Y-%m-%d) | Story completed |" >> "$PERSONAL_DIR/stories/$story_file"
+  STORY_PATH="$PERSONAL_DIR/stories/$story_file"
+
+  # 1. Write Gap Analysis from step-06-dev §6-2c into ## Code Analysis section
+  #    Find the "## Code Analysis" section and replace the placeholder table
+  #    with the actual {gap_analysis_table} produced during step-06.
+  #    If the section already has data (resume case), append rows instead of replacing.
+  #
+  #    Format to write:
+  #    | {checklist_item} | {✅/🟡/❌ status} | {file:line or "none"} |
+  #
+  #    If {gap_analysis_table} is empty (D-Hold case):
+  #    → append "| — | Analysis deferred | — |" row
+
+  # 2. Update status: in-progress → done
+  sed -i '' 's/| Status | in-progress/| Status | done/' "$STORY_PATH"
+
+  # 3. Append Story Log entry
+  echo "| $(date +%Y-%m-%d) | Story completed — Gap Analysis saved |" >> "$STORY_PATH"
 done
 ```
 
