@@ -32,6 +32,16 @@ forbidden_actions:
     USER_NAME=$(gh api user --jq '.name // .login')
     # Read _wood/team-roles.yaml → find USER_LOGIN → store {user_role}
     # If not found → user_role=Guest
+
+    # Write to session state
+    jq -n \
+      --arg role "${user_role}" \
+      --arg agent "master" \
+      --arg mode "active" \
+      --arg step "activation" \
+      --arg updated "$(date -u +%Y-%m-%dT%H:%M:%SZ)" \
+      '{mode: $mode, step: $step, role: $role, agent: $agent, updated: $updated}' \
+      > _wood/state/session.json
     ```
     DO NOT PROCEED until USER_LOGIN and user_role are resolved.
   </step>
