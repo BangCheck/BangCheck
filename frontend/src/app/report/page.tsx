@@ -3,7 +3,8 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useAuthStore } from '@/store/use-auth-store';
-import { getRooms, Room } from '@/services/room-service';
+import { getRooms } from '@/services/room-service';
+import type { Room } from '@/types';
 import { cn } from '@/lib/utils';
 import Image from 'next/image';
 

@@ -1,13 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-
-interface User {
-  id: string;
-  email: string;
-  nickname?: string;
-  profileImage?: string;
-  profileImageUrl?: string;
-}
+import type { User } from '@/types';
 
 interface AuthState {
   user: User | null;
@@ -17,7 +10,6 @@ interface AuthState {
   logout: () => void;
 }
 
-// 쿠키 관리를 위한 간단한 헬퍼
 const setCookie = (name: string, value: string, days: number) => {
   const expires = new Date(Date.now() + days * 864e5).toUTCString();
   document.cookie = `${name}=${value}; expires=${expires}; path=/; SameSite=Lax`;
@@ -25,6 +17,12 @@ const setCookie = (name: string, value: string, days: number) => {
 
 const deleteCookie = (name: string) => {
   document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+};
+
+const setAuthCookie = (token: string) => {
+  if (typeof window !== 'undefined') {
+    setCookie('accessToken', token, 7);
+  }
 };
 
 export const useAuthStore = create<AuthState>()(
@@ -47,10 +45,3 @@ export const useAuthStore = create<AuthState>()(
     }
   )
 );
-
-// 클라이언트 사이드에서만 쿠키 설정 (Zustand persist와 동기화)
-const setAuthCookie = (token: string) => {
-  if (typeof window !== 'undefined') {
-    setCookie('accessToken', token, 7);
-  }
-};
