@@ -12,9 +12,8 @@ public class ChecklistOption {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "checklist_item_id", nullable = false)
-    private ChecklistItem checklistItem;
+    @Column(name="checklist_item_id", nullable = false)
+    private Long checklistItemId;
 
     @Column(nullable = false, length = 100)
     private String value;
