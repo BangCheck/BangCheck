@@ -82,18 +82,16 @@ members:
     notes: "Repository admin & policy owner. Frontend developer."
 
   # ─── PM ───────────────────────────────────────
-  # Hong Ye-Eun — TO BE REGISTERED (GitHub login pending)
-  # PM_GITHUB_LOGIN:
-  #   role: PM
-  #   real_name: "Hong Ye-Eun"
-  #   doc_owner: false
+  yekhong:
+    role: PM
+    real_name: "Hong Ye-Eun"
+    doc_owner: false
 
   # ─── Frontend ─────────────────────────────────
-  # Han Jang-Ui — TO BE REGISTERED (GitHub login pending)
-  # FE_GITHUB_LOGIN:
-  #   role: Frontend
-  #   real_name: "Han Jang-Ui"
-  #   doc_owner: false
+  leohan6540:
+    role: Frontend
+    real_name: "Han Jang-Hui"
+    doc_owner: false
 
   # ─── Backend ──────────────────────────────────
   dlwldP:
@@ -117,11 +115,10 @@ members:
     llm: "Claude"
     doc_owner: false
 
-  # Ha Ji-Myeong — TO BE REGISTERED (GitHub login pending)
-  # BE_JM_LOGIN:
-  #   role: Backend
-  #   real_name: "Ha Ji-Myeong"
-  #   doc_owner: false
+  hajimeong:
+    role: Backend
+    real_name: "Ha Ji-Myeong"
+    doc_owner: false
 
   # ─── Design ───────────────────────────────────
   # Designer 1 — TO BE REGISTERED (GitHub login pending)
