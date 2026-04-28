@@ -22,23 +22,24 @@ Verify that step-02 and step-03 have been completed in this session:
 If either is missing, show:
 
 ```
-⛔ 선행 단계 미완료
+⛔ Prerequisite not met
 
-  Story를 작성하려면 코드 분석(step-02)과 사실 확인(step-03)이 먼저 완료되어야 합니다.
+  Story creation requires code reading (step-02) and fact checking (step-03) to be completed first.
 
-  A. step-02로 돌아가 코드 읽기부터 진행
-     — 관련 파일을 실제로 읽지 않으면 Story의 구현 힌트와 AC가 코드 현실과 달라집니다.
-       이 단계를 건너뛰면 Story가 이슈 요약 수준에 머물며, 개발 중 재분석이 불가피합니다.
+  A. Return to step-02 — start with code reading
+     — Without reading the related files, the Story's Implementation Hints and AC will diverge
+       from the actual code. Skipping this step leaves the Story at issue-summary level,
+       making re-analysis inevitable during development.
 
-  B. step-03으로 돌아가 Fact Check 먼저 완료
-     — Fact Check 없이 Story를 작성하면 현재 구현 상태와 커밋 이력이 Story에 반영되지
-       않습니다. 나중에 충돌하거나 이미 구현된 항목을 다시 작업하는 낭비가 발생합니다.
+  B. Return to step-03 — complete Fact Check first
+     — Without a Fact Check, the Story won't reflect the current implementation state or
+       commit history. This risks conflicts or re-doing already-implemented items.
 
-  C. 강행 (권장하지 않음)
-     — 시간 제약이 있는 경우에 한해 허용합니다. Story Log에
-       "⚠️ step-02/03 미완료 상태로 생성됨" 을 반드시 기록해야 합니다.
+  C. Proceed anyway (not recommended)
+     — Only allowed under time constraints. You must record
+       "⚠️ Created without completing step-02/03" in the Story Log.
 
-  Cold Recommendation: A → B 순서 — 코드 현실 기반 Story가 세션 재진입 시 resume 품질을 결정합니다.
+  Cold Recommendation: A → B in order — Code-reality-based Stories determine resume quality in future sessions.
 ```
 
 STOP and WAIT.

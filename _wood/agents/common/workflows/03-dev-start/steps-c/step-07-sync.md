@@ -181,9 +181,9 @@ echo "  stories:"
 echo "    {story_id}: in-progress → done"
 ```
 
-### 7-5b. Personal Story File — Gap Analysis 저장 + Status → done
+### 7-5b. Personal Story File — Save Gap Analysis + Status → done
 
-**Gap Analysis를 먼저 저장하고, 그 다음 Status를 업데이트한다.**
+**Save Gap Analysis first, then update Status.**
 
 ```bash
 # Update story files in personal workspace

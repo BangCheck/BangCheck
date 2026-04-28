@@ -332,30 +332,30 @@ LAST_AUTHOR_NAME=$(git log --follow -1 --pretty="%an" -- {file_path})
 **If `LAST_AUTHOR_EMAIL != CURRENT_EMAIL`** → show warning and STOP:
 
 ```
-⚠️ 타인이 작성한 코드 수정 감지 (_core.md §5-1)
+⚠️ Same-role code authorship conflict detected (_core.md §5-1)
 
   File:        {file_path}
   Last author: {LAST_AUTHOR_NAME} ({LAST_AUTHOR_EMAIL})
   You:         {USER_LOGIN} ({CURRENT_EMAIL})
 
-  직접 수정 전에 아래 방법 중 하나를 선택하세요:
+  Choose how to proceed before modifying directly:
 
-  A. Issue 생성 → 원작자({LAST_AUTHOR_NAME}) assign (권장)
-     — 변경 이유와 영향 범위를 이슈에 명시하고 원작자를 assignee로 지정합니다.
-       충돌 없이 변경 의도를 공유할 수 있고, 원작자가 맥락을 잃지 않습니다.
-       수정이 비자명하거나 로직에 영향을 주는 경우 이 방법을 권장합니다.
+  A. Create issue → assign original author ({LAST_AUTHOR_NAME}) (recommended)
+     — Document the change rationale and impact in the issue, assign the original author.
+       This preserves intent without merge conflicts and ensures the author doesn't lose context.
+       Use this when the change is non-trivial or affects business logic.
 
-  B. PR 직접 생성 → {LAST_AUTHOR_NAME}을 reviewer로 지정
-     — 변경이 긴급하거나 작성자와 사전에 구두 합의가 된 경우 사용합니다.
-       PR 본문에 변경 이유를 명시하고, 원작자의 리뷰 승인 없이 merge하지 않습니다.
-       빠른 진행이 필요할 때 유효하지만 리뷰 없이 merge하면 이 규칙 위반입니다.
+  B. Create PR directly → set {LAST_AUTHOR_NAME} as reviewer
+     — Use when the change is urgent or verbal agreement has been made with the author.
+       State the reason clearly in the PR body; do not merge without the author's review approval.
+       Valid for fast-path situations, but merging without review is a rule violation.
 
-  C. 수정 진행 (Minor fix 예외 적용)
-     — 오탈자 수정, 주석 변경, import 정리 등 로직에 영향 없는 경우에만 허용됩니다.
-       commit 메시지에 반드시 "minor: touch {LAST_AUTHOR_NAME}'s file" 을 명시하고,
-       변경 범위가 3줄 이하일 때만 이 예외를 적용하세요.
+  C. Proceed with modification (Minor fix exception)
+     — Only allowed for changes with no logic impact: typo fixes, comment edits, import cleanup.
+       Commit message must include "minor: touch {LAST_AUTHOR_NAME}'s file",
+       and the change must be 3 lines or fewer to qualify for this exception.
 
-  Cold Recommendation: A — 수정 이유를 이슈로 남기면 이후 blame 추적 시 맥락이 보존됩니다.
+  Cold Recommendation: A — Filing an issue preserves context for future git blame traces.
 ```
 
 STOP and WAIT.
