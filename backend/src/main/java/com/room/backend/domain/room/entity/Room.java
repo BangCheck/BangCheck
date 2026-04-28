@@ -7,10 +7,12 @@ import com.room.backend.domain.room.entity.enums.RentType;
 import com.room.backend.global.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 
+@Getter
 @Entity
 @Table(name="rooms")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -26,27 +28,27 @@ public class Room extends BaseEntity {
     private String address;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(name = "rent_type", nullable = false, length = 20)
     private RentType rentType;
 
     @Column
     private Long deposit;
-    @Column
+    @Column(name = "monthly_rent")
     private Integer monthlyRent;
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(name = "maintenance_status", nullable = false, length = 20)
     private MaintenanceStatus maintenanceStatus;
-    @Column
+    @Column(name = "maintenance_fee")
     private Integer maintenanceFee;
 
-    @Column(nullable = false)
+    @Column(name="has_loan",nullable = false)
     Boolean hasLoan;
-    @Column
+    @Column(name = "loan_amount")
     private Long loanAmount;
 
-    @Column(nullable = false)
+    @Column(name = "can_register_address", nullable = false)
     private Boolean canRegisterAddress;
-    @Column
+    @Column(name = "available_from")
     private LocalDate availableFrom;
 
     @Enumerated(EnumType.STRING)
@@ -55,11 +57,11 @@ public class Room extends BaseEntity {
 
     @Column
     private Integer floor;
-    @Column(nullable = false)
+    @Column(name = "has_elevator", nullable = false)
     private Boolean hasElevator;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(nullable = false, length = 20)
     private Direction direction;
 
     @Column(length = 1000)
