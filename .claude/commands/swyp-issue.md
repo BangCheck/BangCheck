@@ -1,6 +1,29 @@
 # /swyp-issue — GitHub Issue Registration
 
-Determines type, priority, and labels interactively and creates a structured issue.
+Determines type and priority interactively and creates a structured issue.
+
+---
+
+## Entry Point: Cache-First Spec Loading
+
+**Before any issue creation involving spec data (page/task from spec), run this check:**
+
+```bash
+CACHE="_wood/cache/spec-snapshot.json"
+if [ -f "$CACHE" ]; then
+  echo "CACHE_HIT"
+  cat "$CACHE" | jq '{cached_at, screen_count: (.screens | length)}'
+else
+  echo "CACHE_MISS"
+fi
+```
+
+| Result | Action |
+|--------|--------|
+| `CACHE_HIT` | Load screens from cache — **skip all MCP Drive calls** |
+| `CACHE_MISS` | Run `step-01-read-drive.md` once to populate cache, then continue |
+
+> 명세 없이 bug/improvement 이슈는 캐시 체크 없이 바로 진행.
 
 ---
 
@@ -10,6 +33,8 @@ Determines type, priority, and labels interactively and creates a structured iss
 Collect ALL required values through conversation first, then construct and run the final command with real values substituted.
 
 Required values before any `gh issue create`: `repo` (from `git remote get-url origin`), `title`, `priority`, `milestone` (or skip), `assignee` (or skip).
+
+**Labels are NOT used.** Do NOT pass `--label` to any `gh issue create` command.
 
 **GitHub Projects board linking is MANDATORY after every issue creation:**
 ```bash
@@ -24,8 +49,7 @@ Project: `2` (SWYP Checklist, owner: SWYP-Backend). Run this immediately after e
 
 1. `gh auth status` — stop if not authenticated
 2. `git remote get-url origin` — resolve `{repo}` (e.g. `SWYP-Backend/project`)
-3. Label existence check — if missing, prompt "Run /swyp-project init first"
-4. Duplicate check — search for similar titles and warn
+3. Duplicate check — search for similar titles and warn
 
 ---
 
@@ -111,7 +135,7 @@ If list page, add: pagination, filter/sort, empty state UI
 
 ```bash
 gh issue create --repo {repo} --title "[page] {title}" \
-  --label "page,{priority},frontend" --milestone "{milestone}" \
+  --milestone "{milestone}" \
   --body "{body: description + task list + API + test cases + completion criteria}"
 # Capture the output URL, then immediately link to project board:
 gh project item-add 2 --owner SWYP-Backend --url {issue-url}
@@ -129,7 +153,7 @@ Parent verification:
 
 ```bash
 gh issue create --repo {repo} --title "[task] {title}" \
-  --label "task,{priority},frontend" --milestone "{milestone}" \
+  --milestone "{milestone}" \
   --body "Parent: #{parent}\n\n## Implementation Details\n{desc}\n\n## Completion Criteria\n- [ ] Feature works correctly\n- [ ] Code conventions followed"
 # Immediately link to project board:
 gh project item-add 2 --owner SWYP-Backend --url {issue-url}
@@ -151,7 +175,6 @@ Keyword-based priority recommendation:
 
 ```bash
 gh issue create --repo {repo} --title "[bug] {title}" \
-  --label "bug,{priority},frontend" \
   --body "{Steps to reproduce + expected/actual result + environment + screenshot}"
 # Immediately link to project board:
 gh project item-add 2 --owner SWYP-Backend --url {issue-url}
@@ -201,6 +224,5 @@ What would you like to do next?
 ## Safety Guards
 
 - Duplicate issue detection → warning
-- Label does not exist → guide to /swyp-project init
 - Task without parent → warn then allow
 - Linking to closed parent → warn then confirm

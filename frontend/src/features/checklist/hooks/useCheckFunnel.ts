@@ -27,5 +27,5 @@ export const useCheckFunnel = () => {
     else router.back();
   };
 
-  return { step, next, prev };
+  return { step, next, prev, setStep };
 };

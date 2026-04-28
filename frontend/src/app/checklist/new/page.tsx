@@ -1,5 +1,6 @@
 'use client';
 
+import { Suspense } from 'react';
 import { useForm, FormProvider } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -32,11 +33,19 @@ const checklistSchema = z.object({
   memo: z.string().optional(),
 });
 
-type ChecklistFormValues = z.infer<typeof checklistSchema>;
+type ChecklistFormValues = z.input<typeof checklistSchema>;
 
 const TABS = ['기본 정보', '건물 정보', '상세 점검'];
 
 export default function ChecklistNewPage() {
+  return (
+    <Suspense>
+      <ChecklistNewContent />
+    </Suspense>
+  );
+}
+
+function ChecklistNewContent() {
   const router = useRouter();
   const methods = useForm<ChecklistFormValues>({
     resolver: zodResolver(checklistSchema),

@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/v1/auth")
+@RequestMapping("${app.paths.auth-base-path}")
 @RequiredArgsConstructor
 public class AuthController {
 
@@ -32,13 +32,13 @@ public class AuthController {
     private final AuthService authService;
     private final CookieProvider cookieProvider;
 
-    @GetMapping("/oauth2/{provider}")
+    @GetMapping("${app.paths.auth-oauth-base-path}/{provider}")
     public ResponseEntity<ApiResponse<OAuthAuthorizeResponseDTO>> authorize(@PathVariable String provider) {
         OAuthAuthorizeResponseDTO data = oauthService.buildAuthorizeUrl(provider);
         return ResponseEntity.ok(ApiResponse.success(data));
     }
 
-    @GetMapping("/oauth2/{provider}/callback")
+    @GetMapping("${app.paths.auth-oauth-base-path}/{provider}/callback")
     public ResponseEntity<ApiResponse<OAuthCallbackResponseDTO>> callback(
             @PathVariable String provider,
             @RequestParam(required = false) String code,
@@ -62,7 +62,7 @@ public class AuthController {
                 .body(ApiResponse.success(result.response()));
     }
 
-    @PostMapping("/jwt/refresh")
+    @PostMapping("${app.paths.auth-refresh-path}")
     public ResponseEntity<ApiResponse<Void>> refresh(
             @CookieValue(name = "refresh_token", required = false) String refreshToken
     ) {
@@ -74,7 +74,7 @@ public class AuthController {
                 .body(ApiResponse.success(null));
     }
 
-    @PostMapping("/logout")
+    @PostMapping("${app.paths.auth-logout-path}")
     public ResponseEntity<ApiResponse<Void>> logout() {
         Long userId = SecurityUtil.getCurrentUserId();
         authService.logout(userId);

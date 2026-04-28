@@ -1,5 +1,6 @@
 package com.room.backend;
 
+import com.room.backend.global.config.AppPathProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.ApplicationRunner;
@@ -25,11 +26,11 @@ public class BackendApplication {
     }
 
     @Bean
-    public ApplicationRunner printSwaggerUrl(Environment env) {
+    public ApplicationRunner printSwaggerUrl(Environment env, AppPathProperties appPathProperties) {
         return args -> {
             String ip = resolveLocalIp();
             String port = env.getProperty("server.port", "8080");
-            String swaggerPath = env.getProperty("springdoc.swagger-ui.path", "/swagger-ui.html");
+            String swaggerPath = appPathProperties.getSwaggerUiPath();
 
             if (!swaggerPath.startsWith("/")) {
                 swaggerPath = "/" + swaggerPath;
