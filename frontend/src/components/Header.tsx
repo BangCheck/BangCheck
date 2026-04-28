@@ -7,6 +7,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { LogoutConfirmModal } from './ui/Modals';
 import { cn } from '@/lib/utils';
+import { ROUTES } from '@/lib/routes';
 import Image from 'next/image';
 
 function getInitial(nickname?: string, email?: string) {
@@ -34,7 +35,7 @@ export default function Header() {
   const confirmLogout = () => {
     logout();
     setIsLogoutModalOpen(false);
-    router.push('/');
+    router.push(ROUTES.HOME);
   };
 
   if (!mounted) {
@@ -52,26 +53,26 @@ export default function Header() {
     <>
       <header className="flex items-center h-16 px-4 md:px-10 border-b border-border-light bg-white w-full sticky top-0 z-50">
         <div className="flex-1 flex justify-start z-10">
-          <Link href="/">
+          <Link href={ROUTES.HOME}>
             <LogoWithText size={20} textClassName="text-base md:text-lg" />
           </Link>
         </div>
 
         <nav aria-label="주요 네비게이션" className="hidden sm:flex gap-10 sm:absolute sm:left-1/2 sm:-translate-x-1/2">
-          <Link 
-            href="/" 
+          <Link
+            href={ROUTES.HOME}
             className={cn(
               "text-[15px] font-bold transition-colors p-2",
-              pathname === '/' ? "text-[#0A607D]" : "text-[#232527]"
+              pathname === ROUTES.HOME ? "text-[#0A607D]" : "text-[#232527]"
             )}
           >
             방 목록
           </Link>
-          <Link 
-            href="/settings" 
+          <Link
+            href={ROUTES.SETTINGS}
             className={cn(
               "text-[15px] font-bold transition-colors p-2",
-              pathname === '/settings' ? "text-[#0A607D]" : "text-[#232527]"
+              pathname === ROUTES.SETTINGS ? "text-[#0A607D]" : "text-[#232527]"
             )}
           >
             설정
@@ -102,8 +103,8 @@ export default function Header() {
               </button>
             </div>
           ) : (
-            <Link 
-              href="/login"
+            <Link
+              href={ROUTES.LOGIN}
               className="text-[13px] font-bold text-[#0A607D] border border-[#0A607D]/30 px-4 py-1.5 rounded-md hover:bg-[#0A607D]/5 transition-colors"
             >
               로그인

@@ -2,6 +2,7 @@
 
 import { useAuthStore } from '@/store/use-auth-store';
 import { useRouter } from 'next/navigation';
+import { ROUTES } from '@/lib/routes';
 
 /**
  * 로그인/로그아웃 버튼을 처리하는 클라이언트 컴포넌트
@@ -11,7 +12,7 @@ export default function AuthButtons() {
   const { isLoggedIn, user, logout } = useAuthStore();
 
   const handleLoginClick = () => {
-    router.push('/login');
+    router.push(ROUTES.LOGIN);
   };
 
   const handleLogoutClick = () => {

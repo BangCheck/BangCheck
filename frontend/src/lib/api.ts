@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { loginRedirect } from '@/lib/routes';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
 
@@ -16,7 +17,7 @@ interface ApiHooks {
 let hooks: ApiHooks = {
   getToken: () => null,
   onUnauthorized: () => {
-    if (typeof window !== 'undefined') window.location.href = '/login?error=expired';
+    if (typeof window !== 'undefined') window.location.href = loginRedirect('expired');
   },
   onTokenRefresh: () => {},
 };

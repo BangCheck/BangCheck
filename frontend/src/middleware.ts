@@ -1,28 +1,15 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-
-/**
- * 인증이 필요한 경로 목록
- */
-const protectedRoutes = ['/report', '/settings'];
-
-/**
- * 인증이 되어있을 때 접근하면 안되는 경로 (로그인/회원가입 등)
- */
-const publicOnlyRoutes = ['/login'];
+import { ROUTES, PROTECTED_ROUTES } from '@/lib/routes';
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  
-  // 현재는 클라이언트 상태(Zustand) 기반이므로 미들웨어에서 쿠키를 통해 토큰 확인이 권장됨.
-  // 우선 구조만 잡고, 실제 토큰 존재 여부는 쿠키 'accessToken'으로 판단한다고 가정.
+
   const token = request.cookies.get('accessToken')?.value;
 
-  // 1. 인증이 필요한 페이지에 토큰 없이 접근할 경우
-  if (protectedRoutes.some(route => pathname.startsWith(route)) && !token) {
+  if (PROTECTED_ROUTES.some(route => pathname.startsWith(route)) && !token) {
     const url = request.nextUrl.clone();
-    url.pathname = '/login';
-    // 원래 가려던 페이지 정보를 쿼리 스트링으로 전달하여 로그인 후 되돌아오게 함
+    url.pathname = ROUTES.LOGIN;
     url.searchParams.set('callbackUrl', pathname);
     return NextResponse.redirect(url);
   }

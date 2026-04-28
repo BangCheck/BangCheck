@@ -5,6 +5,7 @@ import { useRouter, useParams, useSearchParams } from 'next/navigation';
 import { useMutation } from '@tanstack/react-query';
 import { useAuthStore } from '@/store/use-auth-store';
 import { api } from '@/lib/api';
+import { ROUTES, loginRedirect } from '@/lib/routes';
 
 export default function AuthCallbackPage() {
   const router = useRouter();
@@ -47,12 +48,12 @@ export default function AuthCallbackPage() {
     },
     onSuccess: (data) => {
       setAuth(data.accessToken, data.user);
-      const callbackUrl = searchParams.get('callbackUrl') || '/';
+      const callbackUrl = searchParams.get('callbackUrl') || ROUTES.HOME;
       router.replace(callbackUrl);
     },
     onError: (error) => {
       console.error('Login Error:', error);
-      router.replace('/login?error=auth_failed');
+      router.replace(loginRedirect('auth_failed'));
     },
   });
 
@@ -66,7 +67,7 @@ export default function AuthCallbackPage() {
       isProcessed.current = true;
       loginMutation.mutate({ code, state });
     } else {
-      router.replace('/login?error=invalid_params');
+      router.replace(loginRedirect('invalid_params'));
     }
   }, [provider, searchParams, loginMutation, router]);
 

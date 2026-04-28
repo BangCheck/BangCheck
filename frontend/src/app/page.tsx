@@ -7,10 +7,11 @@ import { cn } from '@/lib/utils';
 import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { 
-  LoginRequiredModal, 
-  ComparisonDisabledModal 
+import {
+  LoginRequiredModal,
+  ComparisonDisabledModal
 } from '@/components/ui/Modals';
+import { ROUTES } from '@/lib/routes';
 
 /**
  * 로딩 중 보여줄 스켈레톤 UI
@@ -181,7 +182,7 @@ export default function Home() {
     if (!isLoggedIn) {
       setIsLoginModalOpen(true);
     } else {
-      router.push('/checklist/new');
+      router.push(ROUTES.CHECKLIST_NEW);
     }
   };
 
@@ -269,7 +270,7 @@ export default function Home() {
         </div>
         
         <Link 
-          href="/report"
+          href={ROUTES.REPORT}
           onClick={handleComparisonClick}
           className={cn(
             "px-4 py-2 rounded-[4px] text-[12px] font-semibold flex items-center gap-2 transition-all shadow-sm",
@@ -292,7 +293,7 @@ export default function Home() {
             </p>
             {isLoggedIn && rooms.length > 0 && (
               <button 
-                onClick={() => router.push('/checklist/new')}
+                onClick={() => router.push(ROUTES.CHECKLIST_NEW)}
                 className="text-[14px] font-bold text-[#0A607D] flex items-center gap-1.5 cursor-pointer hover:underline"
               >
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
@@ -389,11 +390,11 @@ export default function Home() {
         onClose={() => setIsLoginModalOpen(false)}
         onContinueAsGuest={() => {
           setIsLoginModalOpen(false);
-          router.push('/checklist/new');
+          router.push(ROUTES.CHECKLIST_NEW);
         }}
         onLogin={() => {
           setIsLoginModalOpen(false);
-          router.push('/login');
+          router.push(ROUTES.LOGIN);
         }}
       />
 
@@ -402,7 +403,7 @@ export default function Home() {
         onClose={() => setIsComparisonModalOpen(false)}
         onStartChecklist={() => {
           setIsComparisonModalOpen(false);
-          router.push('/checklist/new');
+          router.push(ROUTES.CHECKLIST_NEW);
         }}
       />
     </main>
