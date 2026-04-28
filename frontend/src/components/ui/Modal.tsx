@@ -49,7 +49,10 @@ export function Modal({ isOpen, onClose, children, className }: ModalProps) {
   );
 }
 
-interface ConfirmModalProps extends ModalProps {
+interface ConfirmModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  className?: string;
   title: string;
   description?: string;
   leftButtonText: string;
