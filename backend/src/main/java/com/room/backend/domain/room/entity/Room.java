@@ -64,6 +64,9 @@ public class Room extends BaseEntity {
     @Column(nullable = false)
     private Direction direction;
 
+    @Column(length = 1000)
+    private String memo;
+
 
     public static Room create(
             User user,
@@ -80,7 +83,8 @@ public class Room extends BaseEntity {
             BuildingType buildingType,
             Integer floor,
             Boolean hasElevator,
-            Direction direction
+            Direction direction,
+            String memo
     ){
         if (rentType == RentType.JEONSE) {
             if (deposit == null) {
@@ -129,6 +133,7 @@ public class Room extends BaseEntity {
         room.floor = floor;
         room.hasElevator = hasElevator;
         room.direction = direction;
+        room.memo = memo;
 
         return room;
     }
