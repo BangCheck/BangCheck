@@ -4,7 +4,6 @@ import com.room.backend.domain.room.entity.enums.BuildingType;
 import com.room.backend.domain.room.entity.enums.Direction;
 import com.room.backend.domain.room.entity.enums.MaintenanceStatus;
 import com.room.backend.domain.room.entity.enums.RentType;
-import com.room.backend.domain.user.entity.User;
 import com.room.backend.global.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -20,9 +19,8 @@ public class Room extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @Column(name = "user_id", nullable = false)
+    private Long userId;
 
     @Column(nullable = false, length = 255)
     private String address;
@@ -69,7 +67,7 @@ public class Room extends BaseEntity {
 
 
     public static Room create(
-            User user,
+            Long userId,
             String address,
             RentType rentType,
             Long deposit,
@@ -118,7 +116,7 @@ public class Room extends BaseEntity {
         }
 
         Room room = new Room();
-        room.user = user;
+        room.userId = userId;
         room.address = address;
         room.rentType = rentType;
         room.deposit = deposit;
