@@ -49,10 +49,6 @@ public class AuthService {
 
         if (activeUser.isPresent()) {
             User user = activeUser.get();
-            // 최신 프로필 정보로 업데이트
-            if (oauthInfo.profileImageUrl() != null && !oauthInfo.profileImageUrl().isBlank()) {
-                user.updateProfileImageUrl(oauthInfo.profileImageUrl());
-            }
             return issueJwtAndReturn(user, "Existing user login success", false, false);
         }
 
@@ -64,18 +60,12 @@ public class AuthService {
         if (deletedUser.isPresent()) {
             User user = deletedUser.get();
             user.reactivate();
-            // 최신 프로필 정보로 업데이트
-            if (oauthInfo.profileImageUrl() != null && !oauthInfo.profileImageUrl().isBlank()) {
-                user.updateProfileImageUrl(oauthInfo.profileImageUrl());
-            }
             return issueJwtAndReturn(user, "Deleted user reactivated and login success", false, true);
         }
 
-        String nickname = oauthInfo.nickname() != null && !oauthInfo.nickname().isBlank() 
-                ? oauthInfo.nickname() 
-                : buildDefaultNickname(providerEnum, oauthInfo.providerUserId());
-        
-        User newUser = User.signUpUser(providerEnum, oauthInfo.providerUserId(), oauthInfo.email(), nickname, oauthInfo.profileImageUrl());
+        String nickname = buildDefaultNickname(providerEnum, oauthInfo.providerUserId());
+
+        User newUser = User.signUpUser(providerEnum, oauthInfo.providerUserId(), oauthInfo.email(), nickname, null);
         userRepository.save(newUser);
 
         return issueJwtAndReturn(newUser, "New social user auto-registered and login success", true, false);

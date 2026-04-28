@@ -46,3 +46,6 @@ out/
 
 #claude
 .claude
+
+# Ignore Gradle properties 
+gradle.properties

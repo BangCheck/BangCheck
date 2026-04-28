@@ -1,32 +1,41 @@
 package com.room.backend.global.auth.oauth.service;
 
+import com.room.backend.global.auth.jwt.JwtProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import javax.crypto.SecretKey;
 import java.time.Instant;
+import java.util.Date;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
+
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.security.Keys;
+import java.nio.charset.StandardCharsets;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class OAuthStateService {
 
-    private static final String STATE_PREFIX = "OAUTH_STATE:";
     private static final long STATE_TTL_MINUTES = 5;
 
-    private final ConcurrentMap<String, Long> stateStore = new ConcurrentHashMap<>();
+    private final JwtProperties jwtProperties;
 
     public String generateState() {
-        String state = UUID.randomUUID().toString();
-        String key = STATE_PREFIX + state;
+        Instant now = Instant.now();
+        Instant expiresAt = now.plusSeconds(STATE_TTL_MINUTES * 60);
+        String nonce = UUID.randomUUID().toString();
 
-        long expiresAt = Instant.now().plusSeconds(STATE_TTL_MINUTES * 60).toEpochMilli();
-        stateStore.put(key, expiresAt);
+        String state = Jwts.builder()
+                .setSubject(nonce)
+                .setIssuedAt(Date.from(now))
+                .setExpiration(Date.from(expiresAt))
+                .signWith(getSigningKey())
+                .compact();
 
-        log.debug("OAuth state created: {}", state);
+        log.debug("OAuth state created: {}", nonce);
         return state;
     }
 
@@ -36,20 +45,29 @@ public class OAuthStateService {
             return false;
         }
 
-        String key = STATE_PREFIX + state;
-        Long expiresAt = stateStore.remove(key);
+        try {
+            String nonce = Jwts.parserBuilder()
+                    .setSigningKey(getSigningKey())
+                    .build()
+                    .parseClaimsJws(state)
+                    .getBody()
+                    .getSubject();
 
-        if (expiresAt == null) {
-            log.warn("OAuth state validation failed: state not found - {}", state);
+            if (nonce == null || nonce.isBlank()) {
+                log.warn("OAuth state validation failed: missing nonce");
+                return false;
+            }
+
+            log.debug("OAuth state validated: {}", nonce);
+            return true;
+        } catch (Exception e) {
+            log.warn("OAuth state validation failed: {}", e.getMessage());
             return false;
         }
+    }
 
-        if (Instant.now().toEpochMilli() >= expiresAt) {
-            log.warn("OAuth state validation failed: expired state - {}", state);
-            return false;
-        }
-
-        log.debug("OAuth state validated: {}", state);
-        return true;
+    private SecretKey getSigningKey() {
+        byte[] keyBytes = jwtProperties.getSecretKey().getBytes(StandardCharsets.UTF_8);
+        return Keys.hmacShaKeyFor(keyBytes);
     }
 }
