@@ -4,6 +4,29 @@ Determines type and priority interactively and creates a structured issue.
 
 ---
 
+## Entry Point: Cache-First Spec Loading
+
+**Before any issue creation involving spec data (page/task from spec), run this check:**
+
+```bash
+CACHE="_wood/cache/spec-snapshot.json"
+if [ -f "$CACHE" ]; then
+  echo "CACHE_HIT"
+  cat "$CACHE" | jq '{cached_at, screen_count: (.screens | length)}'
+else
+  echo "CACHE_MISS"
+fi
+```
+
+| Result | Action |
+|--------|--------|
+| `CACHE_HIT` | Load screens from cache — **skip all MCP Drive calls** |
+| `CACHE_MISS` | Run `step-01-read-drive.md` once to populate cache, then continue |
+
+> 명세 없이 bug/improvement 이슈는 캐시 체크 없이 바로 진행.
+
+---
+
 ## IMPORTANT: Placeholder Resolution Rule
 
 **NEVER execute a bash command while any `{placeholder}` remains unresolved.**

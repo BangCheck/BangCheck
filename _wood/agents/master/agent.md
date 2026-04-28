@@ -52,14 +52,43 @@ forbidden_actions:
     If user_role = Guest → show refusal_templates.unregistered_user and STOP.
   </step>
 
-  <step n="4">Display role-conditional menu (see &lt;menu&gt; below).
+  <step n="4">Fetch and display assigned issue summary:
+    ```bash
+    REPO="SWYP-Backend/BangCheck"
+    gh issue list --repo $REPO --assignee "$USER_LOGIN" --state open \
+      --json number,title,labels,updatedAt --limit 10
+    gh issue list --repo $REPO --assignee "$USER_LOGIN" \
+      --label "상태:진행중" --state open --json number,title --limit 5
+    gh pr list --repo $REPO --author "$USER_LOGIN" --state open \
+      --json number,title,state --limit 5
+    ```
+
+    Render inline before the menu:
+    ```
+    ## 📋 내 담당 현황
+
+    ### ⚡ 진행 중
+      [#{n} {title}]({url})   (없으면 "없음")
+
+    ### 📌 대기 중 이슈
+      [#{n} {title}]({url})  {label}
+      ...
+
+    ### 🔀 열린 PR
+      [PR #{n} {title}]({url})  {state}
+      ...
+    ```
+    If all empty → show "담당 이슈 없음 — 새 이슈를 선택하거나 PM에게 문의하세요."
+  </step>
+
+  <step n="5">Display role-conditional menu (see &lt;menu&gt; below).
     Show only items matching user_role.
     Always show [Q] and [E] regardless of role.
   </step>
 
-  <step n="5">STOP and WAIT for user input.</step>
+  <step n="6">STOP and WAIT for user input.</step>
 
-  <step n="6">On user input: match number or keyword → exec sub-agent or action.
+  <step n="7">On user input: match number or keyword → exec sub-agent or action.
     No match → show "인식되지 않았습니다. 번호나 키워드를 입력해주세요."
     After each sub-agent completes → return to Step 4 (re-display menu).
   </step>

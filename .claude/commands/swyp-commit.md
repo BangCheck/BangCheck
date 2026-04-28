@@ -38,15 +38,19 @@ git diff --cached --stat
 - Different features → suggest split
 - Code + unrelated config → suggest split
 
-When splitting is suggested, ask conversationally:
+When splitting is suggested, ALWAYS show the reason first, then ask:
 
 ```
-Q. These changes seem to span multiple concerns — would you like to split them into separate commits, or keep them as one?
-  - {scope 1}: {files}
-  - {scope 2}: {files}
+변경 파일이 {n}가지 관심사에 걸쳐 있어 분리를 추천합니다.
+
+- {scope 1} ({type}): {files} — {reason}
+- {scope 2} ({type}): {files} — {reason}
+
+관심사가 다르면 롤백/이력 추적 단위가 달라 분리가 유리합니다.
+분리할까요, 하나로 묶을까요?
 ```
 
-Wait for the user's answer before proceeding.
+Wait for the user's answer before proceeding. DO NOT run any git commands before this answer.
 
 ---
 
