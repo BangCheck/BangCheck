@@ -167,21 +167,45 @@ EOF
   echo "📁 Personal sprint-status created: $PERSONAL_SPRINT"
 fi
 
-# Add completed story
-# Add {story_id}: done to stories list
+# Update story status: in-progress → done
+# Find entry with matching story_id or issue number, set status: done
+# If entry does not exist, append:
+#   - story_id: {story_id}
+#     issue: {issue_number}
+#     branch: {branch_name}
+#     status: done
+#     started: {started_at or today}
+#     completed: {today}
 echo "📊 Personal sprint-status update:"
 echo "  stories:"
-echo "    + {story_id}: done"
+echo "    {story_id}: in-progress → done"
 ```
 
-### 7-5b. Personal Story File Status → done
+### 7-5b. Personal Story File — Save Gap Analysis + Status → done
+
+**Save Gap Analysis first, then update Status.**
 
 ```bash
 # Update story files in personal workspace
 for story_file in $(completed_stories); do
-  sed -i '' 's/| Status | in-progress/| Status | done/' \
-    "$PERSONAL_DIR/stories/$story_file"
-  echo "| $(date +%Y-%m-%d) | Story completed |" >> "$PERSONAL_DIR/stories/$story_file"
+  STORY_PATH="$PERSONAL_DIR/stories/$story_file"
+
+  # 1. Write Gap Analysis from step-06-dev §6-2c into ## Code Analysis section
+  #    Find the "## Code Analysis" section and replace the placeholder table
+  #    with the actual {gap_analysis_table} produced during step-06.
+  #    If the section already has data (resume case), append rows instead of replacing.
+  #
+  #    Format to write:
+  #    | {checklist_item} | {✅/🟡/❌ status} | {file:line or "none"} |
+  #
+  #    If {gap_analysis_table} is empty (D-Hold case):
+  #    → append "| — | Analysis deferred | — |" row
+
+  # 2. Update status: in-progress → done
+  sed -i '' 's/| Status | in-progress/| Status | done/' "$STORY_PATH"
+
+  # 3. Append Story Log entry
+  echo "| $(date +%Y-%m-%d) | Story completed — Gap Analysis saved |" >> "$STORY_PATH"
 done
 ```
 

@@ -10,6 +10,42 @@ READ THIS ENTIRE FILE before executing any action.
 
 ---
 
+## 4-0. Prerequisite Gate (MANDATORY — check BEFORE drafting)
+
+Verify that step-02 and step-03 have been completed in this session:
+
+| Prerequisite | Check | On Failure |
+|---|---|---|
+| `{related_files}` populated | step-02 (code reading) produced a file list | → redirect to `step-02-read.md` |
+| `{fact_check_table}` populated | step-03 output a Fact Check table | → redirect to `step-03-fact.md` |
+
+If either is missing, show:
+
+```
+⛔ Prerequisite not met
+
+  Story creation requires code reading (step-02) and fact checking (step-03) to be completed first.
+
+  A. Return to step-02 — start with code reading
+     — Without reading the related files, the Story's Implementation Hints and AC will diverge
+       from the actual code. Skipping this step leaves the Story at issue-summary level,
+       making re-analysis inevitable during development.
+
+  B. Return to step-03 — complete Fact Check first
+     — Without a Fact Check, the Story won't reflect the current implementation state or
+       commit history. This risks conflicts or re-doing already-implemented items.
+
+  C. Proceed anyway (not recommended)
+     — Only allowed under time constraints. You must record
+       "⚠️ Created without completing step-02/03" in the Story Log.
+
+  Cold Recommendation: A → B in order — Code-reality-based Stories determine resume quality in future sessions.
+```
+
+STOP and WAIT.
+
+---
+
 ## 4-1. Story Auto-Draft
 
 Break down Stories based on code status (step-02) + facts (step-03) + incomplete issue checklist items:

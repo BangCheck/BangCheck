@@ -59,6 +59,17 @@ And   <additional constraint>
 
 ---
 
+## Code Analysis
+
+> Auto-populated by step-07-sync when development session closes.
+> Do not fill manually — this section preserves the Gap Analysis from step-06-dev §6-2c.
+
+| Checklist Item | Code Status | Location |
+|---|---|---|
+| — | — | — |
+
+---
+
 ## Definition of Done
 
 - [ ] AC above are met

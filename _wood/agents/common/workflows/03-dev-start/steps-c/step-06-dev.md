@@ -114,12 +114,23 @@ Propose **specific modification directions** based on code analysis results.
 
   Proceed?
 
-  A. {minimum scope} — {description} (safest)
-  B. {recommended scope} — {description} (recommended)
-  C. {broad scope} — {description} (maximum cleanliness)
-  D. Hold — record analysis only, implement later
+  A. {minimum scope label}
+     — {Which files are touched and what exactly changes. Why this is the safest path and
+        what it deliberately leaves out. Estimated effort and regression risk.}
 
-  Recommendation: B — {reason}
+  B. {recommended scope label}
+     — {What this covers beyond A, and why the combination is worth the extra effort.
+        What the expected outcome looks like when done. Any tradeoffs to be aware of.}
+
+  C. {broad scope label}
+     — {The full extent: what additional systems or files are included compared to B.
+        Why someone would choose this and what the cost is in time or risk.}
+
+  D. Hold
+     — Record the Gap Analysis table into the Story Log now and defer implementation.
+        Use this when scope is unclear or a blocker exists. Analysis is not lost.
+
+  Cold Recommendation: B — {one-sentence reason grounded in the Gap Analysis above}
 
   Which direction?
 ```
@@ -289,12 +300,62 @@ If a problem is found by **reading** another role's code during development:
   ❌ You cannot modify this directly.
 
   Instead:
-  A. Create issue — request fix from the responsible party
-     → 02-project/case-03-task.md (auto-assigns role label + assignee)
-  B. Issue comment — add finding to existing related issue
-  C. Ignore — not in scope for this task
+  A. Create issue — request fix from the responsible party.
+     — Opens a tracked issue assigned to the correct role owner, with your finding as the body.
+       Nothing is lost, the right person is notified, and there is no merge conflict risk.
+       Use this when the fix is non-trivial or the impact is unclear.
 
-  Recommendation: A — needs to be tracked as an issue.
+  B. Issue comment — add finding to an existing related issue.
+     — If a relevant open issue already exists, attach the finding there as a comment.
+       Faster than A; avoids duplicate issues. Use when the fix is clearly in-scope
+       for something already being tracked.
+
+  C. Ignore — not in scope for this task.
+     — If the problem does not affect the current issue's acceptance criteria,
+       skip it and stay focused. Note it in your Story Log so it is not forgotten.
+
+  Cold Recommendation: A — needs to be tracked as an issue.
+```
+
+STOP and WAIT.
+
+### Same-Role Authorship Check (MANDATORY before modifying any file)
+
+Before editing a file within your allowed path, verify authorship:
+
+```bash
+LAST_AUTHOR_EMAIL=$(git log --follow -1 --pretty="%ae" -- {file_path})
+CURRENT_EMAIL=$(git config user.email)
+LAST_AUTHOR_NAME=$(git log --follow -1 --pretty="%an" -- {file_path})
+```
+
+**If `LAST_AUTHOR_EMAIL != CURRENT_EMAIL`** → show warning and STOP:
+
+```
+⚠️ Same-role code authorship conflict detected (_core.md §5-1)
+
+  File:        {file_path}
+  Last author: {LAST_AUTHOR_NAME} ({LAST_AUTHOR_EMAIL})
+  You:         {USER_LOGIN} ({CURRENT_EMAIL})
+
+  Choose how to proceed before modifying directly:
+
+  A. Create issue → assign original author ({LAST_AUTHOR_NAME}) (recommended)
+     — Document the change rationale and impact in the issue, assign the original author.
+       This preserves intent without merge conflicts and ensures the author doesn't lose context.
+       Use this when the change is non-trivial or affects business logic.
+
+  B. Create PR directly → set {LAST_AUTHOR_NAME} as reviewer
+     — Use when the change is urgent or verbal agreement has been made with the author.
+       State the reason clearly in the PR body; do not merge without the author's review approval.
+       Valid for fast-path situations, but merging without review is a rule violation.
+
+  C. Proceed with modification (Minor fix exception)
+     — Only allowed for changes with no logic impact: typo fixes, comment edits, import cleanup.
+       Commit message must include "minor: touch {LAST_AUTHOR_NAME}'s file",
+       and the change must be 3 lines or fewer to qualify for this exception.
+
+  Cold Recommendation: A — Filing an issue preserves context for future git blame traces.
 ```
 
 STOP and WAIT.

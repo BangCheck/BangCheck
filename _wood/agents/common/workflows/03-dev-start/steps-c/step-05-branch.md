@@ -51,6 +51,39 @@ sed -i '' 's/| Status | ready/| Status | in-progress/' \
 
 ---
 
+## 5-4. Sprint Status — Record in-progress (MANDATORY)
+
+Record the development start point in personal sprint-status.
+
+```bash
+PERSONAL_DIR="_wood/workspace/_${USER_LOGIN}"
+PERSONAL_SPRINT="$PERSONAL_DIR/sprint-status.yaml"
+
+mkdir -p "$PERSONAL_DIR/stories" "$PERSONAL_DIR/epics"
+
+if [ ! -f "$PERSONAL_SPRINT" ]; then
+  cat > "$PERSONAL_SPRINT" << EOF
+# Sprint Status
+login: ${USER_LOGIN}
+stories: []
+EOF
+fi
+
+# Add in-progress entry (AI: append to stories list)
+# Entry format:
+# - story_id: {story_id}
+#   issue: {issue_number}
+#   branch: {branch_name}
+#   status: in-progress
+#   started: {YYYY-MM-DD}
+```
+
+**Rules:**
+- If an entry with the same `issue` already exists, update `status` to `in-progress` only (no duplicate entries)
+- `story_id` is based on the Story filename created in step-04 (use `issue-{issue_number}` if no Story file)
+
+---
+
 ## Completion
 
 ```
