@@ -23,9 +23,11 @@ import java.util.List;
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+        private final AppPathProperties appPathProperties;
 
-    public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter) {
+        public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter, AppPathProperties appPathProperties) {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+                this.appPathProperties = appPathProperties;
     }
 
     @Bean
@@ -38,15 +40,16 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
                 // Public — 인증 불필요
-                .requestMatchers("/api/v1/auth/oauth2/**").permitAll()
-                .requestMatchers("/api/v1/auth/jwt/refresh").permitAll()
-                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                .requestMatchers(appPathProperties.getAuthBasePath() + appPathProperties.getAuthOauthBasePath() + "/**").permitAll()
+
+                .requestMatchers(appPathProperties.getAuthRefreshPath()).permitAll()
+                .requestMatchers(appPathProperties.getSwaggerUiPath(), appPathProperties.getSwaggerUiPath() + "/**", appPathProperties.getApiDocsPath(), appPathProperties.getApiDocsPath() + "/**").permitAll()
 
                 // Guest — 비로그인도 허용할 엔드포인트 (추후 추가)
                 // .requestMatchers(HttpMethod.GET, "/api/v1/rooms/**").permitAll()
 
                 // Authenticated — 반드시 로그인 필요
-                .requestMatchers("/api/v1/auth/logout").authenticated()
+                .requestMatchers(appPathProperties.getAuthLogoutPath()).authenticated()
                 .anyRequest().authenticated()
         );
 
@@ -76,10 +79,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of(
-                "http://localhost:3000",
-                "http://localhost:5173"
-        ));
+        config.setAllowedOrigins(appPathProperties.getCorsAllowedOrigins());
         config.setAllowCredentials(true);
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("Authorization", "Content-Type", "Accept", "Origin", "X-Requested-With"));
