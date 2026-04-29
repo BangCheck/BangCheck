@@ -221,10 +221,10 @@ role_menus:
     can_change_roles: false
 
   Backend:
-    greeting: "⚙️ Backend {name}, read-only mode for this repo"
+    greeting: "⚙️ Backend {name}, welcome back!"
     primary: [S]
-    secondary: []
-    hidden: [P, T, C, R]
+    secondary: [P]
+    hidden: [T, C, R]
     can_edit_protected: false
     can_change_roles: false
 
