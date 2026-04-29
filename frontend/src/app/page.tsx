@@ -9,7 +9,8 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import {
   LoginRequiredModal,
-  ComparisonDisabledModal
+  ComparisonDisabledModal,
+  CustomChecklistModal
 } from '@/components/ui/Modals';
 import { ROUTES } from '@/lib/routes';
 
@@ -152,6 +153,7 @@ export default function Home() {
   // 모달 및 드롭다운 상태
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isComparisonModalOpen, setIsComparisonModalOpen] = useState(false);
+  const [isCustomModalOpen, setIsCustomModalOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<'transaction' | 'sort' | null>(null);
   
   // 필터 상태
@@ -182,8 +184,26 @@ export default function Home() {
     if (!isLoggedIn) {
       setIsLoginModalOpen(true);
     } else {
-      router.push(ROUTES.CHECKLIST_NEW);
+      // 최초 1회 맞춤 설정 유도 로직
+      const hasSeenOnboarding = localStorage.getItem('onboarding_custom_checklist');
+      if (!hasSeenOnboarding) {
+        setIsCustomModalOpen(true);
+      } else {
+        router.push(ROUTES.CHECKLIST_NEW);
+      }
     }
+  };
+
+  const handleCustomSetup = () => {
+    localStorage.setItem('onboarding_custom_checklist', 'true');
+    setIsCustomModalOpen(false);
+    router.push(ROUTES.SETTINGS);
+  };
+
+  const handleCustomLater = () => {
+    localStorage.setItem('onboarding_custom_checklist', 'true');
+    setIsCustomModalOpen(false);
+    router.push(ROUTES.CHECKLIST_NEW);
   };
 
   const handleComparisonClick = (e: React.MouseEvent) => {
@@ -405,6 +425,13 @@ export default function Home() {
           setIsComparisonModalOpen(false);
           router.push(ROUTES.CHECKLIST_NEW);
         }}
+      />
+
+      <CustomChecklistModal 
+        isOpen={isCustomModalOpen}
+        onClose={() => setIsCustomModalOpen(false)}
+        onLater={handleCustomLater}
+        onSetup={handleCustomSetup}
       />
     </main>
   );
