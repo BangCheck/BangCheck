@@ -124,6 +124,17 @@ Agents MUST NOT:
 - Execute destructive actions without explicit confirmation
 - Paraphrase workflow instructions
 
+### 6-1. File Placement Rules (ABSOLUTE)
+
+| File Type | Correct Location | FORBIDDEN Locations |
+|-----------|-----------------|---------------------|
+| Story files (`e*-s*-*.md`) | `_wood/workspace/_{USER_LOGIN}/stories/` | `docs/stories/`, `docs/`, anywhere else |
+| Epic files | `_wood/workspace/_{USER_LOGIN}/epics/` | `docs/`, anywhere else |
+| Sprint status | `_wood/workspace/_{USER_LOGIN}/sprint-status.yaml` | `docs/`, root |
+| Spec snapshots | `_wood/cache/` | `docs/`, root |
+
+**If an AI session creates story/epic files outside `_wood/workspace/`, it is a bug. Delete and recreate in the correct path.**
+
 Agents SHOULD:
 - Delegate common tasks to common workflows
 - Add role-specific context and shortcuts
