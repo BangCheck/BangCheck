@@ -1,11 +1,13 @@
 package com.room.backend.api.auth.controller;
 
+import com.room.backend.api.auth.dto.response.GuestTokenResponseDTO;
 import com.room.backend.api.auth.dto.response.OAuthCallbackResponseDTO;
 import com.room.backend.api.auth.dto.result.OAuthCallbackResult;
 import com.room.backend.api.auth.dto.result.TokenPair;
 import com.room.backend.api.auth.exception.AuthErrorCode;
 import com.room.backend.api.auth.service.AuthService;
 import com.room.backend.global.auth.cookie.CookieProvider;
+import com.room.backend.global.auth.jwt.JwtProvider;
 import com.room.backend.global.auth.oauth.dto.oauth.OAuthAuthorizeResponseDTO;
 import com.room.backend.global.auth.oauth.service.OAuthService;
 import com.room.backend.global.auth.util.SecurityUtil;
@@ -31,6 +33,7 @@ public class AuthController {
     private final OAuthService oauthService;
     private final AuthService authService;
     private final CookieProvider cookieProvider;
+    private final JwtProvider jwtProvider;
 
     @GetMapping("${app.paths.auth-oauth-base-path}/{provider}")
     public ResponseEntity<ApiResponse<OAuthAuthorizeResponseDTO>> authorize(@PathVariable String provider) {
@@ -60,6 +63,14 @@ public class AuthController {
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + result.accessToken())
                 .header(HttpHeaders.SET_COOKIE, cookieProvider.createRefreshTokenCookie(result.refreshToken()).toString())
                 .body(ApiResponse.success(result.response()));
+    }
+
+    @PostMapping("/guest")
+    public ResponseEntity<ApiResponse<GuestTokenResponseDTO>> guest() {
+        JwtProvider.GuestToken guestToken = jwtProvider.generateGuestToken();
+        GuestTokenResponseDTO response = GuestTokenResponseDTO.of(guestToken.guestId(), guestToken.accessToken());
+
+        return ResponseEntity.ok(ApiResponse.success(response));
     }
 
     @PostMapping("${app.paths.auth-refresh-path}")
