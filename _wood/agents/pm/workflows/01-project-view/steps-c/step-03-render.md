@@ -76,20 +76,20 @@ Render each page issue as a human-friendly block:
 
 ## 3-3. Attention Items — Dynamic Recommendations (pm-recommend engine)
 
-Instead of hardcoded A/B/C options, invoke the `pm-recommend.md` engine to generate dynamic recommendations.
+Instead of hardcoded A/B/C options, invoke the `07-pm-recommend.md` engine to generate dynamic recommendations.
 
 ### Execution
 
 1. After outputting the render result up to Step 3-2,
-2. Load `../pm-recommend.md` and **follow all its instructions.**
-   - pm-recommend handles: status collection → pm-actions.csv evaluation → dynamic A/B/C generation → input handling
-3. After pm-recommend completes, return to the Completion section of this file.
+2. Load `../07-pm-recommend.md` and **follow all its instructions.**
+   - 07-pm-recommend handles: status collection → pm-actions.csv evaluation → dynamic A/B/C generation → input handling
+3. After 07-pm-recommend completes, return to the Completion section of this file.
 
 ### Notes
 
 - Do not hardcode A/B/C options directly in this file.
-- Do not proceed to step-04 without going through pm-recommend.
-- If pm-recommend returns "all-clear", proceed directly to step-04.
+- Do not proceed to step-04 without going through 07-pm-recommend.
+- If 07-pm-recommend returns "all-clear", proceed directly to step-04.
 
 ---
 

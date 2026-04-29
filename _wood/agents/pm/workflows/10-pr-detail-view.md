@@ -4,7 +4,7 @@
 # PM Workflow — PR Detail View
 
 > **Purpose:** Enable a non-developer PM to grasp PR status at a glance and decide on next actions.
-> **Caller:** pm-recommend.md (action: pr-violation, pr-incomplete, pr-no-reviewer, pr-stale)
+> **Caller:** 07-pm-recommend.md (action: pr-violation, pr-incomplete, pr-no-reviewer, pr-stale)
 
 ---
 

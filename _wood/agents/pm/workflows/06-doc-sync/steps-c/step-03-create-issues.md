@@ -242,7 +242,7 @@ STOP and WAIT.
 
 Assignee is determined by the following priority:
 1. If the user explicitly specified → use as-is
-2. assign-recommend engine (`../assign-recommend.md` Step 2~3 logic executed inline):
+2. assign-recommend engine (`../08-assign-recommend.md` Step 2~3 logic executed inline):
    - Look up members for the role from team-roles.yaml
    - Compare current open issue count per member
    - Recommend the member with the most capacity
