@@ -58,11 +58,11 @@ export default function Header() {
           </Link>
         </div>
 
-        <nav aria-label="주요 네비게이션" className="hidden sm:flex gap-10 sm:absolute sm:left-1/2 sm:-translate-x-1/2">
+        <nav aria-label="주요 네비게이션" className="hidden sm:flex gap-10 sm:absolute sm:left-1/2 sm:-translate-x-1/2 z-20">
           <Link
             href={ROUTES.HOME}
             className={cn(
-              "text-[15px] font-bold transition-colors p-2",
+              "text-[15px] font-bold transition-colors p-2 cursor-pointer",
               pathname === ROUTES.HOME ? "text-[#0A607D]" : "text-[#232527]"
             )}
           >
@@ -71,7 +71,7 @@ export default function Header() {
           <Link
             href={ROUTES.SETTINGS}
             className={cn(
-              "text-[15px] font-bold transition-colors p-2",
+              "text-[15px] font-bold transition-colors p-2 cursor-pointer",
               pathname === ROUTES.SETTINGS ? "text-[#0A607D]" : "text-[#232527]"
             )}
           >
