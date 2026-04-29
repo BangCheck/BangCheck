@@ -33,7 +33,7 @@ policy:
 # Project Configuration (centrally managed — referenced by all agents/workflows)
 # ============================================================
 project:
-  primary_repo: "SWYP-Backend/project"   # current main repo
+  primary_repo: "SWYP-Backend/BangCheck"  # current main repo
   backend_repo: null                       # will be "SWYP-Backend/backend" once confirmed
   board:
     owner: "SWYP-Backend"
