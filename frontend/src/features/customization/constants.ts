@@ -1,41 +1,42 @@
 export const USER_TYPES = [
   {
-    id: 'pest-sensitive',
-    label: '벌레 민감형',
-    description: '벌레/위생 관련 집중',
-    icon: '🪲',
+    id: 'bug-avoidant',
+    label: '벌레 싫어형',
+    description: '해충/위생 집중 관리',
+    icon: 'bug',
   },
   {
-    id: 'safety-concerned',
-    label: '밤길 걱정형',
-    description: '보안/조명 집중 점검',
-    icon: '👮',
+    id: 'noise-sensitive',
+    label: '소음 민감형',
+    description: '조용하고 아늑한 공간',
+    icon: 'mute',
   },
   {
-    id: 'sunlight-focused',
+    id: 'comfort-oriented',
     label: '채광 중요형',
-    description: '햇빛/환기/곰팡이',
-    icon: '☀️',
+    description: '햇빛과 환기 위주',
+    icon: 'sun',
   },
   {
-    id: 'quiet-prefer',
-    label: '조용한 곳 선호',
-    description: '소음/방음 집중',
-    icon: '🔇',
+    id: 'life-performance',
+    label: '생활 성능형',
+    description: '수압과 편의시설 중심',
+    icon: 'moon',
   },
   {
     id: 'first-timer',
     label: '첫 자취',
-    description: '처음이라 다 확인!',
-    icon: '🏠',
+    description: '처음이라 꼼꼼하게 다 확인!',
+    icon: 'house',
   },
   {
-    id: 'core-only',
+    id: 'quick-core',
     label: '핵심만 빠르게',
-    description: '필수만 빠르게',
-    icon: '⚡',
+    description: '필수 항목만 쏙쏙',
+    icon: 'lightning',
   },
 ] as const;
+
 
 export interface ChecklistItem {
   id: string;
@@ -45,43 +46,61 @@ export interface ChecklistItem {
 }
 
 export const CHECKLIST_ITEMS: ChecklistItem[] = [
-  // 생활 환경
-  { id: 'sunlight', label: '채광', category: '생활 환경', isDefault: true },
-  { id: 'ventilation', label: '환기', category: '생활 환경', isDefault: true },
-  { id: 'noise-between', label: '층간 소음', category: '생활 환경' },
-  { id: 'noise-outside', label: '외부 소음', category: '생활 환경' },
-  
-  // 방 상태
-  { id: 'mold', label: '곰팡이', category: '방 상태', isDefault: true },
-  { id: 'wallpaper', label: '벽지 상태', category: '방 상태' },
-  { id: 'floor', label: '바닥 상태', category: '방 상태' },
-  { id: 'leak', label: '누수 흔적', category: '방 상태', isDefault: true },
-  
-  // 공동/보안
-  { id: 'cctv', label: 'CCTV/보안시설', category: '공동/보안', isDefault: true },
-  { id: 'entrance', label: '공동 현관 보안', category: '공동/보안' },
-  { id: 'delivery', label: '무인 택배함', category: '공동/보안' },
-  { id: 'parking', label: '주차 공간', category: '공동/보안' },
-  
-  // 주방/욕실
-  { id: 'water-pressure', label: '수압', category: '주방/욕실', isDefault: true },
-  { id: 'toilet-flush', label: '변기 배수', category: '주방/욕실' },
-  { id: 'sink-drain', label: '싱크대 배수', category: '주방/욕실' },
-  
+  // 내부 상태
+  { id: 'sunlight', label: '채광', category: '내부 상태' },
+  { id: 'ventilation', label: '환기', category: '내부 상태' },
+  { id: 'water-pressure', label: '수압 및 배수', category: '내부 상태' },
+  { id: 'soundproof', label: '방음', category: '내부 상태' },
+  { id: 'window-screen', label: '창문 / 방충망', category: '내부 상태' },
+  { id: 'door-gap', label: '현관 / 문틈', category: '내부 상태' },
+
+  // 문제 요소
+  { id: 'mold', label: '곰팡이', category: '문제 요소', isDefault: true },
+  { id: 'leak-trace', label: '누수 흔적', category: '문제 요소', isDefault: true },
+  { id: 'bug-trace', label: '벌레 흔적', category: '문제 요소', isDefault: true },
+  { id: 'noise-all', label: '내/외부 소음', category: '문제 요소' },
+  { id: 'smell', label: '하수구/곰팡이 냄새', category: '문제 요소' },
+  { id: 'moisture', label: '습기 / 결로', category: '문제 요소' },
+
+  // 안전/보안
+  { id: 'entrance-security', label: '공동 현관', category: '안전/보안', isDefault: true },
+  { id: 'window-lock', label: '창문 잠금장치', category: '안전/보안', isDefault: true },
+  { id: 'cctv', label: 'CCTV 설치 여부', category: '안전/보안' },
+  { id: 'night-light', label: '야간 조명', category: '안전/보안' },
+  { id: 'police', label: '경찰서 근처', category: '안전/보안' },
+  { id: 'night-safety', label: '밤길 안전도', category: '안전/보안' },
+  { id: 'accessibility', label: '접근성(큰길/골목)', category: '안전/보안' },
+  { id: 'fire-safety', label: '소화기/화재 경보', category: '안전/보안' },
+
+  // 생활 편의
+  { id: 'study-space', label: '카페 / 공부 공간', category: '생활 편의', isDefault: true },
+  { id: 'laundry', label: '코인세탁소', category: '생활 편의' },
+  { id: 'parking', label: '자전거 / 차량 주차', category: '생활 편의' },
+  { id: 'pharmacy', label: '병원 / 약국', category: '생활 편의' },
+  { id: 'outlets', label: '콘센트 수', category: '생활 편의' },
+  { id: 'landlord', label: '집주인 거주 여부', category: '생활 편의' },
+  { id: 'delivery', label: '택배 보관 환경', category: '생활 편의' },
+  { id: 'dry-space', label: '세탁 건조 공간', category: '생활 편의' },
+
   // 주변 환경
-  { id: 'convenience', label: '편의점/마트', category: '주변 환경' },
-  { id: 'subway', label: '지하철역 거리', category: '주변 환경' },
-  { id: 'bus', label: '버스 정류장 거리', category: '주변 환경' },
+  { id: 'convenience', label: '편의점 / 마트', category: '주변 환경', isDefault: true },
+  { id: 'transport', label: '대중교통 접근성', category: '주변 환경' },
+  { id: 'night-business', label: '야간 상권 인접도', category: '주변 환경' },
+  { id: 'greenery', label: '녹지/산 인접도', category: '주변 환경' },
+  { id: 'food-density', label: '음식점 밀집도', category: '주변 환경' },
+  { id: 'crowd', label: '유동인구', category: '주변 환경' },
+  { id: 'construction', label: '공사장 여부', category: '주변 환경' },
+  { id: 'slope', label: '언덕 경사', category: '주변 환경' },
 ];
 
-export const CATEGORIES = ['생활 환경', '방 상태', '공동/보안', '주방/욕실', '주변 환경'];
+export const CATEGORIES = ['내부 상태', '문제 요소', '안전/보안', '생활 편의', '주변 환경'];
 
-// 사용자 유형별 추천 항목 매핑
+// 사용자 유형별 추천 항목 매핑 (기능명세서 기반)
 export const TYPE_ITEM_MAP: Record<string, string[]> = {
-  'pest-sensitive': ['mold', 'leak', 'ventilation', 'sink-drain'],
-  'safety-concerned': ['cctv', 'entrance', 'window'],
-  'sunlight-focused': ['sunlight', 'ventilation', 'mold'],
-  'quiet-prefer': ['noise-between', 'noise-outside'],
-  'first-timer': ['sunlight', 'ventilation', 'mold', 'leak', 'cctv', 'water-pressure'],
-  'core-only': ['sunlight', 'mold', 'water-pressure'],
+  'bug-avoidant': ['window-screen', 'door-gap', 'bug-trace', 'smell', 'greenery', 'food-density'],
+  'noise-sensitive': ['soundproof', 'noise-all', 'transport', 'night-business', 'crowd', 'construction'],
+  'comfort-oriented': ['sunlight', 'ventilation', 'mold', 'moisture', 'greenery', 'food-density'],
+  'life-performance': ['water-pressure', 'noise-all', 'laundry', 'outlets', 'dry-space'],
+  'first-timer': CHECKLIST_ITEMS.map(item => item.id), // 전체 항목
+  'quick-core': CHECKLIST_ITEMS.filter(item => item.isDefault).map(item => item.id), // 기본 항목만
 };

@@ -8,6 +8,7 @@ import { USER_TYPES, CHECKLIST_ITEMS, CATEGORIES } from '@/features/customizatio
 import { UserTypeCard } from '@/features/customization/components/UserTypeCard';
 import { ChecklistItemToggle } from '@/features/customization/components/ChecklistItemToggle';
 import { useCustomization } from '@/features/customization/hooks/useCustomization';
+import { ItemIcons, IconChevron } from '@/features/customization/components/Icons';
 
 // Reusable Section Header Component matching Figma
 const SectionHeader = ({ 
@@ -55,12 +56,7 @@ const SectionHeader = ({
           className="h-8 px-4 bg-white border border-[#E2E2E2] rounded-[4px] flex items-center gap-2.5 hover:bg-gray-50 transition-all"
         >
           <span className="text-[12px] font-semibold text-[#232527]">{isFolded ? '펼치기' : '접기'}</span>
-          <svg 
-            width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
-            className={cn("transition-transform duration-200", isFolded ? "rotate-90" : "-rotate-90")}
-          >
-            <path d="m9 18 6-6-6-6"/>
-          </svg>
+          <IconChevron className={cn("transition-transform duration-200", isFolded ? "rotate-90" : "-rotate-90")} />
         </button>
       )}
     </div>
@@ -175,11 +171,12 @@ export default function SettingsPage() {
                   </div>
                 ) : (
                   <div className="bg-white rounded-[6px] border border-[#F0F0F0] p-6 shadow-sm">
-                    <div className="flex flex-wrap gap-3">
+                    <div className="grid grid-cols-3 gap-3">
                       {CHECKLIST_ITEMS.filter(item => activeItemIds.includes(item.id)).map((item) => (
                         <ChecklistItemToggle
                           key={item.id}
                           label={item.label}
+                          icon={ItemIcons[item.id] || ItemIcons.default}
                           isActive={activeItemIds.includes(item.id)}
                           onToggle={() => toggleItem(item.id)}
                         />
@@ -203,8 +200,47 @@ export default function SettingsPage() {
             />
             {!isSection3Folded && (
               <div className="space-y-10">
-                {/* All Items Toggle ... unchanged code ... */}
+                {/* All Items Toggle */}
+                <div className="bg-[#f5f5f5] border border-[#e2e2e2] rounded-[6px] p-3 flex items-center justify-between">
+                  <div className="space-y-2">
+                    <p className="text-[16px] font-medium text-[#232527]">전체 체크리스트 보기</p>
+                    <p className="text-[14px] font-medium text-[#777]">모든 항목을 카테고리별로 펼쳐 보여줍니다</p>
+                  </div>
+                  <button 
+                    onClick={() => setIsAllItemsVisible(!isAllItemsVisible)}
+                    className={cn(
+                      "w-11 h-[22px] rounded-full transition-all relative p-[2px]",
+                      isAllItemsVisible ? "bg-[#0A607D]" : "bg-[#7F7F7F]"
+                    )}
+                  >
+                    <div className={cn(
+                      "w-[18px] h-[18px] bg-white rounded-full transition-all shadow-sm",
+                      isAllItemsVisible ? "translate-x-[22px]" : "translate-x-0"
+                    )} />
+                  </button>
+                </div>
                 
+                {isAllItemsVisible && (
+                  <div className="pt-4 border-t border-[#F5F5F5] space-y-10">
+                    {CATEGORIES.map(category => (
+                      <div key={category} className="space-y-4">
+                        <h4 className="text-[14px] font-bold text-[#A0A0A0]">{category}</h4>
+                        <div className="grid grid-cols-3 gap-3">
+                          {CHECKLIST_ITEMS.filter(item => item.category === category).map((item) => (
+                            <ChecklistItemToggle
+                              key={item.id}
+                              label={item.label}
+                              icon={ItemIcons[item.id] || ItemIcons.default}
+                              isActive={activeItemIds.includes(item.id)}
+                              onToggle={() => toggleItem(item.id)}
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
                 {/* Custom Items Add */}
                 <div className="space-y-5">
                   <div className="flex justify-between items-center">
