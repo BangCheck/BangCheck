@@ -43,3 +43,7 @@ next-env.d.ts
 _wood/cache/spec-snapshot.json
 _wood/state/*
 !_wood/state/.gitkeep
+
+# macOS Finder duplicates
+* 2
+* 2.*
