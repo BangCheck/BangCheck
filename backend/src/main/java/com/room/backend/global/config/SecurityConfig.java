@@ -43,7 +43,7 @@ public class SecurityConfig {
                 .requestMatchers(appPathProperties.getAuthBasePath() + appPathProperties.getAuthOauthBasePath() + "/**").permitAll()
 
                 .requestMatchers(appPathProperties.getAuthRefreshPath()).permitAll()
-                .requestMatchers(appPathProperties.getSwaggerUiPath(), appPathProperties.getSwaggerUiPath() + "/**", appPathProperties.getApiDocsPath(), appPathProperties.getApiDocsPath() + "/**").permitAll()
+                .requestMatchers(appPathProperties.getSwaggerUiPath(), appPathProperties.getSwaggerUiPath() + "/**", "/swagger-ui/**", appPathProperties.getApiDocsPath(), appPathProperties.getApiDocsPath() + "/**").permitAll()
 
                 // Guest — 비로그인도 허용할 엔드포인트 (추후 추가)
                 // .requestMatchers(HttpMethod.GET, "/api/v1/rooms/**").permitAll()
