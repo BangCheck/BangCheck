@@ -19,7 +19,7 @@ import java.nio.charset.StandardCharsets;
 @RequiredArgsConstructor
 public class OAuthStateService {
 
-    private static final long STATE_TTL_MINUTES = 5;
+    private static final long STATE_TTL_MINUTES = 10;
 
     private final JwtProperties jwtProperties;
 
@@ -48,6 +48,7 @@ public class OAuthStateService {
         try {
             String nonce = Jwts.parserBuilder()
                     .setSigningKey(getSigningKey())
+                    .setAllowedClockSkewSeconds(60)
                     .build()
                     .parseClaimsJws(state)
                     .getBody()

@@ -30,6 +30,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private static final String AUTHORIZATION_HEADER = "Authorization";
     private static final String BEARER_PREFIX = "Bearer ";
+    private static final String GUEST_TOKEN_TYPE = "GUEST";
 
     @Override
     protected void doFilterInternal(
@@ -47,6 +48,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
 
             if (jwtProvider.validateToken(token)) {
+                String tokenType = jwtProvider.getTokenTypeFromToken(token);
+                if (GUEST_TOKEN_TYPE.equals(tokenType)) {
+                    filterChain.doFilter(request, response);
+                    return;
+                }
+
                 Long userId = jwtProvider.getUserIdFromToken(token);
                 String role = jwtProvider.getRoleFromToken(token);
 
