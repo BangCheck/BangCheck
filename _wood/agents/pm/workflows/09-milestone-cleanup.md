@@ -4,7 +4,7 @@
 # PM Workflow — Milestone Cleanup
 
 > **Purpose:** Close completed milestones + set due dates + guide new sprint creation
-> **Caller:** pm-recommend.md (action: milestone-stale, milestone-no-due)
+> **Caller:** 07-pm-recommend.md (action: milestone-stale, milestone-no-due)
 
 ---
 

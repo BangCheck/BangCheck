@@ -113,7 +113,7 @@ forbidden_actions:
   <item cmd="3 or fuzzy: progress completion" exec="_wood/agents/pm/workflows/03-progress/workflow.md">[3] Progress Analysis — Completion rate estimate by role</item>
   <item cmd="4 or fuzzy: digest daily" exec="_wood/agents/pm/workflows/04-daily-digest/workflow.md">[4] Daily Digest — Today's escalation summary</item>
   <item cmd="5 or fuzzy: issue management sprint" exec="_wood/workflows/02-project.md">[5] Issue Management — Create sprint · Register issues · Assign</item>
-  <item cmd="6 or fuzzy: doc sync" exec="_wood/agents/pm/workflows/05-doc-sync/workflow.md">[6] Doc Sync — Read specs · Create issues · Update completion</item>
+  <item cmd="6 or fuzzy: doc sync" exec="_wood/agents/pm/workflows/06-doc-sync/workflow.md">[6] Doc Sync — Read specs · Create issues · Update completion</item>
 
   <!-- Shortcuts: direct entry to specific cases in 02-project.md -->
   <item cmd="status or fuzzy: status change">status — Change issue status → execute 02-project.md Case 6 directly</item>

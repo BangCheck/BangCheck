@@ -5,7 +5,7 @@
 
 > **Purpose:** Match unassigned issues to team members using label-based FE/BE classification and workload comparison.
 > **Pattern:** BMAD catalog (team-roles.yaml) + state discovery (gh issue) + rule matching
-> **Caller:** pm-recommend.md (action: assign-recommend)
+> **Caller:** 07-pm-recommend.md (action: assign-recommend)
 
 ---
 
@@ -199,7 +199,7 @@ STOP and WAIT.
 | Input | Action |
 |-------|--------|
 | `A` (assign rest) | Re-run this workflow from Step 1 |
-| `A` or `B` (pm-recommend) | Re-run `pm-recommend.md` from Step 1 (re-collect state + re-evaluate) |
+| `A` or `B` (pm-recommend) | Re-run `07-pm-recommend.md` from Step 1 (re-collect state + re-evaluate) |
 | `B` or `C` (dashboard) | Return to agent.md menu |
 
 ---
