@@ -52,7 +52,7 @@ export default function LoginPage() {
               >
                 <div className="w-[20px] h-[20px] relative overflow-hidden shrink-0">
                   <Image
-                    src="/images/df.png"
+                    src="/images/naver-logo.png"
                     alt=""
                     fill
                     className="object-contain"
