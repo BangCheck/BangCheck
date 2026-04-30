@@ -6,6 +6,7 @@ ALTER TABLE rooms
 -- 기준점 테이블
 CREATE TABLE IF NOT EXISTS map_points (
     id          BIGINT          NOT NULL AUTO_INCREMENT,
+    user_id     BIGINT          NOT NULL,
     name        VARCHAR(255)    NOT NULL,
     lat         DECIMAL(10, 7)  NOT NULL,
     lon         DECIMAL(10, 7)  NOT NULL,
@@ -14,7 +15,8 @@ CREATE TABLE IF NOT EXISTS map_points (
     updated_at  DATETIME(6)     NOT NULL,
     deleted_at  DATETIME(6),
     is_deleted  TINYINT(1)      NOT NULL DEFAULT 0,
-    PRIMARY KEY (id)
+    PRIMARY KEY (id),
+    CONSTRAINT fk_map_points_user FOREIGN KEY (user_id) REFERENCES users(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- 방-기준점 거리 테이블
