@@ -4,7 +4,8 @@ export interface RoomIssues {
   mold: boolean;
   leak: boolean;
   bug: boolean;
-  etcCount: number;
+  condensation?: boolean;
+  drainSmell?: boolean;
 }
 
 export interface Room {
@@ -12,9 +13,23 @@ export interface Room {
   name: string;
   address: string;
   type: RoomType;
+  deposit: number;
+  rent: number;
+  managementFee?: number;
   price: string;
   tags: string[];
+  score: number;
   issues: RoomIssues;
   memo?: string;
   createdAt: string;
+  buildingType?: string;
+  floor?: string;
+  direction?: string;
+}
+
+export interface PaginatedResponse<T> {
+  success: boolean;
+  code: string;
+  message: string;
+  data: T[];
 }
