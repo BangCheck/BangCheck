@@ -6,13 +6,13 @@ import com.room.backend.domain.checklist.entity.enums.ItemType;
 import com.room.backend.domain.checklist.entity.enums.UserType;
 import com.room.backend.global.common.entity.BaseEntity;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Getter
+@Builder
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 @Table(name="checklist_items")
 public class ChecklistItem extends BaseEntity {
     @Id
@@ -43,4 +43,7 @@ public class ChecklistItem extends BaseEntity {
 
     @Column
     private Integer displayOrder;
+
+    @Column(name = "owner_user_id")
+    private Long ownerUserId;  // CUSTOM 항목만 값 있음
 }
