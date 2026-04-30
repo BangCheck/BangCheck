@@ -42,6 +42,12 @@ oauth:
     user-info-uri: https://www.googleapis.com/oauth2/v3/userinfo
     scope: openid email profile
 
+naver:
+  geocoding:
+    client-id: ${NAVER_GEOCODING_CLIENT_ID}
+    client-secret: ${NAVER_GEOCODING_CLIENT_SECRET}
+    url: https://naveropenapi.apigw.ntruss.com/map-geocode/v2/geocode
+
 springdoc:
   swagger-ui:
     path: /swagger-ui.html
