@@ -12,7 +12,7 @@ export interface Checklist {
   id?: string;
   name: string;
   address?: string;
-  type: RoomType;
+  type?: RoomType;
   deposit?: string;
   rent?: string;
   managementFee?: string;
