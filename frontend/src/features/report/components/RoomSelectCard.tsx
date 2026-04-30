@@ -1,7 +1,7 @@
 'use client';
 
 import { cn } from '@/lib/utils';
-import type { Room } from '@/types';
+import type { RoomDetail as Room } from '@/types';
 
 interface Props {
   room: Room;
@@ -26,7 +26,10 @@ export function RoomSelectCard({ room, selected, onToggle, canAdd }: Props) {
         <div className="space-y-1">
           <h3 className="font-bold text-[#232527]">{room.name}</h3>
           <p className="text-xs text-[#A0A0A0] truncate max-w-[200px]">{room.address}</p>
-          <p className="text-sm font-semibold text-[#0A607D] mt-2">{room.price}</p>
+          <p className="text-sm font-semibold text-[#0A607D] mt-2">
+            {room.transactionType === 'JEONSE' ? '전세' : '월세'} {room.deposit.toLocaleString()}만
+            {room.rent ? ` / ${room.rent.toLocaleString()}만` : ''}
+          </p>
           <p className="text-xs text-[#A0A0A0]">총점 {room.score}점</p>
         </div>
         <div className={cn(

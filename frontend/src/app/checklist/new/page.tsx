@@ -104,7 +104,7 @@ function ChecklistNewContent() {
         return;
       }
       
-      const success = addGuestRoom(data);
+      const success = addGuestRoom(data as any);
       if (success) {
         alert('체크리스트가 브라우저에 임시 저장되었습니다!\n로그인하시면 영구적으로 보관할 수 있습니다.');
         router.push('/');

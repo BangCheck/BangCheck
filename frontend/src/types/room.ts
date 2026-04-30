@@ -1,7 +1,41 @@
-// BE API 응답 기준 타입 (room-detail.json 스펙)
-
-// 하위호환 — checklist.ts 등에서 사용
+// 하위호환 타입 (RoomCard, use-guest-room-store 등 기존 코드용)
 export type RoomType = '전세' | '월세' | '단기임대';
+
+export interface RoomIssues {
+  mold: boolean;
+  leak: boolean;
+  bug: boolean;
+  condensation?: boolean;
+  drainSmell?: boolean;
+}
+
+export interface Room {
+  id: string;
+  name: string;
+  address: string;
+  type: RoomType;
+  deposit: number;
+  rent: number;
+  managementFee?: number;
+  price: string;
+  tags: string[];
+  score: number;
+  issues: RoomIssues;
+  memo?: string;
+  createdAt: string;
+  buildingType?: string;
+  floor?: string;
+  direction?: string;
+}
+
+export interface PaginatedResponse<T> {
+  success: boolean;
+  code: string;
+  message: string;
+  data: T[];
+}
+
+// ── report 전용 타입 (BE room-detail.json 스펙) ──────────────────
 
 export type TransactionType = 'JEONSE' | 'MONTHLY' | 'SHORT_TERM';
 export type BuildingType = 'VILLA' | 'OFFICETEL' | 'ONE_ROOM' | 'TWO_ROOM';
@@ -31,12 +65,10 @@ export interface CustomItem {
   value: string;
 }
 
-export interface Room {
+export interface RoomDetail {
   id: string;
   name: string;
   address: string;
-
-  // 기본 정보
   transactionType: TransactionType;
   deposit: number;
   rent: number;
@@ -47,36 +79,16 @@ export interface Room {
   canRegisterAddress?: boolean;
   moveInDate?: string;
   isMoveInDateNegotiable?: boolean;
-
-  // 건물 정보
   buildingType?: BuildingType;
   hasElevator?: boolean;
   hasParking?: boolean;
   floor?: number;
   specialFloor?: SpecialFloor;
   direction?: DirectionType;
-
-  // 옵션
   options: string[];
-
-  // 상세 평가
   evaluations?: RoomEvaluations;
-
-  // 나만의 항목
   customItems?: CustomItem[];
-
   memo?: string;
   score: number;
   createdAt: string;
-
-  // 하위호환 (홈 카드 등 기존 사용처)
-  price: string;
-  tags: string[];
-}
-
-export interface PaginatedResponse<T> {
-  success: boolean;
-  code: string;
-  message: string;
-  data: T[];
 }
