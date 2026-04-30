@@ -10,6 +10,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Getter
@@ -26,6 +27,12 @@ public class Room extends BaseEntity {
 
     @Column(nullable = false, length = 255)
     private String address;
+
+    @Column(name = "lat", precision = 10, scale = 7)
+    private BigDecimal lat;
+
+    @Column(name = "lon", precision = 10, scale = 7)
+    private BigDecimal lon;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "rent_type", nullable = false, length = 20)
@@ -71,6 +78,8 @@ public class Room extends BaseEntity {
     public static Room create(
             Long userId,
             String address,
+            BigDecimal lat,
+            BigDecimal lon,
             RentType rentType,
             Long deposit,
             Integer monthlyRent,
@@ -120,6 +129,8 @@ public class Room extends BaseEntity {
         Room room = new Room();
         room.userId = userId;
         room.address = address;
+        room.lat = lat;
+        room.lon = lon;
         room.rentType = rentType;
         room.deposit = deposit;
         room.monthlyRent = monthlyRent;

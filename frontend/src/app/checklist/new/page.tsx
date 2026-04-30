@@ -9,28 +9,37 @@ import Step1BasicInfo from '@/features/checklist/components/Step1BasicInfo';
 import Step2BuildingInfo from '@/features/checklist/components/Step2BuildingInfo';
 import Step3DetailedCheck from '@/features/checklist/components/Step3DetailedCheck';
 import { cn } from '@/lib/utils';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useMutation } from '@tanstack/react-query';
+import { createChecklist } from '@/services/checklist-service';
+import { useAuthStore } from '@/store/use-auth-store';
+import { useGuestRoomStore } from '@/store/use-guest-room-store';
 
 // 스크린샷 기반 통합 Zod 스키마
 const checklistSchema = z.object({
-  name: z.string().min(1, '매물명을 입력해주세요'),
+  name: z.string().min(1, '매물명을 입력해주세요').max(20, '매물명은 최대 20자까지 가능합니다'),
   address: z.string().optional(),
   type: z.enum(['전세', '월세', '단기임대']).default('월세'),
   deposit: z.string().optional(),
   rent: z.string().optional(),
   managementFee: z.string().optional(),
+  isManagementFeeUnknown: z.boolean().default(false),
   hasLoan: z.enum(['없음', '있음']).default('없음'),
+  loanAmount: z.string().optional(),
+  moveInReport: z.enum(['가능', '불가능']).default('가능'),
   moveInDate: z.string().optional(),
+  isMoveInDateNegotiable: z.boolean().default(false),
   buildingType: z.string().optional(),
   hasElevator: z.enum(['없음', '있음']).default('있음'),
   hasParking: z.enum(['없음', '있음']).default('없음'),
   floor: z.string().optional(),
-  direction: z.enum(['남', '동', '서', '북']).default('남'),
+  specialFloor: z.string().nullable().optional(),
+  direction: z.string().default('남'),
   options: z.array(z.string()).default([]),
-  scores: z.record(z.string(), z.enum(['좋음', '보통', '나쁨'])).default({}),
-  problems: z.record(z.string(), z.enum(['없음', '있음'])).default({}),
-  memo: z.string().optional(),
+  scores: z.record(z.string(), z.string()).default({}),
+  problems: z.record(z.string(), z.string()).default({}),
+  customItems: z.array(z.string()).default([]),
+  memo: z.string().max(50, '메모는 최대 50자까지 가능합니다').optional(),
 });
 
 type ChecklistFormValues = z.input<typeof checklistSchema>;
@@ -47,25 +56,62 @@ export default function ChecklistNewPage() {
 
 function ChecklistNewContent() {
   const router = useRouter();
+  const { isLoggedIn } = useAuthStore();
+  const { addGuestRoom, guestRooms } = useGuestRoomStore();
+
   const methods = useForm<ChecklistFormValues>({
     resolver: zodResolver(checklistSchema),
     defaultValues: {
       type: '월세',
       hasLoan: '없음',
+      moveInReport: '가능',
+      isManagementFeeUnknown: false,
+      isMoveInDateNegotiable: false,
       hasElevator: '있음',
       hasParking: '없음',
       direction: '남',
+      customItems: ['채광 상태', '초인종 작동 여부'], // 예시 데이터
     }
   });
 
   const { step, next, prev, setStep } = useCheckFunnel();
-  // 8단계에서 3단계로 조정됨에 따른 퍼센트 계산
   const progress = Math.round((step / TABS.length) * 100);
 
+  const nameValue = methods.watch('name');
+  const isNameEmpty = !nameValue || nameValue.trim().length === 0;
+
+  const { mutate: submitChecklist, isPending } = useMutation({
+    mutationFn: createChecklist,
+    onSuccess: () => {
+      alert('체크리스트가 성공적으로 저장되었습니다!');
+      router.push('/');
+      router.refresh();
+    },
+    onError: (error: any) => {
+      console.error('Save failed:', error);
+      alert(error.response?.data?.message || '저장 중 오류가 발생했습니다.');
+    }
+  });
+
   const onSubmit = (data: ChecklistFormValues) => {
-    console.log('Final Data:', data);
-    alert('체크리스트가 성공적으로 저장되었습니다!');
-    router.push('/');
+    if (isLoggedIn) {
+      submitChecklist(data as any);
+    } else {
+      // 비로그인 사용자 로직
+      if (guestRooms.length >= 2) {
+        alert('비로그인 사용자는 최대 2개까지만 체크리스트를 생성할 수 있습니다.\n로그인하여 무제한으로 이용해보세요!');
+        router.push('/');
+        return;
+      }
+      
+      const success = addGuestRoom(data);
+      if (success) {
+        alert('체크리스트가 브라우저에 임시 저장되었습니다!\n로그인하시면 영구적으로 보관할 수 있습니다.');
+        router.push('/');
+      } else {
+        alert('저장 가능한 개수를 초과했습니다.');
+      }
+    }
   };
 
   return (
@@ -115,13 +161,14 @@ function ChecklistNewContent() {
               {step === 3 && <Step3DetailedCheck />}
             </div>
 
-            {/* Navigation Buttons */}
-            <div className="pt-16 pb-10 flex gap-3 sticky bottom-0 bg-white/90 backdrop-blur-md mt-auto">
+            {/* Navigation Buttons - Sticky at the bottom */}
+            <div className="pt-16 pb-10 flex gap-3 sticky bottom-0 bg-white/95 backdrop-blur-sm mt-auto z-50 border-t border-[#F5F5F5] -mx-6 px-6">
               {step > 1 && (
                 <button
                   type="button"
                   onClick={prev}
-                  className="flex-1 py-4 rounded-xl font-bold text-[16px] bg-white border border-[#E2E2E2] text-[#232527] hover:bg-gray-50 transition-all"
+                  disabled={isPending}
+                  className="flex-1 py-4 rounded-xl font-bold text-[16px] bg-white border border-[#E2E2E2] text-[#232527] hover:bg-gray-50 transition-all disabled:opacity-50 cursor-pointer"
                 >
                   이전으로
                 </button>
@@ -129,12 +176,21 @@ function ChecklistNewContent() {
               <button 
                 type="button"
                 onClick={step === TABS.length ? methods.handleSubmit(onSubmit) : next}
+                disabled={isPending || (step === TABS.length && isNameEmpty)}
                 className={cn(
-                  "py-4 rounded-xl font-bold text-[16px] transition-all shadow-lg",
-                  step === 1 ? "w-full bg-[#0A607D] text-white" : "flex-[2_2_0%] bg-[#0A607D] text-white"
+                  "py-4 rounded-xl font-bold text-[16px] transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer",
+                  step === 1 ? "w-full bg-[#0A607D] text-white" : "flex-[2_2_0%] bg-[#0A607D] text-white",
+                  (isPending || (step === TABS.length && isNameEmpty)) && "opacity-50 cursor-not-allowed grayscale-[0.5]"
                 )}
               >
-                {step === TABS.length ? '저장하기' : '다음으로'}
+                {isPending ? (
+                  <>
+                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    저장 중...
+                  </>
+                ) : (
+                  step === TABS.length ? '저장하기' : '다음으로'
+                )}
               </button>
             </div>
           </form>
