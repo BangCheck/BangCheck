@@ -1,5 +1,8 @@
 // BE API 응답 기준 타입 (room-detail.json 스펙)
 
+// 하위호환 — checklist.ts 등에서 사용
+export type RoomType = '전세' | '월세' | '단기임대';
+
 export type TransactionType = 'JEONSE' | 'MONTHLY' | 'SHORT_TERM';
 export type BuildingType = 'VILLA' | 'OFFICETEL' | 'ONE_ROOM' | 'TWO_ROOM';
 export type SpecialFloor = 'SEMI_BASEMENT' | 'ROOFTOP';
