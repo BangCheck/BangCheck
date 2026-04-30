@@ -12,11 +12,13 @@ import com.room.backend.global.auth.oauth.dto.oauth.OAuthCallbackUserInfoRespons
 import com.room.backend.global.auth.oauth.dto.oauth.OAuthTokenResponseDTO;
 import com.room.backend.global.common.exception.GeneralException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.time.LocalDateTime;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class OAuthService {
@@ -29,10 +31,7 @@ public class OAuthService {
 
     private final OAuthStateService oAuthStateService;
 
-    /**
-     * OAuth ?몄쬆 URL ?앹꽦
-     * - state ?뚮씪誘명꽣 ?ы븿 (CSRF 諛⑹?)
-     */
+
     public OAuthAuthorizeResponseDTO buildAuthorizeUrl(String provider) {
         String state = oAuthStateService.generateState();
 
@@ -65,18 +64,14 @@ public class OAuthService {
         return new OAuthAuthorizeResponseDTO(url, LocalDateTime.now());
     }
 
-    /**
-     * State 寃利?     */
+    
     public void validateState(String state) {
         if (!oAuthStateService.validateAndDeleteState(state)) {
             throw new GeneralException(AuthErrorCode.INVALID_STATE);
         }
     }
 
-    /**
-     * OAuth 肄쒕갚 泥섎━
-     * - provider access token? userinfo 1???몄텧 ???먭린
-     */
+  
     public OAuthCallbackUserInfoResponseDTO handleCallback(String provider, String code, String state) {
         if ("naver".equals(provider)) {
             return handleNaverCallback(code, state);
@@ -121,6 +116,7 @@ public class OAuthService {
         try {
             token = tokenClient.exchangeGoogleCodeForToken(code);
         } catch (Exception e) {
+            log.error("[OAuth] Google token exchange failed: {}", e.getMessage(), e);
             throw new GeneralException(AuthErrorCode.OAUTH_TOKEN_REQUEST_FAILED);
         }
 
@@ -128,6 +124,7 @@ public class OAuthService {
         try {
             userInfo = userInfoClient.fetchGoogleUserInfo(token.accessToken());
         } catch (Exception e) {
+            log.error("[OAuth] Google userinfo request failed: {}", e.getMessage(), e);
             throw new GeneralException(AuthErrorCode.OAUTH_USERINFO_REQUEST_FAILED);
         }
 

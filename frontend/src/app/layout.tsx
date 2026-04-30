@@ -3,6 +3,7 @@ import "./globals.css";
 import ReactQueryProvider from "../components/providers/react-query-provider";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import { DevLoginButton } from "@/features/dev/DevLoginButton";
 
 export const metadata: Metadata = {
   title: "방체크 - 자취방 체크리스트",
@@ -45,6 +46,7 @@ export default function RootLayout({
             {children}
           </main>
           <Footer />
+          <DevLoginButton />
         </ReactQueryProvider>
       </body>
     </html>

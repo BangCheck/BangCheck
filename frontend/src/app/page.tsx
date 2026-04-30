@@ -1,15 +1,19 @@
 'use client';
 
-import { useQuery } from '@tanstack/react-query';
+import { useInfiniteQuery } from '@tanstack/react-query';
 import { useAuthStore } from '@/store/use-auth-store';
+import { useGuestRoomStore } from '@/store/use-guest-room-store';
 import { getRooms } from '@/services/room-service';
 import { cn } from '@/lib/utils';
 import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { useInView } from 'react-intersection-observer';
+import RoomCard from '@/components/RoomCard';
 import {
   LoginRequiredModal,
-  ComparisonDisabledModal
+  ComparisonDisabledModal,
+  CustomChecklistModal
 } from '@/components/ui/Modals';
 import { ROUTES } from '@/lib/routes';
 
@@ -25,19 +29,19 @@ function HomeSkeleton() {
           <div className="w-20 h-4 bg-gray-100 rounded" />
         </div>
       </div>
-      <div className="border-b border-[#E2E2E2] px-4 md:px-10 py-3 flex justify-between items-center bg-white h-[60px]">
+      <div className="border-b border-[#E2E2E2] px-10 py-3 flex justify-between items-center bg-white h-[60px]">
         <div className="flex gap-2.5">
           <div className="w-24 h-8 bg-gray-100 rounded-[6px]" />
           <div className="w-32 h-8 bg-gray-100 rounded-[6px]" />
         </div>
         <div className="w-24 h-8 bg-gray-100 rounded-[4px]" />
       </div>
-      <div className="px-4 md:px-10 py-8 space-y-6">
+      <div className="px-10 py-8 space-y-6">
         <div className="w-32 h-4 bg-gray-100 rounded mb-4" />
         <div className="w-full h-12 bg-gray-50 rounded-[8px]" />
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {[1, 2, 3].map((i) => (
-            <div key={i} className="h-60 bg-gray-50 rounded-[8px]" />
+          {[1, 2, 3, 4, 5, 6].map((i) => (
+            <div key={i} className="h-60 bg-gray-50 rounded-[12px]" />
           ))}
         </div>
       </div>
@@ -147,11 +151,13 @@ function CustomizationInfoBar() {
  */
 export default function Home() {
   const { isLoggedIn } = useAuthStore();
+  const { guestRooms, deleteGuestRoom } = useGuestRoomStore();
   const router = useRouter();
   
   // 모달 및 드롭다운 상태
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isComparisonModalOpen, setIsComparisonModalOpen] = useState(false);
+  const [isCustomModalOpen, setIsCustomModalOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<'transaction' | 'sort' | null>(null);
   
   // 필터 상태
@@ -160,12 +166,36 @@ export default function Home() {
   
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const { data: rooms = [], isLoading, isFetched } = useQuery({
-    queryKey: ['rooms'],
-    queryFn: getRooms,
+  // 무한 스크롤 설정
+  const { ref, inView } = useInView();
+
+  const {
+    data,
+    isLoading,
+    isFetched,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useInfiniteQuery({
+    queryKey: ['rooms', transactionType, sortOption],
+    queryFn: ({ pageParam = 0 }) => getRooms(pageParam, 6),
+    initialPageParam: 0,
+    getNextPageParam: (lastPage, allPages) => {
+      return lastPage.length === 6 ? allPages.length : undefined;
+    },
     enabled: isLoggedIn,
     staleTime: 1000 * 60,
   });
+
+  const apiRooms = data?.pages.flat() || [];
+  const rooms = isLoggedIn ? apiRooms : guestRooms;
+
+  // 스크롤이 끝에 닿으면 다음 페이지 로드
+  useEffect(() => {
+    if (inView && hasNextPage && !isFetchingNextPage && isLoggedIn) {
+      fetchNextPage();
+    }
+  }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage, isLoggedIn]);
 
   // 드롭다운 외부 클릭 시 닫기
   useEffect(() => {
@@ -180,10 +210,31 @@ export default function Home() {
 
   const handleStartChecklist = () => {
     if (!isLoggedIn) {
+      if (guestRooms.length >= 2) {
+        alert('비로그인 사용자는 최대 2개까지만 체크리스트를 생성할 수 있습니다.\n로그인하여 무제한으로 이용해보세요!');
+        return;
+      }
       setIsLoginModalOpen(true);
     } else {
-      router.push(ROUTES.CHECKLIST_NEW);
+      const hasSeenOnboarding = localStorage.getItem('onboarding_custom_checklist');
+      if (!hasSeenOnboarding) {
+        setIsCustomModalOpen(true);
+      } else {
+        router.push(ROUTES.CHECKLIST_NEW);
+      }
     }
+  };
+
+  const handleCustomSetup = () => {
+    localStorage.setItem('onboarding_custom_checklist', 'true');
+    setIsCustomModalOpen(false);
+    router.push(ROUTES.SETTINGS);
+  };
+
+  const handleCustomLater = () => {
+    localStorage.setItem('onboarding_custom_checklist', 'true');
+    setIsCustomModalOpen(false);
+    router.push(ROUTES.CHECKLIST_NEW);
   };
 
   const handleComparisonClick = (e: React.MouseEvent) => {
@@ -219,92 +270,92 @@ export default function Home() {
       </div>
 
       {/* 필터 바 */}
-      <div className="border-b border-[#E2E2E2] px-4 md:px-10 py-3 flex justify-between items-center bg-white sticky top-16 z-40">
-        <div className="flex gap-2.5 relative" ref={dropdownRef}>
-          <button 
-            onClick={() => toggleDropdown('transaction')}
-            className={cn(
-              "border border-[#E2E2E2] rounded-[6px] px-3 py-1.5 text-[13px] font-medium flex items-center gap-1.5 transition-all cursor-pointer bg-white shadow-sm",
-              activeDropdown === 'transaction' ? "border-[#0A607D] text-[#0A607D]" : "text-[#232527] hover:bg-gray-50"
-            )}
-          >
-            거래방식 
-            <svg 
-              width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"
-              className={cn("transition-transform duration-200", activeDropdown === 'transaction' ? "rotate-0" : "rotate-180")}
+      <div className="border-b border-[#E2E2E2] bg-white sticky top-16 z-40">
+        <div className="px-10 py-3 flex justify-between items-center">
+          <div className="flex gap-2.5 relative" ref={dropdownRef}>
+            <button 
+              onClick={() => toggleDropdown('transaction')}
+              className={cn(
+                "border border-[#E2E2E2] rounded-[6px] px-3 py-1.5 text-[13px] font-medium flex items-center gap-1.5 transition-all cursor-pointer bg-white shadow-sm",
+                activeDropdown === 'transaction' ? "border-[#0A607D] text-[#0A607D]" : "text-[#232527] hover:bg-gray-50"
+              )}
             >
-              <path d="m18 15-6-6-6 6"/>
-            </svg>
-          </button>
-          <button 
-            onClick={() => toggleDropdown('sort')}
-            className={cn(
-              "border border-[#E2E2E2] rounded-[6px] px-3 py-1.5 text-[13px] font-medium flex items-center gap-1.5 transition-all cursor-pointer bg-white shadow-sm",
-              activeDropdown === 'sort' ? "border-[#0A607D] text-[#0A607D]" : "text-[#0A607D] hover:bg-gray-50"
-            )}
-          >
-            {transactionType} ({sortOption})
-            <svg 
-              width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"
-              className={cn("transition-transform duration-200", activeDropdown === 'sort' ? "rotate-0" : "rotate-180")}
+              거래방식 
+              <svg 
+                width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"
+                className={cn("transition-transform duration-200", activeDropdown === 'transaction' ? "rotate-0" : "rotate-180")}
+              >
+                <path d="m18 15-6-6-6 6"/>
+              </svg>
+            </button>
+            <button 
+              onClick={() => toggleDropdown('sort')}
+              className={cn(
+                "border border-[#E2E2E2] rounded-[6px] px-3 py-1.5 text-[13px] font-medium flex items-center gap-1.5 transition-all cursor-pointer bg-white shadow-sm",
+                activeDropdown === 'sort' ? "border-[#0A607D] text-[#0A607D]" : "text-[#0A607D] hover:bg-gray-50"
+              )}
             >
-              <path d="m18 15-6-6-6 6"/>
-            </svg>
-          </button>
+              {transactionType} ({sortOption})
+              <svg 
+                width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"
+                className={cn("transition-transform duration-200", activeDropdown === 'sort' ? "rotate-0" : "rotate-180")}
+              >
+                <path d="m18 15-6-6-6 6"/>
+              </svg>
+            </button>
+            
+            {activeDropdown === 'transaction' && (
+              <TransactionDropdown 
+                transactionType={transactionType} 
+                setTransactionType={setTransactionType}
+                onClose={() => setActiveDropdown(null)}
+              />
+            )}
+            {activeDropdown === 'sort' && (
+              <SortDropdown 
+                sortOption={sortOption} 
+                setSortOption={setSortOption}
+                onReset={() => setSortOption('보증금 낮은순')}
+                onClose={() => setActiveDropdown(null)}
+              />
+            )}
+          </div>
           
-          {activeDropdown === 'transaction' && (
-            <TransactionDropdown 
-              transactionType={transactionType} 
-              setTransactionType={setTransactionType}
-              onClose={() => setActiveDropdown(null)}
-            />
-          )}
-          {activeDropdown === 'sort' && (
-            <SortDropdown 
-              sortOption={sortOption} 
-              setSortOption={setSortOption}
-              onReset={() => setSortOption('보증금 낮은순')}
-              onClose={() => setActiveDropdown(null)}
-            />
-          )}
+          <Link 
+            href={ROUTES.REPORT}
+            onClick={handleComparisonClick}
+            className={cn(
+              "px-4 py-2 rounded-[4px] text-[12px] font-semibold flex items-center gap-2 transition-all shadow-sm",
+              rooms.length <= 1 
+                ? "bg-[#BFBFBF] text-white cursor-not-allowed" 
+                : "bg-[#0A607D] text-white hover:bg-[#084e6d] cursor-pointer"
+            )}
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+            비교 리포트
+          </Link>
         </div>
-        
-        <Link 
-          href={ROUTES.REPORT}
-          onClick={handleComparisonClick}
-          className={cn(
-            "px-4 py-2 rounded-[4px] text-[12px] font-semibold flex items-center gap-2 transition-all shadow-sm",
-            rooms.length <= 1 
-              ? "bg-[#BFBFBF] text-white cursor-pointer" 
-              : "bg-[#0A607D] text-white hover:bg-[#084e6d] cursor-pointer"
-          )}
-        >
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
-          비교 리포트
-        </Link>
       </div>
 
       {/* 메인 컨텐츠 */}
       <div className="flex-1 flex flex-col bg-white overflow-y-auto">
-        <div className="px-4 md:px-10 py-8">
-          <div className="flex justify-between items-center mb-4">
-            <p className="text-[13px] font-semibold text-[#A0A0A0]">
-              등록된 방 {rooms.length}개/{isLoggedIn ? '6' : '2'}개
+        <div className="w-full px-10 py-8">
+          <div className="flex justify-between items-center mb-5">
+            <p className="text-[14px] font-bold text-[#A0A0A0]">
+              등록된 방 {rooms.length}개{ !isLoggedIn && '/2개' }
             </p>
-            {isLoggedIn && rooms.length > 0 && (
-              <button 
-                onClick={() => router.push(ROUTES.CHECKLIST_NEW)}
-                className="text-[14px] font-bold text-[#0A607D] flex items-center gap-1.5 cursor-pointer hover:underline"
-              >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                추가하기
-              </button>
-            )}
+            <button 
+              onClick={handleStartChecklist}
+              className="text-[15px] font-bold text-[#0A607D] flex items-center gap-1 cursor-pointer hover:underline"
+            >
+              <span className="text-[20px] leading-none mb-0.5">+</span>
+              추가하기
+            </button>
           </div>
 
           {isLoggedIn && <CustomizationInfoBar />}
 
-          {(!isLoggedIn || (isFetched && rooms.length === 0)) ? (
+          {((isFetched || !isLoggedIn) && rooms.length === 0) ? (
             <div className="flex flex-col items-center justify-center py-20">
               <div className="flex flex-col items-center gap-[40px] max-w-[320px]">
                 <div className="flex flex-col items-center gap-[28px]">
@@ -333,53 +384,29 @@ export default function Home() {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {rooms.map((room) => (
-                <div key={room.id} className="border border-[#E2E2E2] rounded-[8px] p-6 shadow-sm hover:shadow-md transition-all relative bg-white group cursor-pointer">
-                  <button className="absolute top-6 right-6 text-[#BFBFBF] hover:text-red-500 transition-colors cursor-pointer opacity-0 group-hover:opacity-100">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path></svg>
-                  </button>
-                  <div className="space-y-6">
-                    <div className="space-y-3">
-                      <div className="flex items-center gap-2 text-[#A0A0A0] text-[11px] font-medium">
-                        <span className="w-2 h-2 rounded-full bg-[#0A607D]/40" />
-                        <span>등록일시 {new Date(room.createdAt).toLocaleDateString()}</span>
-                      </div>
-                      <div className="space-y-1">
-                        <h3 className="text-[18px] font-bold text-[#232527] line-clamp-1 tracking-tight">{room.name}</h3>
-                        <p className="text-[13px] text-[#777] font-medium flex items-center gap-1">
-                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                          {room.address}
-                        </p>
-                      </div>
-                    </div>
-                    
-                    <div className="space-y-4">
-                      <div className="flex flex-wrap gap-1.5">
-                        {room.tags.map(tag => (
-                          <span key={tag} className="bg-[#0A607D]/5 text-[#0A607D] text-[11px] font-bold px-2 py-1 rounded-[4px] border border-[#0A607D]/10">
-                            {tag}
-                          </span>
-                        ))}
-                        <span className="bg-[#F9E8F0] text-[#461A2B] text-[11px] font-bold px-2 py-1 rounded-[4px] border border-[#F9E8F0]">
-                          {room.price}
-                        </span>
-                      </div>
-                      <div className="flex gap-4 text-[12px] text-[#232527] font-semibold">
-                        {room.issues.mold && <span className="flex items-center gap-1">🦠 곰팡이</span>}
-                        {room.issues.leak && <span className="flex items-center gap-1">💧 누수</span>}
-                        {room.issues.bug && <span className="flex items-center gap-1">🪲 벌레</span>}
-                      </div>
-                    </div>
-                    
-                    {room.memo && (
-                      <div className="pt-4 border-t border-[#F5F5F5]">
-                        <p className="text-[12px] text-[#777] font-medium line-clamp-2 leading-relaxed bg-[#F5F5F5] p-2.5 rounded-lg">
-                          {room.memo}
-                        </p>
-                      </div>
-                    )}
-                  </div>
-                </div>
+                <RoomCard 
+                  key={room.id} 
+                  room={room} 
+                  onClick={(id) => router.push(`/checklist/${id}`)}
+                  onDelete={(id) => {
+                    if (!isLoggedIn) {
+                      deleteGuestRoom(id);
+                    } else {
+                      // TODO: Implement API delete logic
+                      console.log('Delete room:', id);
+                    }
+                  }}
+                />
               ))}
+              
+              {/* 무한 스크롤 관찰 대상 */}
+              {isLoggedIn && (
+                <div ref={ref} className="col-span-full h-20 flex items-center justify-center">
+                  {isFetchingNextPage && (
+                    <div className="w-6 h-6 border-2 border-[#0A607D]/30 border-t-[#0A607D] rounded-full animate-spin" />
+                  )}
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -405,6 +432,13 @@ export default function Home() {
           setIsComparisonModalOpen(false);
           router.push(ROUTES.CHECKLIST_NEW);
         }}
+      />
+
+      <CustomChecklistModal 
+        isOpen={isCustomModalOpen}
+        onClose={() => setIsCustomModalOpen(false)}
+        onLater={handleCustomLater}
+        onSetup={handleCustomSetup}
       />
     </main>
   );

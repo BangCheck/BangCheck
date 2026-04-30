@@ -41,15 +41,16 @@ public class SecurityConfig {
 
                 // Public — 인증 불필요
                 .requestMatchers(appPathProperties.getAuthBasePath() + appPathProperties.getAuthOauthBasePath() + "/**").permitAll()
+                .requestMatchers(HttpMethod.POST, appPathProperties.getAuthBasePath() + "/guest").permitAll()
 
-                .requestMatchers(appPathProperties.getAuthRefreshPath()).permitAll()
-                .requestMatchers(appPathProperties.getSwaggerUiPath(), appPathProperties.getSwaggerUiPath() + "/**", appPathProperties.getApiDocsPath(), appPathProperties.getApiDocsPath() + "/**").permitAll()
+                .requestMatchers(appPathProperties.getAuthBasePath() + appPathProperties.getAuthRefreshPath()).permitAll()
+                .requestMatchers(appPathProperties.getSwaggerUiPath(), "/swagger-ui/**", appPathProperties.getApiDocsPath(), appPathProperties.getApiDocsPath() + "/**", "/webjars/**").permitAll()
 
                 // Guest — 비로그인도 허용할 엔드포인트 (추후 추가)
                 // .requestMatchers(HttpMethod.GET, "/api/v1/rooms/**").permitAll()
 
                 // Authenticated — 반드시 로그인 필요
-                .requestMatchers(appPathProperties.getAuthLogoutPath()).authenticated()
+                .requestMatchers(appPathProperties.getAuthBasePath() + appPathProperties.getAuthLogoutPath()).authenticated()
                 .anyRequest().authenticated()
         );
 
