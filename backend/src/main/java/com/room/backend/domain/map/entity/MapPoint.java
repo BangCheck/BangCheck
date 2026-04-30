@@ -1,4 +1,4 @@
-package com.room.backend.map.domain.entity;
+package com.room.backend.domain.map.entity;
 
 import com.room.backend.global.common.entity.BaseEntity;
 import jakarta.persistence.*;
@@ -28,5 +28,4 @@ public class MapPoint extends BaseEntity {
 
     @Column(name = "address", nullable = false, length = 255)
     private String address;
-
 }

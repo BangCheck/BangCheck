@@ -28,10 +28,10 @@ public class Room extends BaseEntity {
     @Column(nullable = false, length = 255)
     private String address;
 
-    @Column(precision = 10, scale = 7)
+    @Column(name = "lat", precision = 10, scale = 7)
     private BigDecimal lat;
 
-    @Column(precision = 10, scale = 7)
+    @Column(name = "lon", precision = 10, scale = 7)
     private BigDecimal lon;
 
     @Enumerated(EnumType.STRING)

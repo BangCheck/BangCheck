@@ -1,8 +1,7 @@
-package com.room.backend.map.domain.entity;
+package com.room.backend.domain.map.entity;
 
-
-import com.room.backend.global.common.entity.BaseEntity;
 import com.room.backend.domain.room.entity.Room;
+import com.room.backend.global.common.entity.BaseEntity;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -27,7 +26,7 @@ public class RoomPointDistance extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "point_id", nullable = false)
     private MapPoint mapPoint;
-    
+
     @Column(name = "distance_m", nullable = false)
     private int distanceM;
 
@@ -40,9 +39,6 @@ public class RoomPointDistance extends BaseEntity {
     @Column(name = "transit_type", nullable = false, length = 20)
     private String transitType;
 
-    @Column(name = "calculated_at", nullable = false, columnDefinition = "DATETIME(6)")
+    @Column(name = "calculated_at", nullable = false)
     private LocalDateTime calculatedAt;
-
-
-
 }

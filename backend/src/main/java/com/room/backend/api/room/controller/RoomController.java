@@ -1,10 +1,11 @@
-package com.room.backend.room.controller;
+package com.room.backend.api.room.controller;
 
+import com.room.backend.api.room.dto.request.RoomCreateRequestDTO;
+import com.room.backend.api.room.dto.response.RoomCreateResponseDTO;
+import com.room.backend.api.room.service.RoomService;
+import com.room.backend.domain.room.entity.Room;
 import com.room.backend.global.auth.util.SecurityUtil;
 import com.room.backend.global.common.response.ApiResponse;
-import com.room.backend.room.dto.request.RoomCreateRequestDTO;
-import com.room.backend.room.dto.response.RoomCreateResponseDTO;
-import com.room.backend.room.service.RoomService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -29,7 +30,7 @@ public class RoomController {
     public ResponseEntity<ApiResponse<RoomCreateResponseDTO>> createRoom(
             @RequestBody RoomCreateRequestDTO request) {
         Long userId = SecurityUtil.getCurrentUserId();
-        RoomCreateResponseDTO response = roomService.createRoom(request, userId);
-        return ResponseEntity.ok(ApiResponse.success(response));
+        Room savedRoom = roomService.createRoom(request, userId);
+        return ResponseEntity.ok(ApiResponse.success(new RoomCreateResponseDTO(savedRoom)));
     }
 }

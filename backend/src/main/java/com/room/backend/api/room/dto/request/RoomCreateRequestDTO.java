@@ -1,4 +1,4 @@
-package com.room.backend.room.dto.request;
+package com.room.backend.api.room.dto.request;
 
 import com.room.backend.domain.room.entity.enums.BuildingType;
 import com.room.backend.domain.room.entity.enums.Direction;

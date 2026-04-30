@@ -1,4 +1,4 @@
-package com.room.backend.room.dto.response;
+package com.room.backend.api.room.dto.response;
 
 import com.room.backend.domain.room.entity.Room;
 import com.room.backend.domain.room.entity.enums.BuildingType;

@@ -1,13 +1,12 @@
-package com.room.backend.room.service;
+package com.room.backend.api.room.service;
 
 import java.math.BigDecimal;
 
+import com.room.backend.api.room.dto.request.RoomCreateRequestDTO;
 import com.room.backend.domain.room.entity.Room;
+import com.room.backend.domain.room.repository.RoomRepository;
 import com.room.backend.domain.user.repository.UserRepository;
 import com.room.backend.global.geocoding.service.GeocodingService;
-import com.room.backend.room.domain.repository.RoomRepository;
-import com.room.backend.room.dto.request.RoomCreateRequestDTO;
-import com.room.backend.room.dto.response.RoomCreateResponseDTO;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,7 +21,7 @@ public class RoomService {
     private final GeocodingService geocodingService;
 
     @Transactional
-    public RoomCreateResponseDTO createRoom(RoomCreateRequestDTO request, Long userId) {
+    public Room createRoom(RoomCreateRequestDTO request, Long userId) {
         userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
 
@@ -49,8 +48,6 @@ public class RoomService {
                 request.getMemo()
         );
 
-        Room savedRoom = roomRepository.save(room);
-
-        return new RoomCreateResponseDTO(savedRoom);
+        return roomRepository.save(room);
     }
 }
