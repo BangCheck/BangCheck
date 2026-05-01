@@ -10,7 +10,6 @@ export const ROUTES = {
 
 export const PROTECTED_ROUTES: readonly string[] = [
   ROUTES.REPORT,
-  ROUTES.SETTINGS,
 ];
 
 export const loginRedirect = (reason: 'expired' | 'auth_failed' | 'invalid_params'): string =>
