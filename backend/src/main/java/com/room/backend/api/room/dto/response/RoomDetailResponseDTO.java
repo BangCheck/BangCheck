@@ -1,17 +1,18 @@
 package com.room.backend.api.room.dto.response;
 
-import com.room.backend.domain.room.entity.Room;
-import com.room.backend.domain.room.entity.enums.BuildingType;
-import com.room.backend.domain.room.entity.enums.Direction;
-import com.room.backend.domain.room.entity.enums.RentType;
-import lombok.Getter;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
+import com.room.backend.domain.room.entity.Room;
+import com.room.backend.domain.room.entity.enums.BuildingType;
+import com.room.backend.domain.room.entity.enums.Direction;
+import com.room.backend.domain.room.entity.enums.RentType;
+
+import lombok.Getter;
+
 @Getter
-public class RoomCreateResponseDTO {
+public class RoomDetailResponseDTO {
 
     private final Long id;
     private final String name;
@@ -37,7 +38,7 @@ public class RoomCreateResponseDTO {
     private final String memo;
     private final LocalDateTime createdAt;
 
-    public RoomCreateResponseDTO(Room room) {
+    public RoomDetailResponseDTO(Room room) {
         this.id = room.getId();
         this.name = room.getName();
         this.address = room.getAddress();

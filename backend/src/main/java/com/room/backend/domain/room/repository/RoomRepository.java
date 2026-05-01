@@ -4,6 +4,7 @@ import com.room.backend.domain.room.entity.Room;
 import com.room.backend.domain.room.entity.enums.RentType;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -20,4 +21,8 @@ public interface RoomRepository extends JpaRepository<Room, Long> {
         ORDER BY room.createdAt ASC
         """)
     List<Room> findRoomsWithFilter(@Param("userId") Long userId, @Param("rentType") RentType rentType);
+
+    List<Room> findByUserIdAndIsDeletedFalseOrderByCreatedAtDesc(Long userId);
+
+    Optional<Room> findByIdAndUserIdAndIsDeletedFalse(Long id, Long userId);
 }
