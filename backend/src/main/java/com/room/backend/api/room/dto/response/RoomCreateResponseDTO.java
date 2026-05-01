@@ -6,6 +6,7 @@ import com.room.backend.domain.room.entity.enums.Direction;
 import com.room.backend.domain.room.entity.enums.MaintenanceStatus;
 import com.room.backend.domain.room.entity.enums.RentType;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
