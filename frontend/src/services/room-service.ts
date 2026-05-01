@@ -10,3 +10,7 @@ export const getRoomDetails = async (): Promise<RoomDetail[]> => {
   const response = await api.get<ApiResponse<RoomDetail[]>>('/api/v1/rooms/detail');
   return response.data.data;
 };
+
+export const deleteRoom = async (roomId: string): Promise<void> => {
+  await api.delete(`/api/v1/rooms/${roomId}`);
+};

@@ -1,9 +1,9 @@
 'use client';
 
-import { useInfiniteQuery } from '@tanstack/react-query';
+import { useInfiniteQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuthStore } from '@/store/use-auth-store';
 import { useGuestRoomStore } from '@/store/use-guest-room-store';
-import { getRooms } from '@/services/room-service';
+import { getRooms, deleteRoom } from '@/services/room-service';
 import { cn } from '@/lib/utils';
 import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
@@ -63,7 +63,7 @@ function TransactionDropdown({
     <div className="absolute top-full left-0 mt-2 w-[280px] bg-white border border-[#E2E2E2] rounded-[12px] shadow-xl z-50 p-5 animate-in fade-in zoom-in-95 duration-150">
       <h4 className="text-[14px] font-bold text-[#232527] mb-4">거래방식</h4>
       <div className="flex gap-2">
-        {['전체', '월세', '단기임대'].map((type) => (
+        {['전체', '전세', '월세', '단기임대'].map((type) => (
           <button
             key={type}
             onClick={() => {
@@ -153,6 +153,7 @@ export default function Home() {
   const { isLoggedIn } = useAuthStore();
   const { guestRooms, deleteGuestRoom } = useGuestRoomStore();
   const router = useRouter();
+  const queryClient = useQueryClient();
   
   // 모달 및 드롭다운 상태
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
@@ -165,6 +166,18 @@ export default function Home() {
   const [sortOption, setSortOption] = useState('보증금 낮은순');
   
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // 삭제 뮤테이션
+  const deleteRoomMutation = useMutation({
+    mutationFn: (roomId: string) => deleteRoom(roomId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['rooms'] });
+    },
+    onError: (error) => {
+      console.error('Failed to delete room:', error);
+      alert('매물 삭제에 실패했습니다. 다시 시도해주세요.');
+    }
+  });
 
   // 무한 스크롤 설정
   const { ref, inView } = useInView();
@@ -188,7 +201,20 @@ export default function Home() {
   });
 
   const apiRooms = data?.pages.flat() || [];
-  const rooms = isLoggedIn ? apiRooms : guestRooms;
+  const baseRooms = isLoggedIn ? apiRooms : guestRooms;
+
+  // 필터링 및 정렬 로직 적용
+  const rooms = baseRooms
+    .filter((room) => {
+      if (transactionType === '전체') return true;
+      return room.type === transactionType;
+    })
+    .sort((a, b) => {
+      if (sortOption === '보증금 낮은순') return (a.deposit || 0) - (b.deposit || 0);
+      if (sortOption === '월세 낮은순') return (a.rent || 0) - (b.rent || 0);
+      if (sortOption === '관리비 낮은순') return (a.managementFee || 0) - (b.managementFee || 0);
+      return 0;
+    });
 
   // 스크롤이 끝에 닿으면 다음 페이지 로드
   useEffect(() => {
@@ -280,7 +306,7 @@ export default function Home() {
                 activeDropdown === 'transaction' ? "border-[#0A607D] text-[#0A607D]" : "text-[#232527] hover:bg-gray-50"
               )}
             >
-              거래방식 
+              {transactionType === '전체' ? '거래방식' : transactionType}
               <svg 
                 width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"
                 className={cn("transition-transform duration-200", activeDropdown === 'transaction' ? "rotate-0" : "rotate-180")}
@@ -392,8 +418,9 @@ export default function Home() {
                     if (!isLoggedIn) {
                       deleteGuestRoom(id);
                     } else {
-                      // TODO: Implement API delete logic
-                      console.log('Delete room:', id);
+                      if (confirm('정말 이 체크리스트를 삭제하시겠습니까?')) {
+                        deleteRoomMutation.mutate(id);
+                      }
                     }
                   }}
                 />

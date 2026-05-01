@@ -1,0 +1,100 @@
+'use client';
+
+import React from 'react';
+import { cn } from '@/lib/utils';
+import type { Room } from '@/types';
+import { ItemIcons } from '@/features/customization/components/Icons';
+
+interface RoomCardProps {
+  room: Room;
+  onDelete?: (id: string) => void;
+  onClick?: (id: string) => void;
+}
+
+/**
+ * 방 카드 컴포넌트 (SCR-DASHBOARD-CARD)
+ * 최신 디자인 시안 및 기능 명세서 반영
+ */
+export default function RoomCard({
+  room,
+  onDelete,
+  onClick,
+}: RoomCardProps) {
+  const { id, name, address, type, deposit, rent, managementFee, price, issues, memo, createdAt, buildingType, floor, direction } = room;
+
+  // 1. 등록일자 포맷: YYYY.MM.DD HH:mm (24시간제)
+  const formatDateTime = (dateStr: string) => {
+    const date = new Date(dateStr);
+    const YYYY = date.getFullYear();
+    const MM = String(date.getMonth() + 1).padStart(2, '0');
+    const DD = String(date.getDate()).padStart(2, '0');
+    const HH = String(date.getHours()).padStart(2, '0');
+    const mm = String(date.getMinutes()).padStart(2, '0');
+    return `${YYYY}.${MM}.${DD} ${HH}:${mm}`;
+  };
+
+  // 2. 금액 변환 로직 (만원 단위 입력 기준)
+  const formatPriceValue = (val: number | undefined) => {
+    if (val === undefined || val === null) return '0';
+    if (val >= 10000) {
+      const eok = Math.floor(val / 10000);
+      const remainder = val % 10000;
+      const cheon = Math.floor(remainder / 1000);
+      return `${eok}억${cheon > 0 ? ` ${cheon}천` : ''}`;
+    }
+    return val.toLocaleString();
+  };
+
+  const formattedPrice = price || (type === '전세' 
+    ? `${formatPriceValue(deposit)}` 
+    : `${formatPriceValue(deposit)}/${formatPriceValue(rent)}${managementFee ? `/${managementFee}` : ''}`);
+
+  // 3. 문제 요소 설정
+  const issueConfig: Record<string, { label: string; color: string }> = {
+    mold: { label: '곰팡이', color: 'text-[#228A2C]' },
+    leak: { label: '누수', color: 'text-[#94BDF9]' },
+    bug: { label: '벌레', color: 'text-[#34181F]' },
+    condensation: { label: '결로', color: 'text-[#A0A0A0]' },
+    drainSmell: { label: '냄새', color: 'text-[#A0A0A0]' },
+  };
+
+  const activeIssues = issues ? Object.entries(issues)
+    .filter(([, active]) => active)
+    .map(([key]) => ({
+      key,
+      ...issueConfig[key] || { label: key, color: 'text-[#A0A0A0]' }
+    })) : [];
+
+  const displayIssues = activeIssues.slice(0, 3);
+  const extraCount = activeIssues.length - 3;
+
+  // 4. 카드 테마 (Dot 컬러)
+  const colors = ['#5B213B', '#0A607D', '#3E4F2E', '#777777', '#21255B', '#7D0A4E'];
+  const themeColor = colors[parseInt(id.slice(-1), 16) % colors.length] || colors[0];
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      onClick?.(id);
+    }
+  };
+
+  return (
+    <div
+      role="button"
+      tabIndex={0}
+      onClick={() => onClick?.(id)}
+      onKeyDown={handleKeyDown}
+      className={cn(
+        "relative p-6 rounded-[20px] bg-white border border-[#E2E2E2] shadow-[0_4px_20px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.08)] transition-all cursor-pointer group flex flex-col h-full"
+      )}
+    >
+      {/* 1. 등록일자 및 삭제 버튼 */}
+      <div className="flex justify-between items-center mb-5">
+        <div className="flex items-center gap-2">
+          <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: themeColor }} />
+          <span className="text-[#A0A0A0] text-[13px] font-bold">등록일시 {formatDateTime(createdAt)}</span>
+        </div>
+        <button
+          type="button"
+          onClick={(e) => { 
