@@ -42,7 +42,8 @@ const checklistSchema = z.object({
   memo: z.string().max(50, '메모는 최대 50자까지 가능합니다').optional(),
 });
 
-type ChecklistFormValues = z.infer<typeof checklistSchema>;
+type ChecklistFormValues = z.input<typeof checklistSchema>;
+type ChecklistFormOutput = z.output<typeof checklistSchema>;
 
 const TABS = ['기본 정보', '건물 정보', '상세 점검'];
 
@@ -93,7 +94,7 @@ function ChecklistNewContent() {
     }
   });
 
-  const onSubmit = (data: ChecklistFormValues) => {
+  const onSubmit = (data: ChecklistFormOutput) => {
     if (isLoggedIn) {
       submitChecklist(data as any);
     } else {
