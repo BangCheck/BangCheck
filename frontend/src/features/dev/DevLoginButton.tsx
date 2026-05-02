@@ -38,7 +38,7 @@ export function DevLoginButton() {
   return (
     <button
       onClick={handleDevLogin}
-      className="fixed bottom-4 right-4 bg-gray-800 text-white text-xs px-4 py-2 rounded-lg z-50 hover:bg-gray-700"
+      className="fixed bottom-6 right-6 bg-gray-800 text-white text-xs px-4 py-2 rounded-lg z-[9999] hover:bg-gray-700 shadow-lg"
     >
       [DEV] userId:{ACTIVE_USER_ID} 로그인
     </button>
