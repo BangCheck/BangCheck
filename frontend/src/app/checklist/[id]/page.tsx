@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense, useEffect } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useForm, FormProvider } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -14,6 +14,8 @@ import { useMutation, useQuery } from '@tanstack/react-query';
 import { getChecklist, updateChecklist } from '@/services/checklist-service';
 import { useAuthStore } from '@/store/use-auth-store';
 import { useGuestRoomStore } from '@/store/use-guest-room-store';
+import { GuestEditDisabledModal } from '@/components/ui/Modals';
+import { ROUTES } from '@/lib/routes';
 
 // 스크린샷 기반 통합 Zod 스키마 (New 페이지와 동일하게 유지)
 const checklistSchema = z.object({
@@ -60,6 +62,7 @@ function ChecklistDetailContent() {
   const router = useRouter();
   const { isLoggedIn } = useAuthStore();
   const { guestRooms } = useGuestRoomStore();
+  const [isGuestModalOpen, setIsGuestModalOpen] = useState(false);
 
   const methods = useForm<ChecklistFormValues>({
     resolver: zodResolver(checklistSchema),
@@ -142,9 +145,7 @@ function ChecklistDetailContent() {
     if (isLoggedIn) {
       updateMutation(data);
     } else {
-      // 비로그인 수정 로직 (Store에 update 기능이 있다고 가정하거나 새로 추가 필요)
-      alert('비로그인 상태에서는 수정 기능이 아직 지원되지 않습니다.');
-      router.push('/');
+      setIsGuestModalOpen(true);
     }
   };
 
@@ -224,6 +225,12 @@ function ChecklistDetailContent() {
           </form>
         </FormProvider>
       </main>
+
+      <GuestEditDisabledModal 
+        isOpen={isGuestModalOpen}
+        onClose={() => setIsGuestModalOpen(false)}
+        onLogin={() => router.push(ROUTES.LOGIN)}
+      />
     </div>
   );
 }

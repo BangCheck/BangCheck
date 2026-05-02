@@ -220,6 +220,10 @@ export default function Home() {
       return 0;
     });
 
+  const hasNoRoomsAtAll = (isFetched || !isLoggedIn) && baseRooms.length === 0;
+  const hasNoFilteredRooms = (isFetched || !isLoggedIn) && baseRooms.length > 0 && rooms.length === 0;
+  const isGuestLimitReached = !isLoggedIn && baseRooms.length >= 2;
+
   // 스크롤이 끝에 닿으면 다음 페이지 로드
   useEffect(() => {
     if (inView && hasNextPage && !isFetchingNextPage && isLoggedIn) {
@@ -240,7 +244,7 @@ export default function Home() {
 
   const handleStartChecklist = () => {
     if (!isLoggedIn) {
-      if (guestRooms.length >= 2) {
+      if (baseRooms.length >= 2) {
         alert('비로그인 사용자는 최대 2개까지만 체크리스트를 생성할 수 있습니다.\n로그인하여 무제한으로 이용해보세요!');
         return;
       }
@@ -372,15 +376,24 @@ export default function Home() {
         <div className="w-full px-10 py-8">
           <div className="flex justify-between items-center mb-5">
             <p className="text-[14px] font-bold text-[#A0A0A0]">
-              등록된 방 {rooms.length}개{ !isLoggedIn && '/2개' }
+              등록된 방 {baseRooms.length}개{ !isLoggedIn && '/2개' }
             </p>
-            <button 
-              onClick={handleStartChecklist}
-              className="text-[15px] font-bold text-[#0A607D] flex items-center gap-1 cursor-pointer hover:underline"
-            >
-              <span className="text-[20px] leading-none mb-0.5">+</span>
-              추가하기
-            </button>
+            {!isGuestLimitReached ? (
+              <button 
+                onClick={handleStartChecklist}
+                className="text-[15px] font-bold text-[#0A607D] flex items-center gap-1 cursor-pointer hover:underline"
+              >
+                <span className="text-[20px] leading-none mb-0.5">+</span>
+                추가하기
+              </button>
+            ) : (
+              <button 
+                disabled
+                className="text-[15px] font-bold text-[#A0A0A0] flex items-center gap-1 cursor-not-allowed"
+              >
+                방 등록 마감 (최대 2개)
+              </button>
+            )}
           </div>
 
           {isLoggedIn && (
@@ -390,7 +403,7 @@ export default function Home() {
             />
           )}
 
-          {((isFetched || !isLoggedIn) && rooms.length === 0) ? (
+          {hasNoRoomsAtAll ? (
             <div className="flex flex-col items-center justify-center py-20">
               <div className="flex flex-col items-center gap-[40px] max-w-[320px]">
                 <div className="flex flex-col items-center gap-[28px]">
@@ -414,6 +427,41 @@ export default function Home() {
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                   체크리스트 시작하기
                 </button>
+              </div>
+            </div>
+          ) : hasNoFilteredRooms ? (
+            <div className="flex flex-col items-center justify-center py-20">
+              <div className="flex flex-col items-center gap-[40px] max-w-[320px]">
+                <div className="flex flex-col items-center gap-[28px]">
+                  <div className="w-[100px] h-[100px] relative">
+                    <svg width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="#E2E2E2" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                  </div>
+                  <div className="text-center space-y-4">
+                    <h2 className="text-[22px] font-bold text-[#232527] leading-tight tracking-tight">
+                      현재 선택한 조건에 맞는 방이 없습니다.
+                    </h2>
+                    {isGuestLimitReached ? (
+                      <div className="text-[16px] text-[#232527] font-medium leading-relaxed opacity-60">
+                        <p>다른 조건으로 이미 2개의 방이 모두 등록되어 있습니다.</p>
+                        <p>새로운 방을 등록하려면 기존 방을 삭제해주세요.</p>
+                      </div>
+                    ) : (
+                      <div className="text-[16px] text-[#232527] font-medium leading-relaxed opacity-60">
+                        <p>필터를 변경하거나</p>
+                        <p>새로운 방을 추가해보세요</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+                {!isGuestLimitReached && (
+                  <button 
+                    onClick={handleStartChecklist}
+                    className="w-[260px] bg-[#0A607D] text-white py-[14px] rounded-[8px] flex items-center justify-center gap-[10px] font-bold text-[18px] hover:bg-[#084e6d] transition-all active:scale-[0.98] cursor-pointer shadow-md"
+                  >
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                    체크리스트 시작하기
+                  </button>
+                )}
               </div>
             </div>
           ) : (

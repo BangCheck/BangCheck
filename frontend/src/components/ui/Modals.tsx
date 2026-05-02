@@ -105,3 +105,27 @@ export function CustomChecklistModal({
     />
   );
 }
+
+/**
+ * 01_비로그인 수정 제한 안내 모달
+ */
+export function GuestEditDisabledModal({ 
+  isOpen, 
+  onClose, 
+  onLogin 
+}: BaseModalProps & { 
+  onLogin: () => void; 
+}) {
+  return (
+    <ConfirmModal
+      isOpen={isOpen}
+      onClose={onClose}
+      title="수정할 수 없어요"
+      description="비로그인 상태에서는 수정이 불가능합니다.&#10;로그인해서 수정 기능을 이용해보세요!"
+      leftButtonText="취소"
+      rightButtonText="로그인하기"
+      onLeftClick={onClose}
+      onRightClick={onLogin}
+    />
+  );
+}
