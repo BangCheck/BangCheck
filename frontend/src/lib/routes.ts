@@ -7,6 +7,7 @@ export const ROUTES = {
   SETTINGS: '/settings',
   CHECKLIST_NEW: '/checklist/new',
   CHECKLIST_DETAIL: (id: string) => `/checklist/${id}`,
+  LANDING: '/landing',
 } as const;
 
 export const PROTECTED_ROUTES: readonly string[] = [
