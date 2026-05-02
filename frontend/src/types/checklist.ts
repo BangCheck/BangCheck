@@ -8,6 +8,52 @@ export type ScoreLevel = '좋음' | '보통' | '나쁨';
 export type ProblemFlag = '없음' | '있음';
 export type MoveInReportStatus = '가능' | '불가능';
 
+export type ChecklistCategory = 
+  | 'BASIC_INFO' 
+  | 'BUILDING_INFO' 
+  | 'OPTION' 
+  | 'INTERNAL_STATE' 
+  | 'PROBLEM' 
+  | 'SAFETY' 
+  | 'CONVENIENCE' 
+  | 'ENVIRONMENT'
+  | 'CUSTOM';
+
+export type ItemType = 'DEFAULT' | 'CUSTOM';
+
+export type UserType = 
+  | 'BUG_AVOIDER' 
+  | 'NOISE_SENSITIVE' 
+  | 'CLEAN_FREAK' 
+  | 'PERFORMANCE_TYPE';
+
+export type InputType = 
+  | 'TEXT' 
+  | 'NUMBER' 
+  | 'SINGLE_CHOICE' 
+  | 'MULTIPLE_CHOICE' 
+  | 'DATE' 
+  | 'BOOLEAN';
+
+export interface ChecklistOptionResponse {
+  id: number;
+  optionValue: string;
+  displayOrder: number;
+}
+
+export interface ChecklistItemResponse {
+  id: number;
+  itemName: string;
+  category: ChecklistCategory;
+  itemType: ItemType;
+  userType: UserType;
+  inputType: InputType;
+  description: string;
+  displayOrder: number;
+  isEnabled: boolean;
+  options: ChecklistOptionResponse[];
+}
+
 export interface Checklist {
   id?: string;
   name: string;
