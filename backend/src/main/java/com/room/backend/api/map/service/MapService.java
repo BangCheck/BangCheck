@@ -34,7 +34,7 @@ public class MapService {
 
     @Transactional(readOnly = true)
     public Optional<MapPoint> getMapPointById(Long mapId, Long userId) {
-        return mapRepository.findByIdAndUserId(mapId, userId);
+        return mapRepository.findByIdAndUserIdAndIsDeletedFalse(mapId, userId);
     }
 
     @Transactional
@@ -45,7 +45,7 @@ public class MapService {
 
     @Transactional
     public void deleteMapPoint(Long mapId, Long userId) {
-        MapPoint mapPoint = mapRepository.findByIdAndUserId(mapId, userId)
+        MapPoint mapPoint = mapRepository.findByIdAndUserIdAndIsDeletedFalse(mapId, userId)
                 .orElseThrow(() -> new RuntimeException("지도 기준점을 찾을 수 없습니다."));
         mapPoint.softDelete();
     }

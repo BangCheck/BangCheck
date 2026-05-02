@@ -2,6 +2,7 @@ package com.room.backend.api.map.dto.response;
 
 import java.math.BigDecimal;
 
+import com.room.backend.domain.room.entity.Room;
 import com.room.backend.domain.room.entity.enums.RentType;
 
 import lombok.Getter;
@@ -16,14 +17,13 @@ public class MapRoomResponseDTO {
     private final Long deposit;
     private final Integer rent;
 
-    public MapRoomResponseDTO(Long id, String address, BigDecimal lat,
-            BigDecimal lon, RentType rentType, Long deposit, Integer rent) {
-        this.id = id;
-        this.address = address;
-        this.lat = lat;
-        this.lon = lon;
-        this.rentType = rentType;
-        this.deposit = deposit;
-        this.rent = rent;
+    public MapRoomResponseDTO(Room room) {
+        this.id = room.getId();
+        this.address = room.getAddress();
+        this.lat = room.getLat();
+        this.lon = room.getLon();
+        this.rentType = room.getRentType();
+        this.deposit = room.getDeposit();
+        this.rent = room.getMonthlyRent();
     }
 }
