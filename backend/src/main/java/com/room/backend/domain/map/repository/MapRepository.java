@@ -8,7 +8,7 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface MapRepository extends JpaRepository<MapPoint, Long> {
-    List<MapPoint> findByUserId(Long userId);
+    List<MapPoint> findByUserIdAndIsDeletedFalse(Long userId);
     Optional<MapPoint> findByIdAndUserId(Long id, Long userId);
 
 }

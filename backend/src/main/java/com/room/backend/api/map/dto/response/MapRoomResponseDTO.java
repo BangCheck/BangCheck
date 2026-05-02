@@ -14,16 +14,16 @@ public class MapRoomResponseDTO {
     private final BigDecimal lon;
     private final RentType rentType;
     private final Long deposit;
-    private final Integer monthlyRent;
+    private final Integer rent;
 
     public MapRoomResponseDTO(Long id, String address, BigDecimal lat,
-            BigDecimal lon, RentType rentType, Long deposit, Integer monthlyRent) {
+            BigDecimal lon, RentType rentType, Long deposit, Integer rent) {
         this.id = id;
         this.address = address;
         this.lat = lat;
         this.lon = lon;
         this.rentType = rentType;
         this.deposit = deposit;
-        this.monthlyRent = monthlyRent;
+        this.rent = rent;
     }
 }

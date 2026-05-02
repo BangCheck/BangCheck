@@ -10,10 +10,9 @@ import java.time.LocalDate;
 
 @Getter
 @NoArgsConstructor
-public class RoomCreateRequestDTO {
+public class RoomUpdateRequestDTO {
 
     private String name;
-    private String address;
     private RentType rentType;
     private Long deposit;
     private Integer rent;
