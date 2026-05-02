@@ -175,23 +175,25 @@ public class Room extends BaseEntity {
     }
 
     public void update(RoomUpdateRequestDTO request) {
-        this.name = (request.getName() != null) ? request.getName() : this.name;
-        this.rentType = (request.getRentType() != null) ? request.getRentType() : this.rentType;
-        this.deposit = (request.getDeposit() != null) ? request.getDeposit() : this.deposit;
-        this.monthlyRent = (request.getRent() != null) ? request.getRent() : this.monthlyRent;
-        this.isManagementFeeUnknown = (request.getIsManagementFeeUnknown() != null) ? request.getIsManagementFeeUnknown() : this.isManagementFeeUnknown;
-        this.maintenanceFee = (request.getManagementFee() != null) ? request.getManagementFee() : this.maintenanceFee;
-        this.hasLoan = (request.getHasLoan() != null) ? request.getHasLoan() : this.hasLoan;
-        this.loanAmount = (request.getLoanAmount() != null) ? request.getLoanAmount() : this.loanAmount;
-        this.canRegisterAddress = (request.getCanRegisterAddress() != null) ? request.getCanRegisterAddress() : this.canRegisterAddress;
-        this.availableFrom = (request.getMoveInDate() != null) ? request.getMoveInDate() : this.availableFrom;
-        this.isMoveInDateNegotiable = (request.getIsMoveInDateNegotiable() != null) ? request.getIsMoveInDateNegotiable() : this.isMoveInDateNegotiable;
-        this.buildingType = (request.getBuildingType() != null) ? request.getBuildingType() : this.buildingType;
-        this.floor = (request.getFloor() != null) ? request.getFloor() : this.floor;
-        this.hasElevator = (request.getHasElevator() != null) ? request.getHasElevator() : this.hasElevator;
-        this.hasParking = (request.getHasParking() != null) ? request.getHasParking() : this.hasParking;
-        this.specialFloor = (request.getSpecialFloor() != null) ? request.getSpecialFloor() : this.specialFloor;
-        this.direction = (request.getDirection() != null) ? request.getDirection() : this.direction;
-        this.memo = (request.getMemo() != null) ? request.getMemo() : this.memo;
+        this.name = request.getName();
+        this.rentType = request.getRentType();
+        this.deposit = request.getDeposit();
+        this.monthlyRent = request.getRent();
+        this.isManagementFeeUnknown = request.getIsManagementFeeUnknown();
+        this.maintenanceFee = request.getManagementFee();
+        this.maintenanceStatus = this.isManagementFeeUnknown ? MaintenanceStatus.UNKNOWN :
+                (this.maintenanceFee != null ? MaintenanceStatus.INCLUDED : MaintenanceStatus.NONE);
+        this.hasLoan = request.getHasLoan();
+        this.loanAmount = request.getLoanAmount();
+        this.canRegisterAddress = request.getCanRegisterAddress();
+        this.availableFrom = request.getMoveInDate();
+        this.isMoveInDateNegotiable = request.getIsMoveInDateNegotiable();
+        this.buildingType = request.getBuildingType();
+        this.floor = request.getFloor();
+        this.hasElevator = request.getHasElevator();
+        this.hasParking = request.getHasParking();
+        this.specialFloor = request.getSpecialFloor();
+        this.direction = request.getDirection();
+        this.memo = request.getMemo();
     }
 }

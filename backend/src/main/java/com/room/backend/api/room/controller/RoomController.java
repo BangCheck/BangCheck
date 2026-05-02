@@ -1,6 +1,7 @@
 package com.room.backend.api.room.controller;
 
 import com.room.backend.api.room.dto.request.RoomCreateRequestDTO;
+import com.room.backend.api.room.dto.request.RoomUpdateRequestDTO;
 import com.room.backend.api.room.dto.response.RoomCreateResponseDTO;
 import com.room.backend.api.room.dto.response.RoomDetailResponseDTO;
 import com.room.backend.api.room.dto.response.RoomListResponseDTO;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -37,6 +39,7 @@ public class RoomController {
     public ResponseEntity<ApiResponse<RoomCreateResponseDTO>> createRoom(@RequestBody RoomCreateRequestDTO request) {
         Long userId = SecurityUtil.getCurrentUserId();
         Room savedRoom = roomService.createRoom(request, userId);
+
         return ResponseEntity.ok(ApiResponse.success(new RoomCreateResponseDTO(savedRoom)));
     }
 
@@ -48,6 +51,7 @@ public class RoomController {
         List<RoomListResponseDTO> response = rooms.stream()
                 .map(room -> new RoomListResponseDTO(room))
                 .toList();
+
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 
@@ -62,11 +66,21 @@ public class RoomController {
 
     }
 
+    @PutMapping("/{id}")
+    @Operation(summary = "방 수정", description = "방을 수정합니다")
+    public ResponseEntity<ApiResponse<RoomDetailResponseDTO>> updateRoom(@RequestBody RoomUpdateRequestDTO request, @PathVariable Long id) {
+        Long userId = SecurityUtil.getCurrentUserId();
+        Room editedRoom = roomService.updateRoom(request, id, userId);
+
+        return ResponseEntity.ok(ApiResponse.success(new RoomDetailResponseDTO(editedRoom)));
+    }
+
     @DeleteMapping("/{id}")
     @Operation(summary = "내 방 1개 삭제", description = "방 한개를 삭제합니다")
     public ResponseEntity<ApiResponse<Void>> deleteRoom(@PathVariable Long id) {
         Long userId = SecurityUtil.getCurrentUserId();
         roomService.deleteRoom(id, userId);
+
         return ResponseEntity.ok(ApiResponse.success(null));
 
     }
