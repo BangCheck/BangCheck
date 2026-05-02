@@ -1,39 +1,27 @@
 export const USER_TYPES = [
   {
-    id: 'bug-avoidant',
+    id: 'BUG_AVOIDER',
     label: '벌레 싫어형',
     description: '해충/위생 집중 관리',
     icon: 'bug',
   },
   {
-    id: 'noise-sensitive',
+    id: 'NOISE_SENSITIVE',
     label: '소음 민감형',
     description: '조용하고 아늑한 공간',
     icon: 'mute',
   },
   {
-    id: 'comfort-oriented',
-    label: '채광 중요형',
+    id: 'CLEAN_FREAK',
+    label: '깔끔 꼼꼼형',
     description: '햇빛과 환기 위주',
     icon: 'sun',
   },
   {
-    id: 'life-performance',
+    id: 'PERFORMANCE_TYPE',
     label: '생활 성능형',
     description: '수압과 편의시설 중심',
     icon: 'moon',
-  },
-  {
-    id: 'first-timer',
-    label: '첫 자취',
-    description: '처음이라 꼼꼼하게 다 확인!',
-    icon: 'house',
-  },
-  {
-    id: 'quick-core',
-    label: '핵심만 빠르게',
-    description: '필수 항목만 쏙쏙',
-    icon: 'lightning',
   },
 ] as const;
 
@@ -97,10 +85,8 @@ export const CATEGORIES = ['내부 상태', '문제 요소', '안전/보안', '�
 
 // 사용자 유형별 추천 항목 매핑 (기능명세서 기반)
 export const TYPE_ITEM_MAP: Record<string, string[]> = {
-  'bug-avoidant': ['window-screen', 'door-gap', 'bug-trace', 'smell', 'greenery', 'food-density'],
-  'noise-sensitive': ['soundproof', 'noise-all', 'transport', 'night-business', 'crowd', 'construction'],
-  'comfort-oriented': ['sunlight', 'ventilation', 'mold', 'moisture', 'greenery', 'food-density'],
-  'life-performance': ['water-pressure', 'noise-all', 'laundry', 'outlets', 'dry-space'],
-  'first-timer': CHECKLIST_ITEMS.map(item => item.id), // 전체 항목
-  'quick-core': CHECKLIST_ITEMS.filter(item => item.isDefault).map(item => item.id), // 기본 항목만
+  'BUG_AVOIDER': ['window-screen', 'door-gap', 'bug-trace', 'smell', 'greenery', 'food-density'],
+  'NOISE_SENSITIVE': ['soundproof', 'noise-all', 'transport', 'night-business', 'crowd', 'construction'],
+  'CLEAN_FREAK': ['sunlight', 'ventilation', 'mold', 'moisture', 'greenery', 'food-density'],
+  'PERFORMANCE_TYPE': ['water-pressure', 'noise-all', 'laundry', 'outlets', 'dry-space'],
 };
