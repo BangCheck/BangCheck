@@ -18,6 +18,7 @@ public interface RoomRepository extends JpaRepository<Room, Long> {
         SELECT room FROM Room room
         WHERE room.userId = :userId
         AND (:rentType IS NULL OR room.rentType = :rentType)
+        AND room.isDeleted = false
         ORDER BY room.createdAt ASC
         """)
     List<Room> findRoomsWithFilter(@Param("userId") Long userId, @Param("rentType") RentType rentType);

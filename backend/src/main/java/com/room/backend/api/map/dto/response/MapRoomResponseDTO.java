@@ -16,7 +16,10 @@ public class MapRoomResponseDTO {
     private final RentType rentType;
     private final Long deposit;
     private final Integer rent;
+    private final Integer distanceM;
+    private final Integer walkTimeMin;
 
+    // 기준점 존재 안할때
     public MapRoomResponseDTO(Room room) {
         this.id = room.getId();
         this.address = room.getAddress();
@@ -25,5 +28,20 @@ public class MapRoomResponseDTO {
         this.rentType = room.getRentType();
         this.deposit = room.getDeposit();
         this.rent = room.getMonthlyRent();
+        this.distanceM = null;
+        this.walkTimeMin = null;
+    }
+
+    // 기준점 존재 할때
+    public MapRoomResponseDTO(Room room, int distanceM, int walkTimeMin) {
+        this.id = room.getId();
+        this.address = room.getAddress();
+        this.lat = room.getLat();
+        this.lon = room.getLon();
+        this.rentType = room.getRentType();
+        this.deposit = room.getDeposit();
+        this.rent = room.getMonthlyRent();
+        this.distanceM = distanceM;
+        this.walkTimeMin = walkTimeMin;
     }
 }

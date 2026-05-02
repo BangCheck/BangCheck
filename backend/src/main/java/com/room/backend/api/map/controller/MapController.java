@@ -16,9 +16,12 @@ import com.room.backend.api.map.dto.request.MapPointCreateRequestDTO;
 import com.room.backend.api.map.dto.response.MapPointResponseDTO;
 import com.room.backend.api.map.dto.response.MapRoomResponseDTO;
 import com.room.backend.api.map.service.MapService;
+import com.room.backend.domain.map.entity.MapPoint;
+import com.room.backend.domain.room.entity.Room;
 import com.room.backend.domain.room.entity.enums.RentType;
 import com.room.backend.global.auth.util.SecurityUtil;
 import com.room.backend.global.common.response.ApiResponse;
+import com.room.backend.global.map.DistanceUtil;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -34,14 +37,32 @@ public class MapController {
 
     @GetMapping("/rooms")
     @Operation(summary = "지도용 매물 목록 조회", description = "지도에 표시할 내 방 목록을 반환합니다.")
-    public ResponseEntity<ApiResponse<List<MapRoomResponseDTO>>> getMapRooms(
-            @RequestParam(required = false) RentType rentType) {
+    public ResponseEntity<ApiResponse<List<MapRoomResponseDTO>>> getMapRooms(@RequestParam(required = false) RentType rentType, 
+    @RequestParam(required = false) Long pointId, @RequestParam(required = false) Integer maxDistance) {
         Long userId = SecurityUtil.getCurrentUserId();
-        List<MapRoomResponseDTO> response = mapService.getRoomsForMap(userId, rentType)
-                .stream()
-                .map(MapRoomResponseDTO::new)
-                .toList();
-        return ResponseEntity.ok(ApiResponse.success(response));
+        List<Room> rooms = mapService.getRoomsForMap(userId, rentType);
+
+        if (pointId == null) {
+                return ResponseEntity.ok(ApiResponse.success(
+                rooms.stream().map(MapRoomResponseDTO::new).toList()
+                ));
+        }
+
+        MapPoint point = mapService.getMapPointById(pointId, userId)
+                .orElseThrow(() -> new RuntimeException("기준점을 찾을 수 없습니다."));
+
+        return ResponseEntity.ok(ApiResponse.success(
+                rooms.stream()
+                .map(room -> {
+                        double distM = DistanceUtil.calculateDistanceM(
+                        point.getLat(), point.getLon(),
+                        room.getLat(), room.getLon());
+                        int walkMin = DistanceUtil.estimateWalkMinutes(distM);
+                        return new MapRoomResponseDTO(room, (int) distM, walkMin);
+                })
+                .filter(dto -> maxDistance == null || dto.getDistanceM() <= maxDistance)
+                .toList()
+        ));
     }
 
     @GetMapping("/points")
