@@ -1,6 +1,6 @@
 'use client';
 
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 
 /**
  * 체크리스트 8단계 퍼널 제어를 위한 커스텀 훅
@@ -8,6 +8,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 export const useCheckFunnel = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const pathname = usePathname();
   
   // 현재 단계를 쿼리 파라미터에서 가져옴 (기본값 1)
   const step = Number(searchParams.get('step')) || 1;
@@ -15,7 +16,7 @@ export const useCheckFunnel = () => {
   const setStep = (nextStep: number) => {
     const params = new URLSearchParams(searchParams.toString());
     params.set('step', nextStep.toString());
-    router.push(`/checklist/new?${params.toString()}`);
+    router.push(`${pathname}?${params.toString()}`);
   };
 
   const next = () => {

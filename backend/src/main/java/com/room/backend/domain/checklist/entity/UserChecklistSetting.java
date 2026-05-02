@@ -1,16 +1,15 @@
 package com.room.backend.domain.checklist.entity;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
 @Getter
+@Builder
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 @Table(name = "user_checklist_settings",
        uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "item_id"}))
 public class UserChecklistSetting {
@@ -20,10 +19,10 @@ public class UserChecklistSetting {
     private Long id;
 
     @Column(name = "user_id", nullable = false)
-    private Long userId;                          // 논리적 FK (물리적 연결 없음)
+    private Long userId;
 
     @Column(name = "item_id", nullable = false)
-    private Long itemId;                          // 논리적 FK (물리적 연결 없음)
+    private Long itemId;
 
     @Column(name = "is_enabled", nullable = false)
     private Boolean isEnabled;
@@ -34,22 +33,21 @@ public class UserChecklistSetting {
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
-    @Builder
-    public UserChecklistSetting(Long userId, Long itemId, Boolean isEnabled) {
-        this.userId = userId;
-        this.itemId = itemId;
-        this.isEnabled = isEnabled;
-        this.createdAt = LocalDateTime.now();
-        this.updatedAt = LocalDateTime.now();
+    public static UserChecklistSetting of(Long userId, Long itemId, Boolean isEnabled) {
+        return UserChecklistSetting.builder()
+                .userId(userId)
+                .itemId(itemId)
+                .isEnabled(isEnabled)
+                .createdAt(LocalDateTime.now())
+                .updatedAt(LocalDateTime.now())
+                .build();
     }
 
-    // ON/OFF 토글
     public void toggle() {
         this.isEnabled = !this.isEnabled;
         this.updatedAt = LocalDateTime.now();
     }
 
-    // 명시적 설정
     public void updateEnabled(Boolean isEnabled) {
         this.isEnabled = isEnabled;
         this.updatedAt = LocalDateTime.now();

@@ -31,4 +31,16 @@ public class MapPoint extends BaseEntity {
 
     @Column(name = "address", nullable = false, length = 255)
     private String address;
+
+    private MapPoint(Long userId, String name, BigDecimal lat, BigDecimal lon, String address) {
+        this.userId = userId;
+        this.name = name;
+        this.lat = lat;
+        this.lon = lon;
+        this.address = address;
+    }
+
+    public static MapPoint create(Long userId, String name, BigDecimal lat, BigDecimal lon, String address) {
+        return new MapPoint(userId, name, lat, lon, address);
+    }
 }
