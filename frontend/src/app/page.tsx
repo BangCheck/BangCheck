@@ -16,6 +16,7 @@ import {
   CustomChecklistModal
 } from '@/components/ui/Modals';
 import { ROUTES } from '@/lib/routes';
+import { useCustomization } from '@/features/customization/hooks/useCustomization';
 
 /**
  * 로딩 중 보여줄 스켈레톤 UI
@@ -133,15 +134,17 @@ function SortDropdown({
 }
 
 // 맞춤 설정 정보 바
-function CustomizationInfoBar() {
+function CustomizationInfoBar({ normalCount, customCount }: { normalCount: number; customCount: number }) {
   return (
     <div className="w-full bg-[#F5F5F5] rounded-[8px] px-[16px] py-[14px] flex items-center gap-2 mb-10 border border-[#E2E2E2]/50">
       <span className="bg-[#777] text-white text-[12px] font-bold px-2 py-1 rounded-[4px]">
-        17개 항목 활성
+        {normalCount}개 항목 활성
       </span>
-      <span className="bg-[#D9EAF0] text-[#0A607D] text-[12px] font-bold px-2 py-1 rounded-[4px]">
-        + 1개 커스텀
-      </span>
+      {customCount > 0 && (
+        <span className="bg-[#D9EAF0] text-[#0A607D] text-[12px] font-bold px-2 py-1 rounded-[4px]">
+          + {customCount}개 커스텀
+        </span>
+      )}
     </div>
   );
 }
@@ -152,6 +155,7 @@ function CustomizationInfoBar() {
 export default function Home() {
   const { isLoggedIn } = useAuthStore();
   const { guestRooms, deleteGuestRoom } = useGuestRoomStore();
+  const { counts } = useCustomization();
   const router = useRouter();
   const queryClient = useQueryClient();
   
@@ -379,7 +383,12 @@ export default function Home() {
             </button>
           </div>
 
-          {isLoggedIn && <CustomizationInfoBar />}
+          {isLoggedIn && (
+            <CustomizationInfoBar 
+              normalCount={counts.normalActiveCount} 
+              customCount={counts.customActiveCount} 
+            />
+          )}
 
           {((isFetched || !isLoggedIn) && rooms.length === 0) ? (
             <div className="flex flex-col items-center justify-center py-20">
