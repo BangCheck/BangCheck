@@ -1,7 +1,7 @@
 'use client';
 
 import { cn } from '@/lib/utils';
-import type { Room } from '@/types';
+import type { RoomDetail as Room } from '@/types';
 import type { SectionKey } from './SectionFilter';
 
 interface Props {

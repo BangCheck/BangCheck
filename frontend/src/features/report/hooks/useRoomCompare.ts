@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import type { Room } from '@/types';
+import type { RoomDetail as Room } from '@/types';
 
 const MAX_SELECT = 6;
 const MIN_SELECT = 2;

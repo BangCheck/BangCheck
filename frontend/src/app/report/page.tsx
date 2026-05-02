@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useAuthStore } from '@/store/use-auth-store';
-import { getRooms } from '@/services/room-service';
+import { getReportRooms } from '@/services/room-service';
 import { useRoomCompare } from '@/features/report/hooks/useRoomCompare';
 import { RoomSelectCard } from '@/features/report/components/RoomSelectCard';
 import { SectionFilter, SECTIONS } from '@/features/report/components/SectionFilter';
@@ -15,8 +15,8 @@ export default function ReportPage() {
   const { isLoggedIn } = useAuthStore();
 
   const { data: rooms = [], isLoading } = useQuery({
-    queryKey: ['rooms'],
-    queryFn: getRooms,
+    queryKey: ['report-rooms'],
+    queryFn: getReportRooms,
     enabled: isLoggedIn,
   });
 

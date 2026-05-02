@@ -1,5 +1,6 @@
 export const ROUTES = {
   HOME: '/',
+  ROOMS: '/rooms',
   LOGIN: '/login',
   AUTH_CALLBACK: (provider: string) => `/auth/callback/${provider}`,
   REPORT: '/report',
