@@ -4,9 +4,11 @@ import * as customService from '@/services/custom-checklist-service';
 import { ChecklistItemResponse } from '@/types/checklist';
 import { TYPE_ITEM_MAP, CHECKLIST_ITEMS } from '../constants';
 import { useCustomizationStore } from '@/store/use-customization-store';
+import { useAuthStore } from '@/store/use-auth-store';
 
 export const useCustomization = () => {
   const queryClient = useQueryClient();
+  const { isLoggedIn } = useAuthStore();
   const { 
     selectedTypeIds, 
     activeItemNames, 
@@ -20,6 +22,7 @@ export const useCustomization = () => {
   const { data: items = [], isLoading } = useQuery({
     queryKey: ['customChecklistItems'],
     queryFn: customService.getCustomizedItems,
+    enabled: isLoggedIn, // 로그인 상태일 때만 서버에서 데이터를 가져옴
     refetchOnWindowFocus: false, // 창 포커스 시 재로딩 방지
     staleTime: 1000 * 60 * 5, // 5분간 데이터 유지
   });

@@ -3,6 +3,7 @@ import "./globals.css";
 import ReactQueryProvider from "../components/providers/react-query-provider";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
+import BottomNavigation from "../components/BottomNavigation";
 import { DevLoginButton } from "@/features/dev/DevLoginButton";
 
 export const metadata: Metadata = {
@@ -42,9 +43,10 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col font-['Pretendard',sans-serif]">
         <ReactQueryProvider>
           <Header />
-          <main className="flex-1 flex flex-col">
+          <main className="flex-1 flex flex-col pb-[80px] md:pb-0">
             {children}
           </main>
+          <BottomNavigation />
           <Footer />
           <DevLoginButton />
         </ReactQueryProvider>
