@@ -4,14 +4,14 @@ import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/use-auth-store';
 import type { User } from '@/types';
 
-// ⚠️ 만료 1시간 — 만료 시 BE에서 새 토큰 발급 후 교체
+// ⚠️ 무한 만료 토큰 — BE에서 새 토큰 발급 시 교체 (2026-05-02)
 // userId 1 ~ 5 선택 가능
 const DEV_TOKENS: Record<number, string> = {
-  1: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwidXNlcklkIjoxLCJyb2xlIjoiVVNFUiIsImlhdCI6MTc3NzU1MzQ4NywiZXhwIjoxNzc3NTU3MDg3fQ.eD5ax5EqjBX00PbchDoQEpa0SHWVKqBR-49CCMgiGCY',
-  2: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyIiwidXNlcklkIjoyLCJyb2xlIjoiVVNFUiIsImlhdCI6MTc3NzU1MzQ4NywiZXhwIjoxNzc3NTU3MDg3fQ.UOldVpY27xvZ04bHL6rifejeMMTKbsDVw17SBz55Yq0',
-  3: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzIiwidXNlcklkIjozLCJyb2xlIjoiVVNFUiIsImlhdCI6MTc3NzU1MzQ4NywiZXhwIjoxNzc3NTU3MDg3fQ.MZfaSgqt9l_VEUOUgMCNWBET5ujcUnEj_YdphrEN5Uw',
-  4: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI0IiwidXNlcklkIjo0LCJyb2xlIjoiQURNSU4iLCJpYXQiOjE3Nzc1NTM0ODcsImV4cCI6MTc3NzU1NzA4N30.yKD0rDA2W4pNZDMMsTJWDIrTtnYEFBU79jlUFfMJtOQ',
-  5: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI1IiwidXNlcklkIjo1LCJyb2xlIjoiVVNFUiIsImlhdCI6MTc3NzU1MzQ4NywiZXhwIjoxNzc3NTU3MDg3fQ.PA-GRobBTv5D0JM5qybH2mxArpqnByAbthhyR23mVL8',
+  1: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxIiwidXNlcklkIjoxLCJyb2xlIjoiUk9MRV9VU0VSIiwiaWF0IjoxNzc3NzA2MTIzLCJleHAiOjk5OTk5OTk5OTl9._9aMVxu_8RHH4RzgHctLNhiRQrrbMfLrh0xOLSmR8hs',
+  2: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIyIiwidXNlcklkIjoyLCJyb2xlIjoiUk9MRV9VU0VSIiwiaWF0IjoxNzc3NzA2MTIzLCJleHAiOjk5OTk5OTk5OTl9.r-68-OZnJVnciHUczuj3EJuj-ev9EHBTwrUjXKFiwQc',
+  3: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzIiwidXNlcklkIjozLCJyb2xlIjoiUk9MRV9VU0VSIiwiaWF0IjoxNzc3NzA2MTIzLCJleHAiOjk5OTk5OTk5OTl9.I6wq137UVOXYr7YRR3sqw1Lm4t-zBxhp60Myb8bv0TA',
+  4: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI0IiwidXNlcklkIjo0LCJyb2xlIjoiUk9MRV9VU0VSIiwiaWF0IjoxNzc3NzA2MTIzLCJleHAiOjk5OTk5OTk5OTl9.azyl6Y32R23XWeTYowwa-q1KbiumjQnIt0aEyBzGxvU',
+  5: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI1IiwidXNlcklkIjo1LCJyb2xlIjoiUk9MRV9VU0VSIiwiaWF0IjoxNzc3NzA2MTIzLCJleHAiOjk5OTk5OTk5OTl9.-DlAb7t9pvo-P-dtVuf5dxJF6LHzzeJGfRxRRvMFaKk',
 };
 
 const ACTIVE_USER_ID = 1;
