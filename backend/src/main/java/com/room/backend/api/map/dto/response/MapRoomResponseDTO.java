@@ -2,6 +2,7 @@ package com.room.backend.api.map.dto.response;
 
 import java.math.BigDecimal;
 
+import com.room.backend.domain.room.entity.Room;
 import com.room.backend.domain.room.entity.enums.RentType;
 
 import lombok.Getter;
@@ -14,16 +15,33 @@ public class MapRoomResponseDTO {
     private final BigDecimal lon;
     private final RentType rentType;
     private final Long deposit;
-    private final Integer monthlyRent;
+    private final Integer rent;
+    private final Integer distanceM;
+    private final Integer walkTimeMin;
 
-    public MapRoomResponseDTO(Long id, String address, BigDecimal lat,
-            BigDecimal lon, RentType rentType, Long deposit, Integer monthlyRent) {
-        this.id = id;
-        this.address = address;
-        this.lat = lat;
-        this.lon = lon;
-        this.rentType = rentType;
-        this.deposit = deposit;
-        this.monthlyRent = monthlyRent;
+    // 기준점 존재 안할때
+    public MapRoomResponseDTO(Room room) {
+        this.id = room.getId();
+        this.address = room.getAddress();
+        this.lat = room.getLat();
+        this.lon = room.getLon();
+        this.rentType = room.getRentType();
+        this.deposit = room.getDeposit();
+        this.rent = room.getMonthlyRent();
+        this.distanceM = null;
+        this.walkTimeMin = null;
+    }
+
+    // 기준점 존재 할때
+    public MapRoomResponseDTO(Room room, int distanceM, int walkTimeMin) {
+        this.id = room.getId();
+        this.address = room.getAddress();
+        this.lat = room.getLat();
+        this.lon = room.getLon();
+        this.rentType = room.getRentType();
+        this.deposit = room.getDeposit();
+        this.rent = room.getMonthlyRent();
+        this.distanceM = distanceM;
+        this.walkTimeMin = walkTimeMin;
     }
 }

@@ -3,6 +3,8 @@ package com.room.backend.api.map.dto.response;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+import com.room.backend.domain.map.entity.MapPoint;
+
 import lombok.Getter;
 
 @Getter
@@ -12,14 +14,14 @@ public class MapPointResponseDTO {
     private final String address;
     private final BigDecimal lat;
     private final BigDecimal lon;
-    private LocalDateTime createdAt;
+    private final LocalDateTime createdAt;
 
-    public MapPointResponseDTO(Long id, String name, String address, BigDecimal lat, BigDecimal lon, LocalDateTime createdAt) {
-        this.id = id;
-        this.name = name;
-        this.address = address;
-        this.lat = lat;
-        this.lon = lon;
-        this.createdAt = createdAt;
+    public MapPointResponseDTO(MapPoint point) {
+        this.id = point.getId();
+        this.name = point.getName();
+        this.address = point.getAddress();
+        this.lat = point.getLat();
+        this.lon = point.getLon();
+        this.createdAt = point.getCreatedAt();
     }
 }

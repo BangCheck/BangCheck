@@ -29,12 +29,12 @@ public class MapService {
 
     @Transactional(readOnly = true)
     public List<MapPoint> getAllMapPointsForRooms(Long userId) {
-        return mapRepository.findByUserId(userId);
+        return mapRepository.findByUserIdAndIsDeletedFalse(userId);
     }
 
     @Transactional(readOnly = true)
     public Optional<MapPoint> getMapPointById(Long mapId, Long userId) {
-        return mapRepository.findByIdAndUserId(mapId, userId);
+        return mapRepository.findByIdAndUserIdAndIsDeletedFalse(mapId, userId);
     }
 
     @Transactional
@@ -43,12 +43,11 @@ public class MapService {
         return mapRepository.save(mapPoint);
     }
 
-    // (지도 기준점 삭제)하드 삭제로 코딩 되어 있음 - 추후 소프트 삭제로 변경 가능성도 체크 해봐야함.
     @Transactional
     public void deleteMapPoint(Long mapId, Long userId) {
-        MapPoint mapPoint = mapRepository.findByIdAndUserId(mapId, userId)
+        MapPoint mapPoint = mapRepository.findByIdAndUserIdAndIsDeletedFalse(mapId, userId)
                 .orElseThrow(() -> new RuntimeException("지도 기준점을 찾을 수 없습니다."));
-        mapRepository.delete(mapPoint);
+        mapPoint.softDelete();
     }
 
 }
