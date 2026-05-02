@@ -42,7 +42,7 @@ const checklistSchema = z.object({
   memo: z.string().max(50, '메모는 최대 50자까지 가능합니다').optional(),
 });
 
-type ChecklistFormValues = z.input<typeof checklistSchema>;
+type ChecklistFormValues = z.infer<typeof checklistSchema>;
 
 const TABS = ['기본 정보', '건물 정보', '상세 점검'];
 
