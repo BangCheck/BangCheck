@@ -23,6 +23,9 @@ import com.room.backend.global.auth.util.SecurityUtil;
 import com.room.backend.global.common.response.ApiResponse;
 import com.room.backend.global.map.DistanceUtil;
 
+import com.room.backend.global.common.exception.GeneralException;
+import com.room.backend.global.common.exception.MapErrorCode;
+import jakarta.validation.Valid;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -49,10 +52,11 @@ public class MapController {
         }
 
         MapPoint point = mapService.getMapPointById(pointId, userId)
-                .orElseThrow(() -> new RuntimeException("기준점을 찾을 수 없습니다."));
+                .orElseThrow(() -> new GeneralException(MapErrorCode.MAP_POINT_NOT_FOUND));
 
         return ResponseEntity.ok(ApiResponse.success(
                 rooms.stream()
+                .filter(room -> room.getLat() != null && room.getLon() != null)
                 .map(room -> {
                         double distM = DistanceUtil.calculateDistanceM(
                         point.getLat(), point.getLon(),
@@ -79,7 +83,7 @@ public class MapController {
     @PostMapping("/points")
     @Operation(summary = "지도용 기준점 생성", description = "지도에 표시할 기준점을 생성합니다.")
     public ResponseEntity<ApiResponse<MapPointResponseDTO>> createMapPoint(
-            @RequestBody MapPointCreateRequestDTO request) {
+            @Valid @RequestBody MapPointCreateRequestDTO request) {
         Long userId = SecurityUtil.getCurrentUserId();
         MapPointResponseDTO response = new MapPointResponseDTO(
                 mapService.createMapPoint(request, userId));

@@ -9,6 +9,8 @@ import org.springframework.transaction.annotation.Transactional;
 import com.room.backend.api.map.dto.request.MapPointCreateRequestDTO;
 import com.room.backend.domain.map.entity.MapPoint;
 import com.room.backend.domain.map.repository.MapRepository;
+import com.room.backend.global.common.exception.GeneralException;
+import com.room.backend.global.common.exception.MapErrorCode;
 import com.room.backend.domain.room.entity.Room;
 import com.room.backend.domain.room.entity.enums.RentType;
 import com.room.backend.domain.room.repository.RoomRepository;
@@ -46,7 +48,7 @@ public class MapService {
     @Transactional
     public void deleteMapPoint(Long mapId, Long userId) {
         MapPoint mapPoint = mapRepository.findByIdAndUserIdAndIsDeletedFalse(mapId, userId)
-                .orElseThrow(() -> new RuntimeException("지도 기준점을 찾을 수 없습니다."));
+                .orElseThrow(() -> new GeneralException(MapErrorCode.MAP_POINT_NOT_FOUND));
         mapPoint.softDelete();
     }
 

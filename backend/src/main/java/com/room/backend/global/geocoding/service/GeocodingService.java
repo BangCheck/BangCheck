@@ -4,6 +4,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
+import com.room.backend.global.common.exception.GeocodingErrorCode;
+import com.room.backend.global.common.exception.GeneralException;
 import com.room.backend.global.geocoding.dto.GeocodingResponseDTO;
 
 import java.math.BigDecimal;
@@ -34,7 +36,7 @@ public class GeocodingService {
                 .body(GeocodingResponseDTO.class);
 
         if (response == null || response.getAddresses().isEmpty()) {
-            throw new RuntimeException("주소를 찾을 수 없습니다: " + address);
+            throw new GeneralException(GeocodingErrorCode.ADDRESS_NOT_FOUND);
         }
 
         GeocodingResponseDTO.Address result = response.getAddresses().get(0);
