@@ -29,7 +29,7 @@ public class GeocodingService {
 
     public BigDecimal[] getCoordinates(String address) {
         GeocodingResponseDTO response = restClient.get()
-                .uri("https://naveropenapi.apigw.ntruss.com/map-geocode/v2/geocode?query={address}", address)
+                .uri("https://maps.apigw.ntruss.com/map-geocode/v2/geocode?query={address}", address)
                 .header("x-ncp-apigw-api-key-id", clientId)
                 .header("x-ncp-apigw-api-key", clientSecret)
                 .retrieve()
