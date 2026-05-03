@@ -24,6 +24,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import com.room.backend.global.common.exception.GeneralException;
+import com.room.backend.global.common.exception.RoomErrorCode;
+import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -36,7 +39,7 @@ public class RoomController {
 
     @PostMapping
     @Operation(summary = "방 등록", description = "새로운 방을 등록합니다. 주소를 기반으로 좌표를 자동 변환합니다.")
-    public ResponseEntity<ApiResponse<RoomCreateResponseDTO>> createRoom(@RequestBody RoomCreateRequestDTO request) {
+    public ResponseEntity<ApiResponse<RoomCreateResponseDTO>> createRoom(@Valid @RequestBody RoomCreateRequestDTO request) {
         Long userId = SecurityUtil.getCurrentUserId();
         Room savedRoom = roomService.createRoom(request, userId);
 
@@ -60,7 +63,7 @@ public class RoomController {
     public ResponseEntity<ApiResponse<RoomDetailResponseDTO>> getRoom(@PathVariable Long id) {
         Long userId = SecurityUtil.getCurrentUserId();
         Room room = roomService.getRoom(id, userId)
-                .orElseThrow(() -> new RuntimeException("방을 찾을 수 없습니다."));
+                .orElseThrow(() -> new GeneralException(RoomErrorCode.ROOM_NOT_FOUND));
         
         return ResponseEntity.ok(ApiResponse.success(new RoomDetailResponseDTO(room)));
 
@@ -68,7 +71,7 @@ public class RoomController {
 
     @PutMapping("/{id}")
     @Operation(summary = "방 수정", description = "방을 수정합니다")
-    public ResponseEntity<ApiResponse<RoomDetailResponseDTO>> updateRoom(@RequestBody RoomUpdateRequestDTO request, @PathVariable Long id) {
+    public ResponseEntity<ApiResponse<RoomDetailResponseDTO>> updateRoom(@Valid @RequestBody RoomUpdateRequestDTO request, @PathVariable Long id) {
         Long userId = SecurityUtil.getCurrentUserId();
         Room editedRoom = roomService.updateRoom(request, id, userId);
 

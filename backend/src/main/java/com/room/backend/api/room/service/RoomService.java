@@ -8,6 +8,8 @@ import com.room.backend.api.room.dto.request.RoomCreateRequestDTO;
 import com.room.backend.api.room.dto.request.RoomUpdateRequestDTO;
 import com.room.backend.domain.room.entity.Room;
 import com.room.backend.domain.room.repository.RoomRepository;
+import com.room.backend.global.common.exception.GeneralException;
+import com.room.backend.global.common.exception.RoomErrorCode;
 import com.room.backend.global.geocoding.service.GeocodingService;
 
 import lombok.RequiredArgsConstructor;
@@ -66,14 +68,14 @@ public class RoomService {
     @Transactional
     public void deleteRoom(Long roomId, Long userId){
         Room room = roomRepository.findByIdAndUserIdAndIsDeletedFalse(roomId, userId)
-                .orElseThrow(() -> new RuntimeException("방을 찾을 수 없습니다."));
+                .orElseThrow(() -> new GeneralException(RoomErrorCode.ROOM_NOT_FOUND));
         room.softDelete();
     }
 
     @Transactional
     public Room updateRoom(RoomUpdateRequestDTO request, Long roomId, Long userId){
         Room room = roomRepository.findByIdAndUserIdAndIsDeletedFalse(roomId, userId)
-                .orElseThrow(() -> new RuntimeException("방을 찾을 수 없습니다."));
+                .orElseThrow(() -> new GeneralException(RoomErrorCode.ROOM_NOT_FOUND));
         
         room.update(request);
         return room;
