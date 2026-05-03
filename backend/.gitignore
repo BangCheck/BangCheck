@@ -49,3 +49,5 @@ out/
 
 # Ignore Gradle properties 
 gradle.properties
+# Local profile config
+src/main/resources/application-local.yaml
