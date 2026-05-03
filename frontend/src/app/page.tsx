@@ -195,7 +195,7 @@ export default function Home() {
     isFetchingNextPage,
   } = useInfiniteQuery({
     queryKey: ['rooms', transactionType, sortOption],
-    queryFn: ({ pageParam = 0 }) => getRooms(pageParam, 6),
+    queryFn: ({ pageParam = 0 }) => getRooms(pageParam, 6, transactionType, sortOption),
     initialPageParam: 0,
     getNextPageParam: (lastPage, allPages) => {
       return lastPage.length === 6 ? allPages.length : undefined;
@@ -206,19 +206,10 @@ export default function Home() {
 
   const apiRooms = data?.pages.flat() || [];
   const baseRooms = isLoggedIn ? apiRooms : guestRooms;
-
-  // 필터링 및 정렬 로직 적용
-  const rooms = baseRooms
-    .filter((room) => {
-      if (transactionType === '전체') return true;
-      return room.type === transactionType;
-    })
-    .sort((a, b) => {
-      if (sortOption === '보증금 낮은순') return (a.deposit || 0) - (b.deposit || 0);
-      if (sortOption === '월세 낮은순') return (a.rent || 0) - (b.rent || 0);
-      if (sortOption === '관리비 낮은순') return (a.managementFee || 0) - (b.managementFee || 0);
-      return 0;
-    });
+  const rooms = isLoggedIn ? apiRooms : guestRooms.filter((room) => {
+    if (transactionType === '전체') return true;
+    return room.type === transactionType;
+  });
 
   const hasNoRoomsAtAll = (isFetched || !isLoggedIn) && baseRooms.length === 0;
   const hasNoFilteredRooms = (isFetched || !isLoggedIn) && baseRooms.length > 0 && rooms.length === 0;
