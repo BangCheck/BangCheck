@@ -11,4 +11,5 @@ import java.util.List;
 @AllArgsConstructor
 public class ReportInfoResponseDTO {
     private List<RoomSummaryDTO> rooms;
+    private List<CategoryDTO> categories;
 }
