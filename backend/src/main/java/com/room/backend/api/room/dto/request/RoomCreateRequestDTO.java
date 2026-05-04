@@ -3,6 +3,7 @@ package com.room.backend.api.room.dto.request;
 import com.room.backend.domain.room.entity.enums.BuildingType;
 import com.room.backend.domain.room.entity.enums.Direction;
 import com.room.backend.domain.room.entity.enums.RentType;
+import com.room.backend.domain.room.entity.enums.SpecialFloor;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -50,7 +51,7 @@ public class RoomCreateRequestDTO {
     private Boolean hasElevator;
 
     private Boolean hasParking;
-    private String specialFloor;
+    private SpecialFloor specialFloor;
 
     @NotNull(message = "방향은 필수입니다.")
     private Direction direction;

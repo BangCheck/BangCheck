@@ -10,6 +10,7 @@ import com.room.backend.domain.room.entity.Room;
 import com.room.backend.domain.room.entity.enums.BuildingType;
 import com.room.backend.domain.room.entity.enums.Direction;
 import com.room.backend.domain.room.entity.enums.RentType;
+import com.room.backend.domain.room.entity.enums.SpecialFloor;
 
 import lombok.Getter;
 
@@ -35,7 +36,7 @@ public class RoomDetailResponseDTO {
     private final Integer floor;
     private final Boolean hasElevator;
     private final Boolean hasParking;
-    private final String specialFloor;
+    private final SpecialFloor specialFloor;
     private final List<RoomCheckResultResponseDTO> checkResults;
     private final Direction direction;
     private final String memo;
