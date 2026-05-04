@@ -3,7 +3,9 @@ package com.room.backend.api.room.dto.response;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
+import com.room.backend.domain.checklist.dto.response.RoomCheckResultResponseDTO;
 import com.room.backend.domain.room.entity.Room;
 import com.room.backend.domain.room.entity.enums.BuildingType;
 import com.room.backend.domain.room.entity.enums.Direction;
@@ -34,11 +36,12 @@ public class RoomDetailResponseDTO {
     private final Boolean hasElevator;
     private final Boolean hasParking;
     private final String specialFloor;
+    private final List<RoomCheckResultResponseDTO> checkResults;
     private final Direction direction;
     private final String memo;
     private final LocalDateTime createdAt;
 
-    public RoomDetailResponseDTO(Room room) {
+    public RoomDetailResponseDTO(Room room, List<RoomCheckResultResponseDTO> checkResults) {
         this.id = room.getId();
         this.name = room.getName();
         this.address = room.getAddress();
@@ -59,6 +62,7 @@ public class RoomDetailResponseDTO {
         this.hasElevator = room.getHasElevator();
         this.hasParking = room.getHasParking();
         this.specialFloor = room.getSpecialFloor();
+        this.checkResults = checkResults;
         this.direction = room.getDirection();
         this.memo = room.getMemo();
         this.createdAt = room.getCreatedAt();
