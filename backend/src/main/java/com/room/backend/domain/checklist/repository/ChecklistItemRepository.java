@@ -1,6 +1,7 @@
 package com.room.backend.domain.checklist.repository;
 
 import com.room.backend.domain.checklist.entity.ChecklistItem;
+import com.room.backend.domain.checklist.entity.enums.ChecklistCategory;
 import com.room.backend.domain.checklist.entity.enums.ItemType;
 import com.room.backend.domain.checklist.entity.enums.UserType;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -13,6 +14,8 @@ import java.util.List;
 @Repository
 public interface ChecklistItemRepository extends JpaRepository<ChecklistItem, Long> {
     List<ChecklistItem> findByItemType(ItemType itemType);
+
+    List<ChecklistItem> findByCategory(ChecklistCategory category);
 
     @Query("""
             SELECT ci FROM ChecklistItem ci
