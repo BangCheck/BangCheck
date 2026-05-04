@@ -1,0 +1,17 @@
+package com.room.backend.domain.checklist.dto.request;
+
+import java.math.BigDecimal;
+import java.util.List;
+
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+@Getter
+@NoArgsConstructor
+public class RoomCheckAnswerRequestDTO {
+    
+    private Long itemId;
+    private String valueText;
+    private BigDecimal valueNumber;
+    private List<Long> selectedOptionIds;
+}

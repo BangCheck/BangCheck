@@ -8,6 +8,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -21,6 +22,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
@@ -43,6 +45,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         if (StringUtils.hasText(token)) {
             if (jwtProvider.isTokenExpired(token)) {
+                log.info("[JWT] 토큰 만료 - URI: {}", request.getRequestURI());
                 writeErrorResponse(response, "AUTH_40102", "Access token has expired. Please re-login.");
                 return;
             }
@@ -50,12 +53,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             if (jwtProvider.validateToken(token)) {
                 String tokenType = jwtProvider.getTokenTypeFromToken(token);
                 if (GUEST_TOKEN_TYPE.equals(tokenType)) {
+                    log.info("[JWT] 게스트 토큰 - URI: {}", request.getRequestURI());
                     filterChain.doFilter(request, response);
                     return;
                 }
 
                 Long userId = jwtProvider.getUserIdFromToken(token);
                 String role = jwtProvider.getRoleFromToken(token);
+
+                log.info("[JWT] 인증 성공 - userId: {}, role: {}, URI: {}", userId, role, request.getRequestURI());
 
                 UsernamePasswordAuthenticationToken authentication =
                         new UsernamePasswordAuthenticationToken(
@@ -66,9 +72,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             } else {
+                log.info("[JWT] 유효하지 않은 토큰 - URI: {}", request.getRequestURI());
                 writeErrorResponse(response, "AUTH_40103", "Invalid access token.");
                 return;
             }
+        } else {
+            log.info("[JWT] 토큰 없음 - URI: {}", request.getRequestURI());
         }
 
         filterChain.doFilter(request, response);
