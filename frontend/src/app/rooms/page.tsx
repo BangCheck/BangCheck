@@ -1,9 +1,8 @@
 'use client';
 
-import { useInfiniteQuery } from '@tanstack/react-query';
 import { useAuthStore } from '@/store/use-auth-store';
 import { useGuestRoomStore } from '@/store/use-guest-room-store';
-import { getRooms } from '@/services/room-service';
+import { useRoomsList, useDeleteRoom } from '@/features/rooms/hooks/useRoomsQuery';
 import { cn } from '@/lib/utils';
 import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
@@ -176,16 +175,9 @@ export default function Home() {
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
-  } = useInfiniteQuery({
-    queryKey: ['rooms', transactionType, sortOption],
-    queryFn: ({ pageParam = 0 }) => getRooms(pageParam, 6),
-    initialPageParam: 0,
-    getNextPageParam: (lastPage, allPages) => {
-      return lastPage.length === 6 ? allPages.length : undefined;
-    },
-    enabled: isLoggedIn,
-    staleTime: 1000 * 60,
-  });
+  } = useRoomsList(transactionType, sortOption);
+
+  const { mutate: deleteRoomById } = useDeleteRoom();
 
   const apiRooms = data?.pages.flat() || [];
   const rooms = isLoggedIn ? apiRooms : guestRooms;
@@ -392,8 +384,7 @@ export default function Home() {
                     if (!isLoggedIn) {
                       deleteGuestRoom(id);
                     } else {
-                      // TODO: Implement API delete logic
-                      console.log('Delete room:', id);
+                      deleteRoomById(id);
                     }
                   }}
                 />

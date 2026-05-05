@@ -4,47 +4,22 @@ import { useEffect, useRef } from 'react';
 import { useRouter, useParams, useSearchParams } from 'next/navigation';
 import { useMutation } from '@tanstack/react-query';
 import { useAuthStore } from '@/store/use-auth-store';
-import { api } from '@/lib/api';
+import { exchangeOAuthCode } from '@/services/auth-service';
+import type { OAuthProvider } from '@/types';
 import { ROUTES, loginRedirect } from '@/lib/routes';
 
 export default function AuthCallbackPage() {
   const router = useRouter();
   const params = useParams();
   const searchParams = useSearchParams();
-  const provider = params.provider as string;
+  const provider = params.provider as OAuthProvider;
   const setAuth = useAuthStore((state) => state.setAuth);
-  
+
   const isProcessed = useRef(false);
 
   const loginMutation = useMutation({
     mutationFn: async ({ code, state }: { code: string; state: string }) => {
-      const response = await api.get(`/api/v1/auth/oauth2/${provider}/callback`, {
-        params: { code, state }
-      });
-
-      const accessToken = response.headers['authorization']?.replace('Bearer ', '');
-      const result = response.data;
-
-      if (!accessToken || !result.success) {
-        throw new Error('토큰 정보가 없습니다.');
-      }
-
-      const profileImg = 
-        result.data?.profileImageUrl || 
-        result.data?.profile_image || 
-        result.data?.picture || 
-        result.data?.image || 
-        '';
-
-      return {
-        accessToken,
-        user: {
-          id: result.data?.id || 'unknown',
-          email: result.data?.email || '',
-          nickname: result.data?.nickname || result.data?.name || 'User',
-          profileImageUrl: profileImg,
-        },
-      };
+      return exchangeOAuthCode(provider, code, state);
     },
     onSuccess: (data) => {
       setAuth(data.accessToken, data.user);
