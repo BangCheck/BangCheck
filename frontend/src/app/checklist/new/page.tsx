@@ -14,6 +14,7 @@ import { useCreateChecklist } from '@/features/checklist/hooks/useChecklistQuery
 import { useAuthStore } from '@/store/use-auth-store';
 import { useGuestRoomStore } from '@/store/use-guest-room-store';
 import { ROUTES } from '@/lib/routes';
+import { useState } from 'react';
 
 // 스크린샷 기반 통합 Zod 스키마
 const checklistSchema = z.object({
@@ -70,6 +71,7 @@ function ChecklistNewContent() {
       hasElevator: '있음',
       hasParking: '없음',
       direction: '남',
+      // TODO(be): customItems는 유저 설정 API 연동 후 서버에서 불러올 것
       customItems: [],
     }
   });
@@ -80,35 +82,35 @@ function ChecklistNewContent() {
   const nameValue = methods.watch('name');
   const isNameEmpty = !nameValue || nameValue.trim().length === 0;
 
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const { mutate: submitChecklist, isPending } = useCreateChecklist();
 
   const onSubmit = (data: ChecklistFormValues) => {
+    setSubmitError(null);
     if (isLoggedIn) {
       submitChecklist(data as any, {
         onSuccess: () => {
-          alert('체크리스트가 성공적으로 저장되었습니다!');
           router.push(ROUTES.ROOMS);
           router.refresh();
         },
         onError: (error: any) => {
           console.error('Save failed:', error);
-          alert(error.response?.data?.message || '저장 중 오류가 발생했습니다.');
+          setSubmitError(error.response?.data?.message || '저장 중 오류가 발생했습니다. 다시 시도해 주세요.');
         },
       });
     } else {
       // 비로그인 사용자 로직
       if (guestRooms.length >= 2) {
-        alert('비로그인 사용자는 최대 2개까지만 체크리스트를 생성할 수 있습니다.\n로그인하여 무제한으로 이용해보세요!');
-        router.push(ROUTES.ROOMS);
+        // TODO(be): 비로그인 한도 초과 시 로그인 유도 모달로 교체 필요
+        setSubmitError('비로그인 상태에서는 최대 2개까지만 등록할 수 있습니다. 로그인하시면 무제한으로 이용 가능해요.');
         return;
       }
-      
+
       const success = addGuestRoom(data as any);
       if (success) {
-        alert('체크리스트가 브라우저에 임시 저장되었습니다!\n로그인하시면 영구적으로 보관할 수 있습니다.');
         router.push(ROUTES.ROOMS);
       } else {
-        alert('저장 가능한 개수를 초과했습니다.');
+        setSubmitError('저장 가능한 개수를 초과했습니다.');
       }
     }
   };
@@ -161,36 +163,43 @@ function ChecklistNewContent() {
             </div>
 
             {/* Navigation Buttons - Sticky at the bottom */}
-            <div className="pt-16 pb-10 flex gap-3 sticky bottom-0 bg-white/95 backdrop-blur-sm mt-auto z-50 border-t border-[#F5F5F5] -mx-6 px-6">
-              {step > 1 && (
+            <div className="pt-16 pb-10 sticky bottom-0 bg-white/95 backdrop-blur-sm mt-auto z-50 border-t border-[#F5F5F5] -mx-6 px-6">
+              {submitError && (
+                <div className="mb-3 px-4 py-3 bg-red-50 border border-red-200 rounded-lg text-[13px] text-red-600 font-medium">
+                  {submitError}
+                </div>
+              )}
+              <div className="flex gap-3">
+                {step > 1 && (
+                  <button
+                    type="button"
+                    onClick={prev}
+                    disabled={isPending}
+                    className="flex-1 py-4 rounded-xl font-bold text-[16px] bg-white border border-[#E2E2E2] text-[#232527] hover:bg-gray-50 transition-all disabled:opacity-50 cursor-pointer"
+                  >
+                    이전으로
+                  </button>
+                )}
                 <button
                   type="button"
-                  onClick={prev}
-                  disabled={isPending}
-                  className="flex-1 py-4 rounded-xl font-bold text-[16px] bg-white border border-[#E2E2E2] text-[#232527] hover:bg-gray-50 transition-all disabled:opacity-50 cursor-pointer"
+                  onClick={step === TABS.length ? methods.handleSubmit(onSubmit) : next}
+                  disabled={isPending || (step === TABS.length && isNameEmpty)}
+                  className={cn(
+                    "py-4 rounded-xl font-bold text-[16px] transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer",
+                    step === 1 ? "w-full bg-[#0A607D] text-white" : "flex-[2_2_0%] bg-[#0A607D] text-white",
+                    (isPending || (step === TABS.length && isNameEmpty)) && "opacity-50 cursor-not-allowed grayscale-[0.5]"
+                  )}
                 >
-                  이전으로
+                  {isPending ? (
+                    <>
+                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      저장 중...
+                    </>
+                  ) : (
+                    step === TABS.length ? '저장하기' : '다음으로'
+                  )}
                 </button>
-              )}
-              <button 
-                type="button"
-                onClick={step === TABS.length ? methods.handleSubmit(onSubmit) : next}
-                disabled={isPending || (step === TABS.length && isNameEmpty)}
-                className={cn(
-                  "py-4 rounded-xl font-bold text-[16px] transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer",
-                  step === 1 ? "w-full bg-[#0A607D] text-white" : "flex-[2_2_0%] bg-[#0A607D] text-white",
-                  (isPending || (step === TABS.length && isNameEmpty)) && "opacity-50 cursor-not-allowed grayscale-[0.5]"
-                )}
-              >
-                {isPending ? (
-                  <>
-                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    저장 중...
-                  </>
-                ) : (
-                  step === TABS.length ? '저장하기' : '다음으로'
-                )}
-              </button>
+              </div>
             </div>
           </form>
         </FormProvider>

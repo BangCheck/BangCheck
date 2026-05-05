@@ -84,19 +84,20 @@ function ChecklistDetailContent() {
     }
   }, [isLoggedIn, apiData, guestRooms, id, methods]);
 
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const { mutate: updateMutation, isPending } = useUpdateChecklist(id);
 
   const onSubmit = (data: ChecklistFormValues) => {
+    setSubmitError(null);
     if (isLoggedIn) {
       updateMutation(data as any, {
         onSuccess: () => {
-          alert('체크리스트가 수정되었습니다!');
           router.push(ROUTES.ROOMS);
           router.refresh();
         },
         onError: (error: any) => {
           console.error('Update failed:', error);
-          alert('수정 중 오류가 발생했습니다.');
+          setSubmitError('수정 중 오류가 발생했습니다. 다시 시도해 주세요.');
         },
       });
     } else {
@@ -105,7 +106,33 @@ function ChecklistDetailContent() {
   };
 
   if (isLoading) {
-    return <div className="flex-1 flex items-center justify-center">데이터를 불러오는 중...</div>;
+    return (
+      <div className="flex-1 bg-white min-h-screen flex flex-col animate-pulse">
+        {/* 탭 스켈레톤 */}
+        <div className="border-b border-[#E2E2E2] bg-white sticky top-16 z-40 h-[57px] flex items-center justify-center gap-8 px-6">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="w-16 h-4 bg-gray-100 rounded" />
+          ))}
+        </div>
+        {/* 프로그레스 스켈레톤 */}
+        <div className="max-w-[800px] mx-auto w-full px-6 pt-10">
+          <div className="flex justify-between items-end mb-4">
+            <div className="w-32 h-6 bg-gray-100 rounded" />
+            <div className="w-10 h-4 bg-gray-100 rounded" />
+          </div>
+          <div className="h-2 bg-gray-100 rounded-full" />
+        </div>
+        {/* 폼 스켈레톤 */}
+        <div className="max-w-[800px] mx-auto w-full px-6 py-12 space-y-8">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="space-y-2">
+              <div className="w-24 h-4 bg-gray-100 rounded" />
+              <div className="w-full h-12 bg-gray-50 rounded-[6px]" />
+            </div>
+          ))}
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -152,30 +179,37 @@ function ChecklistDetailContent() {
               {step === 3 && <Step3DetailedCheck />}
             </div>
 
-            <div className="pt-16 pb-10 flex gap-3 sticky bottom-0 bg-white/95 backdrop-blur-sm mt-auto z-50 border-t border-[#F5F5F5] -mx-6 px-6">
-              <button
-                type="button"
-                onClick={() => router.push(ROUTES.ROOMS)}
-                className="flex-1 py-4 rounded-xl font-bold text-[16px] bg-white border border-[#E2E2E2] text-[#232527] hover:bg-gray-50 transition-all cursor-pointer"
-              >
-                닫기
-              </button>
-              {step > 1 && (
+            <div className="pt-16 pb-10 sticky bottom-0 bg-white/95 backdrop-blur-sm mt-auto z-50 border-t border-[#F5F5F5] -mx-6 px-6">
+              {submitError && (
+                <div className="mb-3 px-4 py-3 bg-red-50 border border-red-200 rounded-lg text-[13px] text-red-600 font-medium">
+                  {submitError}
+                </div>
+              )}
+              <div className="flex gap-3">
                 <button
                   type="button"
-                  onClick={prev}
+                  onClick={() => router.push(ROUTES.ROOMS)}
                   className="flex-1 py-4 rounded-xl font-bold text-[16px] bg-white border border-[#E2E2E2] text-[#232527] hover:bg-gray-50 transition-all cursor-pointer"
                 >
-                  이전
+                  닫기
                 </button>
-              )}
-              <button 
-                type="button"
-                onClick={step === TABS.length ? methods.handleSubmit(onSubmit) : next}
-                className="flex-[2_2_0%] bg-[#0A607D] text-white py-4 rounded-xl font-bold text-[16px] transition-all shadow-lg cursor-pointer"
-              >
-                {step === TABS.length ? '수정 완료' : '다음으로'}
-              </button>
+                {step > 1 && (
+                  <button
+                    type="button"
+                    onClick={prev}
+                    className="flex-1 py-4 rounded-xl font-bold text-[16px] bg-white border border-[#E2E2E2] text-[#232527] hover:bg-gray-50 transition-all cursor-pointer"
+                  >
+                    이전
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={step === TABS.length ? methods.handleSubmit(onSubmit) : next}
+                  className="flex-[2_2_0%] bg-[#0A607D] text-white py-4 rounded-xl font-bold text-[16px] transition-all shadow-lg cursor-pointer"
+                >
+                  {step === TABS.length ? '수정 완료' : '다음으로'}
+                </button>
+              </div>
             </div>
           </form>
         </FormProvider>

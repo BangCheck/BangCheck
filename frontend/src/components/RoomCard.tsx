@@ -89,11 +89,13 @@ export default function RoomCard({
           <span className="text-[#A0A0A0] text-[14px] font-medium">등록일시 {formatDateTime(createdAt)}</span>
         </div>
         <div className="flex items-center gap-3">
+          {/* TODO: 삭제 확인 모달 추가 필요 — 현재는 confirm 없이 즉시 삭제됨 */}
           <button
             type="button"
-            onClick={(e) => { 
+            aria-label="방 삭제"
+            onClick={(e) => {
               e.stopPropagation();
-              onDelete?.(id); 
+              onDelete?.(id);
             }}
             className="text-[#D9D9D9] hover:text-[#F15556] transition-colors cursor-pointer"
           >
