@@ -47,21 +47,14 @@ public class RoomSummaryDTO {
     }
 
     private static String getFloorType(Room room) {
-
         if (room.getSpecialFloor() == null) {
             return "일반";
         }
 
-        String value = room.getSpecialFloor().toLowerCase();
-
-        if (value.contains("옥탑방")) {
-            return "옥탑";
-        }
-
-        if (value.contains("반지하") || value.contains("지하")) {
-            return "반지하";
-        }
-
-        return "일반";
+        return switch (room.getSpecialFloor()) {
+            case SEMI_BASEMENT -> "반지하";
+            case ROOFTOP -> "옥탑";
+            case NONE -> "일반";
+        };
     }
 }
