@@ -29,14 +29,14 @@ function HomeSkeleton() {
           <div className="w-20 h-4 bg-gray-100 rounded" />
         </div>
       </div>
-      <div className="border-b border-[#E2E2E2] px-10 py-3 flex justify-between items-center bg-white h-[60px]">
+      <div className="border-b border-[#E2E2E2] px-4 md:px-10 py-3 flex justify-between items-center bg-white h-[60px]">
         <div className="flex gap-2.5">
           <div className="w-24 h-8 bg-gray-100 rounded-[6px]" />
           <div className="w-32 h-8 bg-gray-100 rounded-[6px]" />
         </div>
         <div className="w-24 h-8 bg-gray-100 rounded-[4px]" />
       </div>
-      <div className="px-10 py-8 space-y-6">
+      <div className="px-4 md:px-10 py-8 space-y-6">
         <div className="w-32 h-4 bg-gray-100 rounded mb-4" />
         <div className="w-full h-12 bg-gray-50 rounded-[8px]" />
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -133,15 +133,20 @@ function SortDropdown({
 }
 
 // 맞춤 설정 정보 바
-function CustomizationInfoBar() {
+// TODO(be): activeItemCount, customItemCount를 유저 설정 API에서 받아와야 함
+function CustomizationInfoBar({ activeItemCount, customItemCount }: { activeItemCount?: number; customItemCount?: number }) {
   return (
     <div className="w-full bg-[#F5F5F5] rounded-[8px] px-[16px] py-[14px] flex items-center gap-2 mb-10 border border-[#E2E2E2]/50">
-      <span className="bg-[#777] text-white text-[12px] font-bold px-2 py-1 rounded-[4px]">
-        17개 항목 활성
-      </span>
-      <span className="bg-[#D9EAF0] text-[#0A607D] text-[12px] font-bold px-2 py-1 rounded-[4px]">
-        + 1개 커스텀
-      </span>
+      {activeItemCount != null && (
+        <span className="bg-[#777] text-white text-[12px] font-bold px-2 py-1 rounded-[4px]">
+          {activeItemCount}개 항목 활성
+        </span>
+      )}
+      {customItemCount != null && customItemCount > 0 && (
+        <span className="bg-[#D9EAF0] text-[#0A607D] text-[12px] font-bold px-2 py-1 rounded-[4px]">
+          + {customItemCount}개 커스텀
+        </span>
+      )}
     </div>
   );
 }
@@ -210,10 +215,7 @@ export default function Home() {
 
   const handleStartChecklist = () => {
     if (!isLoggedIn) {
-      if (guestRooms.length >= 2) {
-        alert('비로그인 사용자는 최대 2개까지만 체크리스트를 생성할 수 있습니다.\n로그인하여 무제한으로 이용해보세요!');
-        return;
-      }
+      // 비로그인 한도 초과 시에도 로그인 유도 모달 표시
       setIsLoginModalOpen(true);
     } else {
       const hasSeenOnboarding = localStorage.getItem('onboarding_custom_checklist');
@@ -271,7 +273,7 @@ export default function Home() {
 
       {/* 필터 바 */}
       <div className="border-b border-[#E2E2E2] bg-white sticky top-16 z-40">
-        <div className="px-10 py-3 flex justify-between items-center">
+        <div className="px-4 md:px-10 py-3 flex justify-between items-center">
           <div className="flex gap-2.5 relative" ref={dropdownRef}>
             <button 
               onClick={() => toggleDropdown('transaction')}
@@ -339,7 +341,7 @@ export default function Home() {
 
       {/* 메인 컨텐츠 */}
       <div className="flex-1 flex flex-col bg-white overflow-y-auto">
-        <div className="w-full px-10 py-8">
+        <div className="w-full px-4 md:px-10 py-8">
           <div className="flex justify-between items-center mb-5">
             <p className="text-[14px] font-bold text-[#A0A0A0]">
               등록된 방 {rooms.length}개{ !isLoggedIn && '/2개' }
@@ -353,6 +355,7 @@ export default function Home() {
             </button>
           </div>
 
+          {/* TODO(be): activeItemCount, customItemCount를 API에서 주입 필요 */}
           {isLoggedIn && <CustomizationInfoBar />}
 
           {((isFetched || !isLoggedIn) && rooms.length === 0) ? (

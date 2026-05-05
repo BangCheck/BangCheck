@@ -9,14 +9,17 @@ import { cn } from "@/lib/utils";
 
 export default function LoginPage() {
   const [isLoading, setIsLoading] = useState<string | null>(null);
+  const [loginError, setLoginError] = useState<string | null>(null);
 
   const handleLogin = async (provider: "naver" | "google") => {
     setIsLoading(provider);
+    setLoginError(null);
     try {
       await getOAuthUrl(provider);
     } catch (error) {
       console.error(error);
       setIsLoading(null);
+      setLoginError('로그인 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.');
     }
   };
 
@@ -38,6 +41,13 @@ export default function LoginPage() {
                 </p>
               </div>
             </div>
+
+            {/* Error Message */}
+            {loginError && (
+              <div className="w-full px-4 py-3 bg-red-50 border border-red-200 rounded-lg text-[13px] text-red-600 font-medium text-center">
+                {loginError}
+              </div>
+            )}
 
             {/* Social Buttons */}
             <div className="flex flex-col gap-[12px] w-full">
