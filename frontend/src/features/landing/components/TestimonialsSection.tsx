@@ -1,4 +1,3 @@
-import Image from 'next/image';
 import { cn } from '@/lib/utils';
 import { SectionWrapper } from './SectionWrapper';
 
@@ -38,11 +37,11 @@ function QuoteCard({ quote }: { quote: Quote }) {
       )}
     >
       <div className="absolute top-[93px] left-[30px] w-[78.808px] h-[68.25px] rotate-180">
-        <Image
+        <img
           src={quote.dark ? '/images/landing/polygon-dark.svg' : '/images/landing/polygon-light.svg'}
           alt=""
-          fill
-          className="object-contain"
+          aria-hidden="true"
+          className="w-full h-full object-contain"
         />
       </div>
       <p className="font-bold text-[24px] leading-[1.5] tracking-[-0.264px] whitespace-nowrap relative z-10">

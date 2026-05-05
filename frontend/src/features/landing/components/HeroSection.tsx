@@ -1,5 +1,4 @@
-import Link from 'next/link';
-import Image from 'next/image';
+import { Link } from 'react-router-dom';
 import { ROUTES } from '@/lib/routes';
 import { ChevronRight } from '@/components/ui/ChevronRight';
 
@@ -7,13 +6,11 @@ export default function HeroSection() {
   return (
     <section className="relative w-full h-[600px] flex items-center justify-center overflow-hidden">
       <div className="absolute inset-0">
-        <Image
+        <img
           src="/images/landing/hero-bg.jpg"
           alt=""
           aria-hidden="true"
-          fill
-          className="object-cover"
-          priority
+          className="w-full h-full object-cover"
         />
         <div className="absolute inset-0 bg-black/64" />
       </div>
@@ -32,14 +29,14 @@ export default function HeroSection() {
 
           <div className="flex gap-8 items-center flex-wrap justify-center">
             <Link
-              href={ROUTES.CHECKLIST_NEW}
+              to={ROUTES.CHECKLIST_NEW}
               className="flex items-center gap-2 bg-white text-[#232527] font-bold text-[16px] tracking-[-0.5px] px-[10px] py-[16px] rounded-[8px] w-[210px] justify-center hover:bg-gray-100 transition-colors"
             >
               로그인없이 시작하기
               <ChevronRight className="w-4 h-4" />
             </Link>
             <Link
-              href={ROUTES.LOGIN}
+              to={ROUTES.LOGIN}
               className="flex items-center gap-2 bg-[#0a607d] text-white font-bold text-[16px] tracking-[-0.5px] px-[10px] py-[16px] rounded-[8px] w-[210px] justify-center hover:bg-[#084e6d] transition-colors"
             >
               로그인하고 시작하기

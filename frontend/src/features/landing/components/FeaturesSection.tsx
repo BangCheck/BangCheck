@@ -1,5 +1,4 @@
-import Link from 'next/link';
-import Image from 'next/image';
+import { Link } from 'react-router-dom';
 import { ROUTES } from '@/lib/routes';
 import { ChevronRight } from '@/components/ui/ChevronRight';
 import { SectionWrapper } from './SectionWrapper';
@@ -49,7 +48,7 @@ function FeatureRow({ imageSrc, imageAlt, title, subtitle, description, cta }: F
   return (
     <div className="flex items-start justify-between w-full gap-10">
       <div className="border border-[#191b1e] rounded-[8px] overflow-hidden flex-none w-[568px] h-[434px] relative">
-        <Image src={imageSrc} alt={imageAlt} fill className="object-cover" />
+        <img src={imageSrc} alt={imageAlt} className="w-full h-full object-cover" loading="lazy" />
       </div>
 
       <div className="flex flex-col gap-[33px] items-start w-[310px] flex-none">
@@ -66,7 +65,7 @@ function FeatureRow({ imageSrc, imageAlt, title, subtitle, description, cta }: F
         </p>
         {cta && (
           <Link
-            href={cta.href}
+            to={cta.href}
             className="flex items-center gap-2 bg-[#e2e2e2] text-[#232527] font-bold text-[16px] tracking-[-0.5px] px-[10px] py-[16px] rounded-[12px] w-[210px] justify-center hover:bg-[#d0d0d0] transition-colors"
           >
             {cta.label}

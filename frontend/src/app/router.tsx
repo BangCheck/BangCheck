@@ -1,4 +1,5 @@
 import { Routes, Route } from 'react-router-dom';
+import LandingPage from '@/features/landing/LandingPage';
 
 interface PlaceholderProps {
   name: string;
@@ -7,13 +8,13 @@ interface PlaceholderProps {
 const Placeholder = ({ name }: PlaceholderProps) => (
   <div className="container-center min-h-screen flex-col gap-2 p-8">
     <h1 className="text-text-main text-2xl font-bold">[{name}]</h1>
-    <p className="text-text-caption text-sm">E09-S01 placeholder — 페이지는 후속 스토리에서 마이그레이션됩니다.</p>
+    <p className="text-text-caption text-sm">E09 placeholder — 페이지는 후속 스토리에서 마이그레이션됩니다.</p>
   </div>
 );
 
 export const Router = () => (
   <Routes>
-    <Route path="/" element={<Placeholder name="LandingPage" />} />
+    <Route path="/" element={<LandingPage />} />
     <Route path="/login" element={<Placeholder name="LoginPage" />} />
     <Route path="/auth/callback/:provider" element={<Placeholder name="AuthCallback" />} />
     <Route path="/rooms" element={<Placeholder name="RoomsPage" />} />
