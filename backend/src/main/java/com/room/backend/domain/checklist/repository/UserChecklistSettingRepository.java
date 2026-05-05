@@ -13,4 +13,5 @@ public interface UserChecklistSettingRepository extends JpaRepository<UserCheckl
     Optional<UserChecklistSetting> findByUserIdAndItemId(Long userId, Long itemId);
     void deleteByUserIdAndItemId(Long userId, Long itemId);
     List<UserChecklistSetting> findByUserIdAndIsEnabledFalse(Long userId);
+    void deleteByUserId(Long userId);
 }
