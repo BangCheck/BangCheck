@@ -13,6 +13,7 @@ import org.springframework.data.repository.query.Param;
 public interface RoomRepository extends JpaRepository<Room, Long> {
     List<Room> findByUserId(Long userId);
     int countByUserId(Long userId);
+    int countByUserIdAndIsDeletedFalse(Long userId);
 
     @Query("""
         SELECT room FROM Room room

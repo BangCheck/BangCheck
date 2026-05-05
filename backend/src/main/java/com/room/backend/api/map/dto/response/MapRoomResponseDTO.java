@@ -10,6 +10,7 @@ import lombok.Getter;
 @Getter
 public class MapRoomResponseDTO {
     private final Long id;
+    private final String name;
     private final String address;
     private final BigDecimal lat;
     private final BigDecimal lon;
@@ -22,6 +23,7 @@ public class MapRoomResponseDTO {
     // 기준점 존재 안할때
     public MapRoomResponseDTO(Room room) {
         this.id = room.getId();
+        this.name = room.getName();
         this.address = room.getAddress();
         this.lat = room.getLat();
         this.lon = room.getLon();
@@ -35,6 +37,7 @@ public class MapRoomResponseDTO {
     // 기준점 존재 할때
     public MapRoomResponseDTO(Room room, int distanceM, int walkTimeMin) {
         this.id = room.getId();
+        this.name = room.getName();
         this.address = room.getAddress();
         this.lat = room.getLat();
         this.lon = room.getLon();

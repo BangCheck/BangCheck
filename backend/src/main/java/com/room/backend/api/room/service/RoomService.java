@@ -25,6 +25,11 @@ public class RoomService {
 
     @Transactional
     public Room createRoom(RoomCreateRequestDTO request, Long userId) {
+
+        if(roomRepository.countByUserIdAndIsDeletedFalse(userId) >=6) {
+            throw new GeneralException(RoomErrorCode.ROOM_LIMIT_EXCEEDED);
+        }
+
         BigDecimal[] coordinates = geocodingService.getCoordinates(request.getAddress());
 
         Room room = Room.create(

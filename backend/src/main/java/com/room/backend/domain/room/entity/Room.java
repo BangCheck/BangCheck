@@ -5,6 +5,7 @@ import com.room.backend.domain.room.entity.enums.BuildingType;
 import com.room.backend.domain.room.entity.enums.Direction;
 import com.room.backend.domain.room.entity.enums.MaintenanceStatus;
 import com.room.backend.domain.room.entity.enums.RentType;
+import com.room.backend.domain.room.entity.enums.SpecialFloor;
 import com.room.backend.global.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -87,8 +88,9 @@ public class Room extends BaseEntity {
     @Column(name = "has_parking")
     private Boolean hasParking;
 
-    @Column(name = "special_floor", length = 50)
-    private String specialFloor;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "special_floor", length = 20)
+    private SpecialFloor specialFloor;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
@@ -118,7 +120,7 @@ public class Room extends BaseEntity {
             Integer floor,
             Boolean hasElevator,
             Boolean hasParking,
-            String specialFloor,
+            SpecialFloor specialFloor,
             Direction direction,
             String memo
     ) {
