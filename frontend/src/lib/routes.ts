@@ -1,5 +1,5 @@
 export const ROUTES = {
-  HOME: '/',
+  HOME: '/rooms',
   ROOMS: '/rooms',
   LOGIN: '/login',
   AUTH_CALLBACK: (provider: string) => `/auth/callback/${provider}`,
@@ -7,7 +7,7 @@ export const ROUTES = {
   SETTINGS: '/settings',
   CHECKLIST_NEW: '/checklist/new',
   CHECKLIST_DETAIL: (id: string) => `/checklist/${id}`,
-  LANDING: '/landing',
+  LANDING: '/',
 } as const;
 
 export const PROTECTED_ROUTES: readonly string[] = [

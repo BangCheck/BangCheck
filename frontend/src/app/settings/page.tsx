@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { useAuthStore } from '@/store/use-auth-store';
 import { useRouter } from 'next/navigation';
+import { ROUTES } from '@/lib/routes';
 import { cn } from '@/lib/utils';
 import { USER_TYPES, CHECKLIST_ITEMS, CATEGORIES, TYPE_ITEM_MAP } from '@/features/customization/constants';
 import { UserTypeCard } from '@/features/customization/components/UserTypeCard';
@@ -284,7 +285,7 @@ export default function SettingsPage() {
               <span className="text-[15px] md:text-[16px] font-bold text-[#232527]">{totalSelectedCount}개</span>
             </div>
             <button 
-              onClick={() => router.push('/')} 
+              onClick={() => router.push(ROUTES.ROOMS)}
               className="w-full bg-[#0A607D] text-white py-3.5 md:py-4 rounded-xl font-bold text-[16px] md:text-[18px] shadow-lg hover:bg-[#084e6d] transition-all active:scale-[0.99]"
             >
               맞춤 설정 완료

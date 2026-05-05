@@ -14,6 +14,7 @@ import { useMutation } from '@tanstack/react-query';
 import { createChecklist } from '@/services/checklist-service';
 import { useAuthStore } from '@/store/use-auth-store';
 import { useGuestRoomStore } from '@/store/use-guest-room-store';
+import { ROUTES } from '@/lib/routes';
 
 // 스크린샷 기반 통합 Zod 스키마
 const checklistSchema = z.object({
@@ -84,7 +85,7 @@ function ChecklistNewContent() {
     mutationFn: createChecklist,
     onSuccess: () => {
       alert('체크리스트가 성공적으로 저장되었습니다!');
-      router.push('/');
+      router.push(ROUTES.ROOMS);
       router.refresh();
     },
     onError: (error: any) => {
@@ -100,14 +101,14 @@ function ChecklistNewContent() {
       // 비로그인 사용자 로직
       if (guestRooms.length >= 2) {
         alert('비로그인 사용자는 최대 2개까지만 체크리스트를 생성할 수 있습니다.\n로그인하여 무제한으로 이용해보세요!');
-        router.push('/');
+        router.push(ROUTES.ROOMS);
         return;
       }
       
       const success = addGuestRoom(data as any);
       if (success) {
         alert('체크리스트가 브라우저에 임시 저장되었습니다!\n로그인하시면 영구적으로 보관할 수 있습니다.');
-        router.push('/');
+        router.push(ROUTES.ROOMS);
       } else {
         alert('저장 가능한 개수를 초과했습니다.');
       }

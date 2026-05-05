@@ -132,7 +132,7 @@ function ChecklistDetailContent() {
     mutationFn: (data: ChecklistFormValues) => updateChecklist(id, data as any),
     onSuccess: () => {
       alert('체크리스트가 수정되었습니다!');
-      router.push('/');
+      router.push(ROUTES.ROOMS);
       router.refresh();
     },
     onError: (error: any) => {
@@ -200,7 +200,7 @@ function ChecklistDetailContent() {
             <div className="pt-16 pb-10 flex gap-3 sticky bottom-0 bg-white/95 backdrop-blur-sm mt-auto z-50 border-t border-[#F5F5F5] -mx-6 px-6">
               <button
                 type="button"
-                onClick={() => router.push('/')}
+                onClick={() => router.push(ROUTES.ROOMS)}
                 className="flex-1 py-4 rounded-xl font-bold text-[16px] bg-white border border-[#E2E2E2] text-[#232527] hover:bg-gray-50 transition-all cursor-pointer"
               >
                 닫기
