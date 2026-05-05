@@ -27,7 +27,7 @@ export function DevLoginButton() {
   const router = useRouter();
   const { setAuth } = useAuthStore();
 
-  if (process.env.NODE_ENV !== 'development') return null;
+  if (!import.meta.env.DEV) return null;
 
   const token = DEV_TOKENS[ACTIVE_USER_ID];
 

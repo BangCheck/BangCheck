@@ -17,7 +17,7 @@ export function DevLoginSection() {
   const router = useRouter();
   const { setAuth } = useAuthStore();
 
-  if (process.env.NODE_ENV !== 'development') return null;
+  if (!import.meta.env.DEV) return null;
 
   const handleLogin = (userId: number) => {
     const user: User = {
