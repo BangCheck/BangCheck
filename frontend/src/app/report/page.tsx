@@ -20,6 +20,8 @@ export default function ReportPage() {
     enabled: isLoggedIn,
   });
 
+  // TODO(be): compare endpoint — 현재 로컬 필터로 대체
+  // getComparison(selectedIds) 호출이 필요해지면 useRoomCompare 훅 내부에서 연결
   const { selectedIds, selectedRooms, toggle, canAdd } = useRoomCompare(rooms);
   const [activeSections, setActiveSections] = useState<SectionKey[]>([...SECTIONS]);
 

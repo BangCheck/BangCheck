@@ -10,8 +10,7 @@ import Step1BasicInfo from '@/features/checklist/components/Step1BasicInfo';
 import Step2BuildingInfo from '@/features/checklist/components/Step2BuildingInfo';
 import Step3DetailedCheck from '@/features/checklist/components/Step3DetailedCheck';
 import { cn } from '@/lib/utils';
-import { useMutation, useQuery } from '@tanstack/react-query';
-import { getChecklist, updateChecklist } from '@/services/checklist-service';
+import { useChecklist, useUpdateChecklist } from '@/features/checklist/hooks/useChecklistQuery';
 import { useAuthStore } from '@/store/use-auth-store';
 import { useGuestRoomStore } from '@/store/use-guest-room-store';
 import { GuestEditDisabledModal } from '@/components/ui/Modals';
@@ -71,79 +70,35 @@ function ChecklistDetailContent() {
   const { step, next, prev, setStep } = useCheckFunnel();
   const progress = Math.round((step / TABS.length) * 100);
 
-  // 데이터 불러오기
-  const { data: apiData, isLoading } = useQuery({
-    queryKey: ['checklist', id],
-    queryFn: () => getChecklist(id),
-    enabled: isLoggedIn && !!id,
-  });
+  // 데이터 불러오기 — useChecklist가 내부적으로 mapResponseToForm 적용
+  const { data: apiData, isLoading } = useChecklist(id);
 
   useEffect(() => {
-    const mapDataToForm = (data: any) => {
-      // API 응답 필드와 Form 필드 간의 매핑 로직
-      return {
-        name: data.name || '',
-        address: data.address || '',
-        type: data.rentType === 'JEONSE' ? '전세' : (data.rentType === 'MONTHLY' ? '월세' : (data.type || '월세')),
-        deposit: String(data.deposit || data.depositAmount || ''),
-        rent: String(data.monthlyRent || data.rent || ''),
-        managementFee: String(data.maintenanceFee || data.managementFee || ''),
-        isManagementFeeUnknown: data.isManagementFeeUnknown || false,
-        hasLoan: data.hasLoan ? '있음' : '없음',
-        loanAmount: String(data.loanAmount || ''),
-        moveInReport: data.canRegisterAddress ? '가능' : '불가능',
-        moveInDate: data.availableFrom || data.moveInDate || '',
-        isMoveInDateNegotiable: data.isMoveInDateNegotiable || false,
-        buildingType: data.buildingType || '',
-        hasElevator: data.hasElevator ? '있음' : '없음',
-        hasParking: data.hasParking ? '있음' : '없음',
-        floor: String(data.floor || ''),
-        direction: data.direction === 'SOUTH' ? '남' : (data.direction === 'EAST' ? '동' : (data.direction === 'WEST' ? '서' : (data.direction === 'NORTH' ? '북' : (data.direction || '남')))),
-        options: data.options || [],
-        memo: data.memo || '',
-        scores: {
-          '채광': data.lighting === 3 ? '좋음' : (data.lighting === 2 ? '보통' : '나쁨'),
-          '방음': data.noiseLevel === 3 ? '좋음' : (data.noiseLevel === 2 ? '보통' : '나쁨'),
-          '수압': data.waterPressure === 3 ? '좋음' : (data.waterPressure === 2 ? '보통' : '나쁨'),
-          '결로/곰팡이': data.soundproof === 3 ? '좋음' : (data.soundproof === 2 ? '보통' : '나쁨'),
-          ...(data.scores || {})
-        },
-        problems: {
-          '곰팡이': data.hasMold ? '있음' : '없음',
-          '누수': data.hasLeak ? '있음' : '없음',
-          '벌레': data.hasBug ? '있음' : '없음',
-          ...(data.problems || {})
-        },
-        customItems: data.customItems || [],
-      };
-    };
-
     if (isLoggedIn && apiData) {
-      methods.reset(mapDataToForm(apiData) as any);
+      methods.reset(apiData as any);
     } else if (!isLoggedIn) {
       const guestRoom = guestRooms.find(r => r.id === id);
       if (guestRoom) {
-        methods.reset(mapDataToForm(guestRoom) as any);
+        methods.reset(guestRoom as any);
       }
     }
   }, [isLoggedIn, apiData, guestRooms, id, methods]);
 
-  const { mutate: updateMutation, isPending } = useMutation({
-    mutationFn: (data: ChecklistFormValues) => updateChecklist(id, data as any),
-    onSuccess: () => {
-      alert('체크리스트가 수정되었습니다!');
-      router.push(ROUTES.ROOMS);
-      router.refresh();
-    },
-    onError: (error: any) => {
-      console.error('Update failed:', error);
-      alert('수정 중 오류가 발생했습니다.');
-    }
-  });
+  const { mutate: updateMutation, isPending } = useUpdateChecklist(id);
 
   const onSubmit = (data: ChecklistFormValues) => {
     if (isLoggedIn) {
-      updateMutation(data);
+      updateMutation(data as any, {
+        onSuccess: () => {
+          alert('체크리스트가 수정되었습니다!');
+          router.push(ROUTES.ROOMS);
+          router.refresh();
+        },
+        onError: (error: any) => {
+          console.error('Update failed:', error);
+          alert('수정 중 오류가 발생했습니다.');
+        },
+      });
     } else {
       setIsGuestModalOpen(true);
     }
