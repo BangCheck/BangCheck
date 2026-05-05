@@ -1,6 +1,10 @@
 import { api } from '@/lib/api';
 import type { ChecklistItemResponse, UserType } from '@/types';
 
+// TODO(be): ApiResponse wrapper 검증 필요
+// 다른 서비스는 api.get<ApiResponse<T>>(...).data.data 패턴을 사용하지만
+// 이 엔드포인트가 ApiResponse wrapper를 반환하는지 실제 응답 구조 확인 후
+// 필요하면 api.get<ApiResponse<ChecklistItemResponse[]>>(...).data.data 로 변경
 export const getCustomizedItems = async (): Promise<ChecklistItemResponse[]> => {
   const response = await api.get<ChecklistItemResponse[]>('/api/v1/checklist/items');
   return response.data;

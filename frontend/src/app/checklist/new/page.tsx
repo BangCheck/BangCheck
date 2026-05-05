@@ -10,8 +10,7 @@ import Step2BuildingInfo from '@/features/checklist/components/Step2BuildingInfo
 import Step3DetailedCheck from '@/features/checklist/components/Step3DetailedCheck';
 import { cn } from '@/lib/utils';
 import { useRouter } from 'next/navigation';
-import { useMutation } from '@tanstack/react-query';
-import { createChecklist } from '@/services/checklist-service';
+import { useCreateChecklist } from '@/features/checklist/hooks/useChecklistQuery';
 import { useAuthStore } from '@/store/use-auth-store';
 import { useGuestRoomStore } from '@/store/use-guest-room-store';
 import { ROUTES } from '@/lib/routes';
@@ -71,7 +70,7 @@ function ChecklistNewContent() {
       hasElevator: '있음',
       hasParking: '없음',
       direction: '남',
-      customItems: ['채광 상태', '초인종 작동 여부'], // 예시 데이터
+      customItems: [],
     }
   });
 
@@ -81,22 +80,21 @@ function ChecklistNewContent() {
   const nameValue = methods.watch('name');
   const isNameEmpty = !nameValue || nameValue.trim().length === 0;
 
-  const { mutate: submitChecklist, isPending } = useMutation({
-    mutationFn: createChecklist,
-    onSuccess: () => {
-      alert('체크리스트가 성공적으로 저장되었습니다!');
-      router.push(ROUTES.ROOMS);
-      router.refresh();
-    },
-    onError: (error: any) => {
-      console.error('Save failed:', error);
-      alert(error.response?.data?.message || '저장 중 오류가 발생했습니다.');
-    }
-  });
+  const { mutate: submitChecklist, isPending } = useCreateChecklist();
 
   const onSubmit = (data: ChecklistFormValues) => {
     if (isLoggedIn) {
-      submitChecklist(data as any);
+      submitChecklist(data as any, {
+        onSuccess: () => {
+          alert('체크리스트가 성공적으로 저장되었습니다!');
+          router.push(ROUTES.ROOMS);
+          router.refresh();
+        },
+        onError: (error: any) => {
+          console.error('Save failed:', error);
+          alert(error.response?.data?.message || '저장 중 오류가 발생했습니다.');
+        },
+      });
     } else {
       // 비로그인 사용자 로직
       if (guestRooms.length >= 2) {
