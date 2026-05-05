@@ -11,7 +11,10 @@ export const ROUTES = {
 } as const;
 
 export const PROTECTED_ROUTES: readonly string[] = [
+  ROUTES.ROOMS,
   ROUTES.REPORT,
+  ROUTES.SETTINGS,
+  ROUTES.CHECKLIST_NEW,
 ];
 
 export const loginRedirect = (reason: 'expired' | 'auth_failed' | 'invalid_params'): string =>

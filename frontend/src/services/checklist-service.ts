@@ -53,7 +53,6 @@ const mapChecklistToRoomRequest = (input: ChecklistInput) => {
     hasBug: input.problems['벌레'] === '있음',
   };
 
-  console.log('API Request Payload:', payload);
   return payload;
 };
 
