@@ -10,6 +10,7 @@ import com.room.backend.api.room.service.RoomService;
 import com.room.backend.domain.checklist.dto.request.RoomCheckAnswerRequestDTO;
 import com.room.backend.domain.checklist.dto.response.RoomCheckResultResponseDTO;
 import com.room.backend.domain.room.entity.Room;
+import com.room.backend.domain.room.entity.enums.RentType;
 import com.room.backend.global.auth.util.SecurityUtil;
 import com.room.backend.global.common.response.ApiResponse;
 
@@ -27,6 +28,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import com.room.backend.global.common.exception.GeneralException;
 import com.room.backend.global.common.exception.RoomErrorCode;
 import jakarta.validation.Valid;
@@ -51,10 +53,10 @@ public class RoomController {
     }
 
     @GetMapping
-    @Operation(summary = "내 방들 목록 조회", description = "등록한 방 목록을 최신순으로 반환합니다.")
-    public ResponseEntity<ApiResponse<List<RoomListResponseDTO>>> getRooms() {
+    @Operation(summary = "내 방들 목록 조회", description = "등록한 방 목록을 최신순으로 반환합니다. rentType 미입력 시 전체 반환.")
+    public ResponseEntity<ApiResponse<List<RoomListResponseDTO>>> getRooms(@RequestParam(required = false) RentType rentType) {
         Long userId = SecurityUtil.getCurrentUserId();
-        List<Room> rooms = roomService.getRooms(userId);
+        List<Room> rooms = roomService.getRooms(userId, rentType);
         List<RoomListResponseDTO> response = rooms.stream()
                 .map(room -> new RoomListResponseDTO(room))
                 .toList();

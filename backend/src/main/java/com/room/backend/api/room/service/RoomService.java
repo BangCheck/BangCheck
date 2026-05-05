@@ -7,6 +7,7 @@ import java.util.Optional;
 import com.room.backend.api.room.dto.request.RoomCreateRequestDTO;
 import com.room.backend.api.room.dto.request.RoomUpdateRequestDTO;
 import com.room.backend.domain.room.entity.Room;
+import com.room.backend.domain.room.entity.enums.RentType;
 import com.room.backend.domain.room.repository.RoomRepository;
 import com.room.backend.global.common.exception.GeneralException;
 import com.room.backend.global.common.exception.RoomErrorCode;
@@ -61,8 +62,8 @@ public class RoomService {
     }
 
     @Transactional(readOnly = true)
-    public List<Room> getRooms(Long userId) {
-        return roomRepository.findByUserIdAndIsDeletedFalseOrderByCreatedAtDesc(userId);
+    public List<Room> getRooms(Long userId, RentType rentType) {
+        return roomRepository.findRoomsWithFilter(userId, rentType);
     }
 
     @Transactional(readOnly = true)
