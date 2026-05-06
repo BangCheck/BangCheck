@@ -1,5 +1,6 @@
 package com.room.backend.domain.checklist.controller;
 
+import com.room.backend.domain.checklist.dto.request.ChecklistSettingsRequest;
 import com.room.backend.domain.checklist.dto.request.CustomItemCreateRequest;
 import com.room.backend.domain.checklist.dto.response.ChecklistItemResponse;
 import com.room.backend.domain.checklist.entity.enums.UserType;
@@ -26,10 +27,11 @@ public class ChecklistController {
     }
 
     @PostMapping("/types/{userType}")
-    public ResponseEntity<Void> selectUserType(@PathVariable UserType userType) {
+    public ResponseEntity<List<ChecklistItemResponse>> selectUserType(@PathVariable UserType userType) {
         Long userId = SecurityUtil.getCurrentUserId();
         checklistService.selectUserType(userId, userType);
-        return ResponseEntity.ok().build();
+        List<ChecklistItemResponse> items = checklistService.getCustomizedItems(userId);
+        return ResponseEntity.ok(items);
     }
 
     @DeleteMapping("/types/{userType}")
@@ -39,10 +41,10 @@ public class ChecklistController {
         return ResponseEntity.ok().build();
     }
 
-    @PatchMapping("/items/{itemId}/toggle")
-    public ResponseEntity<Void> toggleItem(@PathVariable Long itemId) {
+    @PostMapping("/items/settings")
+    public ResponseEntity<Void> saveSettings(@RequestBody ChecklistSettingsRequest request) {
         Long userId = SecurityUtil.getCurrentUserId();
-        checklistService.toggleItem(userId, itemId);
+        checklistService.saveSettings(userId, request.getDisabledItemIds());
         return ResponseEntity.ok().build();
     }
 

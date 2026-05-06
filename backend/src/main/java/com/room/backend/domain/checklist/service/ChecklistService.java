@@ -72,15 +72,12 @@ public class ChecklistService {
         userTypeSelectionRepository.deleteByUserIdAndUserType(userId, userType);
     }
 
-    public void toggleItem(Long userId, Long itemId) {
-        userChecklistSettingRepository.findByUserIdAndItemId(userId, itemId)
-                .ifPresentOrElse(
-                        setting -> setting.toggle(),
-                        () -> {
-                            UserChecklistSetting newSetting = UserChecklistSetting.of(userId, itemId, false);
-                            userChecklistSettingRepository.save(newSetting);
-                        }
-                );
+    public void saveSettings(Long userId, List<Long> disabledItemIds) {
+        userChecklistSettingRepository.deleteByUserId(userId);
+        List<UserChecklistSetting> settings = disabledItemIds.stream()
+                .map(itemId -> UserChecklistSetting.of(userId, itemId, false))
+                .toList();
+        userChecklistSettingRepository.saveAll(settings);
     }
 
     public void addCustomItem(Long userId, String itemName) {
