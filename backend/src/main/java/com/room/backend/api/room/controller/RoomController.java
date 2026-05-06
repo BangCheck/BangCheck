@@ -1,7 +1,8 @@
 package com.room.backend.api.room.controller;
 
 import com.room.backend.api.room.dto.request.RoomCreateRequestDTO;
-import com.room.backend.api.room.dto.request.RoomUpdateRequestDTO;
+import com.room.backend.api.room.dto.request.RoomUpdateWithCheckAnswerRequestDTO;
+import com.room.backend.api.room.dto.request.RoomWithCheckAnswerRequestDTO;
 import com.room.backend.api.room.dto.response.RoomCreateResponseDTO;
 import com.room.backend.api.room.dto.response.RoomDetailResponseDTO;
 import com.room.backend.api.room.dto.response.RoomListResponseDTO;
@@ -40,6 +41,15 @@ public class RoomController {
 
     private final RoomService roomService;
     private final RoomCheckResultService roomCheckResultService;
+
+    @PostMapping("/check-results")
+    @Operation(summary = "방 + 체크리스트 등록", description = "새로운 방과 체크리스트를 등록합니다. 주소를 기반으로 좌표를 자동 변환합니다.")
+    public ResponseEntity<ApiResponse<RoomCreateResponseDTO>> createRoom(@Valid @RequestBody RoomWithCheckAnswerRequestDTO request) {
+        Long userId = SecurityUtil.getCurrentUserId();
+        Room savedRoom = roomService.createRoomWithCheckAnswers(request, userId);
+
+        return ResponseEntity.ok(ApiResponse.success(new RoomCreateResponseDTO(savedRoom)));
+    }
 
     @PostMapping
     @Operation(summary = "방 등록", description = "새로운 방을 등록합니다. 주소를 기반으로 좌표를 자동 변환합니다.")
@@ -82,10 +92,10 @@ public class RoomController {
     }
 
     @PutMapping("/{id}")
-    @Operation(summary = "방 수정", description = "방을 수정합니다")
-    public ResponseEntity<ApiResponse<RoomCreateResponseDTO>> updateRoom(@Valid @RequestBody RoomUpdateRequestDTO request, @PathVariable Long id) {
+    @Operation(summary = "방 + 체크리스트 수정", description = "방 과 체크리스트를 수정합니다")
+    public ResponseEntity<ApiResponse<RoomCreateResponseDTO>> updateRoom(@Valid @RequestBody RoomUpdateWithCheckAnswerRequestDTO request, @PathVariable Long id) {
         Long userId = SecurityUtil.getCurrentUserId();
-        Room editedRoom = roomService.updateRoom(request, id, userId);
+        Room editedRoom = roomService.updateRoomWithCheckAnswers(request, id, userId);
 
         return ResponseEntity.ok(ApiResponse.success(new RoomCreateResponseDTO(editedRoom)));
     }
