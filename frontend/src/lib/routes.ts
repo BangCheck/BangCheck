@@ -11,6 +11,8 @@ export const ROUTES = {
   LANDING: '/',
 } as const;
 
+export const loginRedirect = (_reason?: string) => ROUTES.LOGIN;
+
 export const PROTECTED_ROUTES: readonly string[] = [
   ROUTES.ROOMS,
   ROUTES.REPORT,

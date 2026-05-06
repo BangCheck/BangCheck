@@ -3,6 +3,7 @@ import LandingPage from '@/features/landing/LandingPage';
 import LoginPage from '@/features/login/LoginPage';
 import AuthCallbackPage from '@/features/auth/AuthCallbackPage';
 import LoginErrorPage from '@/features/auth/LoginErrorPage';
+import ChecklistNewPage from '@/features/checklist/ChecklistNewPage';
 
 interface PlaceholderProps {
   name: string;
@@ -22,7 +23,7 @@ export const Router = () => (
     <Route path="/login-error" element={<LoginErrorPage />} />
     <Route path="/auth/callback/:provider" element={<AuthCallbackPage />} />
     <Route path="/rooms" element={<Placeholder name="RoomsPage" />} />
-    <Route path="/checklist/new" element={<Placeholder name="ChecklistNew" />} />
+    <Route path="/checklist/new" element={<ChecklistNewPage />} />
     <Route path="/checklist/:id" element={<Placeholder name="ChecklistDetail" />} />
     <Route path="/report" element={<Placeholder name="ReportPage" />} />
     <Route path="/settings" element={<Placeholder name="SettingsPage" />} />
