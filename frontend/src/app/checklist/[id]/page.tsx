@@ -92,7 +92,7 @@ function ChecklistDetailContent() {
     if (isLoggedIn) {
       updateMutation(data as any, {
         onSuccess: () => {
-          router.push(ROUTES.ROOMS);
+          router.push(ROUTES.HOME);
           router.refresh();
         },
         onError: (error: any) => {
@@ -188,7 +188,7 @@ function ChecklistDetailContent() {
               <div className="flex gap-3">
                 <button
                   type="button"
-                  onClick={() => router.push(ROUTES.ROOMS)}
+                  onClick={() => router.push(ROUTES.HOME)}
                   className="flex-1 py-4 rounded-xl font-bold text-[16px] bg-white border border-[#E2E2E2] text-[#232527] hover:bg-gray-50 transition-all cursor-pointer"
                 >
                   닫기

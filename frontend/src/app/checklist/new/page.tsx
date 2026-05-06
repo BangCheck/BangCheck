@@ -90,7 +90,7 @@ function ChecklistNewContent() {
     if (isLoggedIn) {
       submitChecklist(data as any, {
         onSuccess: () => {
-          router.push(ROUTES.ROOMS);
+          router.push(ROUTES.HOME);
           router.refresh();
         },
         onError: (error: any) => {
@@ -108,7 +108,7 @@ function ChecklistNewContent() {
 
       const success = addGuestRoom(data as any);
       if (success) {
-        router.push(ROUTES.ROOMS);
+        router.push(ROUTES.HOME);
       } else {
         setSubmitError('저장 가능한 개수를 초과했습니다.');
       }

@@ -2,8 +2,8 @@ import { api } from '@/lib/api';
 import type { ApiResponse, User, OAuthProvider } from '@/types';
 
 export const getOAuthAuthorizeUrl = async (provider: OAuthProvider): Promise<string> => {
-  const response = await api.get<ApiResponse<{ url: string }>>(`/api/v1/auth/oauth2/${provider}`);
-  return response.data.data.url;
+  const response = await api.get<ApiResponse<{ authorizeUrl: string }>>(`/api/v1/auth/oauth2/${provider}`);
+  return response.data.data.authorizeUrl;
 };
 
 interface ExchangeResult {

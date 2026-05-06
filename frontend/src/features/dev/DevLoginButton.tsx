@@ -33,7 +33,7 @@ export function DevLoginButton() {
 
   const handleDevLogin = () => {
     setAuth(token, DEV_USER);
-    router.push(ROUTES.ROOMS);
+    router.push(ROUTES.HOME);
   };
 
   return (

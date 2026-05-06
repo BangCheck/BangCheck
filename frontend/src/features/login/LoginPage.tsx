@@ -1,8 +1,5 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
-import BottomNavigation from '@/components/BottomNavigation';
 import { LogoWithText } from '@/components/Logo';
 import { useAuthStore } from '@/store/use-auth-store';
 import { getOAuthAuthorizeUrl } from '@/services/auth-service';
@@ -120,9 +117,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-white">
-      <Header />
-
+    <div className="flex-1 flex flex-col bg-white">
       {/* Desktop */}
       <main className="hidden md:flex flex-1 items-center justify-center">
         <div className="border border-[#E2E2E2] rounded-[6px] px-[32px] py-[48px]">
@@ -137,7 +132,7 @@ export default function LoginPage() {
       </main>
 
       {/* Mobile */}
-      <main className="flex md:hidden flex-1 items-center justify-center px-[16px] pb-[80px]">
+      <main className="flex md:hidden flex-1 items-center justify-center px-[16px]">
         <div className="flex flex-col items-center gap-6 w-full max-w-[343px]">
           <LoginCard
             onNaver={() => login('naver')}
@@ -148,11 +143,6 @@ export default function LoginPage() {
           />
         </div>
       </main>
-
-      <div className="hidden md:block">
-        <Footer />
-      </div>
-      <BottomNavigation />
     </div>
   );
 }

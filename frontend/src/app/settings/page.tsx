@@ -285,7 +285,7 @@ export default function SettingsPage() {
               <span className="text-[15px] md:text-[16px] font-bold text-[#232527]">{totalSelectedCount}개</span>
             </div>
             <button 
-              onClick={() => router.push(ROUTES.ROOMS)}
+              onClick={() => router.push(ROUTES.HOME)}
               className="w-full bg-[#0A607D] text-white py-3.5 md:py-4 rounded-xl font-bold text-[16px] md:text-[18px] shadow-lg hover:bg-[#084e6d] transition-all active:scale-[0.99]"
             >
               맞춤 설정 완료

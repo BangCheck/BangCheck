@@ -26,7 +26,7 @@ export function DevLoginSection() {
       nickname: `개발자${userId}`,
     };
     setAuth(DEV_TOKENS[userId], user);
-    router.push(ROUTES.ROOMS);
+    router.push(ROUTES.HOME);
   };
 
   return (

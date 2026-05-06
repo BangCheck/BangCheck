@@ -1,32 +1,22 @@
-'use client';
+import { useState } from 'react';
 
-import { useRouter, useSearchParams, usePathname } from 'next/navigation';
+export const FUNNEL_STEPS = [
+  { id: 1, label: '기본 정보' },
+  { id: 2, label: '건물 정보' },
+  { id: 3, label: '내부 점검' },
+  { id: 4, label: '안전/생활' },
+  { id: 5, label: '나만의 항목' },
+] as const;
 
-/**
- * 체크리스트 8단계 퍼널 제어를 위한 커스텀 훅
- */
-export const useCheckFunnel = () => {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const pathname = usePathname();
-  
-  // 현재 단계를 쿼리 파라미터에서 가져옴 (기본값 1)
-  const step = Number(searchParams.get('step')) || 1;
+export type FunnelStep = (typeof FUNNEL_STEPS)[number]['id'];
 
-  const setStep = (nextStep: number) => {
-    const params = new URLSearchParams(searchParams.toString());
-    params.set('step', nextStep.toString());
-    router.push(`${pathname}?${params.toString()}`);
-  };
+export function useCheckFunnel() {
+  const [step, setStep] = useState<FunnelStep>(1);
 
-  const next = () => {
-    if (step < 8) setStep(step + 1);
-  };
+  const next = () => setStep((s) => (s < 5 ? ((s + 1) as FunnelStep) : s));
+  const prev = () => setStep((s) => (s > 1 ? ((s - 1) as FunnelStep) : s));
+  const isFirst = step === 1;
+  const isLast = step === 5;
 
-  const prev = () => {
-    if (step > 1) setStep(step - 1);
-    else router.back();
-  };
-
-  return { step, next, prev, setStep };
-};
+  return { step, setStep, next, prev, isFirst, isLast };
+}

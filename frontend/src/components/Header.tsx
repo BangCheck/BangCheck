@@ -37,10 +37,10 @@ export default function Header() {
 
         <nav aria-label="주요 네비게이션" className="hidden sm:flex gap-10 sm:absolute sm:left-1/2 sm:-translate-x-1/2 z-20">
           <Link
-            to={ROUTES.ROOMS}
+            to={ROUTES.HOME}
             className={cn(
               'text-[15px] font-bold transition-colors p-2',
-              pathname === ROUTES.ROOMS ? 'text-[#0A607D]' : 'text-[#232527]'
+              pathname === ROUTES.HOME ? 'text-[#0A607D]' : 'text-[#232527]'
             )}
           >
             방 목록
