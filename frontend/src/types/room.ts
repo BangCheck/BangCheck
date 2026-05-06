@@ -1,6 +1,18 @@
 // 하위호환 타입 (RoomCard, use-guest-room-store 등 기존 코드용)
 export type RoomType = '전세' | '월세' | '단기임대';
 
+// BE /api/v1/rooms 목록 응답 DTO
+export interface RoomListItem {
+  id: number;
+  name: string;
+  address: string;
+  rentType: 'MONTHLY' | 'JEONSE' | 'SHORT_TERM';
+  deposit: number;
+  rent: number;
+  buildingType: string;
+  createdAt: string;
+}
+
 export interface RoomIssues {
   mold: boolean;
   leak: boolean;
