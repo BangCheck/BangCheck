@@ -2,6 +2,7 @@ export const ROUTES = {
   HOME: '/rooms',
   ROOMS: '/rooms',
   LOGIN: '/login',
+  LOGIN_ERROR: '/login-error',
   AUTH_CALLBACK: (provider: string) => `/auth/callback/${provider}`,
   REPORT: '/report',
   SETTINGS: '/settings',
@@ -16,6 +17,3 @@ export const PROTECTED_ROUTES: readonly string[] = [
   ROUTES.SETTINGS,
   ROUTES.CHECKLIST_NEW,
 ];
-
-export const loginRedirect = (reason: 'expired' | 'auth_failed' | 'invalid_params'): string =>
-  `${ROUTES.LOGIN}?error=${reason}`;

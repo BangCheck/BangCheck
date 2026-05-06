@@ -1,5 +1,8 @@
 import { Routes, Route } from 'react-router-dom';
 import LandingPage from '@/features/landing/LandingPage';
+import LoginPage from '@/features/login/LoginPage';
+import AuthCallbackPage from '@/features/auth/AuthCallbackPage';
+import LoginErrorPage from '@/features/auth/LoginErrorPage';
 
 interface PlaceholderProps {
   name: string;
@@ -15,8 +18,9 @@ const Placeholder = ({ name }: PlaceholderProps) => (
 export const Router = () => (
   <Routes>
     <Route path="/" element={<LandingPage />} />
-    <Route path="/login" element={<Placeholder name="LoginPage" />} />
-    <Route path="/auth/callback/:provider" element={<Placeholder name="AuthCallback" />} />
+    <Route path="/login" element={<LoginPage />} />
+    <Route path="/login-error" element={<LoginErrorPage />} />
+    <Route path="/auth/callback/:provider" element={<AuthCallbackPage />} />
     <Route path="/rooms" element={<Placeholder name="RoomsPage" />} />
     <Route path="/checklist/new" element={<Placeholder name="ChecklistNew" />} />
     <Route path="/checklist/:id" element={<Placeholder name="ChecklistDetail" />} />
