@@ -47,3 +47,11 @@ tasks.withType(JavaCompile).configureEach {
 tasks.named('test') {
     useJUnitPlatform()
 }
+
+bootJar {
+    archiveFileName = 'bangcheck.jar'
+}
+
+jar {
+    enabled = false
+}
