@@ -68,4 +68,16 @@ public class RoomCheckResultService {
             .toList();
     }
 
+    @Transactional
+    public void updateCheckResults(Long roomId, List<RoomCheckAnswerRequestDTO> answers) {
+        List<RoomCheckResult> existingResults = roomCheckResultRepository.findByRoomId(roomId);
+        for (RoomCheckResult result : existingResults) {
+            roomCheckSelectedOptionRepository.deleteByResultId(result.getId());
+            roomCheckResultRepository.delete(result);
+        }
+        roomCheckResultRepository.flush();
+
+        saveCheckResult(roomId, answers);
+    }
+
 }
