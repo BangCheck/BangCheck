@@ -4,5 +4,6 @@ public enum UserType {
     BUG_AVOIDER,
     NOISE_SENSITIVE,
     CLEAN_FREAK,
-    PERFORMANCE_TYPE
+    PERFORMANCE_TYPE,
+    FIRST_TIMER
 }

@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -39,7 +40,10 @@ public class ChecklistService {
                 .map(UserTypeSelection::getUserType)
                 .toList();
 
-        List<ChecklistItem> items = checklistItemRepository.findCustomizedItems(userId, selectedTypes);
+        List<UserType> queryTypes = selectedTypes.contains(UserType.FIRST_TIMER)
+                ? Arrays.stream(UserType.values()).toList()
+                : selectedTypes;
+        List<ChecklistItem> items = checklistItemRepository.findCustomizedItems(userId, queryTypes);
         List<Long> disabledItemIds = userChecklistSettingRepository.findByUserIdAndIsEnabledFalse(userId)
                 .stream()
                 .map(UserChecklistSetting::getItemId)
