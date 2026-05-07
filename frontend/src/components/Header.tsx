@@ -79,7 +79,7 @@ export default function Header() {
               type="button"
               disabled
               aria-label="비로그인 한도(2개)에 도달했어요"
-              className="hidden sm:flex h-8 px-4 py-2 rounded-[4px] bg-[#BFBFBF] items-center gap-[10px] cursor-not-allowed"
+              className="flex h-8 px-3 sm:px-4 py-2 rounded-[4px] bg-[#BFBFBF] items-center gap-[6px] sm:gap-[10px] cursor-not-allowed"
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <line x1="12" y1="5" x2="12" y2="19" />
@@ -90,7 +90,7 @@ export default function Header() {
           ) : (
             <Link
               to={ROUTES.CHECKLIST_NEW}
-              className="hidden sm:flex h-8 px-4 py-2 rounded-[4px] bg-[#0A607D] items-center gap-[10px] hover:bg-[#084e6d] transition-colors"
+              className="flex h-8 px-3 sm:px-4 py-2 rounded-[4px] bg-[#0A607D] items-center gap-[6px] sm:gap-[10px] hover:bg-[#084e6d] transition-colors"
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <line x1="12" y1="5" x2="12" y2="19" />
