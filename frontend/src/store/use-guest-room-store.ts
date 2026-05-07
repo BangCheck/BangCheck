@@ -1,70 +1,110 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import type { Room, ChecklistInput } from '@/types';
+import type { Room, RoomType, GuestRoomRaw } from '@/types/room';
 
 interface GuestRoomState {
   guestRooms: Room[];
-  addGuestRoom: (roomData: ChecklistInput) => boolean; // Returns false if limit reached
+  addGuestRoom: (raw: GuestRoomRaw) => boolean; // false if limit reached
+  updateGuestRoom: (id: string, raw: GuestRoomRaw) => boolean;
   deleteGuestRoom: (id: string) => void;
+  getGuestRoom: (id: string) => Room | undefined;
   clearGuestRooms: () => void;
 }
+
+const parseMoney = (val: string | undefined): number => {
+  if (!val) return 0;
+  const n = parseInt(val.replace(/[^0-9]/g, ''), 10);
+  return Number.isFinite(n) ? n : 0;
+};
+
+const formatPrice = (raw: GuestRoomRaw): string => {
+  const t = raw.basic.transactionType ?? '월세';
+  const dep = raw.basic.deposit || '0';
+  const rent = raw.basic.monthlyRent || '0';
+  const mgmt = raw.basic.isMgmtUnknown ? '' : raw.basic.managementFee;
+  return `${t} ${dep}/${rent}${mgmt ? `/${mgmt}` : ''}`;
+};
+
+const buildTags = (raw: GuestRoomRaw): string[] => {
+  const tags: string[] = [];
+  if (raw.building.buildingType) tags.push(raw.building.buildingType);
+  if (raw.building.floorLevel) tags.push(`${raw.building.floorLevel}층`);
+  if (raw.building.direction) tags.push(`${raw.building.direction}향`);
+  return tags;
+};
+
+const rawToRoomFields = (raw: GuestRoomRaw) => ({
+  name: raw.basic.name || '이름 없음',
+  address: raw.basic.address || '',
+  type: (raw.basic.transactionType ?? '월세') as RoomType,
+  deposit: parseMoney(raw.basic.deposit),
+  rent: parseMoney(raw.basic.monthlyRent),
+  managementFee: raw.basic.isMgmtUnknown ? undefined : parseMoney(raw.basic.managementFee),
+  price: formatPrice(raw),
+  tags: buildTags(raw),
+  score: 100,
+  issues: {
+    mold: raw.interior.mold === '있음',
+    leak: raw.interior.leak === '있음',
+    bug: raw.interior.pest === '있음',
+    condensation: raw.interior.leak === '있음',
+    drainSmell: raw.interior.drainSmell === '있음',
+  },
+  memo: raw.custom.memo,
+  buildingType: raw.building.buildingType ?? undefined,
+  floor: raw.building.floorLevel ?? undefined,
+  direction: raw.building.direction ?? undefined,
+  raw,
+});
+
+const newId = () =>
+  typeof window !== 'undefined' && 'crypto' in window
+    ? crypto.randomUUID()
+    : Math.random().toString(36).substring(2, 11);
 
 export const useGuestRoomStore = create<GuestRoomState>()(
   persist(
     (set, get) => ({
       guestRooms: [],
-      addGuestRoom: (roomData: ChecklistInput) => {
-        const currentRooms = get().guestRooms;
-        if (currentRooms.length >= 2) {
-          return false;
-        }
 
-        const deposit = parseInt(roomData.deposit?.replace(/[^0-9]/g, '') || '0') || 0;
-        const rent = parseInt(roomData.rent?.replace(/[^0-9]/g, '') || '0') || 0;
-        const managementFee = parseInt(roomData.managementFee?.replace(/[^0-9]/g, '') || '0') || 0;
+      addGuestRoom: (raw) => {
+        const current = get().guestRooms;
+        if (current.length >= 2) return false;
 
-        const newRoom: Room = {
-          id: typeof window !== 'undefined' ? crypto.randomUUID() : Math.random().toString(36).substring(2, 11),
-          name: roomData.name || '이름 없음',
-          address: roomData.address || '',
-          type: roomData.type || '월세',
-          deposit,
-          rent,
-          managementFee,
-          price: `${roomData.type} ${roomData.deposit || 0}/${roomData.rent || 0}${roomData.managementFee ? `/${roomData.managementFee}` : ''}`,
-          buildingType: roomData.buildingType || '원룸',
-          floor: roomData.floor ? `${roomData.floor}층` : '중층',
-          direction: roomData.direction ? `${roomData.direction}향` : '남향',
-          tags: [
-            roomData.buildingType || '원룸',
-            roomData.floor ? `${roomData.floor}층` : '중층',
-            roomData.direction ? `${roomData.direction}향` : '남향',
-          ],
-          score: 100, // Default score for now
-          issues: {
-            mold: roomData.problems?.['곰팡이'] === '있음',
-            leak: roomData.problems?.['누수'] === '있음',
-            bug: roomData.problems?.['벌레'] === '있음',
-            condensation: roomData.problems?.['결로'] === '있음',
-            drainSmell: roomData.problems?.['배수구 냄새'] === '있음',
-          },
-          memo: roomData.memo,
+        const room: Room = {
+          id: newId(),
           createdAt: new Date().toISOString(),
+          ...rawToRoomFields(raw),
         };
-
-        set({ guestRooms: [newRoom, ...currentRooms] });
+        set({ guestRooms: [room, ...current] });
         return true;
       },
+
+      updateGuestRoom: (id, raw) => {
+        const current = get().guestRooms;
+        const idx = current.findIndex((r) => r.id === id);
+        if (idx < 0) return false;
+
+        const next = [...current];
+        next[idx] = {
+          ...next[idx],
+          ...rawToRoomFields(raw),
+        };
+        set({ guestRooms: next });
+        return true;
+      },
+
       deleteGuestRoom: (id) => {
-        set({ guestRooms: get().guestRooms.filter((room) => room.id !== id) });
+        set({ guestRooms: get().guestRooms.filter((r) => r.id !== id) });
       },
-      clearGuestRooms: () => {
-        set({ guestRooms: [] });
-      },
+
+      getGuestRoom: (id) => get().guestRooms.find((r) => r.id === id),
+
+      clearGuestRooms: () => set({ guestRooms: [] }),
     }),
     {
       name: 'guest-room-storage',
       storage: createJSONStorage(() => sessionStorage),
-    }
-  )
+    },
+  ),
 );

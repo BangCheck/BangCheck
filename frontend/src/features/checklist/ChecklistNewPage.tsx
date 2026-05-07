@@ -4,10 +4,6 @@ import { cn } from '@/lib/utils';
 import { useGuestRoomStore } from '@/store/use-guest-room-store';
 
 import BasicInfo from './components/01_basic-info';
-import BuildingInfo from './components/02_building-info';
-import InteriorCheck from './components/03_interior-check';
-import SafetyLiving from './components/04_safety-living';
-import CustomMemo from './components/05_custom-memo';
 
 import type { BasicInfoData } from './components/01_basic-info';
 import type { BuildingInfoData } from './components/02_building-info';
@@ -152,25 +148,7 @@ export default function ChecklistNewPage() {
       setSubmitError('비로그인 상태에서는 방을 2개까지만 등록할 수 있어요.');
       return;
     }
-    const success = addGuestRoom({
-      name: basic.name,
-      address: basic.address,
-      type: (basic.transactionType ?? '월세') as any,
-      deposit: basic.deposit,
-      rent: basic.monthlyRent,
-      managementFee: basic.isMgmtUnknown ? undefined : basic.managementFee,
-      buildingType: building.buildingType ?? undefined,
-      floor: building.floorLevel ?? undefined,
-      direction: building.direction ?? undefined,
-      problems: {
-        '곰팡이': interior.mold === '있음' ? '있음' : '없음',
-        '누수': interior.leak === '있음' ? '있음' : '없음',
-        '벌레': interior.pest === '있음' ? '있음' : '없음',
-        '결로': interior.leak === '있음' ? '있음' : '없음',
-        '배수구 냄새': interior.drainSmell === '있음' ? '있음' : '없음',
-      },
-      memo: custom.memo,
-    } as any);
+    const success = addGuestRoom({ basic, building, interior, safety, custom });
 
     if (!success) {
       setSubmitError('비로그인 상태에서는 방을 2개까지만 등록할 수 있어요.');
@@ -297,7 +275,7 @@ const BUILDING_TYPES = ['원룸', '투룸', '빌라', '오피스텔', '아파트
 const DIRECTIONS = ['남향', '동향', '서향', '북향'];
 const OPTION_LIST = ['에어컨', '세탁기', '냉장고', '가스레인지', '인덕션', '전자레인지', '침대', '책상', '옷장'];
 
-function BuildingSections({
+export function BuildingSections({
   data,
   onChange,
   buildingRef,
@@ -366,9 +344,7 @@ function BuildingSections({
   );
 }
 
-import type { Rating, YesNo } from './components/ui/shared';
-
-function InteriorSections({
+export function InteriorSections({
   data,
   onChange,
   interiorRef,
@@ -407,7 +383,7 @@ function InteriorSections({
   );
 }
 
-function SafetySections({
+export function SafetySections({
   data,
   onChange,
   safetyRef,
@@ -458,7 +434,7 @@ function SafetySections({
   );
 }
 
-function CustomSections({
+export function CustomSections({
   data,
   onChange,
   customRef,

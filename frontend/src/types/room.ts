@@ -38,6 +38,16 @@ export interface Room {
   buildingType?: string;
   floor?: string;
   direction?: string;
+  // 비로그인 sessionStorage 전용: 5섹션 원본 폼 데이터 (수정 페이지 복원용)
+  raw?: GuestRoomRaw;
+}
+
+export interface GuestRoomRaw {
+  basic: import('@/features/checklist/components/01_basic-info').BasicInfoData;
+  building: import('@/features/checklist/components/02_building-info').BuildingInfoData;
+  interior: import('@/features/checklist/components/03_interior-check').InteriorCheckData;
+  safety: import('@/features/checklist/components/04_safety-living').SafetyLivingData;
+  custom: import('@/features/checklist/components/05_custom-memo').CustomMemoData;
 }
 
 export interface PaginatedResponse<T> {

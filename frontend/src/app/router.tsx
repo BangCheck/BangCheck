@@ -4,6 +4,7 @@ import LoginPage from '@/features/login/LoginPage';
 import AuthCallbackPage from '@/features/auth/AuthCallbackPage';
 import LoginErrorPage from '@/features/auth/LoginErrorPage';
 import ChecklistNewPage from '@/features/checklist/ChecklistNewPage';
+import ChecklistDetailPage from '@/features/checklist/ChecklistDetailPage';
 import RoomsPage from '@/features/rooms/pages/RoomsPage';
 import Header from '@/components/Header';
 
@@ -31,12 +32,12 @@ export const Router = () => (
     <Route path="/login-error" element={<LoginErrorPage />} />
     <Route path="/auth/callback/:provider" element={<AuthCallbackPage />} />
     <Route path="/checklist/new" element={<ChecklistNewPage />} />
+    <Route path="/checklist/:id" element={<ChecklistDetailPage />} />
 
     {/* 헤더 있는 페이지 */}
     <Route element={<AppLayout />}>
       <Route path="/login" element={<LoginPage />} />
       <Route path="/rooms" element={<RoomsPage />} />
-      <Route path="/checklist/:id" element={<Placeholder name="ChecklistDetail" />} />
       <Route path="/report" element={<Placeholder name="ReportPage" />} />
       <Route path="/settings" element={<Placeholder name="SettingsPage" />} />
       <Route path="*" element={<Placeholder name="404" />} />
