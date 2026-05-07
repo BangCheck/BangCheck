@@ -6,6 +6,7 @@ import LoginErrorPage from '@/features/auth/LoginErrorPage';
 import ChecklistNewPage from '@/features/checklist/ChecklistNewPage';
 import ChecklistDetailPage from '@/features/checklist/ChecklistDetailPage';
 import RoomsPage from '@/features/rooms/pages/RoomsPage';
+import ReportPage from '@/features/report/ReportPage';
 import Header from '@/components/Header';
 
 const Placeholder = ({ name }: { name: string }) => (
@@ -38,7 +39,7 @@ export const Router = () => (
     <Route element={<AppLayout />}>
       <Route path="/login" element={<LoginPage />} />
       <Route path="/rooms" element={<RoomsPage />} />
-      <Route path="/report" element={<Placeholder name="ReportPage" />} />
+      <Route path="/report" element={<ReportPage />} />
       <Route path="/settings" element={<Placeholder name="SettingsPage" />} />
       <Route path="*" element={<Placeholder name="404" />} />
     </Route>

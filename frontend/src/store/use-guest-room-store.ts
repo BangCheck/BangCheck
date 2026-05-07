@@ -33,6 +33,35 @@ const buildTags = (raw: GuestRoomRaw): string[] => {
   return tags;
 };
 
+// 비로그인 점수 산출: 평가(좋음=3/보통=2/나쁨=1) + 문제(없음=2/있음=0) 기반 0~100
+// 로그인 모드에서는 BE가 score 제공 — 본 함수는 비로그인 전용
+const ratingToPoint = (v: '좋음' | '보통' | '나쁨' | null): number | null =>
+  v === '좋음' ? 3 : v === '보통' ? 2 : v === '나쁨' ? 1 : null;
+const yesNoToPoint = (v: '있음' | '없음' | null): number | null =>
+  v === '없음' ? 2 : v === '있음' ? 0 : null;
+
+export const computeRoomScore = (raw: GuestRoomRaw): number => {
+  const ratings = [
+    raw.interior.lighting, raw.interior.ventilation, raw.interior.floorNoise,
+    raw.interior.waterPressure, raw.interior.soundProof, raw.interior.heating,
+    raw.safety.doorLock, raw.safety.windowLock, raw.safety.cctv,
+    raw.safety.fireSafety, raw.safety.hallLight, raw.safety.securityState,
+    raw.safety.windowScreen, raw.safety.laundry, raw.safety.trash,
+    raw.safety.surroundNoise, raw.safety.amenity, raw.safety.transit, raw.safety.nightSafety,
+  ].map(ratingToPoint).filter((p): p is number => p !== null);
+
+  const problems = [
+    raw.interior.mold, raw.interior.pest, raw.interior.leak,
+    raw.interior.wallpaper, raw.interior.drainSmell,
+    raw.safety.bikeParking, raw.safety.internet,
+  ].map(yesNoToPoint).filter((p): p is number => p !== null);
+
+  const earned = ratings.reduce((a, b) => a + b, 0) + problems.reduce((a, b) => a + b, 0);
+  const max = ratings.length * 3 + problems.length * 2;
+  if (max === 0) return 0;
+  return Math.round((earned / max) * 100);
+};
+
 const rawToRoomFields = (raw: GuestRoomRaw) => ({
   name: raw.basic.name || '이름 없음',
   address: raw.basic.address || '',
@@ -42,7 +71,7 @@ const rawToRoomFields = (raw: GuestRoomRaw) => ({
   managementFee: raw.basic.isMgmtUnknown ? undefined : parseMoney(raw.basic.managementFee),
   price: formatPrice(raw),
   tags: buildTags(raw),
-  score: 100,
+  score: computeRoomScore(raw),
   issues: {
     mold: raw.interior.mold === '있음',
     leak: raw.interior.leak === '있음',
