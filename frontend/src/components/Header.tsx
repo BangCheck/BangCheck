@@ -2,9 +2,12 @@ import { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { LogoWithText } from './Logo';
 import { useAuthStore } from '@/store/use-auth-store';
+import { useGuestRoomStore } from '@/store/use-guest-room-store';
 import { LogoutConfirmModal } from './ui/Modals';
 import { cn } from '@/lib/utils';
 import { ROUTES } from '@/lib/routes';
+
+const GUEST_ROOM_LIMIT = 2;
 
 function getInitial(nickname?: string, email?: string) {
   if (nickname && nickname.length > 0) return nickname.charAt(0);
@@ -14,9 +17,13 @@ function getInitial(nickname?: string, email?: string) {
 
 export default function Header() {
   const { isLoggedIn, user, logout } = useAuthStore();
+  const { guestRooms } = useGuestRoomStore();
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
+
+  // 비로그인 한도(2개) 도달 시 비활성화. 로그인은 일단 항상 활성 (BE 한도 6개는 추후).
+  const startDisabled = !isLoggedIn && guestRooms.length >= GUEST_ROOM_LIMIT;
 
   const confirmLogout = () => {
     logout();
@@ -66,6 +73,33 @@ export default function Header() {
         </nav>
 
         <div className="flex-1 flex justify-end items-center gap-3 z-10">
+          {/* 체크리스트 시작하기 — Figma 373:19998(활성) / 373:20132(비활성) */}
+          {startDisabled ? (
+            <button
+              type="button"
+              disabled
+              aria-label="비로그인 한도(2개)에 도달했어요"
+              className="hidden sm:flex h-8 px-4 py-2 rounded-[4px] bg-[#BFBFBF] items-center gap-[10px] cursor-not-allowed"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="12" y1="5" x2="12" y2="19" />
+                <line x1="5" y1="12" x2="19" y2="12" />
+              </svg>
+              <span className="text-[12px] font-semibold text-white whitespace-nowrap">체크리스트 시작하기</span>
+            </button>
+          ) : (
+            <Link
+              to={ROUTES.CHECKLIST_NEW}
+              className="hidden sm:flex h-8 px-4 py-2 rounded-[4px] bg-[#0A607D] items-center gap-[10px] hover:bg-[#084e6d] transition-colors"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="12" y1="5" x2="12" y2="19" />
+                <line x1="5" y1="12" x2="19" y2="12" />
+              </svg>
+              <span className="text-[12px] font-semibold text-white whitespace-nowrap">체크리스트 시작하기</span>
+            </Link>
+          )}
+
           {isLoggedIn ? (
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 rounded-full bg-[#718096] flex items-center justify-center text-white text-[12px] font-bold overflow-hidden relative">
