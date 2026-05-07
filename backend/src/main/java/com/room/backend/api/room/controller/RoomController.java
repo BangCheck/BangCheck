@@ -66,9 +66,9 @@ public class RoomController {
         Long userId = SecurityUtil.getCurrentUserId();
         List<Room> rooms = roomService.getRooms(userId);
         List<RoomListResponseDTO> response = rooms.stream()
-                .map(room -> new RoomListResponseDTO(room))
-                .toList();
-
+            .map(room -> new RoomListResponseDTO(room,
+                roomCheckResultService.getRoomIssuesSummary(room.getId())))
+            .toList();
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 
@@ -77,11 +77,12 @@ public class RoomController {
     public ResponseEntity<ApiResponse<RoomDetailResponseDTO>> getRoom(@PathVariable Long id) {
         Long userId = SecurityUtil.getCurrentUserId();
         Room room = roomService.getRoom(id, userId)
-                .orElseThrow(() -> new GeneralException(RoomErrorCode.ROOM_NOT_FOUND));
+            .orElseThrow(() -> new GeneralException(RoomErrorCode.ROOM_NOT_FOUND));
         List<RoomCheckResultResponseDTO> checkResults = roomCheckResultService.getCheckResults(id);
-
-        return ResponseEntity.ok(ApiResponse.success(new RoomDetailResponseDTO(room, checkResults)));
+        return ResponseEntity.ok(ApiResponse.success(
+            new RoomDetailResponseDTO(room, checkResults)));
     }
+
 
     @PostMapping("/{id}/check-results")
     @Operation(summary = "체크리스트 답변 저장", description = "방에 대한 체크리스트 답변을 저장합니다")
