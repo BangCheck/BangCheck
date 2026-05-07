@@ -133,7 +133,9 @@ export const useGuestRoomStore = create<GuestRoomState>()(
     }),
     {
       name: 'guest-room-storage',
-      storage: createJSONStorage(() => sessionStorage),
+      // localStorage 사용 — 탭/창을 닫아도 비로그인 데이터 유지.
+      // 로그인 성공 시 clearGuestRooms() 명시적 호출 (E09-S10에서 통합).
+      storage: createJSONStorage(() => localStorage),
     },
   ),
 );
