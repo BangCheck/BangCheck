@@ -1,6 +1,7 @@
 package com.room.backend.api.room.service;
 
 import java.math.BigDecimal;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -9,6 +10,8 @@ import com.room.backend.api.room.dto.request.RoomUpdateRequestDTO;
 import com.room.backend.api.room.dto.request.RoomUpdateWithCheckAnswerRequestDTO;
 import com.room.backend.api.room.dto.request.RoomWithCheckAnswerRequestDTO;
 import com.room.backend.domain.room.entity.Room;
+import com.room.backend.domain.room.entity.enums.RentType;
+import com.room.backend.domain.room.entity.enums.RoomSortType;
 import com.room.backend.domain.room.repository.RoomRepository;
 import com.room.backend.global.common.exception.GeneralException;
 import com.room.backend.global.common.exception.RoomErrorCode;
@@ -106,8 +109,22 @@ public class RoomService {
     }
 
     @Transactional(readOnly = true)
-    public List<Room> getRooms(Long userId) {
-        return roomRepository.findByUserIdAndIsDeletedFalseOrderByCreatedAtDesc(userId);
+    public List<Room> getRooms(Long userId, RentType rentType, RoomSortType sort) {
+        List<Room> rooms = roomRepository.findRoomsWithFilter(userId, rentType);
+
+        if (sort == null) return rooms;
+
+        return switch (sort) {
+            case DEPOSIT_ASC -> rooms.stream()
+                .sorted(Comparator.comparingLong(r -> r.getDeposit() == null ? Long.MAX_VALUE : r.getDeposit()))
+                .toList();
+            case RENT_ASC -> rooms.stream()
+                .sorted(Comparator.comparingInt(r -> r.getMonthlyRent() == null ? Integer.MAX_VALUE : r.getMonthlyRent()))
+                .toList();
+            case MANAGEMENT_FEE_ASC -> rooms.stream()
+                .sorted(Comparator.comparingInt(r -> r.getMaintenanceFee() == null ? Integer.MAX_VALUE : r.getMaintenanceFee()))
+                .toList();
+        };
     }
 
     @Transactional(readOnly = true)
