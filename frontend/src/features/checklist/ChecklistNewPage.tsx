@@ -32,7 +32,7 @@ const initBasic: BasicInfoData = {
   name: '', address: '', transactionType: null,
   deposit: '', monthlyRent: '', managementFee: '',
   includeMgmtInRent: false, isMgmtUnknown: false,
-  loanStatus: null, moveInReport: null,
+  loanStatus: null, loanAmount: '', moveInReport: null,
   moveInDate: '', moveInNegotiable: false,
 };
 

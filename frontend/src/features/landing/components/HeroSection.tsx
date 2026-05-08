@@ -27,22 +27,13 @@ export default function HeroSection() {
             학교·역까지 거리를 확인하세요.
           </p>
 
-          <div className="flex gap-8 items-center flex-wrap justify-center">
-            <Link
-              to={ROUTES.CHECKLIST_NEW}
-              className="flex items-center gap-2 bg-white text-[#232527] font-bold text-[16px] tracking-[-0.5px] px-[10px] py-[16px] rounded-[8px] w-[210px] justify-center hover:bg-gray-100 transition-colors"
-            >
-              로그인없이 시작하기
-              <ChevronRight className="w-4 h-4" />
-            </Link>
-            <Link
-              to={ROUTES.LOGIN}
-              className="flex items-center gap-2 bg-[#0a607d] text-white font-bold text-[16px] tracking-[-0.5px] px-[10px] py-[16px] rounded-[8px] w-[210px] justify-center hover:bg-[#084e6d] transition-colors"
-            >
-              로그인하고 시작하기
-              <ChevronRight className="w-4 h-4" />
-            </Link>
-          </div>
+          <Link
+            to={ROUTES.CHECKLIST_NEW}
+            className="flex items-center gap-[10px] bg-[#0a607d] text-white font-bold text-[16px] tracking-[-0.5px] px-[10px] py-[16px] rounded-[8px] w-[210px] justify-center hover:bg-[#084e6d] transition-colors"
+          >
+            체크리스트 시작하기
+            <ChevronRight className="w-4 h-4" />
+          </Link>
         </div>
       </div>
     </section>

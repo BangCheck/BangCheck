@@ -45,7 +45,11 @@ export default function ReportPage() {
     [guestRooms, selectedIds],
   );
 
+  // 비로그인은 방 한도가 MIN_SELECT(=2)와 동일 → 두 카드 모두 선택 고정, 토글 비활성
+  const isLockedSelection = guestRooms.length <= MIN_SELECT;
+
   const toggle = (id: string) => {
+    if (isLockedSelection) return;
     setSelectedIds((prev) => {
       if (prev.includes(id)) {
         return prev.length > MIN_SELECT ? prev.filter((v) => v !== id) : prev;
@@ -126,6 +130,7 @@ export default function ReportPage() {
                 selected={selectedIds.includes(room.id)}
                 onToggle={toggle}
                 canAdd={canAdd}
+                locked={isLockedSelection}
               />
             ))}
           </div>
@@ -177,20 +182,26 @@ function RoomSelectCard({
   selected,
   onToggle,
   canAdd,
+  locked = false,
 }: {
   room: Room;
   selected: boolean;
   onToggle: (id: string) => void;
   canAdd: boolean;
+  locked?: boolean;
 }) {
-  const disabled = !selected && !canAdd;
+  const disabled = locked || (!selected && !canAdd);
   return (
     <div
       onClick={() => !disabled && onToggle(room.id)}
       className={cn(
         'relative p-5 rounded-xl border-2 transition-all',
         selected ? 'border-[#0A607D] bg-[#0A607D]/5' : 'border-[#E2E2E2]',
-        disabled ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer hover:border-[#BFBFBF]',
+        locked
+          ? 'cursor-not-allowed opacity-60'
+          : disabled
+            ? 'opacity-40 cursor-not-allowed'
+            : 'cursor-pointer hover:border-[#BFBFBF]',
       )}
     >
       <div className="flex justify-between items-start">

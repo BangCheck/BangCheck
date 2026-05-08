@@ -51,7 +51,7 @@ export default function BuildingInfo({ data, onChange }: Props) {
           <div>
             <FieldLabel>층수</FieldLabel>
             <div className="flex flex-wrap gap-3">
-              {(['저층', '중층', '고층'] as const).map((v) => (
+              {(['반지하', '저층', '중층', '고층'] as const).map((v) => (
                 <SelectCard key={v} label={v} active={data.floorLevel === v} onClick={() => onChange('floorLevel', data.floorLevel === v ? null : v)} className="flex-1 min-w-[80px]" />
               ))}
               <div className="flex-1 min-w-[120px]">

@@ -10,6 +10,7 @@ export interface BasicInfoData {
   includeMgmtInRent: boolean;
   isMgmtUnknown: boolean;
   loanStatus: '있음' | '없음' | null;
+  loanAmount: string;
   moveInReport: '가능' | '불가능' | null;
   moveInDate: string;
   moveInNegotiable: boolean;
@@ -68,22 +69,24 @@ export default function BasicInfo({ data, onChange }: Props) {
             <TextInput value={data.deposit} onChange={(v) => onChange('deposit', v)} placeholder="예 : 1000" suffix="만원" type="number" />
           </div>
 
-          {/* 월세 */}
-          <div>
-            <div className="flex items-center justify-between mb-2">
-              <FieldLabel>월세 (만원)</FieldLabel>
-              <label className="flex items-center gap-1.5 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={data.includeMgmtInRent}
-                  onChange={(e) => onChange('includeMgmtInRent', e.target.checked)}
-                  className="w-4 h-4 accent-[#0A607D]"
-                />
-                <span className="text-[13px] text-[#232527]">관리비 포함</span>
-              </label>
+          {/* 월세 — 전세 선택 시 비노출 */}
+          {data.transactionType !== '전세' && (
+            <div>
+              <div className="flex items-center justify-between mb-2">
+                <FieldLabel>월세 (만원)</FieldLabel>
+                <label className="flex items-center gap-1.5 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={data.includeMgmtInRent}
+                    onChange={(e) => onChange('includeMgmtInRent', e.target.checked)}
+                    className="w-4 h-4 accent-[#0A607D]"
+                  />
+                  <span className="text-[13px] text-[#232527]">관리비 포함</span>
+                </label>
+              </div>
+              <TextInput value={data.monthlyRent} onChange={(v) => onChange('monthlyRent', v)} placeholder="예 : 50" suffix="만원" type="number" />
             </div>
-            <TextInput value={data.monthlyRent} onChange={(v) => onChange('monthlyRent', v)} placeholder="예 : 50" suffix="만원" type="number" />
-          </div>
+          )}
 
           {/* 관리비 */}
           <div>
@@ -110,6 +113,18 @@ export default function BasicInfo({ data, onChange }: Props) {
                 <EmojiCard key={v} emoji={v === '없음' ? '😊' : '😞'} label={v} active={data.loanStatus === v} onClick={() => onChange('loanStatus', data.loanStatus === v ? null : v)} />
               ))}
             </div>
+            {data.loanStatus === '있음' && (
+              <div className="mt-3">
+                <FieldLabel>융자 금액 (만원)</FieldLabel>
+                <TextInput
+                  value={data.loanAmount}
+                  onChange={(v) => onChange('loanAmount', v)}
+                  placeholder="예 : 5000"
+                  suffix="만원"
+                  type="number"
+                />
+              </div>
+            )}
           </div>
 
           {/* 전입신고 가능여부 */}
