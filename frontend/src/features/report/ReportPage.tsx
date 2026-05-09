@@ -1,11 +1,14 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Icon } from '@iconify/react';
 import { cn } from '@/lib/utils';
 import { useGuestRoomStore } from '@/store/use-guest-room-store';
 import type { Room } from '@/types/room';
+import { ConfigCard } from './components/ConfigCard';
+import { FilterToggle } from './components/FilterToggle';
+import { REPORT_SECTIONS, type ReportSectionId } from './lib/sections';
 
-const SECTIONS = ['기본정보', '건물정보', '옵션', '내부상태', '문제요소', '안전/생활', '나만의항목'] as const;
-type SectionKey = (typeof SECTIONS)[number];
+const ALL_SECTION_IDS = REPORT_SECTIONS.map((s) => s.id);
 
 const MAX_SELECT = 6;
 const MIN_SELECT = 2;
@@ -31,7 +34,8 @@ export default function ReportPage() {
   const { guestRooms } = useGuestRoomStore();
 
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
-  const [activeSections, setActiveSections] = useState<SectionKey[]>([...SECTIONS]);
+  const [activeSections, setActiveSections] = useState<ReportSectionId[]>([...ALL_SECTION_IDS]);
+  const [isConfigOpen, setIsConfigOpen] = useState(true);
 
   // 초기 진입 시 등록된 방 중 앞에서부터 MIN_SELECT개 자동 선택
   useEffect(() => {
@@ -48,7 +52,7 @@ export default function ReportPage() {
   // 비로그인은 방 한도가 MIN_SELECT(=2)와 동일 → 두 카드 모두 선택 고정, 토글 비활성
   const isLockedSelection = guestRooms.length <= MIN_SELECT;
 
-  const toggle = (id: string) => {
+  const toggleRoom = (id: string) => {
     if (isLockedSelection) return;
     setSelectedIds((prev) => {
       if (prev.includes(id)) {
@@ -58,10 +62,21 @@ export default function ReportPage() {
     });
   };
 
-  const toggleSection = (s: SectionKey) =>
-    setActiveSections((prev) => (prev.includes(s) ? prev.filter((x) => x !== s) : [...prev, s]));
+  const toggleSection = (s: ReportSectionId) =>
+    setActiveSections((prev) => {
+      if (prev.includes(s)) {
+        // 최소 1개 유지
+        return prev.length > 1 ? prev.filter((x) => x !== s) : prev;
+      }
+      return [...prev, s];
+    });
 
-  const canAdd = selectedIds.length < MAX_SELECT;
+  const resetConfig = () => {
+    setSelectedIds(guestRooms.slice(0, MIN_SELECT).map((r) => r.id));
+    setActiveSections([...ALL_SECTION_IDS]);
+  };
+
+  const canSelectMore = selectedIds.length < MAX_SELECT;
 
   // 빈 상태
   if (guestRooms.length < MIN_SELECT) {
@@ -82,7 +97,7 @@ export default function ReportPage() {
           <button
             type="button"
             onClick={() => navigate('/checklist/new')}
-            className="px-6 py-3 rounded-[6px] bg-[#0A607D] text-white text-[14px] font-bold hover:bg-[#084e6d] cursor-pointer"
+            className="px-6 py-3 rounded-[6px] bg-brand-primary text-white text-[14px] font-bold hover:bg-brand-primary-dark cursor-pointer"
           >
             체크리스트 추가하기
           </button>
@@ -92,72 +107,50 @@ export default function ReportPage() {
   }
 
   return (
-    <div className="flex-1 bg-[#FAFAFA] min-h-screen">
-      {/* 액션 바 */}
-      <div className="bg-white border-b border-[#E2E2E2] sticky top-16 z-30">
-        <div className="max-w-[1200px] mx-auto px-4 md:px-10 py-6 flex justify-between items-center">
-          <div className="flex items-center gap-4">
-            <h1 className="text-[24px] md:text-[28px] font-bold text-[#232527]">비교 리포트</h1>
-            <span className="text-[#0A607D] font-semibold bg-[#0A607D]/10 px-3 py-1 rounded-full text-sm">
-              {selectedRooms.length}개 방 선택됨
-            </span>
-          </div>
+    <div className="flex-1 bg-bg-footer min-h-screen">
+      {/* 서브 헤더 */}
+      <div className="bg-white border-b border-border-light sticky top-16 z-30">
+        <div className="max-w-[1200px] mx-auto px-4 md:px-10 py-4 flex items-center gap-4">
           <button
             type="button"
             onClick={() => navigate('/rooms')}
-            className="px-4 py-2 border border-[#E2E2E2] rounded-[4px] text-sm font-semibold text-[#777] hover:bg-[#F5F5F5] cursor-pointer"
+            aria-label="방 목록으로 돌아가기"
+            className="p-1 -ml-1 text-text-main hover:bg-bg-gray rounded-[4px]"
           >
-            방 목록으로
+            <Icon icon="ic:round-navigate-next" width={24} height={24} className="rotate-180" />
           </button>
+          <h1 className="text-xl md:text-2xl font-bold text-text-main">비교 리포트</h1>
+          <FilterToggle open={isConfigOpen} onToggle={() => setIsConfigOpen((v) => !v)} />
+          <span className="text-sm text-text-mute">
+            {selectedRooms.length}개 방 · {activeSections.length}개 섹션
+          </span>
+          <div className="ml-auto flex items-center gap-2">
+            <button
+              type="button"
+              aria-label="공유"
+              className="inline-flex items-center gap-1 rounded-[4px] border border-border-light px-3 py-1.5 text-sm font-semibold text-text-main hover:bg-bg-gray"
+            >
+              <Icon icon="material-symbols:share-outline" width={16} height={16} />
+              <span>공유</span>
+            </button>
+          </div>
         </div>
       </div>
 
-      <div className="max-w-[1200px] mx-auto px-4 md:px-10 py-10 space-y-10">
-        {/* 방 선택 */}
-        <section className="bg-white rounded-lg border border-[#E2E2E2] p-6 md:p-8 shadow-sm">
-          <div className="flex justify-between items-end mb-6">
-            <div className="space-y-1">
-              <h2 className="text-lg md:text-xl font-bold text-[#232527]">비교할 방 선택</h2>
-              <p className="text-[#A0A0A0] text-sm">최소 {MIN_SELECT}개, 최대 {MAX_SELECT}개까지 선택할 수 있어요.</p>
-            </div>
-            <p className="text-sm font-semibold text-[#A0A0A0]">{selectedIds.length}/{MAX_SELECT}</p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {guestRooms.map((room) => (
-              <RoomSelectCard
-                key={room.id}
-                room={room}
-                selected={selectedIds.includes(room.id)}
-                onToggle={toggle}
-                canAdd={canAdd}
-                locked={isLockedSelection}
-              />
-            ))}
-          </div>
-        </section>
-
-        {/* 섹션 필터 */}
-        {selectedRooms.length >= MIN_SELECT && (
-          <section className="bg-white rounded-lg border border-[#E2E2E2] p-6 shadow-sm">
-            <h2 className="text-base font-bold text-[#232527] mb-4">표시할 섹션 선택</h2>
-            <div className="flex flex-wrap gap-2">
-              {SECTIONS.map((s) => (
-                <button
-                  key={s}
-                  type="button"
-                  onClick={() => toggleSection(s)}
-                  className={cn(
-                    'px-4 py-1.5 rounded-full text-sm font-medium border transition-all cursor-pointer',
-                    activeSections.includes(s)
-                      ? 'bg-[#0A607D] text-white border-[#0A607D]'
-                      : 'bg-white text-[#777] border-[#E2E2E2] hover:border-[#BFBFBF]',
-                  )}
-                >
-                  {s}
-                </button>
-              ))}
-            </div>
-          </section>
+      <div className="max-w-[1200px] mx-auto px-4 md:px-10 py-6 space-y-6">
+        {/* 설정 패널 (펼침/접힘) */}
+        {isConfigOpen && (
+          <ConfigCard
+            rooms={guestRooms}
+            selectedRoomIds={selectedIds}
+            onToggleRoom={toggleRoom}
+            canSelectMore={canSelectMore}
+            isLockedSelection={isLockedSelection}
+            activeSections={activeSections}
+            onToggleSection={toggleSection}
+            onComplete={() => setIsConfigOpen(false)}
+            onReset={resetConfig}
+          />
         )}
 
         {/* 비교 테이블 */}
@@ -168,64 +161,14 @@ export default function ReportPage() {
         )}
 
         {/* 종합 요약 */}
-        {selectedRooms.length >= MIN_SELECT && (
-          <ReportSummary rooms={selectedRooms} />
-        )}
-      </div>
-    </div>
-  );
-}
-
-// ─── RoomSelectCard ───────────────────────────────────────────
-function RoomSelectCard({
-  room,
-  selected,
-  onToggle,
-  canAdd,
-  locked = false,
-}: {
-  room: Room;
-  selected: boolean;
-  onToggle: (id: string) => void;
-  canAdd: boolean;
-  locked?: boolean;
-}) {
-  const disabled = locked || (!selected && !canAdd);
-  return (
-    <div
-      onClick={() => !disabled && onToggle(room.id)}
-      className={cn(
-        'relative p-5 rounded-xl border-2 transition-all',
-        selected ? 'border-[#0A607D] bg-[#0A607D]/5' : 'border-[#E2E2E2]',
-        locked
-          ? 'cursor-not-allowed opacity-60'
-          : disabled
-            ? 'opacity-40 cursor-not-allowed'
-            : 'cursor-pointer hover:border-[#BFBFBF]',
-      )}
-    >
-      <div className="flex justify-between items-start">
-        <div className="space-y-1 min-w-0">
-          <h3 className="font-bold text-[#232527] truncate">{room.name}</h3>
-          <p className="text-xs text-[#A0A0A0] truncate">{room.address || '주소 없음'}</p>
-          <p className="text-sm font-semibold text-[#0A607D] mt-2">{room.price}</p>
-          <p className="text-xs text-[#A0A0A0]">총점 {room.score}점</p>
-        </div>
-        <div
-          className={cn(
-            'w-6 h-6 rounded-full border flex items-center justify-center shrink-0 ml-2',
-            selected ? 'bg-[#0A607D] border-[#0A607D]' : 'border-[#E2E2E2]',
-          )}
-        >
-          {selected && <span className="text-white text-xs font-bold">✓</span>}
-        </div>
+        {selectedRooms.length >= MIN_SELECT && <ReportSummary rooms={selectedRooms} />}
       </div>
     </div>
   );
 }
 
 // ─── CompareTable ─────────────────────────────────────────────
-function CompareTable({ rooms, activeSections }: { rooms: Room[]; activeSections: SectionKey[] }) {
+function CompareTable({ rooms, activeSections }: { rooms: Room[]; activeSections: ReportSectionId[] }) {
   if (rooms.length === 0) return null;
 
   const Row = ({ label, values, isLast = false }: { label: string; values: string[]; isLast?: boolean }) => (
@@ -267,7 +210,7 @@ function CompareTable({ rooms, activeSections }: { rooms: Room[]; activeSections
         ))}
       </div>
 
-      {activeSections.includes('기본정보') && (
+      {activeSections.includes('basic') && (
         <>
           <SectionHeader title="기본 정보" />
           <Row label="거래유형" values={rooms.map((r) => r.type)} />
@@ -280,7 +223,7 @@ function CompareTable({ rooms, activeSections }: { rooms: Room[]; activeSections
         </>
       )}
 
-      {activeSections.includes('건물정보') && (
+      {activeSections.includes('building') && (
         <>
           <SectionHeader title="건물 정보" />
           <Row label="건물유형" values={rooms.map((r) => r.buildingType ?? '-')} />
@@ -290,7 +233,7 @@ function CompareTable({ rooms, activeSections }: { rooms: Room[]; activeSections
         </>
       )}
 
-      {activeSections.includes('옵션') && (
+      {activeSections.includes('option') && (
         <>
           <SectionHeader title="옵션" />
           <Row
@@ -301,7 +244,7 @@ function CompareTable({ rooms, activeSections }: { rooms: Room[]; activeSections
         </>
       )}
 
-      {activeSections.includes('내부상태') && (
+      {activeSections.includes('condition') && (
         <>
           <SectionHeader title="내부 상태" />
           <Row label="채광" values={raws.map((raw) => ratingEmoji(raw?.interior.lighting))} />
@@ -313,7 +256,7 @@ function CompareTable({ rooms, activeSections }: { rooms: Room[]; activeSections
         </>
       )}
 
-      {activeSections.includes('문제요소') && (
+      {activeSections.includes('problem') && (
         <>
           <SectionHeader title="문제 요소" />
           <Row label="곰팡이" values={raws.map((raw) => yesNoBadge(raw?.interior.mold, 'problem'))} />
@@ -324,7 +267,7 @@ function CompareTable({ rooms, activeSections }: { rooms: Room[]; activeSections
         </>
       )}
 
-      {activeSections.includes('안전/생활') && (
+      {activeSections.includes('safety') && (
         <>
           <SectionHeader title="안전 / 생활" />
           <Row label="도어락" values={raws.map((raw) => ratingEmoji(raw?.safety.doorLock))} />
@@ -337,23 +280,10 @@ function CompareTable({ rooms, activeSections }: { rooms: Room[]; activeSections
         </>
       )}
 
-      {activeSections.includes('나만의항목') && (
+      {activeSections.includes('environment') && (
         <>
-          <SectionHeader title="나만의 항목" />
-          {(() => {
-            const allKeys = Array.from(
-              new Set(raws.flatMap((raw) => raw?.custom.customItems.map((c) => c.label) ?? [])),
-            ).filter((k) => k);
-            if (allKeys.length === 0) return <Row label="-" values={rooms.map(() => '항목 없음')} isLast />;
-            return allKeys.map((key, i) => (
-              <Row
-                key={key}
-                label={key}
-                values={raws.map((raw) => raw?.custom.customItems.find((c) => c.label === key)?.value ?? '-')}
-                isLast={i === allKeys.length - 1}
-              />
-            ));
-          })()}
+          <SectionHeader title="주변 환경" />
+          <Row label="-" values={rooms.map(() => '데이터 수집 예정')} isLast />
         </>
       )}
 
