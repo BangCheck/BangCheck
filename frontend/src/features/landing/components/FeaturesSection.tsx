@@ -10,7 +10,7 @@ const FEATURES = [
     title: '자취 체크리스트',
     subtitle: '놓치기 쉬운 항목, 확인하는 방법까지',
     description: '곰팡이, 수압, 방음 등 초보 자취생이 챙겨야 할 필수 항목과 항목별 확인 가이드를 함께 제공합니다. 계약 전, 무엇을 확인해야 할지 미리 점검해보세요',
-    cta: { label: '체크리스트 시작하기', href: ROUTES.CHECKLIST_NEW },
+    cta: { label: '체크리스트 시작하기', href: ROUTES.HOME },
   },
   {
     imageSrc: '/images/landing/feature-distance.png',

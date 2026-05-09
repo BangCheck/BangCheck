@@ -28,7 +28,7 @@ export default function HeroSection() {
           </p>
 
           <Link
-            to={ROUTES.CHECKLIST_NEW}
+            to={ROUTES.HOME}
             className="flex items-center gap-[10px] bg-[#0a607d] text-white font-bold text-[16px] tracking-[-0.5px] px-[10px] py-[16px] rounded-[8px] w-[210px] justify-center hover:bg-[#084e6d] transition-colors"
           >
             체크리스트 시작하기

@@ -26,7 +26,11 @@ export default function Header() {
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
 
   const isLanding = pathname === ROUTES.LANDING;
+  const isRoomsPage = pathname === ROUTES.HOME;
   const loggedInRoomCount = rooms?.length ?? 0;
+  const totalRoomCount = isLoggedIn ? loggedInRoomCount : guestRooms.length;
+  // /rooms empty state에서는 본문 CTA가 노출되므로 헤더 버튼 숨김
+  const hideStartButton = isLanding || (isRoomsPage && totalRoomCount === 0);
   const startDisabled = isLoggedIn
     ? loggedInRoomCount >= ROOM_LIMIT
     : guestRooms.length >= GUEST_ROOM_LIMIT;
@@ -82,8 +86,8 @@ export default function Header() {
         </nav>
 
         <div className="flex-1 flex justify-end items-center gap-3 z-10">
-          {/* 체크리스트 시작하기 — Figma 373:19998(활성) / 373:20132(비활성). 랜딩 페이지에서는 숨김. */}
-          {!isLanding && (startDisabled ? (
+          {/* 체크리스트 시작하기 — Figma 373:19998(활성) / 373:20132(비활성). 랜딩 + /rooms empty state에서는 숨김. */}
+          {!hideStartButton && (startDisabled ? (
             <button
               type="button"
               disabled
