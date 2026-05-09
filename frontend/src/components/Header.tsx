@@ -41,7 +41,7 @@ export default function Header() {
   const confirmLogout = () => {
     logout();
     setIsLogoutModalOpen(false);
-    navigate(ROUTES.HOME);
+    navigate(ROUTES.LANDING, { replace: true });
   };
 
   const userInitial = getInitial(user?.nickname, user?.email);
@@ -137,7 +137,7 @@ export default function Header() {
           ) : (
             <Link
               to={ROUTES.LOGIN}
-              className="text-[13px] font-bold text-[#0A607D] border border-[#0A607D]/30 px-4 py-1.5 rounded-md hover:bg-[#0A607D]/5 transition-colors"
+              className="text-[12px] font-semibold text-text-main border border-border-light px-4 py-2 rounded hover:bg-bg-gray transition-colors"
             >
               로그인
             </Link>
