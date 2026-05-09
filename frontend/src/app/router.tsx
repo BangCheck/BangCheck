@@ -33,6 +33,7 @@ const AppLayout = () => (
 export const Router = () => (
   <Routes>
     {/* 헤더 없는 페이지 */}
+    <Route path="/" element={<LandingPage />} />
     <Route path="/login-error" element={<LoginErrorPage />} />
     <Route path="/auth/callback/:provider" element={<AuthCallbackPage />} />
     <Route path="/checklist/new" element={<ChecklistNewPage />} />
@@ -40,7 +41,6 @@ export const Router = () => (
 
     {/* 헤더 있는 페이지 */}
     <Route element={<AppLayout />}>
-      <Route path="/" element={<LandingPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/rooms" element={<RoomsPage />} />
       <Route path="/report" element={<ReportPage />} />
