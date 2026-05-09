@@ -22,73 +22,84 @@ import java.util.List;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+        private final JwtAuthenticationFilter jwtAuthenticationFilter;
         private final AppPathProperties appPathProperties;
 
         public SecurityConfig(JwtAuthenticationFilter jwtAuthenticationFilter, AppPathProperties appPathProperties) {
-        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+                this.jwtAuthenticationFilter = jwtAuthenticationFilter;
                 this.appPathProperties = appPathProperties;
-    }
+        }
 
-    @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.cors(cors -> cors.configurationSource(corsConfigurationSource()));
-        http.csrf(csrf -> csrf.disable());
+        @Bean
+        public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+                http.cors(cors -> cors.configurationSource(corsConfigurationSource()));
+                http.csrf(csrf -> csrf.disable());
 
-        http.authorizeHttpRequests(auth -> auth
-                // Preflight
-                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                http.authorizeHttpRequests(auth -> auth
+                                // Preflight
+                                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
-                // Public — 인증 불필요
-                .requestMatchers(appPathProperties.getAuthBasePath() + appPathProperties.getAuthOauthBasePath() + "/**").permitAll()
-                .requestMatchers(HttpMethod.POST, appPathProperties.getAuthBasePath() + "/guest").permitAll()
+                                // Public — 인증 불필요
+                                .requestMatchers(appPathProperties.getAuthBasePath()
+                                                + appPathProperties.getAuthOauthBasePath() + "/**")
+                                .permitAll()
+                                .requestMatchers(HttpMethod.POST, appPathProperties.getAuthBasePath() + "/guest")
+                                .permitAll()
 
-                .requestMatchers(appPathProperties.getAuthBasePath() + appPathProperties.getAuthRefreshPath()).permitAll()
-                .requestMatchers(appPathProperties.getSwaggerUiPath(), "/swagger-ui/**", appPathProperties.getApiDocsPath(), appPathProperties.getApiDocsPath() + "/**", "/webjars/**").permitAll()
+                                .requestMatchers("/oauth2/authorization/**").permitAll() // 추가
+                                .requestMatchers("/login/oauth2/code/**").permitAll() // 추가
 
-                // Guest — 비로그인도 허용할 엔드포인트 (추후 추가)
-                // .requestMatchers(HttpMethod.GET, "/api/v1/rooms/**").permitAll()
+                                .requestMatchers(appPathProperties.getAuthBasePath()
+                                                + appPathProperties.getAuthRefreshPath())
+                                .permitAll()
+                                .requestMatchers(appPathProperties.getSwaggerUiPath(), "/swagger-ui/**",
+                                                appPathProperties.getApiDocsPath(),
+                                                appPathProperties.getApiDocsPath() + "/**", "/webjars/**")
+                                .permitAll()
 
-                // Authenticated — 반드시 로그인 필요
-                .requestMatchers(appPathProperties.getAuthBasePath() + appPathProperties.getAuthLogoutPath()).authenticated()
-                .anyRequest().authenticated()
-        );
+                                // Guest — 비로그인도 허용할 엔드포인트 (추후 추가)
+                                // .requestMatchers(HttpMethod.GET, "/api/v1/rooms/**").permitAll()
 
-        http.formLogin(form -> form.disable())
-                .httpBasic(basic -> basic.disable())
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+                                // Authenticated — 반드시 로그인 필요
+                                .requestMatchers(appPathProperties.getAuthBasePath()
+                                                + appPathProperties.getAuthLogoutPath())
+                                .authenticated()
+                                .anyRequest().authenticated());
 
-        http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+                http.formLogin(form -> form.disable())
+                                .httpBasic(basic -> basic.disable())
+                                .sessionManagement(session -> session
+                                                .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
-        http.exceptionHandling(e -> e
-                .authenticationEntryPoint((request, response, authException) ->
-                        response.sendError(HttpServletResponse.SC_UNAUTHORIZED)
-                )
-                .accessDeniedHandler((request, response, accessDeniedException) ->
-                        response.sendError(HttpServletResponse.SC_FORBIDDEN)
-                )
-        );
+                http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
-        return http.build();
-    }
+                http.exceptionHandling(e -> e
+                                .authenticationEntryPoint((request, response, authException) -> response
+                                                .sendError(HttpServletResponse.SC_UNAUTHORIZED))
+                                .accessDeniedHandler((request, response, accessDeniedException) -> response
+                                                .sendError(HttpServletResponse.SC_FORBIDDEN)));
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+                return http.build();
+        }
 
-    @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(appPathProperties.getCorsAllowedOrigins());
-        config.setAllowCredentials(true);
-        config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
-        config.setAllowedHeaders(List.of("Authorization", "Content-Type", "Accept", "Origin", "X-Requested-With"));
-        config.setExposedHeaders(List.of("Authorization"));
-        config.setMaxAge(3600L);
+        @Bean
+        public PasswordEncoder passwordEncoder() {
+                return new BCryptPasswordEncoder();
+        }
 
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", config);
-        return source;
-    }
+        @Bean
+        public CorsConfigurationSource corsConfigurationSource() {
+                CorsConfiguration config = new CorsConfiguration();
+                config.setAllowedOrigins(appPathProperties.getCorsAllowedOrigins());
+                config.setAllowCredentials(true);
+                config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
+                config.setAllowedHeaders(
+                                List.of("Authorization", "Content-Type", "Accept", "Origin", "X-Requested-With"));
+                config.setExposedHeaders(List.of("Authorization"));
+                config.setMaxAge(3600L);
+
+                UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+                source.registerCorsConfiguration("/**", config);
+                return source;
+        }
 }
