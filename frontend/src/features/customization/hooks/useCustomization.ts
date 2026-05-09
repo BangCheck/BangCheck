@@ -1,7 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useCallback, useMemo, useEffect } from 'react';
 import * as customService from '@/services/custom-checklist-service';
-import { ChecklistItemResponse } from '@/types/checklist';
 import { TYPE_ITEM_MAP, CHECKLIST_ITEMS } from '../constants';
 import { useCustomizationStore } from '@/store/use-customization-store';
 import { useAuthStore } from '@/store/use-auth-store';

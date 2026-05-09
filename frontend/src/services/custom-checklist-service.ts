@@ -1,5 +1,5 @@
 import { api } from '@/lib/api';
-import type { ChecklistItemResponse, UserType } from '@/types';
+import type { ChecklistItemResponse } from '@/types';
 
 // TODO(be): ApiResponse wrapper 검증 필요
 // 다른 서비스는 api.get<ApiResponse<T>>(...).data.data 패턴을 사용하지만

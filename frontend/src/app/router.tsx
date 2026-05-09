@@ -1,4 +1,4 @@
-import { Routes, Route, Outlet } from 'react-router-dom';
+import { Routes, Route, Outlet, Navigate } from 'react-router-dom';
 import LandingPage from '@/features/landing/LandingPage';
 import LoginPage from '@/features/login/LoginPage';
 import AuthCallbackPage from '@/features/auth/AuthCallbackPage';
@@ -7,6 +7,7 @@ import ChecklistNewPage from '@/features/checklist/ChecklistNewPage';
 import ChecklistDetailPage from '@/features/checklist/ChecklistDetailPage';
 import RoomsPage from '@/features/rooms/pages/RoomsPage';
 import ReportPage from '@/features/report/ReportPage';
+import SettingsPage from '@/features/customization/SettingsPage';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import BottomNavigation from '@/components/BottomNavigation';
@@ -44,7 +45,8 @@ export const Router = () => (
       <Route path="/login" element={<LoginPage />} />
       <Route path="/rooms" element={<RoomsPage />} />
       <Route path="/report" element={<ReportPage />} />
-      <Route path="/settings" element={<Placeholder name="SettingsPage" />} />
+      <Route path="/custom" element={<SettingsPage />} />
+      <Route path="/settings" element={<Navigate to="/custom" replace />} />
       <Route path="*" element={<Placeholder name="404" />} />
     </Route>
   </Routes>

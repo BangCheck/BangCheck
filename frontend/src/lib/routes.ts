@@ -4,7 +4,7 @@ export const ROUTES = {
   LOGIN_ERROR: '/login-error',
   AUTH_CALLBACK: (provider: string) => `/auth/callback/${provider}`,
   REPORT: '/report',
-  SETTINGS: '/settings',
+  SETTINGS: '/custom',
   CHECKLIST_NEW: '/checklist/new',
   CHECKLIST_DETAIL: (id: string) => `/checklist/${id}`,
   LANDING: '/',
