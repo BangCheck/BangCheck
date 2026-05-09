@@ -22,12 +22,6 @@ const yesNoBadge = (v: '있음' | '없음' | null | undefined, mode: 'problem' |
   return v === '있음' ? '있음' : '없음';
 };
 
-function getBadge(score: number): { label: string; color: string } {
-  if (score >= 80) return { label: '강력 추천', color: 'bg-[#0A607D] text-white' };
-  if (score >= 60) return { label: '추천', color: 'bg-[#2196F3] text-white' };
-  if (score >= 40) return { label: '보통', color: 'bg-[#FF9800] text-white' };
-  return { label: '비추천', color: 'bg-[#F44336] text-white' };
-}
 
 export default function ReportPage() {
   const navigate = useNavigate();
@@ -119,19 +113,27 @@ export default function ReportPage() {
           >
             <Icon icon="ic:round-navigate-next" width={24} height={24} className="rotate-180" />
           </button>
-          <h1 className="text-xl md:text-2xl font-bold text-text-main">비교 리포트</h1>
+          <h1 className="text-3xl font-bold text-text-main">비교 리포트</h1>
           <FilterToggle open={isConfigOpen} onToggle={() => setIsConfigOpen((v) => !v)} />
           <span className="text-sm text-text-mute">
             {selectedRooms.length}개 방 · {activeSections.length}개 섹션
           </span>
-          <div className="ml-auto flex items-center gap-2">
+          <div className="ml-auto flex items-center gap-3">
             <button
               type="button"
               aria-label="공유"
-              className="inline-flex items-center gap-1 rounded-[4px] border border-border-light px-3 py-1.5 text-sm font-semibold text-text-main hover:bg-bg-gray"
+              className="inline-flex h-8 items-center gap-2.5 rounded-[4px] border border-border-light px-4 py-2 text-xs font-semibold text-text-main hover:bg-bg-gray"
             >
               <Icon icon="material-symbols:share-outline" width={16} height={16} />
               <span>공유</span>
+            </button>
+            <button
+              type="button"
+              aria-label="PDF 다운로드"
+              className="inline-flex h-8 items-center gap-2.5 rounded-[4px] border border-border-light px-4 py-2 text-xs font-semibold text-text-main hover:bg-bg-gray"
+            >
+              <Icon icon="material-symbols:download-rounded" width={16} height={16} />
+              <span>PDF 다운로드</span>
             </button>
           </div>
         </div>
@@ -159,9 +161,6 @@ export default function ReportPage() {
             <CompareTable rooms={selectedRooms} activeSections={activeSections} />
           </section>
         )}
-
-        {/* 종합 요약 */}
-        {selectedRooms.length >= MIN_SELECT && <ReportSummary rooms={selectedRooms} />}
       </div>
     </div>
   );
@@ -214,10 +213,16 @@ function CompareTable({ rooms, activeSections }: { rooms: Room[]; activeSections
         <>
           <SectionHeader title="기본 정보" />
           <Row label="거래유형" values={rooms.map((r) => r.type)} />
-          <Row label="보증금" values={rooms.map((r) => fmtMoney(r.deposit))} />
-          <Row label="월세" values={rooms.map((r) => fmtMoney(r.rent))} />
-          <Row label="관리비" values={raws.map((raw) => raw?.basic.isMgmtUnknown ? '모름' : fmtMoney(parseInt(raw?.basic.managementFee || '0', 10) || 0))} />
-          <Row label="대출" values={raws.map((raw) => raw?.basic.loanStatus ?? '-')} />
+          <Row
+            label="금액"
+            values={rooms.map((r, i) => {
+              const raw = raws[i];
+              const mgmt = raw?.basic.isMgmtUnknown ? '모름' : (parseInt(raw?.basic.managementFee || '0', 10) || 0) > 0 ? `관리비 ${fmtMoney(parseInt(raw!.basic.managementFee!, 10))}` : null;
+              const base = `${fmtMoney(r.deposit)}/${fmtMoney(r.rent)}`;
+              return mgmt ? `${base} (${mgmt})` : base;
+            })}
+          />
+          <Row label="융자" values={raws.map((raw) => raw?.basic.loanStatus ?? '-')} />
           <Row label="전입신고" values={raws.map((raw) => raw?.basic.moveInReport ?? '-')} />
           <Row label="입주일" values={raws.map((raw) => raw?.basic.moveInDate || (raw?.basic.moveInNegotiable ? '협의 가능' : '-'))} />
         </>
@@ -244,17 +249,9 @@ function CompareTable({ rooms, activeSections }: { rooms: Room[]; activeSections
         </>
       )}
 
-      {activeSections.includes('condition') && (
-        <>
-          <SectionHeader title="내부 상태" />
-          <Row label="채광" values={raws.map((raw) => ratingEmoji(raw?.interior.lighting))} />
-          <Row label="환기" values={raws.map((raw) => ratingEmoji(raw?.interior.ventilation))} />
-          <Row label="층간소음" values={raws.map((raw) => ratingEmoji(raw?.interior.floorNoise))} />
-          <Row label="수압" values={raws.map((raw) => ratingEmoji(raw?.interior.waterPressure))} />
-          <Row label="방음" values={raws.map((raw) => ratingEmoji(raw?.interior.soundProof))} />
-          <Row label="난방" values={raws.map((raw) => ratingEmoji(raw?.interior.heating))} isLast />
-        </>
-      )}
+      {/* TODO(E06-S03): 내부 상태 비교 — 레이더 차트 섹션 (recharts RadarChart)
+          Figma: 373:23xxx 내부 상태 비교 노드. 항목별 점수 bar + 방사형 차트.
+          activeSections.includes('condition') 조건 그대로 유지. */}
 
       {activeSections.includes('problem') && (
         <>
@@ -304,41 +301,3 @@ function CompareTable({ rooms, activeSections }: { rooms: Room[]; activeSections
   );
 }
 
-// ─── ReportSummary ────────────────────────────────────────────
-function ReportSummary({ rooms }: { rooms: Room[] }) {
-  if (rooms.length === 0) return null;
-  const best = rooms.reduce((a, b) => (a.score > b.score ? a : b));
-  return (
-    <section className="bg-white rounded-lg border border-[#E2E2E2] p-6 md:p-8 shadow-sm">
-      <h2 className="text-lg md:text-xl font-bold text-[#232527] mb-6">종합 요약</h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {rooms.map((room) => {
-          const badge = getBadge(room.score);
-          const isBest = room.id === best.id && rooms.length > 1;
-          return (
-            <div
-              key={room.id}
-              className={cn('p-5 rounded-xl border-2', isBest ? 'border-[#0A607D]' : 'border-[#E2E2E2]')}
-            >
-              <div className="flex justify-between items-start mb-3">
-                <h3 className="font-bold text-[#232527] truncate">{room.name}</h3>
-                {isBest && (
-                  <span className="text-xs bg-[#0A607D]/10 text-[#0A607D] font-bold px-2 py-0.5 rounded-full shrink-0 ml-2">
-                    최고점
-                  </span>
-                )}
-              </div>
-              <div className="flex items-center gap-3">
-                <span className={cn('px-3 py-1 rounded-full text-sm font-bold', badge.color)}>{badge.label}</span>
-                <span className="text-2xl font-bold text-[#232527]">
-                  {room.score}
-                  <span className="text-sm font-normal text-[#A0A0A0]">점</span>
-                </span>
-              </div>
-            </div>
-          );
-        })}
-      </div>
-    </section>
-  );
-}

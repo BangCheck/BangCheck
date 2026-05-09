@@ -1,27 +1,33 @@
 export const USER_TYPES = [
   {
     id: 'BUG_AVOIDER',
-    label: '벌레 싫어형',
-    description: '해충/위생 집중 관리',
+    label: '벌레 민감형',
+    description: '벌레/위생 관련 집중',
     icon: 'bug',
   },
   {
     id: 'NOISE_SENSITIVE',
-    label: '소음 민감형',
-    description: '조용하고 아늑한 공간',
+    label: '조용한 곳 선호',
+    description: '소음/방음 집중',
     icon: 'mute',
   },
   {
     id: 'CLEAN_FREAK',
-    label: '깔끔 꼼꼼형',
-    description: '햇빛과 환기 위주',
+    label: '채광 중요형',
+    description: '햇빛/환기/곰팡이',
     icon: 'sun',
   },
   {
     id: 'PERFORMANCE_TYPE',
-    label: '생활 성능형',
-    description: '수압과 편의시설 중심',
-    icon: 'moon',
+    label: '핵심만 빠르게',
+    description: '필수만 빠르게',
+    icon: 'lightning',
+  },
+  {
+    id: 'FIRST_TIMER',
+    label: '첫 자취',
+    description: '처음이라 다 확인!',
+    icon: 'home',
   },
 ] as const;
 
@@ -89,4 +95,5 @@ export const TYPE_ITEM_MAP: Record<string, string[]> = {
   'NOISE_SENSITIVE': ['soundproof', 'noise-all', 'transport', 'night-business', 'crowd', 'construction'],
   'CLEAN_FREAK': ['sunlight', 'ventilation', 'mold', 'moisture', 'greenery', 'food-density'],
   'PERFORMANCE_TYPE': ['water-pressure', 'noise-all', 'laundry', 'outlets', 'dry-space'],
+  'FIRST_TIMER': ['mold', 'leak-trace', 'bug-trace', 'entrance-security', 'window-lock', 'convenience'],
 };

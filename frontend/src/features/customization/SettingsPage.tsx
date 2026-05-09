@@ -142,6 +142,32 @@ export default function SettingsPage() {
     return CHECKLIST_ITEMS.filter((item) => itemIds.has(item.id));
   }, [selectedTypeIds]);
 
+  const handleSelectAllTypes = () => {
+    USER_TYPES.forEach((type) => {
+      if (!selectedTypeIds.includes(type.id)) toggleUserType(type.id);
+    });
+  };
+
+  const handleSelectAllRecommended = () => {
+    recommendedItems.forEach((item) => {
+      if (!activeItemNames.includes(item.label)) {
+        const serverId = getServerIdByLabel(item.label);
+        if (serverId) toggleItem(Number(serverId), item.label);
+        else toggleItemLocally(item.label);
+      }
+    });
+  };
+
+  const handleSelectAllVisible = () => {
+    CHECKLIST_ITEMS.forEach((item) => {
+      if (!activeItemNames.includes(item.label)) {
+        const serverId = getServerIdByLabel(item.label);
+        if (serverId) toggleItem(Number(serverId), item.label);
+        else toggleItemLocally(item.label);
+      }
+    });
+  };
+
   const totalSelectedCount = activeItemNames.length;
 
   if (isLoading) {
@@ -223,6 +249,7 @@ export default function SettingsPage() {
                 number={1}
                 title="나는 이런 유형이에요"
                 description="여러 개 선택 가능 · 선택한 유형에 맞는 항목이 자동으로 체크돼요"
+                onSelectAll={handleSelectAllTypes}
                 isFolded={isSection1Folded}
                 onToggleFold={() => setIsSection1Folded(!isSection1Folded)}
               />
@@ -246,16 +273,21 @@ export default function SettingsPage() {
               <SectionHeader
                 number={2}
                 title="맞춤 체크리스트"
-                description={`${activeItemNames.length}개 항목이 자동 체크되었어요 · 클릭하면 해제할 수 있어요`}
+                description={
+                  selectedTypeIds.length === 0
+                    ? 'Step 1에서 유형을 선택하면 추천 항목이 표시돼요'
+                    : `${activeItemNames.length}개 항목이 자동 체크되었어요 · 클릭하면 해제할 수 있어요`
+                }
+                onSelectAll={selectedTypeIds.length > 0 ? handleSelectAllRecommended : undefined}
                 isFolded={isSection2Folded}
                 onToggleFold={() => setIsSection2Folded(!isSection2Folded)}
               />
               {!isSection2Folded && (
                 <>
                   {recommendedItems.length === 0 ? (
-                    /* EmptyState-Locked: 유형 미선택 시 */
-                    <div className="bg-[#F5F5F5] rounded-[6px] p-6 flex items-center justify-center gap-2 text-[#A0A0A0]">
-                      <span>☝️</span>
+                    /* EmptyState: 유형 미선택 시 */
+                    <div className="bg-[#F5F5F5] border border-[#E2E2E2] rounded-[6px] p-3 md:p-4 flex items-center gap-2 text-[#777]">
+                      <svg className="w-[18px] h-[18px] shrink-0" viewBox="0 0 24 24" fill="currentColor"><path d="M9 11.75a1.25 1.25 0 1 0 0-2.5 1.25 1.25 0 0 0 0 2.5Zm6 0a1.25 1.25 0 1 0 0-2.5 1.25 1.25 0 0 0 0 2.5ZM12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2Z"/></svg>
                       <p className="text-[14px] font-medium">위에서 유형을 먼저 선택해주세요</p>
                     </div>
                   ) : (
@@ -290,6 +322,7 @@ export default function SettingsPage() {
                 number={3}
                 title="추가로 확인할 항목"
                 description="전체 체크리스트에서 추가하고 싶은 항목을 직접 선택하세요"
+                onSelectAll={handleSelectAllVisible}
                 isFolded={isSection3Folded}
                 onToggleFold={() => setIsSection3Folded(!isSection3Folded)}
               />
@@ -410,15 +443,15 @@ export default function SettingsPage() {
 
       {/* 저장 CTA — 로그인 상태에서만 노출 (SCR-CUSTOM-30~33 미확보, 기존 임시 UI 유지) */}
       {isLoggedIn && (
-        <div className="fixed bottom-[80px] md:bottom-0 left-0 right-0 bg-[#FAFAFA] border-t border-[#E2E2E2] px-6 md:px-[136px] py-6 md:py-[30px] z-40 shadow-[0_-4px_20px_rgba(0,0,0,0.05)]">
-          <div className="max-w-[1440px] mx-auto space-y-4 md:space-y-5">
-            <div className="flex items-center justify-between">
-              <span className="text-[13px] md:text-[14px] font-bold text-[#232527]">총 선택된 항목</span>
-              <span className="text-[15px] md:text-[16px] font-bold text-[#232527]">{totalSelectedCount}개</span>
+        <div className="fixed bottom-[80px] md:bottom-0 left-0 right-0 bg-[#FAFAFA] border-t border-[#E2E2E2] px-6 md:px-[136px] py-6 z-40">
+          <div className="max-w-[1440px] mx-auto flex flex-col items-center gap-3">
+            <div className="flex items-center justify-between w-full">
+              <span className="text-[14px] font-medium text-[#777]">총 선택된 항목</span>
+              <span className="text-[14px] font-bold text-[#232527]">{totalSelectedCount}개</span>
             </div>
             <button
               onClick={() => navigate(ROUTES.HOME)}
-              className="w-full bg-[#0A607D] text-white py-3.5 md:py-4 rounded-xl font-bold text-[16px] md:text-[18px] shadow-lg hover:bg-[#084e6d] transition-all active:scale-[0.99]"
+              className="w-full max-w-[1168px] bg-[#0A607D] text-white py-3 rounded-[6px] font-semibold text-[14px] hover:bg-[#084e6d] transition-colors"
             >
               맞춤 설정 완료
             </button>

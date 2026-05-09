@@ -53,8 +53,8 @@ export const useCustomization = () => {
     onSuccess: invalidate,
   });
 
-  const toggleItemMutation = useMutation({
-    mutationFn: customService.toggleItem,
+  const saveSettingsMutation = useMutation({
+    mutationFn: customService.saveSettings,
     onSuccess: invalidate,
   });
 
@@ -83,25 +83,28 @@ export const useCustomization = () => {
         .filter(item => recommendedIds.includes(item.id))
         .map(item => item.label);
 
-      // 서버 상태 반영
-      recommendedLabels.forEach(label => {
-        const item = items.find(i => i.itemName === label);
-        if (item && !item.isEnabled) {
-          toggleItemMutation.mutate(item.id);
-        }
-      });
-
-      // 스토어 업데이트 (추천 항목 일괄 추가)
+      // 유형 선택 시 추천 항목 활성화 → 비활성 항목 ID 목록 재계산 후 일괄 저장
       const nextActiveNames = Array.from(new Set([...activeItemNames, ...recommendedLabels]));
+      const disabledIds = items
+        .filter(i => i.itemType !== 'CUSTOM')
+        .filter(i => !nextActiveNames.includes(i.itemName))
+        .map(i => Number(i.id));
+      saveSettingsMutation.mutate(disabledIds);
+
       setActiveItemNames(nextActiveNames);
     }
     toggleType(typeId);
-  }, [items, selectedTypeIds, activeItemNames, selectTypeMutation, deselectTypeMutation, toggleItemMutation, toggleType, setActiveItemNames]);
+  }, [items, selectedTypeIds, activeItemNames, selectTypeMutation, deselectTypeMutation, saveSettingsMutation, toggleType, setActiveItemNames]);
 
   const toggleItem = useCallback((itemId: number, label: string) => {
-    toggleItemMutation.mutate(itemId);
+    const willBeEnabled = !items.find(i => i.id === itemId)?.isEnabled;
+    const disabledIds = items
+      .filter(i => i.itemType !== 'CUSTOM')
+      .filter(i => (i.id === itemId ? !willBeEnabled : !i.isEnabled))
+      .map(i => Number(i.id));
+    saveSettingsMutation.mutate(disabledIds);
     toggleItemName(label);
-  }, [toggleItemMutation, toggleItemName]);
+  }, [items, saveSettingsMutation, toggleItemName]);
 
   // 서버 ID가 없을 때의 임시 토글 (UI 반응용)
   const toggleItemLocally = useCallback((label: string) => {
@@ -138,11 +141,11 @@ export const useCustomization = () => {
     activeItemNames,
     customItems: items.filter(item => item.itemType === 'CUSTOM'),
     isLoading,
-    isPending: 
-      selectTypeMutation.isPending || 
-      deselectTypeMutation.isPending || 
-      toggleItemMutation.isPending || 
-      addCustomMutation.isPending || 
+    isPending:
+      selectTypeMutation.isPending ||
+      deselectTypeMutation.isPending ||
+      saveSettingsMutation.isPending ||
+      addCustomMutation.isPending ||
       deleteCustomMutation.isPending,
     toggleUserType,
     toggleItem,

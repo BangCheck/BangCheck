@@ -15,7 +15,7 @@ export function FilterToggle({ open, onToggle, className = '' }: Props) {
       className={`inline-flex items-center gap-2.5 rounded-[6px] border border-border-mute px-3 py-1.5 text-sm font-semibold text-text-main transition-colors hover:bg-bg-gray ${className}`}
     >
       <Icon icon="mage:filter-fill" width={18} height={18} aria-hidden />
-      <span>설정</span>
+      <span>{open ? '설정 닫기' : '설정 열기'}</span>
       <Icon
         icon="ic:round-navigate-next"
         width={20}

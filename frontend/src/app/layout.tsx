@@ -40,15 +40,17 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko" className="h-full">
-      <body className="min-h-full flex flex-col font-['Pretendard',sans-serif]">
+      <body className="min-h-full bg-gray-100 font-['Pretendard',sans-serif]">
         <ReactQueryProvider>
-          <Header />
-          <main className="flex-1 flex flex-col pb-[80px] md:pb-0">
-            {children}
-          </main>
-          <BottomNavigation />
-          <Footer />
-          <DevLoginButton />
+          <div className="relative mx-auto flex min-h-screen max-w-[430px] flex-col bg-white">
+            <Header />
+            <main className="flex-1 flex flex-col pb-[80px]">
+              {children}
+            </main>
+            <BottomNavigation />
+            <Footer />
+            <DevLoginButton />
+          </div>
         </ReactQueryProvider>
       </body>
     </html>

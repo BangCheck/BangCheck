@@ -32,11 +32,10 @@ const BottomNavigation = () => {
     { label: '방 목록', icon: IconRoomList, href: ROUTES.HOME },
     { label: '시작', icon: null, href: ROUTES.CHECKLIST_NEW, isCenter: true },
     { label: '커스텀', icon: IconCustom, href: ROUTES.SETTINGS },
-    { label: '마이', icon: IconUser, href: '/my' },
   ];
 
   return (
-    <nav className="md:hidden fixed bottom-0 left-0 right-0 h-[80px] bg-white border-t border-[#E2E2E2] px-2 flex items-center justify-around z-50 pb-safe">
+    <nav className="md:hidden sticky bottom-0 w-full h-[80px] bg-white border-t border-[#E2E2E2] px-2 flex items-center justify-around z-50 pb-safe">
       {navItems.map((item, idx) => {
         const isActive = pathname === item.href;
 

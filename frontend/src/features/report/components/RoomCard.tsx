@@ -16,6 +16,18 @@ const SLOT_DOT: Record<RoomSlot, string> = {
   C: 'bg-brand-primary',
 };
 
+const SLOT_BORDER_SELECTED: Record<RoomSlot, string> = {
+  A: 'border-[#461a2b]',
+  B: 'border-[#004cbd]',
+  C: 'border-brand-primary',
+};
+
+const SLOT_CHECKBOX_COLOR: Record<RoomSlot, string> = {
+  A: 'text-[#461a2b]',
+  B: 'text-[#004cbd]',
+  C: 'text-brand-primary',
+};
+
 export function RoomCard({ room, slot, selected, disabled = false, onToggle }: Props) {
   const chips = [room.buildingType, room.floor, room.direction, room.price].filter(
     (v): v is string => Boolean(v),
@@ -27,7 +39,7 @@ export function RoomCard({ room, slot, selected, disabled = false, onToggle }: P
       onClick={() => !disabled && onToggle(room.id)}
       disabled={disabled}
       className={`w-full max-w-[378px] rounded-[6px] border bg-white p-3 text-left transition-all
-        ${selected ? 'border-brand-primary ring-1 ring-brand-primary' : 'border-border-light'}
+        ${selected ? SLOT_BORDER_SELECTED[slot] : 'border-border-light'}
         ${disabled ? 'cursor-not-allowed opacity-40' : 'cursor-pointer hover:border-border-mute'}
       `}
       aria-pressed={selected}
@@ -52,13 +64,13 @@ export function RoomCard({ room, slot, selected, disabled = false, onToggle }: P
             </div>
           )}
         </div>
-        <span
-          className={`flex size-[18px] shrink-0 items-center justify-center rounded-[3px] border-2 transition-colors
-            ${selected ? 'border-brand-primary bg-brand-primary' : 'border-border-light bg-white'}
-          `}
-          aria-hidden
-        >
-          {selected && <Icon icon="boxicons:check" width={14} height={14} className="text-white" />}
+        <span className="shrink-0 size-[18px]" aria-hidden>
+          <Icon
+            icon={selected ? 'mingcute:checkbox-fill' : 'carbon:checkbox'}
+            width={18}
+            height={18}
+            className={selected ? SLOT_CHECKBOX_COLOR[slot] : 'text-border-light'}
+          />
         </span>
       </div>
     </button>
