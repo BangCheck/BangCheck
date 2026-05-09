@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { cn } from '@/lib/utils';
+import { cn, formatAmount } from '@/lib/utils';
 import type { Room } from '@/types';
 import { ItemIcons } from '@/features/customization/components/Icons';
 
@@ -33,15 +33,9 @@ export default function RoomCard({
     return `${YYYY}.${MM}.${DD} ${HH}:${mm}`;
   };
 
-  // 2. 금액 변환 로직 (만원 단위)
-  const formatPriceValue = (val: number | undefined) => {
-    if (val === undefined || val === null) return '0';
-    return val.toLocaleString();
-  };
-
-  const formattedPrice = price || (type === '전세' 
-    ? `${formatPriceValue(deposit)}만` 
-    : `${formatPriceValue(deposit)}/${formatPriceValue(rent)}/${managementFee || 0}만`);
+  const formattedPrice = price || (type === '전세'
+    ? formatAmount(deposit)
+    : `${formatAmount(deposit)}/${formatAmount(rent)}/${managementFee || 0}만`);
 
   // 3. 문제 요소 설정
   const issueConfig: Record<string, { label: string; color: string }> = {

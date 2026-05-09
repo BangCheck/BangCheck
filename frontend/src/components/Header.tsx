@@ -48,7 +48,7 @@ export default function Header() {
     <>
       <header className="flex items-center h-16 px-4 md:px-10 border-b border-[#E2E2E2] bg-white w-full sticky top-0 z-50">
         <div className="flex-1 flex justify-start z-10">
-          <Link to={ROUTES.LANDING}>
+          <Link to={ROUTES.HOME}>
             <LogoWithText size={20} textClassName="text-base md:text-lg" />
           </Link>
         </div>
@@ -62,15 +62,6 @@ export default function Header() {
             )}
           >
             방 목록
-          </Link>
-          <Link
-            to={ROUTES.REPORT}
-            className={cn(
-              'text-[15px] font-bold transition-colors p-2',
-              pathname === ROUTES.REPORT ? 'text-[#0A607D]' : 'text-[#232527]'
-            )}
-          >
-            비교 리포트
           </Link>
           <Link
             to={ROUTES.SETTINGS}
