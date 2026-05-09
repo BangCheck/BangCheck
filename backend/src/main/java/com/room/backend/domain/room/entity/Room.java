@@ -41,7 +41,7 @@ public class Room extends BaseEntity {
     private BigDecimal lon;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "rent_type", nullable = false, length = 20)
+    @Column(name = "rent_type", length = 20)
     private RentType rentType;
 
     @Column
@@ -51,22 +51,22 @@ public class Room extends BaseEntity {
     private Integer monthlyRent;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "maintenance_status", nullable = false, length = 20)
+    @Column(name = "maintenance_status", length = 20)
     private MaintenanceStatus maintenanceStatus;
 
     @Column(name = "maintenance_fee")
     private Integer maintenanceFee;
 
-    @Column(name = "is_management_fee_unknown", nullable = false)
+    @Column(name = "is_management_fee_unknown")
     private Boolean isManagementFeeUnknown = false;
 
-    @Column(name = "has_loan", nullable = false)
+    @Column(name = "has_loan")
     Boolean hasLoan;
 
     @Column(name = "loan_amount")
     private Long loanAmount;
 
-    @Column(name = "can_register_address", nullable = false)
+    @Column(name = "can_register_address")
     private Boolean canRegisterAddress;
 
     @Column(name = "available_from")
@@ -76,13 +76,13 @@ public class Room extends BaseEntity {
     private Boolean isMoveInDateNegotiable;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column
     private BuildingType buildingType;
 
     @Column
     private Integer floor;
 
-    @Column(name = "has_elevator", nullable = false)
+    @Column(name = "has_elevator")
     private Boolean hasElevator;
 
     @Column(name = "has_parking")
@@ -93,7 +93,7 @@ public class Room extends BaseEntity {
     private SpecialFloor specialFloor;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 20)
+    @Column(length = 20)
     private Direction direction;
 
     @Column(length = 1000)
