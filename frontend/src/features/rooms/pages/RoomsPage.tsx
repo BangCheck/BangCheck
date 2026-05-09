@@ -90,7 +90,7 @@ function TransactionDropdown({
     <div className="absolute top-full left-0 mt-2 w-[280px] bg-white border border-[#E2E2E2] rounded-[12px] shadow-xl z-50 p-5 animate-in fade-in zoom-in-95 duration-150">
       <h4 className="text-[14px] font-bold text-[#232527] mb-4">거래방식</h4>
       <div className="flex gap-2">
-        {['전체', '월세', '단기임대'].map((type) => (
+        {['전체', '전세', '월세', '단기임대'].map((type) => (
           <button
             key={type}
             onClick={() => { onChange(type); onClose(); }}
@@ -170,7 +170,19 @@ export default function RoomsPage() {
   const { mutate: deleteRoomById } = useDeleteRoom();
 
   const apiRooms = apiRoomsData ?? [];
-  const rooms = isLoggedIn ? apiRooms : guestRooms;
+
+  const guestFiltered = (() => {
+    let list = [...guestRooms];
+    if (transactionType !== '전체') {
+      list = list.filter((r) => r.type === transactionType);
+    }
+    if (sortOption === '보증금 낮은순') list.sort((a, b) => (a.deposit ?? 0) - (b.deposit ?? 0));
+    else if (sortOption === '월세 낮은순') list.sort((a, b) => (a.rent ?? 0) - (b.rent ?? 0));
+    else if (sortOption === '관리비 낮은순') list.sort((a, b) => (a.managementFee ?? 0) - (b.managementFee ?? 0));
+    return list;
+  })();
+
+  const rooms = isLoggedIn ? apiRooms : guestFiltered;
   const isGuestAtLimit = !isLoggedIn && guestRooms.length >= GUEST_ROOM_LIMIT;
 
   useEffect(() => {
@@ -246,15 +258,33 @@ export default function RoomsPage() {
               onClick={() => setActiveDropdown(activeDropdown === 'transaction' ? null : 'transaction')}
               className={cn(
                 'border rounded-[6px] px-3 py-1.5 text-[13px] font-medium flex items-center gap-1.5 transition-all cursor-pointer bg-white',
-                activeDropdown === 'transaction'
+                activeDropdown === 'transaction' || transactionType !== '전체'
                   ? 'border-[#0A607D] text-[#0A607D]'
                   : 'border-[#BFBFBF] text-[#444]'
               )}
             >
-              거래방식 (정렬)
+              거래방식{transactionType !== '전체' ? ` · ${transactionType}` : ''}
               <svg
                 width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
                 className={cn('transition-transform duration-200', activeDropdown === 'transaction' ? 'rotate-180' : '')}
+              >
+                <path d="m6 9 6 6 6-6" />
+              </svg>
+            </button>
+
+            <button
+              onClick={() => setActiveDropdown(activeDropdown === 'sort' ? null : 'sort')}
+              className={cn(
+                'border rounded-[6px] px-3 py-1.5 text-[13px] font-medium flex items-center gap-1.5 transition-all cursor-pointer bg-white',
+                activeDropdown === 'sort' || sortOption !== '보증금 낮은순'
+                  ? 'border-[#0A607D] text-[#0A607D]'
+                  : 'border-[#BFBFBF] text-[#444]'
+              )}
+            >
+              정렬 · {sortOption}
+              <svg
+                width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
+                className={cn('transition-transform duration-200', activeDropdown === 'sort' ? 'rotate-180' : '')}
               >
                 <path d="m6 9 6 6 6-6" />
               </svg>

@@ -4,14 +4,14 @@ import { getRooms, deleteRoom } from '@/services/room-service';
 
 export const ROOMS_KEYS = {
   all: ['rooms'] as const,
-  list: () => ['rooms', 'list'] as const,
+  list: (rentType?: string, sort?: string) => ['rooms', 'list', rentType, sort] as const,
 };
 
-export const useRoomsList = (_transactionType?: string, _sortOption?: string) => {
+export const useRoomsList = (transactionType?: string, sortOption?: string) => {
   const { isLoggedIn } = useAuthStore();
   return useQuery({
-    queryKey: ROOMS_KEYS.list(),
-    queryFn: getRooms,
+    queryKey: ROOMS_KEYS.list(transactionType, sortOption),
+    queryFn: () => getRooms(transactionType, sortOption),
     enabled: isLoggedIn,
     staleTime: 1000 * 60,
   });
