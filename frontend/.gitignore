@@ -4,6 +4,7 @@ dist
 out
 build
 .vercel
+.env.deploy
 .env
 .env.local
 .env.development.local
