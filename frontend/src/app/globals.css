@@ -2,11 +2,36 @@
 
 @theme {
   --color-brand-primary: #0a607d;
+  --color-brand-primary-dark: #084e6d;
   --color-text-main: #232527;
+  --color-text-sub: #444444;
+  --color-text-mute: #777777;
   --color-text-caption: #a0a0a0;
   --color-border-light: #e2e2e2;
+  --color-border-mute: #bfbfbf;
   --color-bg-gray: #f5f5f5;
+  --color-bg-gray-soft: #efefef;
+  --color-bg-dark: #191b1e;
   --color-bg-footer: #fafafa;
+
+  /* Room Slot Palette — 비교 리포트에서 방을 구분 (E06 SCR-COMPARE) */
+  --color-slot-a-bg: #f9e8f0;
+  --color-slot-a-text: #461a2b;
+  --color-slot-b-bg: #f4f7ff;
+  --color-slot-b-text: #004cbd;
+  /* Slot C는 brand-primary 재사용 — 별도 토큰 없음 */
+
+  /* Status Chip 3색 시스템 — 위험·양호·주의 (E06) */
+  --color-status-danger-bg: #fff0f0;
+  --color-status-danger-border: #fc9a9b;
+  --color-status-danger-text: #f83233;
+  --color-status-safe-bg: #f5faf7;
+  --color-status-safe-border: #76be95;
+  --color-status-safe-text: #00873c;
+  --color-status-warning-bg: #fffef5;
+  --color-status-warning-border: #ffdf00;
+  /* WCAG AA 대비 — Figma 원본 #fbdb00은 흰배경 대비 부족, darker 톤으로 대체 */
+  --color-status-warning-text: #a07d00;
 }
 
 @layer components {

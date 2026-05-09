@@ -54,11 +54,11 @@ const BottomNavigation = () => {
         if (item.isCenter) {
           return (
             <Link key={idx} to={item.href} className="relative -top-5 flex flex-col items-center">
-              <div className="w-[60px] h-[60px] bg-[#232527] rounded-[16px] flex flex-col items-center justify-center shadow-lg active:scale-95 transition-transform">
+              <div className="w-[60px] h-[60px] bg-[#404040] rounded-lg border-[3px] border-white flex flex-col items-center justify-center shadow-lg active:scale-95 transition-transform">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M12 5V19M5 12H19" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
-                <span className="text-white text-[11px] font-bold mt-0.5">시작</span>
+                <span className="text-white text-[12px] font-medium mt-0.5">시작</span>
               </div>
             </Link>
           );
@@ -68,7 +68,7 @@ const BottomNavigation = () => {
         return (
           <Link key={idx} to={item.href} className="flex flex-col items-center gap-1 min-w-[64px] active:opacity-70 transition-opacity">
             <Icon active={isActive} />
-            <span className={cn('text-[10px] font-bold', isActive ? 'text-[#0A607D]' : 'text-[#A0A0A0]')}>
+            <span className={cn('text-[12px] font-medium', isActive ? 'text-text-caption' : 'text-border-light')}>
               {item.label}
             </span>
           </Link>

@@ -8,6 +8,8 @@ import ChecklistDetailPage from '@/features/checklist/ChecklistDetailPage';
 import RoomsPage from '@/features/rooms/pages/RoomsPage';
 import ReportPage from '@/features/report/ReportPage';
 import Header from '@/components/Header';
+import Footer from '@/components/Footer';
+import BottomNavigation from '@/components/BottomNavigation';
 
 const Placeholder = ({ name }: { name: string }) => (
   <div className="flex flex-col items-center justify-center min-h-[60vh] gap-2 p-8">
@@ -20,9 +22,11 @@ const Placeholder = ({ name }: { name: string }) => (
 const AppLayout = () => (
   <div className="min-h-screen flex flex-col">
     <Header />
-    <div className="flex-1 flex flex-col">
+    <div className="flex-1 flex flex-col pb-[80px] md:pb-0">
       <Outlet />
     </div>
+    <Footer />
+    <BottomNavigation />
   </div>
 );
 
