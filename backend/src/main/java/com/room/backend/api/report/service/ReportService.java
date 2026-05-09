@@ -28,7 +28,7 @@ public class ReportService {
 
     public ReportInfoResponseDTO getRoomsForCompare(Long userId) {
 
-        List<RoomSummaryDTO> rooms = roomRepository.findByUserId(userId)
+        List<RoomSummaryDTO> rooms = roomRepository.findByUserIdAndIsDeletedFalseOrderByCreatedAtDesc(userId)
                 .stream()
                 .map(RoomSummaryDTO::from)
                 .toList();
