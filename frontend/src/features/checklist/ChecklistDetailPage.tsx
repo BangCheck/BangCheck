@@ -109,14 +109,14 @@ export default function ChecklistDetailPage() {
   if (notFound) {
     return (
       <div className="min-h-screen bg-white flex flex-col items-center justify-center gap-4 px-6">
-        <h1 className="text-[18px] font-bold text-[#232527]">체크리스트를 찾을 수 없어요</h1>
-        <p className="text-[13px] text-[#A0A0A0] text-center">
+        <h1 className="text-[18px] font-bold text-text-main">체크리스트를 찾을 수 없어요</h1>
+        <p className="text-[13px] text-text-caption text-center">
           요청하신 방이 삭제되었거나, 다른 브라우저에서 저장된 데이터일 수 있어요.
         </p>
         <button
           type="button"
           onClick={() => navigate('/rooms')}
-          className="mt-2 px-6 py-2.5 rounded-[6px] bg-[#0A607D] text-white text-[14px] font-bold cursor-pointer"
+          className="mt-2 px-6 py-2.5 rounded-[6px] bg-brand-primary text-white text-[14px] font-bold cursor-pointer"
         >
           내 방 목록으로
         </button>
@@ -126,16 +126,16 @@ export default function ChecklistDetailPage() {
 
   return (
     <div className="min-h-screen bg-white flex flex-col">
-      <header className="sticky top-0 z-40 bg-white border-b border-[#E2E2E2] h-14 flex items-center px-4 gap-3">
+      <header className="sticky top-0 z-40 bg-white border-b border-border-light h-14 flex items-center px-4 gap-3">
         <button
           type="button"
           onClick={() => navigate('/rooms')}
-          className="p-1 text-[#232527] cursor-pointer"
+          className="p-1 text-text-main cursor-pointer"
           aria-label="뒤로 가기"
         >
           <BackChevron />
         </button>
-        <h1 className="text-[16px] font-semibold text-[#232527] flex-1">체크리스트 수정</h1>
+        <h1 className="text-[16px] font-semibold text-text-main flex-1">체크리스트 수정</h1>
         <button
           type="button"
           onClick={() => setConfirmDelete(true)}
@@ -147,7 +147,7 @@ export default function ChecklistDetailPage() {
 
       <nav
         ref={tabNavRef}
-        className="sticky top-14 z-30 bg-white border-b border-[#E2E2E2] px-4 py-2 flex gap-2 overflow-x-auto no-scrollbar"
+        className="sticky top-14 z-30 bg-white border-b border-border-light px-4 py-2 flex gap-2 overflow-x-auto no-scrollbar"
       >
         {SECTION_TABS.map(({ id: sid, label }) => (
           <button
@@ -158,8 +158,8 @@ export default function ChecklistDetailPage() {
             className={cn(
               'shrink-0 px-4 py-1.5 rounded-[4px] text-[13px] font-semibold transition-all cursor-pointer whitespace-nowrap',
               activeSection === sid
-                ? 'bg-[#F7FAFB] border border-[#0A607D] text-[#0A607D]'
-                : 'bg-[#EFEFEF] text-[#777] hover:bg-[#E5E5E5]',
+                ? 'bg-bg-primary-soft border border-brand-primary text-brand-primary'
+                : 'bg-bg-gray-soft text-text-mute hover:bg-bg-gray-hover',
             )}
           >
             {label}
@@ -199,7 +199,7 @@ export default function ChecklistDetailPage() {
         />
       </main>
 
-      <div className="fixed bottom-0 left-0 right-0 md:sticky md:bottom-auto bg-white border-t border-[#E2E2E2] px-4 py-4 z-30">
+      <div className="fixed bottom-0 left-0 right-0 md:sticky md:bottom-auto bg-white border-t border-border-light px-4 py-4 z-30">
         <div className="max-w-2xl md:max-w-3xl lg:max-w-4xl mx-auto flex flex-col gap-2">
           {submitError && (
             <p className="text-fluid-base text-red-500 text-center">{submitError}</p>
@@ -211,8 +211,8 @@ export default function ChecklistDetailPage() {
             className={cn(
               'w-full py-3.5 rounded-[6px] text-fluid-lg font-bold transition-all',
               !basic.name.trim() || isSubmitting
-                ? 'bg-[#BFBFBF] text-white cursor-not-allowed'
-                : 'bg-[#0A607D] text-white hover:bg-[#084e6d] cursor-pointer',
+                ? 'bg-border-mute text-white cursor-not-allowed'
+                : 'bg-brand-primary text-white hover:bg-brand-primary-dark cursor-pointer',
             )}
           >
             {isSubmitting ? '저장 중...' : '수정 완료'}
@@ -223,15 +223,15 @@ export default function ChecklistDetailPage() {
       {confirmDelete && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
           <div className="bg-white rounded-[12px] w-full max-w-sm p-6 flex flex-col gap-4">
-            <h2 className="text-[16px] font-bold text-[#232527]">체크리스트를 삭제할까요?</h2>
-            <p className="text-[13px] text-[#777]">
+            <h2 className="text-[16px] font-bold text-text-main">체크리스트를 삭제할까요?</h2>
+            <p className="text-[13px] text-text-mute">
               삭제하면 이 방에 대한 모든 체크 정보가 사라져요.
             </p>
             <div className="flex gap-2 mt-2">
               <button
                 type="button"
                 onClick={() => setConfirmDelete(false)}
-                className="flex-1 py-2.5 rounded-[6px] border border-[#E2E2E2] text-[14px] text-[#232527] hover:bg-[#F5F5F5] cursor-pointer"
+                className="flex-1 py-2.5 rounded-[6px] border border-border-light text-[14px] text-text-main hover:bg-bg-gray cursor-pointer"
               >
                 취소
               </button>

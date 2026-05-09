@@ -17,7 +17,7 @@ export default function ManagementFeeField({
   return (
     <div className="flex flex-col gap-2 w-full">
       <div className="flex items-center justify-between w-full">
-        <span className="text-[14px] font-medium text-[#232527] whitespace-nowrap">관리비 (만원)</span>
+        <span className="text-[14px] font-medium text-text-main whitespace-nowrap">관리비 (만원)</span>
         <Checkbox
           checked={isUnknown}
           onChange={onIsUnknownChange}

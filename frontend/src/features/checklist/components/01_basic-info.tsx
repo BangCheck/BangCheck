@@ -79,9 +79,9 @@ export default function BasicInfo({ data, onChange }: Props) {
                     type="checkbox"
                     checked={data.includeMgmtInRent}
                     onChange={(e) => onChange('includeMgmtInRent', e.target.checked)}
-                    className="w-4 h-4 accent-[#0A607D]"
+                    className="w-4 h-4 accent-brand-primary"
                   />
-                  <span className="text-[13px] text-[#232527]">관리비 포함</span>
+                  <span className="text-[13px] text-text-main">관리비 포함</span>
                 </label>
               </div>
               <TextInput value={data.monthlyRent} onChange={(v) => onChange('monthlyRent', v)} placeholder="예 : 50" suffix="만원" type="number" />
@@ -97,9 +97,9 @@ export default function BasicInfo({ data, onChange }: Props) {
                   type="checkbox"
                   checked={data.isMgmtUnknown}
                   onChange={(e) => onChange('isMgmtUnknown', e.target.checked)}
-                  className="w-4 h-4 accent-[#0A607D]"
+                  className="w-4 h-4 accent-brand-primary"
                 />
-                <span className="text-[13px] text-[#232527]">모름</span>
+                <span className="text-[13px] text-text-main">모름</span>
               </label>
             </div>
             <TextInput value={data.managementFee} onChange={(v) => onChange('managementFee', v)} placeholder="예 : 5" suffix="만원" type="number" disabled={data.isMgmtUnknown} />
@@ -144,7 +144,7 @@ export default function BasicInfo({ data, onChange }: Props) {
               <button
                 type="button"
                 onClick={() => { onChange('moveInDate', ''); onChange('moveInNegotiable', false); }}
-                className="text-[12px] text-[#777] border border-[#E2E2E2] px-2 py-0.5 rounded-[4px] cursor-pointer hover:text-[#232527]"
+                className="text-[12px] text-text-mute border border-border-light px-2 py-0.5 rounded-[4px] cursor-pointer hover:text-text-main"
               >
                 초기화
               </button>
@@ -157,16 +157,16 @@ export default function BasicInfo({ data, onChange }: Props) {
                   onChange('moveInNegotiable', e.target.checked);
                   if (e.target.checked) onChange('moveInDate', '');
                 }}
-                className="w-4 h-4 accent-[#0A607D]"
+                className="w-4 h-4 accent-brand-primary"
               />
-              <span className="text-[13px] text-[#232527]">협의 가능</span>
+              <span className="text-[13px] text-text-main">협의 가능</span>
             </label>
             <input
               type="date"
               value={data.moveInDate}
               onChange={(e) => onChange('moveInDate', e.target.value)}
               disabled={data.moveInNegotiable}
-              className="h-[32px] px-3 border border-[#BFBFBF] rounded-[6px] text-[14px] text-[#232527] outline-none focus:border-[#0A607D] w-[160px] disabled:bg-[#F5F5F5] disabled:text-[#BFBFBF] disabled:cursor-not-allowed"
+              className="h-[32px] px-3 border border-border-mute rounded-[6px] text-[14px] text-text-main outline-none focus:border-brand-primary w-[160px] disabled:bg-bg-gray disabled:text-border-mute disabled:cursor-not-allowed"
             />
           </div>
         </div>

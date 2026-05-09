@@ -30,16 +30,16 @@ export default function CustomMemo({ data, onChange }: Props) {
         <SectionHeader title="나만의 체크 항목" />
         <div className="flex flex-col gap-4">
           {data.customItems.map((item, idx) => (
-            <div key={idx} className="flex flex-col gap-2 p-4 bg-[#F9F9F9] rounded-[8px] border border-[#E2E2E2]">
+            <div key={idx} className="flex flex-col gap-2 p-4 bg-bg-gray-light rounded-[8px] border border-border-light">
               <div className="flex items-center gap-2">
                 <span className="text-[18px]">✏️</span>
                 <input
                   value={item.label}
                   onChange={(e) => updateItem(idx, 'label', e.target.value)}
                   placeholder={`항목 이름`}
-                  className="flex-1 text-[14px] font-medium text-[#232527] bg-transparent outline-none border-b border-[#E2E2E2] pb-0.5 focus:border-[#0A607D]"
+                  className="flex-1 text-[14px] font-medium text-text-main bg-transparent outline-none border-b border-border-light pb-0.5 focus:border-brand-primary"
                 />
-                <button type="button" onClick={() => removeItem(idx)} className="text-[12px] text-[#A0A0A0] hover:text-red-400 cursor-pointer shrink-0">
+                <button type="button" onClick={() => removeItem(idx)} className="text-[12px] text-text-caption hover:text-red-400 cursor-pointer shrink-0">
                   삭제
                 </button>
               </div>
@@ -47,7 +47,7 @@ export default function CustomMemo({ data, onChange }: Props) {
                 value={item.value}
                 onChange={(e) => updateItem(idx, 'value', e.target.value)}
                 placeholder="답변을 입력하세요"
-                className="w-full h-[36px] px-3 rounded-[6px] border border-[#BFBFBF] bg-white text-[14px] text-[#232527] placeholder:text-[#A0A0A0] outline-none focus:border-[#0A607D]"
+                className="w-full h-[36px] px-3 rounded-[6px] border border-border-mute bg-white text-[14px] text-text-main placeholder:text-text-caption outline-none focus:border-brand-primary"
               />
             </div>
           ))}
@@ -55,7 +55,7 @@ export default function CustomMemo({ data, onChange }: Props) {
             <button
               type="button"
               onClick={addItem}
-              className="flex items-center justify-center gap-2 py-3 border border-dashed border-[#BFBFBF] rounded-[6px] text-[14px] text-[#777] hover:border-[#0A607D] hover:text-[#0A607D] transition-colors cursor-pointer"
+              className="flex items-center justify-center gap-2 py-3 border border-dashed border-border-mute rounded-[6px] text-[14px] text-text-mute hover:border-brand-primary hover:text-brand-primary transition-colors cursor-pointer"
             >
               <span className="text-[18px] leading-none">+</span>
               항목 추가 ({data.customItems.length}/5)
@@ -70,7 +70,7 @@ export default function CustomMemo({ data, onChange }: Props) {
         <div className="flex flex-col gap-2">
           <div className="flex items-center justify-between">
             <FieldLabel>메모</FieldLabel>
-            <span className="text-[12px] text-[#A0A0A0]">{data.memo.length}/200</span>
+            <span className="text-[12px] text-text-caption">{data.memo.length}/200</span>
           </div>
           <textarea
             value={data.memo}
@@ -78,7 +78,7 @@ export default function CustomMemo({ data, onChange }: Props) {
             maxLength={200}
             placeholder="방에 대한 메모를 자유롭게 입력하세요."
             rows={5}
-            className="w-full px-3 py-3 rounded-[6px] border border-[#BFBFBF] bg-white outline-none focus:border-[#0A607D] text-[14px] text-[#232527] placeholder:text-[#A0A0A0] resize-none transition-colors"
+            className="w-full px-3 py-3 rounded-[6px] border border-border-mute bg-white outline-none focus:border-brand-primary text-[14px] text-text-main placeholder:text-text-caption resize-none transition-colors"
           />
         </div>
       </section>

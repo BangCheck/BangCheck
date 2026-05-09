@@ -55,15 +55,15 @@ export default function ReportPage() {
   // ── 빈 상태 ──────────────────────────────────────────────────
   if (guestRooms.length < REPORT_MIN_SELECT) {
     return (
-      <div className="flex-1 bg-[#FAFAFA] min-h-[calc(100vh-64px)] flex items-center justify-center px-6">
+      <div className="flex-1 bg-bg-footer min-h-[calc(100vh-64px)] flex items-center justify-center px-6">
         <div className="flex flex-col items-center gap-6 max-w-[360px] text-center">
           <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#E2E2E2" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round">
             <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
             <polyline points="14 2 14 8 20 8" />
           </svg>
           <div className="space-y-2">
-            <h2 className="text-[18px] font-bold text-[#232527]">비교하려면 방이 2개 이상 필요해요</h2>
-            <p className="text-[13px] text-[#A0A0A0] leading-relaxed">
+            <h2 className="text-[18px] font-bold text-text-main">비교하려면 방이 2개 이상 필요해요</h2>
+            <p className="text-[13px] text-text-caption leading-relaxed">
               현재 등록된 방: {guestRooms.length}개<br />
               체크리스트를 추가해 비교 리포트를 받아보세요.
             </p>

@@ -24,14 +24,14 @@ export default function OptionCardSmall({
       className={cn(
         'flex items-center gap-3 p-6 rounded-[6px] w-full',
         'shadow-[0px_6px_8px_rgba(0,0,0,0.04)] transition-all cursor-pointer',
-        state === 'default' && 'bg-white border border-[#E2E2E2]',
-        state === 'selected' && 'bg-white border-2 border-[#232527]',
-        state === 'active' && 'bg-[#F4F7FF] border-2 border-[#0A607D]',
+        state === 'default' && 'bg-white border border-border-light',
+        state === 'selected' && 'bg-white border-2 border-text-main',
+        state === 'active' && 'bg-slot-b-bg border-2 border-brand-primary',
         className
       )}
     >
       <div className="shrink-0 w-9 h-9 flex items-center justify-center">{icon}</div>
-      <span className="text-[18px] font-semibold text-[#232527]">{label}</span>
+      <span className="text-[18px] font-semibold text-text-main">{label}</span>
     </button>
   );
 }

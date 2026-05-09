@@ -13,6 +13,13 @@ export type ReportSection = {
   icon: string;
 };
 
+export const REPORT_MAX_SELECT = 6;
+export const REPORT_MIN_SELECT = 2;
+
+export const ALL_REPORT_SECTION_IDS: readonly ReportSectionId[] = [
+  'basic', 'building', 'option', 'condition', 'problem', 'safety', 'environment',
+];
+
 export const REPORT_SECTIONS: readonly ReportSection[] = [
   { id: 'basic', label: '기본 정보', icon: 'tdesign:money-filled' },
   { id: 'building', label: '건물 정보', icon: 'gravity-ui:house-fill' },

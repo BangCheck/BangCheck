@@ -13,11 +13,11 @@ const TextInput = forwardRef<HTMLInputElement, TextInputProps>(
         {...props}
         className={cn(
           'h-[36px] w-full px-3 py-[6px] rounded-[6px] border bg-white outline-none',
-          'text-[14px] font-medium text-[#232527]',
-          'placeholder:text-[#A0A0A0]',
-          'border-[#BFBFBF] focus:border-[#0A607D]',
+          'text-[14px] font-medium text-text-main',
+          'placeholder:text-text-caption',
+          'border-border-mute focus:border-brand-primary',
           'transition-colors',
-          'disabled:bg-[#F5F5F5] disabled:text-[#A0A0A0] disabled:cursor-not-allowed',
+          'disabled:bg-bg-gray disabled:text-text-caption disabled:cursor-not-allowed',
           className
         )}
       />

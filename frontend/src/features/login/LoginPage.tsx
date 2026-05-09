@@ -57,11 +57,11 @@ function GoogleLoginButton({ onClick, loading }: { onClick: () => void; loading:
 
 function TermsText() {
   return (
-    <p className="text-[#A0A0A0] text-[12px] text-center leading-[1.3]">
+    <p className="text-text-caption text-[12px] text-center leading-[1.3]">
       시작하기를 누르면{' '}
-      <Link to="/terms" className="text-[#0A607D]">이용약관</Link>
+      <Link to="/terms" className="text-brand-primary">이용약관</Link>
       {' '}및{' '}
-      <Link to="/privacy" className="text-[#0A607D]">개인정보 처리방침</Link>
+      <Link to="/privacy" className="text-brand-primary">개인정보 처리방침</Link>
       에 동의하게 됩니다.
     </p>
   );
@@ -82,13 +82,13 @@ function LoginCard({ onNaver, onGoogle, loadingProvider, error, sizeClass }: Log
         <div className="flex flex-col items-center gap-[18px]">
           <LogoWithText size={sizeClass.logo} textClassName={sizeClass.text} />
           <div className="text-center">
-            <p className={`text-[#232527] ${sizeClass.title} font-semibold leading-[1.3]`}>
+            <p className={`text-text-main ${sizeClass.title} font-semibold leading-[1.3]`}>
               방체크에 오신 걸 환영해요.
             </p>
-            <p className={`text-[#232527] ${sizeClass.title} font-light leading-[1.3]`}>
+            <p className={`text-text-main ${sizeClass.title} font-light leading-[1.3]`}>
               소셜 계정으로 간편하게 시작하세요
             </p>
-            <p className="text-[#A0A0A0] text-[12px] mt-1 leading-[1.3]">
+            <p className="text-text-caption text-[12px] mt-1 leading-[1.3]">
               비로그인시 데이터가 저장되지 않습니다.
             </p>
           </div>
@@ -120,7 +120,7 @@ export default function LoginPage() {
     <div className="flex-1 flex flex-col bg-white">
       {/* Desktop */}
       <main className="hidden md:flex flex-1 items-center justify-center">
-        <div className="border border-[#E2E2E2] rounded-[6px] px-[32px] py-[48px]">
+        <div className="border border-border-light rounded-[6px] px-[32px] py-[48px]">
           <LoginCard
             onNaver={() => login('naver')}
             onGoogle={() => login('google')}

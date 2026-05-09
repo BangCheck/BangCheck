@@ -37,7 +37,7 @@ function QuoteCard({ quote }: { quote: Quote }) {
         'flex-none relative flex flex-col justify-end gap-[5px] md:gap-[10px] px-[15px] md:px-[30px] py-[10px] md:py-[20px] rounded-[4px] md:rounded-[8px] min-w-[180px] md:min-w-[320px]',
         quote.dark
           ? 'bg-bg-dark text-white drop-shadow-[0px_0px_7px_rgba(0,0,0,0.25)] md:drop-shadow-[0px_0px_15px_rgba(0,0,0,0.25)]'
-          : 'bg-[#eaeaea] text-[#777] opacity-[0.36] drop-shadow-[0px_0px_1px_rgba(0,0,0,0.25)] md:drop-shadow-[0px_0px_2px_rgba(0,0,0,0.25)]'
+          : 'bg-[#eaeaea] text-text-mute opacity-[0.36] drop-shadow-[0px_0px_1px_rgba(0,0,0,0.25)] md:drop-shadow-[0px_0px_2px_rgba(0,0,0,0.25)]'
       )}
     >
       <div className="absolute top-[47px] md:top-[93px] left-[15px] md:left-[30px] w-[39px] md:w-[78.808px] h-[34px] md:h-[68.25px] rotate-180">

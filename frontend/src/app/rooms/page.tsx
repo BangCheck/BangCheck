@@ -22,13 +22,13 @@ import { ROUTES } from '@/lib/routes';
 function HomeSkeleton() {
   return (
     <div className="flex-1 flex flex-col bg-white animate-pulse">
-      <div className="flex justify-center border-b border-[#E2E2E2] bg-white h-[50px]">
+      <div className="flex justify-center border-b border-border-light bg-white h-[50px]">
         <div className="flex gap-7 h-full items-center">
           <div className="w-20 h-4 bg-gray-100 rounded" />
           <div className="w-20 h-4 bg-gray-100 rounded" />
         </div>
       </div>
-      <div className="border-b border-[#E2E2E2] px-4 md:px-10 py-3 flex justify-between items-center bg-white h-[60px]">
+      <div className="border-b border-border-light px-4 md:px-10 py-3 flex justify-between items-center bg-white h-[60px]">
         <div className="flex gap-2.5">
           <div className="w-24 h-8 bg-gray-100 rounded-[6px]" />
           <div className="w-32 h-8 bg-gray-100 rounded-[6px]" />
@@ -59,8 +59,8 @@ function TransactionDropdown({
   onClose: () => void;
 }) {
   return (
-    <div className="absolute top-full left-0 mt-2 w-[280px] bg-white border border-[#E2E2E2] rounded-[12px] shadow-xl z-50 p-5 animate-in fade-in zoom-in-95 duration-150">
-      <h4 className="text-[14px] font-bold text-[#232527] mb-4">거래방식</h4>
+    <div className="absolute top-full left-0 mt-2 w-[280px] bg-white border border-border-light rounded-[12px] shadow-xl z-50 p-5 animate-in fade-in zoom-in-95 duration-150">
+      <h4 className="text-[14px] font-bold text-text-main mb-4">거래방식</h4>
       <div className="flex gap-2">
         {['전체', '월세', '단기임대'].map((type) => (
           <button
@@ -72,8 +72,8 @@ function TransactionDropdown({
             className={cn(
               "px-4 py-2 rounded-lg text-[13px] font-medium transition-all cursor-pointer",
               transactionType === type
-                ? "border border-[#0A607D] text-[#0A607D] bg-white"
-                : "bg-[#F5F5F5] text-[#A0A0A0] border border-transparent"
+                ? "border border-brand-primary text-brand-primary bg-white"
+                : "bg-bg-gray text-text-caption border border-transparent"
             )}
           >
             {type}
@@ -97,12 +97,12 @@ function SortDropdown({
   onClose: () => void;
 }) {
   return (
-    <div className="absolute top-full left-0 mt-2 w-[320px] bg-white border border-[#E2E2E2] rounded-[12px] shadow-xl z-50 p-5 animate-in fade-in zoom-in-95 duration-150">
+    <div className="absolute top-full left-0 mt-2 w-[320px] bg-white border border-border-light rounded-[12px] shadow-xl z-50 p-5 animate-in fade-in zoom-in-95 duration-150">
       <div className="flex justify-between items-center mb-4">
-        <h4 className="text-[14px] font-bold text-[#232527]">정렬 (중복 선택)</h4>
+        <h4 className="text-[14px] font-bold text-text-main">정렬 (중복 선택)</h4>
         <button 
           onClick={onReset}
-          className="text-[11px] text-[#A0A0A0] hover:text-[#232527] transition-colors cursor-pointer flex items-center gap-0.5"
+          className="text-[11px] text-text-caption hover:text-text-main transition-colors cursor-pointer flex items-center gap-0.5"
         >
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"></path><path d="M21 3v5h-5"></path><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"></path><path d="M3 21v-5h5"></path></svg>
           초기화
@@ -119,8 +119,8 @@ function SortDropdown({
             className={cn(
               "px-4 py-2 rounded-lg text-[13px] font-medium transition-all cursor-pointer",
               sortOption === option
-                ? "border border-[#0A607D] text-[#0A607D] bg-white"
-                : "bg-[#F5F5F5] text-[#A0A0A0] border border-transparent"
+                ? "border border-brand-primary text-brand-primary bg-white"
+                : "bg-bg-gray text-text-caption border border-transparent"
             )}
           >
             {option}
@@ -135,14 +135,14 @@ function SortDropdown({
 // TODO(be): activeItemCount, customItemCount를 유저 설정 API에서 받아와야 함
 function CustomizationInfoBar({ activeItemCount, customItemCount }: { activeItemCount?: number; customItemCount?: number }) {
   return (
-    <div className="w-full bg-[#F5F5F5] rounded-[8px] px-[16px] py-[14px] flex items-center gap-2 mb-10 border border-[#E2E2E2]/50">
+    <div className="w-full bg-bg-gray rounded-[8px] px-[16px] py-[14px] flex items-center gap-2 mb-10 border border-border-light/50">
       {activeItemCount != null && (
-        <span className="bg-[#777] text-white text-[12px] font-bold px-2 py-1 rounded-[4px]">
+        <span className="bg-text-mute text-white text-[12px] font-bold px-2 py-1 rounded-[4px]">
           {activeItemCount}개 항목 활성
         </span>
       )}
       {customItemCount != null && customItemCount > 0 && (
-        <span className="bg-[#D9EAF0] text-[#0A607D] text-[12px] font-bold px-2 py-1 rounded-[4px]">
+        <span className="bg-[#D9EAF0] text-brand-primary text-[12px] font-bold px-2 py-1 rounded-[4px]">
           + {customItemCount}개 커스텀
         </span>
       )}
@@ -250,13 +250,13 @@ export default function Home() {
   return (
     <main className="flex-1 flex flex-col bg-white min-h-[calc(100vh-64px)]">
       {/* 탭 네비게이션 */}
-      <div className="flex justify-center border-b border-[#E2E2E2] bg-white">
+      <div className="flex justify-center border-b border-border-light bg-white">
         <div className="flex gap-7">
-          <button className="flex items-center gap-2 px-4 py-3 border-b-2 border-[#232527] font-bold text-[#232527] cursor-pointer">
-            <div className="w-3.5 h-3.5 bg-[#232527] rounded-[2px]" />
+          <button className="flex items-center gap-2 px-4 py-3 border-b-2 border-text-main font-bold text-text-main cursor-pointer">
+            <div className="w-3.5 h-3.5 bg-text-main rounded-[2px]" />
             카드로 보기
           </button>
-          <button className="flex items-center gap-2 px-4 py-3 text-[#A0A0A0] font-bold cursor-pointer hover:text-[#444] transition-colors">
+          <button className="flex items-center gap-2 px-4 py-3 text-text-caption font-bold cursor-pointer hover:text-text-sub transition-colors">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"></polygon><line x1="8" y1="2" x2="8" y2="18"></line><line x1="16" y1="6" x2="16" y2="22"></line></svg>
             지도로 보기
           </button>
@@ -264,14 +264,14 @@ export default function Home() {
       </div>
 
       {/* 필터 바 */}
-      <div className="border-b border-[#E2E2E2] bg-white sticky top-16 z-40">
+      <div className="border-b border-border-light bg-white sticky top-16 z-40">
         <div className="px-4 md:px-10 py-3 flex justify-between items-center">
           <div className="flex gap-2.5 relative" ref={dropdownRef}>
             <button 
               onClick={() => toggleDropdown('transaction')}
               className={cn(
-                "border border-[#E2E2E2] rounded-[6px] px-3 py-1.5 text-[13px] font-medium flex items-center gap-1.5 transition-all cursor-pointer bg-white shadow-sm",
-                activeDropdown === 'transaction' ? "border-[#0A607D] text-[#0A607D]" : "text-[#232527] hover:bg-gray-50"
+                "border border-border-light rounded-[6px] px-3 py-1.5 text-[13px] font-medium flex items-center gap-1.5 transition-all cursor-pointer bg-white shadow-sm",
+                activeDropdown === 'transaction' ? "border-brand-primary text-brand-primary" : "text-text-main hover:bg-gray-50"
               )}
             >
               거래방식 
@@ -285,8 +285,8 @@ export default function Home() {
             <button 
               onClick={() => toggleDropdown('sort')}
               className={cn(
-                "border border-[#E2E2E2] rounded-[6px] px-3 py-1.5 text-[13px] font-medium flex items-center gap-1.5 transition-all cursor-pointer bg-white shadow-sm",
-                activeDropdown === 'sort' ? "border-[#0A607D] text-[#0A607D]" : "text-[#0A607D] hover:bg-gray-50"
+                "border border-border-light rounded-[6px] px-3 py-1.5 text-[13px] font-medium flex items-center gap-1.5 transition-all cursor-pointer bg-white shadow-sm",
+                activeDropdown === 'sort' ? "border-brand-primary text-brand-primary" : "text-brand-primary hover:bg-gray-50"
               )}
             >
               {transactionType} ({sortOption})
@@ -321,8 +321,8 @@ export default function Home() {
             className={cn(
               "px-4 py-2 rounded-[4px] text-[12px] font-semibold flex items-center gap-2 transition-all shadow-sm",
               rooms.length <= 1 
-                ? "bg-[#BFBFBF] text-white cursor-not-allowed" 
-                : "bg-[#0A607D] text-white hover:bg-[#084e6d] cursor-pointer"
+                ? "bg-border-mute text-white cursor-not-allowed" 
+                : "bg-brand-primary text-white hover:bg-brand-primary-dark cursor-pointer"
             )}
           >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
@@ -335,12 +335,12 @@ export default function Home() {
       <div className="flex-1 flex flex-col bg-white overflow-y-auto">
         <div className="w-full px-4 md:px-10 py-8">
           <div className="flex justify-between items-center mb-5">
-            <p className="text-[14px] font-bold text-[#A0A0A0]">
+            <p className="text-[14px] font-bold text-text-caption">
               등록된 방 {rooms.length}개{ !isLoggedIn && '/2개' }
             </p>
             <button 
               onClick={handleStartChecklist}
-              className="text-[15px] font-bold text-[#0A607D] flex items-center gap-1 cursor-pointer hover:underline"
+              className="text-[15px] font-bold text-brand-primary flex items-center gap-1 cursor-pointer hover:underline"
             >
               <span className="text-[20px] leading-none mb-0.5">+</span>
               추가하기
@@ -358,10 +358,10 @@ export default function Home() {
                     <svg width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="#E2E2E2" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect><path d="M9 14l2 2 4-4"></path></svg>
                   </div>
                   <div className="text-center space-y-4">
-                    <h2 className="text-[22px] font-bold text-[#232527] leading-tight tracking-tight">
+                    <h2 className="text-[22px] font-bold text-text-main leading-tight tracking-tight">
                       아직 등록된 체크리스트가 없어요
                     </h2>
-                    <div className="text-[16px] text-[#232527] font-medium leading-relaxed opacity-60">
+                    <div className="text-[16px] text-text-main font-medium leading-relaxed opacity-60">
                       <p>방체크에서</p>
                       <p>체크리스트를 기록해보세요</p>
                     </div>
@@ -369,7 +369,7 @@ export default function Home() {
                 </div>
                 <button 
                   onClick={handleStartChecklist}
-                  className="w-[260px] bg-[#0A607D] text-white py-[14px] rounded-[8px] flex items-center justify-center gap-[10px] font-bold text-[18px] hover:bg-[#084e6d] transition-all active:scale-[0.98] cursor-pointer shadow-md"
+                  className="w-[260px] bg-brand-primary text-white py-[14px] rounded-[8px] flex items-center justify-center gap-[10px] font-bold text-[18px] hover:bg-brand-primary-dark transition-all active:scale-[0.98] cursor-pointer shadow-md"
                 >
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
                   체크리스트 시작하기
@@ -397,7 +397,7 @@ export default function Home() {
               {isLoggedIn && (
                 <div ref={ref} className="col-span-full h-20 flex items-center justify-center">
                   {isFetchingNextPage && (
-                    <div className="w-6 h-6 border-2 border-[#0A607D]/30 border-t-[#0A607D] rounded-full animate-spin" />
+                    <div className="w-6 h-6 border-2 border-brand-primary/30 border-t-brand-primary rounded-full animate-spin" />
                   )}
                 </div>
               )}

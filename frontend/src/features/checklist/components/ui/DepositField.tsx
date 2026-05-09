@@ -23,7 +23,7 @@ export default function DepositField({
   return (
     <div className="flex flex-col gap-2 w-full">
       <div className="flex items-center justify-between w-full">
-        <span className="text-[14px] font-medium text-[#232527] whitespace-nowrap">{label}</span>
+        <span className="text-[14px] font-medium text-text-main whitespace-nowrap">{label}</span>
         {showManagementFeeCheckbox && onIncludeManagementFeeChange && (
           <Checkbox
             checked={!!includeManagementFee}
@@ -33,7 +33,7 @@ export default function DepositField({
         )}
       </div>
       {convertedValue && (
-        <p className="text-[18px] font-medium text-[#0A607D]">{convertedValue}</p>
+        <p className="text-[18px] font-medium text-brand-primary">{convertedValue}</p>
       )}
       <MoneyInput
         value={value}

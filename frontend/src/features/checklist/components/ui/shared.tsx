@@ -22,8 +22,8 @@ export function SelectCard({
       className={cn(
         'flex items-center justify-center py-4 px-3 rounded-[6px] text-[15px] font-semibold transition-all cursor-pointer',
         active
-          ? 'bg-[#F4F7FF] border-2 border-[#0A607D] text-[#0A607D]'
-          : 'bg-white border border-[#E2E2E2] text-[#232527] shadow-sm hover:border-[#BFBFBF]',
+          ? 'bg-slot-b-bg border-2 border-brand-primary text-brand-primary'
+          : 'bg-white border border-border-light text-text-main shadow-sm hover:border-border-mute',
         className,
       )}
     >
@@ -51,12 +51,12 @@ export function EmojiCard({
       className={cn(
         'flex items-center gap-3 py-5 px-6 rounded-[6px] transition-all cursor-pointer w-full',
         active
-          ? 'bg-[#F4F7FF] border-2 border-[#0A607D]'
-          : 'bg-white border border-[#E2E2E2] shadow-sm hover:border-[#BFBFBF]',
+          ? 'bg-slot-b-bg border-2 border-brand-primary'
+          : 'bg-white border border-border-light shadow-sm hover:border-border-mute',
       )}
     >
       <span className="text-[26px] leading-none">{emoji}</span>
-      <span className={cn('text-[15px] font-semibold', active ? 'text-[#0A607D]' : 'text-[#232527]')}>
+      <span className={cn('text-[15px] font-semibold', active ? 'text-brand-primary' : 'text-text-main')}>
         {label}
       </span>
     </button>
@@ -83,8 +83,8 @@ export function RatingCards({
   return (
     <div className="flex flex-col gap-3">
       <div>
-        <p className="text-[14px] font-semibold text-[#232527]">{label}</p>
-        {hint && <p className="text-[12px] text-[#A0A0A0] mt-0.5">{hint}</p>}
+        <p className="text-[14px] font-semibold text-text-main">{label}</p>
+        {hint && <p className="text-[12px] text-text-caption mt-0.5">{hint}</p>}
       </div>
       <div className="grid grid-cols-3 gap-3">
         {opts.map(({ emoji, val }) => (
@@ -95,12 +95,12 @@ export function RatingCards({
             className={cn(
               'flex flex-col items-center justify-center py-4 rounded-[6px] gap-1 transition-all cursor-pointer',
               value === val
-                ? 'bg-[#F4F7FF] border-2 border-[#0A607D]'
-                : 'bg-white border border-[#E2E2E2] shadow-sm hover:border-[#BFBFBF]',
+                ? 'bg-slot-b-bg border-2 border-brand-primary'
+                : 'bg-white border border-border-light shadow-sm hover:border-border-mute',
             )}
           >
             <span className="text-[22px]">{emoji}</span>
-            <span className={cn('text-[12px] font-medium', value === val ? 'text-[#0A607D]' : 'text-[#777]')}>
+            <span className={cn('text-[12px] font-medium', value === val ? 'text-brand-primary' : 'text-text-mute')}>
               {val}
             </span>
           </button>
@@ -125,8 +125,8 @@ export function YesNoCards({
   return (
     <div className="flex flex-col gap-3">
       <div>
-        <p className="text-[14px] font-semibold text-[#232527]">{label}</p>
-        {hint && <p className="text-[12px] text-[#A0A0A0] mt-0.5">{hint}</p>}
+        <p className="text-[14px] font-semibold text-text-main">{label}</p>
+        {hint && <p className="text-[12px] text-text-caption mt-0.5">{hint}</p>}
       </div>
       <div className="grid grid-cols-2 gap-3">
         {(['없음', '있음'] as const).map((v) => (
@@ -146,9 +146,9 @@ export function YesNoCards({
 // ─── SectionHeader ────────────────────────────────────────
 export function SectionHeader({ title }: { title: string }) {
   return (
-    <div className="flex items-center gap-3 pb-3 border-b border-[#E2E2E2] mb-5">
-      <div className="w-1.5 h-5 rounded-full bg-[#0A607D] shrink-0" />
-      <h2 className="text-[16px] font-bold text-[#232527]">{title}</h2>
+    <div className="flex items-center gap-3 pb-3 border-b border-border-light mb-5">
+      <div className="w-1.5 h-5 rounded-full bg-brand-primary shrink-0" />
+      <h2 className="text-[16px] font-bold text-text-main">{title}</h2>
     </div>
   );
 }
@@ -162,7 +162,7 @@ export function FieldLabel({
   required?: boolean;
 }) {
   return (
-    <p className="text-[14px] font-medium text-[#232527] mb-2">
+    <p className="text-[14px] font-medium text-text-main mb-2">
       {children}
       {required && <span className="text-red-500 ml-0.5">*</span>}
     </p>
@@ -194,15 +194,15 @@ export function TextInput({
         placeholder={placeholder}
         disabled={disabled}
         className={cn(
-          'w-full h-[36px] px-3 rounded-[6px] border text-[14px] text-[#232527] placeholder:text-[#A0A0A0] outline-none transition-colors',
+          'w-full h-[36px] px-3 rounded-[6px] border text-[14px] text-text-main placeholder:text-text-caption outline-none transition-colors',
           disabled
-            ? 'bg-[#F5F5F5] border-[#E2E2E2] text-[#A0A0A0]'
-            : 'bg-white border-[#BFBFBF] focus:border-[#0A607D]',
+            ? 'bg-bg-gray border-border-light text-text-caption'
+            : 'bg-white border-border-mute focus:border-brand-primary',
           suffix && 'pr-12',
         )}
       />
       {suffix && (
-        <span className="absolute right-3 text-[14px] font-medium text-[#232527] pointer-events-none">
+        <span className="absolute right-3 text-[14px] font-medium text-text-main pointer-events-none">
           {suffix}
         </span>
       )}

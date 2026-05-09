@@ -13,7 +13,7 @@ export default function SectionContainer({ number, title, children, className }:
     <section className={cn("flex flex-col gap-6", className)}>
       <div className="flex items-center gap-2">
         <SectionNumberIcon number={number} />
-        <h2 className="text-[18px] font-semibold text-[#232527]">{title}</h2>
+        <h2 className="text-[18px] font-semibold text-text-main">{title}</h2>
       </div>
       <div className="flex flex-col gap-6">{children}</div>
     </section>

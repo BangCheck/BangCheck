@@ -3,7 +3,7 @@ import { RoomCard } from './RoomCard';
 import { SelectAllToggle } from './SelectAllToggle';
 import { SectionChip } from './SectionChip';
 import { getRoomSlot } from '@/components/ui/RoomChip';
-import { REPORT_SECTIONS, type ReportSectionId } from '@/features/report/lib/sections';
+import { REPORT_SECTIONS, ALL_REPORT_SECTION_IDS, type ReportSectionId } from '@/features/report/lib/sections';
 import type { Room } from '@/types/room';
 
 type Props = {
@@ -20,8 +20,6 @@ type Props = {
   onReset: () => void;
 };
 
-const ALL_SECTION_IDS = REPORT_SECTIONS.map((s) => s.id);
-
 export function ConfigCard({
   rooms,
   selectedRoomIds,
@@ -34,7 +32,7 @@ export function ConfigCard({
   onReset,
 }: Props) {
   const allRoomsSelected = rooms.length > 0 && rooms.every((r) => selectedRoomIds.includes(r.id));
-  const allSectionsSelected = ALL_SECTION_IDS.every((id) => activeSections.includes(id));
+  const allSectionsSelected = ALL_REPORT_SECTION_IDS.every((id) => activeSections.includes(id));
 
   const toggleAllRooms = () => {
     if (allRoomsSelected) {
@@ -56,18 +54,18 @@ export function ConfigCard({
   const toggleAllSections = () => {
     if (allSectionsSelected) {
       // 최소 1개 유지 — 첫 섹션만 남기기
-      ALL_SECTION_IDS.slice(1).forEach((id) => {
+      ALL_REPORT_SECTION_IDS.slice(1).forEach((id) => {
         if (activeSections.includes(id)) onToggleSection(id);
       });
     } else {
-      ALL_SECTION_IDS.forEach((id) => {
+      ALL_REPORT_SECTION_IDS.forEach((id) => {
         if (!activeSections.includes(id)) onToggleSection(id);
       });
     }
   };
 
   return (
-    <div className="rounded-[6px] border border-border-light bg-[#f7fafb] p-6">
+    <div className="rounded-[6px] border border-border-light bg-bg-primary-soft p-6">
       {/* 섹션 1: 비교할 방 선택 */}
       <section className="border-b border-border-light pb-6">
         <header className="mb-4 flex items-start justify-between gap-4">

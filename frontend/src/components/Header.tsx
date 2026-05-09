@@ -46,7 +46,7 @@ export default function Header() {
 
   return (
     <>
-      <header className="flex items-center h-16 px-4 md:px-10 lg:px-20 border-b border-[#E2E2E2] bg-white w-full sticky top-0 z-50">
+      <header className="flex items-center h-16 px-4 md:px-10 lg:px-20 border-b border-border-light bg-white w-full sticky top-0 z-50">
         <div className="flex-1 flex justify-start z-10">
           <Link to={ROUTES.HOME}>
             <LogoWithText size={20} textClassName="text-base md:text-lg" />
@@ -58,7 +58,7 @@ export default function Header() {
             to={ROUTES.HOME}
             className={cn(
               'text-fluid-lg font-bold transition-colors p-2',
-              pathname === ROUTES.HOME ? 'text-[#0A607D]' : 'text-[#232527]'
+              pathname === ROUTES.HOME ? 'text-brand-primary' : 'text-text-main'
             )}
           >
             방 목록
@@ -67,7 +67,7 @@ export default function Header() {
             to={ROUTES.SETTINGS}
             className={cn(
               'text-fluid-lg font-bold transition-colors p-2',
-              pathname === ROUTES.SETTINGS ? 'text-[#0A607D]' : 'text-[#232527]'
+              pathname === ROUTES.SETTINGS ? 'text-brand-primary' : 'text-text-main'
             )}
           >
             커스텀
@@ -81,7 +81,7 @@ export default function Header() {
               type="button"
               disabled
               aria-label={disabledLabel}
-              className="flex h-8 px-3 sm:px-4 py-2 rounded-[4px] bg-[#BFBFBF] items-center gap-[6px] sm:gap-[10px] cursor-not-allowed"
+              className="flex h-8 px-3 sm:px-4 py-2 rounded-[4px] bg-border-mute items-center gap-[6px] sm:gap-[10px] cursor-not-allowed"
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <line x1="12" y1="5" x2="12" y2="19" />
@@ -92,7 +92,7 @@ export default function Header() {
           ) : (
             <Link
               to={ROUTES.CHECKLIST_NEW}
-              className="flex h-8 px-3 sm:px-4 py-2 rounded-[4px] bg-[#0A607D] items-center gap-[6px] sm:gap-[10px] hover:bg-[#084e6d] transition-colors"
+              className="flex h-8 px-3 sm:px-4 py-2 rounded-[4px] bg-brand-primary items-center gap-[6px] sm:gap-[10px] hover:bg-brand-primary-dark transition-colors"
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <line x1="12" y1="5" x2="12" y2="19" />
@@ -104,7 +104,7 @@ export default function Header() {
 
           {isLoggedIn ? (
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full bg-[#718096] flex items-center justify-center text-white text-[12px] font-bold overflow-hidden relative">
+              <div className="w-8 h-8 rounded-full bg-bg-avatar flex items-center justify-center text-white text-[12px] font-bold overflow-hidden relative">
                 {user?.profileImageUrl ? (
                   <img src={user.profileImageUrl} alt={user.nickname || 'Profile'} className="object-cover w-full h-full" />
                 ) : (
@@ -113,7 +113,7 @@ export default function Header() {
               </div>
               <button
                 onClick={() => setIsLogoutModalOpen(true)}
-                className="flex items-center gap-1.5 text-[12px] text-[#A0A0A0] hover:text-[#232527] transition-all cursor-pointer border border-[#E2E2E2] rounded-md px-2.5 py-1.5 bg-white"
+                className="flex items-center gap-1.5 text-[12px] text-text-caption hover:text-text-main transition-all cursor-pointer border border-border-light rounded-md px-2.5 py-1.5 bg-white"
               >
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />

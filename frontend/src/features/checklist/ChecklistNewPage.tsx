@@ -71,21 +71,21 @@ export default function ChecklistNewPage() {
   return (
     <div className="min-h-screen bg-white flex flex-col">
 
-      <header className="sticky top-0 z-40 bg-white border-b border-[#E2E2E2] h-14 flex items-center px-4 gap-3">
+      <header className="sticky top-0 z-40 bg-white border-b border-border-light h-14 flex items-center px-4 gap-3">
         <button
           type="button"
           onClick={() => navigate('/rooms')}
-          className="p-1 text-[#232527] cursor-pointer"
+          className="p-1 text-text-main cursor-pointer"
           aria-label="뒤로 가기"
         >
           <BackChevron />
         </button>
-        <h1 className="text-[16px] font-semibold text-[#232527]">방 체크리스트</h1>
+        <h1 className="text-[16px] font-semibold text-text-main">방 체크리스트</h1>
       </header>
 
       <nav
         ref={tabNavRef}
-        className="sticky top-14 z-30 bg-white border-b border-[#E2E2E2] px-4 py-2 flex gap-2 overflow-x-auto no-scrollbar"
+        className="sticky top-14 z-30 bg-white border-b border-border-light px-4 py-2 flex gap-2 overflow-x-auto no-scrollbar"
       >
         {SECTION_TABS.filter((t) => isLoggedIn || t.id !== 'custom').map(({ id, label }) => (
           <button
@@ -96,8 +96,8 @@ export default function ChecklistNewPage() {
             className={cn(
               'shrink-0 px-4 py-1.5 rounded-[4px] text-[13px] font-semibold transition-all cursor-pointer whitespace-nowrap',
               activeSection === id
-                ? 'bg-[#F7FAFB] border border-[#0A607D] text-[#0A607D]'
-                : 'bg-[#EFEFEF] text-[#777] hover:bg-[#E5E5E5]',
+                ? 'bg-bg-primary-soft border border-brand-primary text-brand-primary'
+                : 'bg-bg-gray-soft text-text-mute hover:bg-bg-gray-hover',
             )}
           >
             {label}
@@ -138,7 +138,7 @@ export default function ChecklistNewPage() {
         />
       </main>
 
-      <div className="fixed bottom-0 left-0 right-0 md:sticky md:bottom-auto bg-white border-t border-[#E2E2E2] px-4 py-4 z-30">
+      <div className="fixed bottom-0 left-0 right-0 md:sticky md:bottom-auto bg-white border-t border-border-light px-4 py-4 z-30">
         <div className="max-w-2xl md:max-w-3xl lg:max-w-4xl mx-auto flex flex-col gap-2">
           {submitError && (
             <p className="text-[12px] text-red-500 text-center">{submitError}</p>
@@ -150,8 +150,8 @@ export default function ChecklistNewPage() {
             className={cn(
               'w-full py-3.5 rounded-[6px] text-fluid-lg font-bold transition-all',
               !basic.name.trim() || isSubmitting
-                ? 'bg-[#BFBFBF] text-white cursor-not-allowed'
-                : 'bg-[#0A607D] text-white hover:bg-[#084e6d] cursor-pointer',
+                ? 'bg-border-mute text-white cursor-not-allowed'
+                : 'bg-brand-primary text-white hover:bg-brand-primary-dark cursor-pointer',
             )}
           >
             {isSubmitting ? '저장 중...' : '저장하기'}

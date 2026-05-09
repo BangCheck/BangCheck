@@ -13,6 +13,14 @@
   --color-bg-gray-soft: #efefef;
   --color-bg-dark: #191b1e;
   --color-bg-footer: #fafafa;
+  --color-bg-primary-soft: #f7fafb;
+  --color-bg-gray-hover: #e5e5e5;
+  --color-bg-avatar: #718096;
+  --color-btn-dark: #404040;
+  --color-bg-gray-light: #f9f9f9;
+  --color-bg-brand-lighter: #f0f7ff;
+  --color-border-mid: #d9d9d9;
+  --color-text-mid: #636363;
 
   /* Room Slot Palette — 비교 리포트에서 방을 구분 (E06 SCR-COMPARE) */
   --color-slot-a-bg: #f9e8f0;

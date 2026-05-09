@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useCallback, useMemo, useEffect } from 'react';
 import * as customService from '@/services/custom-checklist-service';
-import { TYPE_ITEM_MAP, CHECKLIST_ITEMS } from '../constants';
+import { TYPE_ITEM_MAP, CHECKLIST_ITEMS, USER_TYPES } from '../constants';
 import { useCustomizationStore } from '@/store/use-customization-store';
 import { useAuthStore } from '@/store/use-auth-store';
 
@@ -36,9 +36,17 @@ export const useCustomization = () => {
       items.forEach(item => {
         if (item.isEnabled && item.userType) serverTypes.add(item.userType);
       });
-      setSelectedTypeIds(Array.from(serverTypes));
+      const typeArray = Array.from(serverTypes);
+      setSelectedTypeIds(typeArray);
+
+      // 처음 진입 시 (서버에 선택된 유형이 없으면) FIRST_TIMER 자동 선택
+      if (typeArray.length === 0 && isLoggedIn) {
+        selectTypeMutation.mutate('FIRST_TIMER');
+        setSelectedTypeIds(['FIRST_TIMER']);
+      }
     }
-  }, [items, setActiveItemNames, setSelectedTypeIds]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [items]);
 
   // 3. Mutation 정의
   const invalidate = () => queryClient.invalidateQueries({ queryKey: ['customChecklistItems'] });
@@ -71,19 +79,17 @@ export const useCustomization = () => {
   // 4. 이벤트 핸들러 (스토어를 먼저 업데이트하여 즉각 반응 제공)
   const toggleUserType = useCallback((typeId: string) => {
     const isSelected = selectedTypeIds.includes(typeId);
-    
+
     if (isSelected) {
       deselectTypeMutation.mutate(typeId);
     } else {
       selectTypeMutation.mutate(typeId);
 
-      // 유형 선택 시 해당 유형의 추천 항목들을 자동으로 활성화(체크)
       const recommendedIds = TYPE_ITEM_MAP[typeId] || [];
       const recommendedLabels = CHECKLIST_ITEMS
         .filter(item => recommendedIds.includes(item.id))
         .map(item => item.label);
 
-      // 유형 선택 시 추천 항목 활성화 → 비활성 항목 ID 목록 재계산 후 일괄 저장
       const nextActiveNames = Array.from(new Set([...activeItemNames, ...recommendedLabels]));
       const disabledIds = items
         .filter(i => i.itemType !== 'CUSTOM')
@@ -110,6 +116,21 @@ export const useCustomization = () => {
   const toggleItemLocally = useCallback((label: string) => {
     toggleItemName(label);
   }, [toggleItemName]);
+
+  const selectAllTypes = useCallback(() => {
+    USER_TYPES.forEach((t) => {
+      if (!selectedTypeIds.includes(t.id)) {
+        selectTypeMutation.mutate(t.id);
+      }
+    });
+    setSelectedTypeIds(USER_TYPES.map((t) => t.id));
+  }, [selectedTypeIds, selectTypeMutation, setSelectedTypeIds]);
+
+  const selectAllItems = useCallback(() => {
+    saveSettingsMutation.mutate([]);
+    const allNames = items.filter((i) => i.itemType !== 'CUSTOM').map((i) => i.itemName);
+    setActiveItemNames(allNames);
+  }, [items, saveSettingsMutation, setActiveItemNames]);
 
   const addCustomItem = useCallback((itemName: string) => {
     addCustomMutation.mutate(itemName);
@@ -148,7 +169,9 @@ export const useCustomization = () => {
       addCustomMutation.isPending ||
       deleteCustomMutation.isPending,
     toggleUserType,
+    selectAllTypes,
     toggleItem,
+    selectAllItems,
     toggleItemLocally,
     addCustomItem,
     removeCustomItem,

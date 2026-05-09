@@ -14,8 +14,8 @@ import BottomNavigation from '@/components/BottomNavigation';
 
 const Placeholder = ({ name }: { name: string }) => (
   <div className="flex flex-col items-center justify-center min-h-[60vh] gap-2 p-8">
-    <h1 className="text-[#232527] text-2xl font-bold">[{name}]</h1>
-    <p className="text-[#A0A0A0] text-sm">E09 placeholder — 페이지는 후속 스토리에서 마이그레이션됩니다.</p>
+    <h1 className="text-text-main text-2xl font-bold">[{name}]</h1>
+    <p className="text-text-caption text-sm">E09 placeholder — 페이지는 후속 스토리에서 마이그레이션됩니다.</p>
   </div>
 );
 

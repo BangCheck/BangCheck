@@ -9,7 +9,7 @@ export default function SectionNumberIcon({ number, className }: SectionNumberIc
   return (
     <div
       className={cn(
-        'w-6 h-6 rounded-[4px] bg-[#232527] flex items-center justify-center shrink-0',
+        'w-6 h-6 rounded-[4px] bg-text-main flex items-center justify-center shrink-0',
         className
       )}
     >

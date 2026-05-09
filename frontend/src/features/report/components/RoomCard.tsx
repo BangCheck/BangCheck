@@ -17,14 +17,14 @@ const SLOT_DOT: Record<RoomSlot, string> = {
 };
 
 const SLOT_BORDER_SELECTED: Record<RoomSlot, string> = {
-  A: 'border-[#461a2b]',
-  B: 'border-[#004cbd]',
+  A: 'border-slot-a-text',
+  B: 'border-slot-b-text',
   C: 'border-brand-primary',
 };
 
 const SLOT_CHECKBOX_COLOR: Record<RoomSlot, string> = {
-  A: 'text-[#461a2b]',
-  B: 'text-[#004cbd]',
+  A: 'text-slot-a-text',
+  B: 'text-slot-b-text',
   C: 'text-brand-primary',
 };
 

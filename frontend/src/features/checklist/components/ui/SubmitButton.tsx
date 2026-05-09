@@ -25,7 +25,7 @@ export default function SubmitButton({
       className={cn(
         'w-full flex items-center justify-center px-4 py-3 rounded-[6px]',
         'text-[14px] font-semibold text-white transition-colors cursor-pointer',
-        disabled || loading ? 'bg-[#40839A]' : 'bg-[#0A607D] hover:bg-[#085570]',
+        disabled || loading ? 'bg-[#40839A]' : 'bg-brand-primary hover:bg-[#085570]',
         (disabled || loading) && 'cursor-not-allowed',
         className
       )}

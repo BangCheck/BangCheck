@@ -19,8 +19,8 @@ export default function Checkbox({ checked, onChange, label, className }: Checkb
           className={cn(
             'w-4 h-4 rounded-[2px] border flex items-center justify-center transition-colors',
             checked
-              ? 'bg-[#0A607D] border-[#0A607D]'
-              : 'bg-white border-[#BFBFBF]'
+              ? 'bg-brand-primary border-brand-primary'
+              : 'bg-white border-border-mute'
           )}
         >
           {checked && (

@@ -42,21 +42,21 @@ export const UserTypeCard: React.FC<UserTypeCardProps> = ({
       className={cn(
         "flex flex-col items-start p-6 rounded-[6px] border transition-all w-full bg-white drop-shadow-[0px_6px_8px_rgba(0,0,0,0.04)]",
         isSelected
-          ? "bg-[#f4f7ff] border-2 border-[#0A607D]"
-          : "border-[#E2E2E2] hover:border-[#BFBFBF]"
+          ? "bg-slot-b-bg border-2 border-brand-primary"
+          : "border-border-light hover:border-border-mute"
       )}
     >
       <div className={cn(
         "mb-3 transition-colors duration-200",
-        isSelected ? "text-[#0A607D]" : "text-[#A0A0A0]"
+        isSelected ? "text-brand-primary" : "text-text-caption"
       )}>
         {IconComponent && <IconComponent />}
       </div>
       <div className="space-y-1">
-        <h3 className="text-[18px] font-semibold leading-tight text-[#232527]">
+        <h3 className="text-[18px] font-semibold leading-tight text-text-main">
           {label}
         </h3>
-        <p className="text-[12px] font-normal leading-[1.3] text-[#777]">
+        <p className="text-[12px] font-normal leading-[1.3] text-text-mute">
           {description}
         </p>
       </div>

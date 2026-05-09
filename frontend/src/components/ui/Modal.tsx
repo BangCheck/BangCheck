@@ -33,14 +33,14 @@ export function Modal({ isOpen, onClose, children, className }: ModalProps) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       {/* Backdrop */}
-      <div 
-        className="fixed inset-0 bg-black/40 backdrop-blur-[2px]" 
+      <div
+        className="fixed inset-0 bg-black/50"
         onClick={onClose}
       />
-      
+
       {/* Modal Content */}
       <div className={cn(
-        "relative bg-white rounded-[20px] shadow-xl w-[90%] max-w-[340px] p-6 flex flex-col items-center animate-in fade-in zoom-in duration-200",
+        "relative bg-white rounded-[6px] shadow-xl w-[90%] max-w-[308px] p-6 flex flex-col items-start animate-in fade-in zoom-in duration-200",
         className
       )}>
         {children}
@@ -74,29 +74,33 @@ export function ConfirmModal({
 }: ConfirmModalProps) {
   return (
     <Modal isOpen={isOpen} onClose={onClose} className={className}>
-      <h3 className="text-[18px] font-bold text-text-main text-center mt-2 mb-3">
-        {title}
-      </h3>
-      
-      {description && (
-        <p className="text-[13px] text-text-caption text-center whitespace-pre-wrap mb-6 leading-relaxed">
-          {description}
-        </p>
-      )}
-      
-      <div className="flex w-full gap-2 mt-2">
-        <button
-          onClick={onLeftClick}
-          className="flex-1 py-3.5 bg-bg-gray text-text-main text-[14px] font-medium rounded-lg hover:bg-gray-200 transition-colors active:scale-[0.98]"
-        >
-          {leftButtonText}
-        </button>
-        <button
-          onClick={onRightClick}
-          className="flex-1 py-3.5 bg-brand-primary text-white text-[14px] font-medium rounded-lg hover:brightness-110 transition-all active:scale-[0.98]"
-        >
-          {rightButtonText}
-        </button>
+      <div className="flex flex-col gap-[24px] items-center w-full">
+        <div className="flex flex-col gap-[24px] items-center text-center w-full">
+          <h3 className="text-[18px] font-semibold text-black leading-[1.3]">
+            {title}
+          </h3>
+
+          {description && (
+            <p className="text-[14px] font-medium text-text-main text-center whitespace-pre-wrap leading-[1.3]">
+              {description}
+            </p>
+          )}
+        </div>
+
+        <div className="flex gap-[12px] items-center w-full">
+          <button
+            onClick={onLeftClick}
+            className="flex-1 py-[12px] px-[16px] bg-bg-gray text-text-main text-[16px] font-medium rounded-[4px] hover:bg-gray-200 transition-colors active:scale-[0.98] cursor-pointer"
+          >
+            {leftButtonText}
+          </button>
+          <button
+            onClick={onRightClick}
+            className="py-[12px] px-[16px] w-[175px] bg-brand-primary text-white text-[16px] font-medium rounded-[4px] hover:bg-brand-primary-dark transition-colors active:scale-[0.98] cursor-pointer"
+          >
+            {rightButtonText}
+          </button>
+        </div>
       </div>
     </Modal>
   );

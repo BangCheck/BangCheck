@@ -28,14 +28,14 @@ const BottomNavigation = () => {
   ];
 
   return (
-    <nav className="md:hidden sticky bottom-0 w-full h-[80px] bg-white border-t border-[#E2E2E2] px-2 flex items-center justify-around z-50 pb-safe">
+    <nav className="md:hidden sticky bottom-0 w-full h-[80px] bg-white border-t border-border-light px-2 flex items-center justify-around z-50 pb-safe">
       {navItems.map((item, idx) => {
         const isActive = pathname === item.href;
 
         if (item.isCenter) {
           return (
             <Link key={idx} to={item.href} className="relative -top-5 flex flex-col items-center">
-              <div className="w-[60px] h-[60px] bg-[#404040] rounded-lg border-[3px] border-white flex flex-col items-center justify-center shadow-lg active:scale-95 transition-transform">
+              <div className="w-[60px] h-[60px] bg-btn-dark rounded-lg border-[3px] border-white flex flex-col items-center justify-center shadow-lg active:scale-95 transition-transform">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <path d="M12 5V19M5 12H19" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
