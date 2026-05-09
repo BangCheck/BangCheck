@@ -46,7 +46,7 @@ export default function Header() {
 
   return (
     <>
-      <header className="flex items-center h-16 px-4 md:px-10 border-b border-[#E2E2E2] bg-white w-full sticky top-0 z-50">
+      <header className="flex items-center h-16 px-4 md:px-10 lg:px-20 border-b border-[#E2E2E2] bg-white w-full sticky top-0 z-50">
         <div className="flex-1 flex justify-start z-10">
           <Link to={ROUTES.HOME}>
             <LogoWithText size={20} textClassName="text-base md:text-lg" />
@@ -57,7 +57,7 @@ export default function Header() {
           <Link
             to={ROUTES.HOME}
             className={cn(
-              'text-[15px] font-bold transition-colors p-2',
+              'text-fluid-lg font-bold transition-colors p-2',
               pathname === ROUTES.HOME ? 'text-[#0A607D]' : 'text-[#232527]'
             )}
           >
@@ -66,7 +66,7 @@ export default function Header() {
           <Link
             to={ROUTES.SETTINGS}
             className={cn(
-              'text-[15px] font-bold transition-colors p-2',
+              'text-fluid-lg font-bold transition-colors p-2',
               pathname === ROUTES.SETTINGS ? 'text-[#0A607D]' : 'text-[#232527]'
             )}
           >

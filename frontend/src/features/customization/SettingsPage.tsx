@@ -2,12 +2,29 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/store/use-auth-store';
 import { cn } from '@/lib/utils';
-import { USER_TYPES, CHECKLIST_ITEMS, CATEGORIES, TYPE_ITEM_MAP } from '@/features/customization/constants';
+import { USER_TYPES, CHECKLIST_ITEMS, TYPE_ITEM_MAP } from '@/features/customization/constants';
+import type { ChecklistCategory } from '@/types/checklist';
 import { UserTypeCard } from '@/features/customization/components/UserTypeCard';
 import { ChecklistItemToggle } from '@/features/customization/components/ChecklistItemToggle';
 import { useCustomization } from '@/features/customization/hooks/useCustomization';
 import { ItemIcons, IconChevron } from '@/features/customization/components/Icons';
 import { ROUTES } from '@/lib/routes';
+
+const CATEGORY_LABEL: Record<ChecklistCategory, string> = {
+  BASIC_INFO: '기본 정보',
+  BUILDING_INFO: '건물 정보',
+  OPTION: '기본 옵션',
+  INTERNAL_STATE: '내부 상태',
+  PROBLEM: '문제 요소',
+  SAFETY: '안전/보안',
+  CONVENIENCE: '생활 편의',
+  ENVIRONMENT: '주변 환경',
+  CUSTOM: '나만의 항목',
+};
+
+const CATEGORY_ORDER: ChecklistCategory[] = [
+  'OPTION', 'INTERNAL_STATE', 'PROBLEM', 'SAFETY', 'CONVENIENCE', 'ENVIRONMENT',
+];
 
 // ─────────────────────────────────────────────
 // SectionHeader
@@ -111,7 +128,9 @@ export default function SettingsPage() {
     isLoading,
     isPending,
     toggleUserType,
+    selectAllTypes,
     toggleItem,
+    selectAllItems,
     toggleItemLocally,
     addCustomItem,
     removeCustomItem,
@@ -142,32 +161,6 @@ export default function SettingsPage() {
     return CHECKLIST_ITEMS.filter((item) => itemIds.has(item.id));
   }, [selectedTypeIds]);
 
-  const handleSelectAllTypes = () => {
-    USER_TYPES.forEach((type) => {
-      if (!selectedTypeIds.includes(type.id)) toggleUserType(type.id);
-    });
-  };
-
-  const handleSelectAllRecommended = () => {
-    recommendedItems.forEach((item) => {
-      if (!activeItemNames.includes(item.label)) {
-        const serverId = getServerIdByLabel(item.label);
-        if (serverId) toggleItem(Number(serverId), item.label);
-        else toggleItemLocally(item.label);
-      }
-    });
-  };
-
-  const handleSelectAllVisible = () => {
-    CHECKLIST_ITEMS.forEach((item) => {
-      if (!activeItemNames.includes(item.label)) {
-        const serverId = getServerIdByLabel(item.label);
-        if (serverId) toggleItem(Number(serverId), item.label);
-        else toggleItemLocally(item.label);
-      }
-    });
-  };
-
   const totalSelectedCount = activeItemNames.length;
 
   if (isLoading) {
@@ -192,13 +185,13 @@ export default function SettingsPage() {
 
       <main
         className={cn(
-          'max-w-[1440px] mx-auto w-full px-6 md:px-[136px] py-[40px] md:py-[50px] flex-1',
+          'max-w-screen-xl mx-auto w-full px-4 md:px-12 lg:px-24 py-8 md:py-12 flex-1',
           isLoggedIn ? 'pb-40' : 'pb-20',
         )}
       >
         {/* PageTitle (SCR-CUSTOM-08~10) */}
         <section className="mb-8 md:mb-12">
-          <h1 className="text-[24px] md:text-[30px] font-bold text-[#232527] mb-2 md:mb-3">
+          <h1 className="text-fluid-4xl font-bold text-[#232527] mb-2 md:mb-3">
             체크리스트 맞춤 설정
           </h1>
           <p className="text-[14px] md:text-[16px] text-[#777] font-medium leading-relaxed">
@@ -248,8 +241,8 @@ export default function SettingsPage() {
               <SectionHeader
                 number={1}
                 title="나는 이런 유형이에요"
-                description="여러 개 선택 가능 · 선택한 유형에 맞는 항목이 자동으로 체크돼요"
-                onSelectAll={handleSelectAllTypes}
+                description="유형을 선택하면 맞춤 항목이 자동으로 체크돼요"
+                onSelectAll={selectAllTypes}
                 isFolded={isSection1Folded}
                 onToggleFold={() => setIsSection1Folded(!isSection1Folded)}
               />
@@ -278,7 +271,6 @@ export default function SettingsPage() {
                     ? 'Step 1에서 유형을 선택하면 추천 항목이 표시돼요'
                     : `${activeItemNames.length}개 항목이 자동 체크되었어요 · 클릭하면 해제할 수 있어요`
                 }
-                onSelectAll={selectedTypeIds.length > 0 ? handleSelectAllRecommended : undefined}
                 isFolded={isSection2Folded}
                 onToggleFold={() => setIsSection2Folded(!isSection2Folded)}
               />
@@ -322,7 +314,7 @@ export default function SettingsPage() {
                 number={3}
                 title="추가로 확인할 항목"
                 description="전체 체크리스트에서 추가하고 싶은 항목을 직접 선택하세요"
-                onSelectAll={handleSelectAllVisible}
+                onSelectAll={selectAllItems}
                 isFolded={isSection3Folded}
                 onToggleFold={() => setIsSection3Folded(!isSection3Folded)}
               />
@@ -355,50 +347,79 @@ export default function SettingsPage() {
                     </button>
                   </div>
 
-                  {/* 전체 카테고리 펼침 */}
+                  {/* 전체 카테고리 펼침 — 서버 items 기준 */}
                   {isAllItemsVisible && (
-                    <div className="pt-4 border-t border-[#F5F5F5] space-y-8 md:space-y-10">
-                      {CATEGORIES.map((category) => (
-                        <div key={category} className="space-y-3 md:space-y-4">
-                          <h4 className="text-[13px] md:text-[14px] font-bold text-[#A0A0A0]">{category}</h4>
-                          <div className="grid grid-cols-1 lg:grid-cols-3 gap-2 lg:gap-3">
-                            {CHECKLIST_ITEMS.filter((item) => item.category === category).map((item) => (
-                              <ChecklistItemToggle
-                                key={item.id}
-                                label={item.label}
-                                icon={ItemIcons[item.id] || ItemIcons.default}
-                                isActive={activeItemNames.includes(item.label)}
-                                onToggle={() => {
-                                  const serverId = getServerIdByLabel(item.label);
-                                  if (serverId) {
-                                    toggleItem(serverId, item.label);
-                                  } else {
-                                    toggleItemLocally(item.label);
-                                  }
+                    <div className="pt-4 border-t border-[#F5F5F5] space-y-10">
+                      {CATEGORY_ORDER.map((cat) => {
+                        const catItems = items.filter(
+                          (i) => i.itemType !== 'CUSTOM' && i.category === cat,
+                        );
+                        if (catItems.length === 0) return null;
+                        const activeCount = catItems.filter((i) => activeItemNames.includes(i.itemName)).length;
+                        return (
+                          <div key={cat} className="space-y-4">
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-2">
+                                <h4 className="text-[14px] font-bold text-[#232527]">
+                                  {CATEGORY_LABEL[cat]}
+                                </h4>
+                                <span className="text-[14px] font-bold text-[#777]">
+                                  {activeCount}/{catItems.length}
+                                </span>
+                              </div>
+                              <button
+                                className="text-[14px] font-medium text-[#232527] hover:text-[#0A607D]"
+                                onClick={() => {
+                                  catItems.forEach((i) => {
+                                    if (!activeItemNames.includes(i.itemName)) {
+                                      toggleItem(Number(i.id), i.itemName);
+                                    }
+                                  });
                                 }}
-                              />
-                            ))}
+                              >
+                                전체 선택
+                              </button>
+                            </div>
+                            <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
+                              {catItems.map((serverItem) => {
+                                const frontItem = CHECKLIST_ITEMS.find(
+                                  (c) => c.label === serverItem.itemName,
+                                );
+                                const icon = frontItem
+                                  ? ItemIcons[frontItem.id] || ItemIcons.default
+                                  : ItemIcons.default;
+                                return (
+                                  <ChecklistItemToggle
+                                    key={serverItem.id}
+                                    label={serverItem.itemName}
+                                    icon={icon}
+                                    isActive={activeItemNames.includes(serverItem.itemName)}
+                                    onToggle={() => toggleItem(Number(serverItem.id), serverItem.itemName)}
+                                  />
+                                );
+                              })}
+                            </div>
                           </div>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   )}
 
-                  {/* RowCustomItemCount + InputText + ButtonAddItem (SCR-CUSTOM-26~29) */}
+                  {/* 나만의 항목 추가 */}
                   <div className="space-y-4 md:space-y-5">
                     <div className="flex justify-between items-center">
                       <div className="flex items-center gap-2">
                         <h4 className="text-[14px] font-bold text-[#232527]">나만의 항목 추가</h4>
-                        <span className="text-[13px] md:text-[14px] font-bold text-[#777]">{customItems.length}건</span>
+                        <span className="text-[14px] font-bold text-[#777]">{customItems.length}건</span>
                       </div>
                     </div>
-                    <form onSubmit={handleAddCustomItem} className="flex gap-2 md:gap-3">
+                    <form onSubmit={handleAddCustomItem} className="flex gap-3">
                       <input
                         type="text"
                         value={newCustomItem}
                         onChange={(e) => setNewCustomItem(e.target.value)}
                         placeholder="예 : 초인종 여부, 환기 상태"
-                        className="flex-1 bg-white border border-[#BFBFBF] rounded-[6px] px-3 py-1.5 md:py-[6px] text-[13px] md:text-[14px] outline-none focus:border-[#0A607D]"
+                        className="flex-1 bg-white border border-[#BFBFBF] rounded-[6px] px-3 py-[6px] text-[14px] outline-none focus:border-[#0A607D]"
                       />
                       <button
                         type="submit"
@@ -412,21 +433,30 @@ export default function SettingsPage() {
                         </svg>
                       </button>
                     </form>
+                    {/* 커스텀 항목 카드 — Figma: 아이콘 + 텍스트 + 삭제 버튼 */}
                     {customItems.length > 0 && (
-                      <div className="flex flex-wrap gap-2">
+                      <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
                         {customItems.map((item) => (
                           <div
                             key={item.id}
-                            className="flex items-center gap-2 bg-[#D9EAF0] text-[#0A607D] px-2.5 py-1 md:px-3 md:py-1.5 rounded-lg text-[12px] md:text-[13px] font-bold"
+                            className="flex items-center justify-between gap-3 bg-[#f4f7ff] border-2 border-[#0A607D] rounded-[6px] p-6 drop-shadow-[0px_6px_8px_rgba(0,0,0,0.04)]"
                           >
-                            {item.itemName}
+                            <div className="flex items-center gap-3">
+                              <div className="w-9 h-9 flex items-center justify-center shrink-0">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="#0A607D"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75z"/></svg>
+                              </div>
+                              <span className="text-[18px] font-semibold text-[#232527] leading-[1.3]">
+                                {item.itemName}
+                              </span>
+                            </div>
                             <button
                               onClick={() => removeCustomItem(item.id, item.itemName)}
-                              className="text-[#0A607D]/60 hover:text-[#0A607D]"
+                              className="shrink-0 w-5 h-5 flex items-center justify-center text-[#777] hover:text-[#232527]"
                               aria-label={`${item.itemName} 삭제`}
                             >
-                              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                                <path d="M3 6h18m-2 0v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6m3 0V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+                              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+                                <line x1="2" y1="2" x2="10" y2="10" />
+                                <line x1="10" y1="2" x2="2" y2="10" />
                               </svg>
                             </button>
                           </div>
@@ -443,15 +473,15 @@ export default function SettingsPage() {
 
       {/* 저장 CTA — 로그인 상태에서만 노출 (SCR-CUSTOM-30~33 미확보, 기존 임시 UI 유지) */}
       {isLoggedIn && (
-        <div className="fixed bottom-[80px] md:bottom-0 left-0 right-0 bg-[#FAFAFA] border-t border-[#E2E2E2] px-6 md:px-[136px] py-6 z-40">
-          <div className="max-w-[1440px] mx-auto flex flex-col items-center gap-3">
+        <div className="fixed bottom-[80px] md:bottom-0 left-0 right-0 bg-[#FAFAFA] border-t border-[#E2E2E2] px-4 md:px-12 lg:px-24 py-6 z-40">
+          <div className="max-w-screen-xl mx-auto flex flex-col items-center gap-3">
             <div className="flex items-center justify-between w-full">
-              <span className="text-[14px] font-medium text-[#777]">총 선택된 항목</span>
-              <span className="text-[14px] font-bold text-[#232527]">{totalSelectedCount}개</span>
+              <span className="text-fluid-lg font-medium text-[#777]">총 선택된 항목</span>
+              <span className="text-fluid-lg font-bold text-[#232527]">{totalSelectedCount}개</span>
             </div>
             <button
               onClick={() => navigate(ROUTES.HOME)}
-              className="w-full max-w-[1168px] bg-[#0A607D] text-white py-3 rounded-[6px] font-semibold text-[14px] hover:bg-[#084e6d] transition-colors"
+              className="w-full bg-[#0A607D] text-white py-3 rounded-[6px] font-semibold text-fluid-lg hover:bg-[#084e6d] transition-colors"
             >
               맞춤 설정 완료
             </button>

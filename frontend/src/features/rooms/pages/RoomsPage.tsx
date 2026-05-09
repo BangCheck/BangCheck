@@ -185,6 +185,13 @@ export default function RoomsPage() {
   const rooms = isLoggedIn ? apiRooms : guestFiltered;
   const isGuestAtLimit = !isLoggedIn && guestRooms.length >= GUEST_ROOM_LIMIT;
 
+  // 로그인 직후 온보딩 모달 자동 노출
+  useEffect(() => {
+    if (isLoggedIn && !localStorage.getItem('onboarding_custom_checklist')) {
+      setIsCustomModalOpen(true);
+    }
+  }, [isLoggedIn]);
+
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
@@ -239,11 +246,11 @@ export default function RoomsPage() {
       {/* 서브 탭 (카드로 보기 / 지도로 보기) */}
       <div className="flex justify-center border-b border-[#E2E2E2] bg-white">
         <div className="flex gap-7">
-          <button className="flex items-center gap-[10px] px-[16px] py-[12px] border-b-2 border-[#232527] font-bold text-[#232527] text-[16px] cursor-pointer">
+          <button className="flex items-center gap-[10px] px-[16px] py-[12px] border-b-2 border-[#232527] font-bold text-[#232527] text-fluid-xl cursor-pointer">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><rect x="2" y="3" width="9" height="9" rx="1" /><rect x="13" y="3" width="9" height="9" rx="1" /><rect x="2" y="14" width="9" height="9" rx="1" /><rect x="13" y="14" width="9" height="9" rx="1" /></svg>
             카드로 보기
           </button>
-          <button className="flex items-center gap-[10px] px-[16px] py-[12px] text-[#A0A0A0] font-bold text-[16px] cursor-pointer hover:text-[#444] transition-colors">
+          <button className="flex items-center gap-[10px] px-[16px] py-[12px] text-[#A0A0A0] font-bold text-fluid-xl cursor-pointer hover:text-[#444] transition-colors">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6" /><line x1="8" y1="2" x2="8" y2="18" /><line x1="16" y1="6" x2="16" y2="22" /></svg>
             지도로 보기
           </button>
@@ -252,12 +259,12 @@ export default function RoomsPage() {
 
       {/* 필터 바 */}
       <div className="border-b border-[#E2E2E2] bg-white sticky top-16 z-40">
-        <div className="px-4 md:px-10 py-3 flex justify-between items-center">
+        <div className="px-4 md:px-10 lg:px-20 py-3 flex justify-between items-center max-w-screen-2xl mx-auto w-full">
           <div className="flex gap-2.5 relative" ref={dropdownRef}>
             <button
               onClick={() => setActiveDropdown(activeDropdown === 'transaction' ? null : 'transaction')}
               className={cn(
-                'border rounded-[6px] px-3 py-1.5 text-[13px] font-medium flex items-center gap-1.5 transition-all cursor-pointer bg-white',
+                'border rounded-[6px] px-3 py-1.5 text-fluid-md font-medium flex items-center gap-1.5 transition-all cursor-pointer bg-white',
                 activeDropdown === 'transaction' || transactionType !== '전체'
                   ? 'border-[#0A607D] text-[#0A607D]'
                   : 'border-[#BFBFBF] text-[#444]'
@@ -275,7 +282,7 @@ export default function RoomsPage() {
             <button
               onClick={() => setActiveDropdown(activeDropdown === 'sort' ? null : 'sort')}
               className={cn(
-                'border rounded-[6px] px-3 py-1.5 text-[13px] font-medium flex items-center gap-1.5 transition-all cursor-pointer bg-white',
+                'border rounded-[6px] px-3 py-1.5 text-fluid-md font-medium flex items-center gap-1.5 transition-all cursor-pointer bg-white',
                 activeDropdown === 'sort' || sortOption !== '보증금 낮은순'
                   ? 'border-[#0A607D] text-[#0A607D]'
                   : 'border-[#BFBFBF] text-[#444]'
@@ -311,7 +318,7 @@ export default function RoomsPage() {
             to={ROUTES.REPORT}
             onClick={handleComparisonClick}
             className={cn(
-              'h-[32px] px-[16px] py-[8px] rounded-[4px] text-[12px] font-semibold flex items-center gap-[10px] transition-all',
+              'h-[32px] px-[16px] py-[8px] rounded-[4px] text-fluid-base font-semibold flex items-center gap-[10px] transition-all',
               rooms.length <= 1
                 ? 'bg-[#BFBFBF] text-white cursor-not-allowed pointer-events-none'
                 : 'bg-[#0A607D] text-white hover:bg-[#084e6d] cursor-pointer'
@@ -323,19 +330,15 @@ export default function RoomsPage() {
         </div>
       </div>
 
-      {/* 방 카운터 */}
-      <div className="px-4 md:px-10 py-[20px]">
-        <p className="text-[14px] font-semibold text-[#A0A0A0]">
+      {/* 방 카운터 + 메인 컨텐츠 */}
+      <div className="flex-1 flex flex-col px-4 md:px-10 lg:px-20 pb-10 max-w-screen-2xl mx-auto w-full">
+        <p className="text-fluid-lg font-semibold text-[#A0A0A0] py-5">
           등록된 방 {rooms.length}개{!isLoggedIn ? `/${GUEST_ROOM_LIMIT}개` : ''}
         </p>
-      </div>
-
-      {/* 메인 컨텐츠 */}
-      <div className="flex-1 flex flex-col px-4 md:px-10 pb-10">
         {showEmpty ? (
           <EmptyState onStart={handleStartChecklist} />
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {rooms.map((room) => (
               <RoomCard
                 key={room.id}
