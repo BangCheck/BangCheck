@@ -74,10 +74,16 @@ public class SecurityConfig {
                 http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
                 http.exceptionHandling(e -> e
-                                .authenticationEntryPoint((request, response, authException) -> response
-                                                .sendError(HttpServletResponse.SC_UNAUTHORIZED))
-                                .accessDeniedHandler((request, response, accessDeniedException) -> response
-                                                .sendError(HttpServletResponse.SC_FORBIDDEN)));
+                                .authenticationEntryPoint((request, response, authException) -> {
+                                        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                                        response.setContentType("application/json;charset=UTF-8");
+                                        response.getWriter().write("{\"success\":false,\"code\":\"AUTH_401\",\"message\":\"Unauthorized\"}");
+                                })
+                                .accessDeniedHandler((request, response, accessDeniedException) -> {
+                                        response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                                        response.setContentType("application/json;charset=UTF-8");
+                                        response.getWriter().write("{\"success\":false,\"code\":\"AUTH_403\",\"message\":\"Forbidden\"}");
+                                }));
 
                 return http.build();
         }
