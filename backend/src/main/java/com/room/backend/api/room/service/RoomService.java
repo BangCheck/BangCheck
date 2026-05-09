@@ -36,13 +36,15 @@ public class RoomService {
         }
 
         BigDecimal[] coordinates = geocodingService.getCoordinates(request.getAddress());
+        BigDecimal lat = coordinates != null ? coordinates[0] : null;
+        BigDecimal lon = coordinates != null ? coordinates[1] : null;
 
         Room room = Room.create(
                 userId,
                 request.getName(),
                 request.getAddress(),
-                coordinates[0],
-                coordinates[1],
+                lat,
+                lon,
                 request.getRentType(),
                 request.getDeposit(),
                 request.getRent(),
@@ -79,13 +81,15 @@ public class RoomService {
         }
 
         BigDecimal[] coordinates = geocodingService.getCoordinates(request.getAddress());
+        BigDecimal lat = coordinates != null ? coordinates[0] : null;
+        BigDecimal lon = coordinates != null ? coordinates[1] : null;
 
         Room room = Room.create(
                 userId,
                 request.getName(),
                 request.getAddress(),
-                coordinates[0],
-                coordinates[1],
+                lat,
+                lon,
                 request.getRentType(),
                 request.getDeposit(),
                 request.getRent(),
