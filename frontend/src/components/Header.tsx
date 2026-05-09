@@ -79,7 +79,7 @@ export default function Header() {
               pathname === ROUTES.SETTINGS ? 'text-[#0A607D]' : 'text-[#232527]'
             )}
           >
-            설정
+            커스텀
           </Link>
         </nav>
 
