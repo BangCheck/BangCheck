@@ -8,6 +8,8 @@ import com.room.backend.domain.checklist.entity.UserTypeSelection;
 import com.room.backend.domain.checklist.entity.enums.ItemType;
 import com.room.backend.domain.checklist.entity.enums.UserType;
 import com.room.backend.domain.checklist.repository.ChecklistItemRepository;
+import com.room.backend.global.common.exception.ChecklistErrorCode;
+import com.room.backend.global.common.exception.GeneralException;
 import com.room.backend.domain.checklist.repository.ChecklistOptionRepository;
 import com.room.backend.domain.checklist.repository.UserChecklistSettingRepository;
 import com.room.backend.domain.checklist.repository.UserTypeSelectionRepository;
@@ -87,7 +89,7 @@ public class ChecklistService {
                 .toList();
 
         if (customItems.size() >= MAX_CUSTOM_ITEMS) {
-            throw new IllegalStateException("나만의 항목은 최대 3개까지만 추가 가능합니다");
+            throw new GeneralException(ChecklistErrorCode.CUSTOM_ITEM_LIMIT_EXCEEDED);
         }
 
         ChecklistItem customItem = ChecklistItem.builder()
@@ -106,7 +108,7 @@ public class ChecklistService {
                 .orElseThrow(() -> new IllegalArgumentException("항목을 찾을 수 없습니다"));
 
         if (!userId.equals(item.getOwnerUserId())) {
-            throw new IllegalArgumentException("삭제 권한이 없습니다");
+            throw new GeneralException(ChecklistErrorCode.CUSTOM_ITEM_FORBIDDEN);
         }
 
         item.softDelete();
