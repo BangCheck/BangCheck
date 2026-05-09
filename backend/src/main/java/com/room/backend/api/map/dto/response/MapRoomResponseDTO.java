@@ -1,9 +1,14 @@
 package com.room.backend.api.map.dto.response;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 import com.room.backend.domain.room.entity.Room;
 import com.room.backend.domain.room.entity.enums.RentType;
+import com.room.backend.api.room.dto.response.RoomIssuesSummaryDTO;
+import com.room.backend.domain.room.entity.enums.Direction;
+import com.room.backend.domain.room.entity.enums.BuildingType;
+
 
 import lombok.Getter;
 
@@ -19,9 +24,15 @@ public class MapRoomResponseDTO {
     private final Integer rent;
     private final Integer distanceM;
     private final Integer walkTimeMin;
-
+    private final Integer managementFee;
+    private final Integer floor;
+    private final Direction direction;
+    private final String memo;
+    private final BuildingType buildingType;
+    private final LocalDateTime createdAt;
+    private final RoomIssuesSummaryDTO issues;
     // 기준점 존재 안할때
-    public MapRoomResponseDTO(Room room) {
+    public MapRoomResponseDTO(Room room, RoomIssuesSummaryDTO issues) {
         this.id = room.getId();
         this.name = room.getName();
         this.address = room.getAddress();
@@ -32,10 +43,17 @@ public class MapRoomResponseDTO {
         this.rent = room.getMonthlyRent();
         this.distanceM = null;
         this.walkTimeMin = null;
+        this.managementFee = room.getMaintenanceFee();
+        this.floor = room.getFloor();
+        this.direction = room.getDirection();
+        this.memo = room.getMemo();
+        this.buildingType = room.getBuildingType();
+        this.createdAt = room.getCreatedAt();
+        this.issues = issues;
     }
 
     // 기준점 존재 할때
-    public MapRoomResponseDTO(Room room, int distanceM, int walkTimeMin) {
+    public MapRoomResponseDTO(Room room, int distanceM, int walkTimeMin, RoomIssuesSummaryDTO issues) {
         this.id = room.getId();
         this.name = room.getName();
         this.address = room.getAddress();
@@ -46,5 +64,12 @@ public class MapRoomResponseDTO {
         this.rent = room.getMonthlyRent();
         this.distanceM = distanceM;
         this.walkTimeMin = walkTimeMin;
+        this.managementFee = room.getMaintenanceFee();
+        this.floor = room.getFloor();
+        this.direction = room.getDirection();
+        this.memo = room.getMemo();
+        this.buildingType = room.getBuildingType();
+        this.createdAt = room.getCreatedAt();
+        this.issues = issues;
     }
 }

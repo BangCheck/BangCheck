@@ -16,6 +16,7 @@ import com.room.backend.api.map.dto.request.MapPointCreateRequestDTO;
 import com.room.backend.api.map.dto.response.MapPointResponseDTO;
 import com.room.backend.api.map.dto.response.MapRoomResponseDTO;
 import com.room.backend.api.map.service.MapService;
+import com.room.backend.api.room.service.RoomCheckResultService;
 import com.room.backend.domain.map.entity.MapPoint;
 import com.room.backend.domain.room.entity.Room;
 import com.room.backend.domain.room.entity.enums.RentType;
@@ -37,6 +38,7 @@ import lombok.RequiredArgsConstructor;
 public class MapController {
 
     private final MapService mapService;
+    private final RoomCheckResultService roomCheckResultService;
 
     @GetMapping("/rooms")
     @Operation(summary = "지도용 매물 목록 조회", description = "지도에 표시할 내 방 목록을 반환합니다.")
@@ -47,7 +49,10 @@ public class MapController {
 
         if (pointId == null) {
                 return ResponseEntity.ok(ApiResponse.success(
-                rooms.stream().map(MapRoomResponseDTO::new).toList()
+                rooms.stream()
+                    .map(room -> new MapRoomResponseDTO(room,
+                        roomCheckResultService.getRoomIssuesSummary(room.getId())))
+                    .toList()
                 ));
         }
 
@@ -62,7 +67,8 @@ public class MapController {
                         point.getLat(), point.getLon(),
                         room.getLat(), room.getLon());
                         int walkMin = DistanceUtil.estimateWalkMinutes(distM);
-                        return new MapRoomResponseDTO(room, (int) distM, walkMin);
+                        return new MapRoomResponseDTO(room, (int) distM, walkMin,
+                            roomCheckResultService.getRoomIssuesSummary(room.getId()));
                 })
                 .filter(dto -> maxDistance == null || dto.getDistanceM() <= maxDistance)
                 .toList()
