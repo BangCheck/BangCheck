@@ -137,7 +137,7 @@ public class Room extends BaseEntity {
             }
         }
 
-        if (!hasLoan) {
+        if (hasLoan == null || !hasLoan) {
             loanAmount = null;
         } else {
             if (loanAmount == null) {
@@ -145,7 +145,8 @@ public class Room extends BaseEntity {
             }
         }
 
-        MaintenanceStatus derived = isManagementFeeUnknown ? MaintenanceStatus.UNKNOWN :
+        boolean managementFeeUnknown = Boolean.TRUE.equals(isManagementFeeUnknown);
+        MaintenanceStatus derived = managementFeeUnknown ? MaintenanceStatus.UNKNOWN :
                 (managementFee != null ? MaintenanceStatus.INCLUDED : MaintenanceStatus.NONE);
 
         Room room = new Room();
@@ -158,8 +159,8 @@ public class Room extends BaseEntity {
         room.deposit = deposit;
         room.monthlyRent = rent;
         room.maintenanceStatus = derived;
-        room.maintenanceFee = isManagementFeeUnknown ? null : managementFee;
-        room.isManagementFeeUnknown = isManagementFeeUnknown;
+        room.maintenanceFee = managementFeeUnknown ? null : managementFee;
+        room.isManagementFeeUnknown = isManagementFeeUnknown != null ? isManagementFeeUnknown : false;
         room.hasLoan = hasLoan;
         room.loanAmount = loanAmount;
         room.canRegisterAddress = canRegisterAddress;
