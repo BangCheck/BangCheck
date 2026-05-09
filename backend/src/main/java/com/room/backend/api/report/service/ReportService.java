@@ -176,7 +176,7 @@ public class ReportService {
                 RoomCompareValueDTO valueDTO;
 
                 if (checkResult != null) {
-                    List<SelectedOptionDTO> selectedOptions = getSelectedOptions(checkResult.getId());
+                    List<SelectedOptionDTO> selectedOptions = getSelectedOptions(checkResult.getId(), item);
 
                     if (!selectedOptions.isEmpty()) {
                         valueDTO = RoomCompareValueDTO.builder()
@@ -211,8 +211,9 @@ public class ReportService {
                 .build();
     }
 
-    private List<SelectedOptionDTO> getSelectedOptions(Long resultId) {
+    private List<SelectedOptionDTO> getSelectedOptions(Long resultId, ChecklistItem item) {
         List<RoomCheckSelectedOption> selectedOptions = roomCheckSelectedOptionRepository.findByResultId(resultId);
+        boolean isInnerState = ChecklistCategory.INTERNAL_STATE.equals(item.getCategory());
 
         return selectedOptions.stream()
                 .map(selected -> {
@@ -220,14 +221,28 @@ public class ReportService {
                             .orElse(null);
 
                     if (option != null) {
+                        Integer optionScore = null;
+                        if (isInnerState) {
+                            optionScore = mapInnerStateScore(option.getOptionValue());
+                        }
                         return SelectedOptionDTO.builder()
                                 .optionId(option.getId())
                                 .optionValue(option.getOptionValue())
+                                .optionScore(optionScore)
                                 .build();
                     }
                     return null;
                 })
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
+    }
+
+    private Integer mapInnerStateScore(String optionValue) {
+        return switch (optionValue) {
+            case "나쁨" -> 1;
+            case "보통" -> 3;
+            case "좋음" -> 5;
+            default -> null;
+        };
     }
 }

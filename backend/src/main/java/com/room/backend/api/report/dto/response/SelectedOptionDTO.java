@@ -10,4 +10,5 @@ import lombok.Getter;
 public class SelectedOptionDTO {
     private Long optionId;
     private String optionValue;
+    private Integer optionScore;
 }
