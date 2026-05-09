@@ -1,0 +1,55 @@
+name: Deploy Backend to EC2
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'backend/**'
+      - '.github/workflows/deploy-backend.yml'
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: SSH 배포
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ubuntu
+          key: ${{ secrets.EC2_SSH_KEY }}
+          command_timeout: 10m
+          script: |
+            set -e
+            echo "▶ 최신 코드 pull"
+            cd ~/BangCheck
+            git pull origin main
+
+            echo "▶ JAR 빌드"
+            cd backend
+            chmod +x gradlew
+            ./gradlew bootJar -x test
+
+            echo "▶ 서비스 재시작"
+            sudo systemctl restart bangcheck-backend
+
+            echo "▶ 헬스 체크 (최대 60초 대기)"
+            for i in {1..30}; do
+              STATE=$(sudo systemctl is-active bangcheck-backend || true)
+              if [ "$STATE" = "active" ]; then
+                echo "✅ 배포 완료 (${i}회차에 active)"
+                exit 0
+              fi
+              if [ "$STATE" = "failed" ]; then
+                echo "❌ 서비스 시작 실패"
+                sudo journalctl -u bangcheck-backend --no-pager -n 50
+                exit 1
+              fi
+              sleep 2
+            done
+
+            echo "⚠ 60초 내 active 상태 도달 실패"
+            sudo systemctl status bangcheck-backend --no-pager
+            exit 1

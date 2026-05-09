@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -39,7 +40,10 @@ public class ChecklistService {
                 .map(UserTypeSelection::getUserType)
                 .toList();
 
-        List<ChecklistItem> items = checklistItemRepository.findCustomizedItems(userId, selectedTypes);
+        List<UserType> queryTypes = selectedTypes.contains(UserType.FIRST_TIMER)
+                ? Arrays.stream(UserType.values()).toList()
+                : selectedTypes;
+        List<ChecklistItem> items = checklistItemRepository.findCustomizedItems(userId, queryTypes);
         List<Long> disabledItemIds = userChecklistSettingRepository.findByUserIdAndIsEnabledFalse(userId)
                 .stream()
                 .map(UserChecklistSetting::getItemId)
@@ -68,15 +72,12 @@ public class ChecklistService {
         userTypeSelectionRepository.deleteByUserIdAndUserType(userId, userType);
     }
 
-    public void toggleItem(Long userId, Long itemId) {
-        userChecklistSettingRepository.findByUserIdAndItemId(userId, itemId)
-                .ifPresentOrElse(
-                        setting -> setting.toggle(),
-                        () -> {
-                            UserChecklistSetting newSetting = UserChecklistSetting.of(userId, itemId, false);
-                            userChecklistSettingRepository.save(newSetting);
-                        }
-                );
+    public void saveSettings(Long userId, List<Long> disabledItemIds) {
+        userChecklistSettingRepository.deleteByUserId(userId);
+        List<UserChecklistSetting> settings = disabledItemIds.stream()
+                .map(itemId -> UserChecklistSetting.of(userId, itemId, false))
+                .toList();
+        userChecklistSettingRepository.saveAll(settings);
     }
 
     public void addCustomItem(Long userId, String itemName) {

@@ -38,3 +38,5 @@ This folder is for reference only. Frontend code is in `src/`.
 
 **Admin:** @Woo-JongHo
 **Last reviewed:** 2026-04-16
+<--update deploy test 2026년  5월  6일 수요일 23시 44분 42초 KST -->
+# Prod 배포 테스트 - Thu May  7 20:20:33 KST 2026
