@@ -68,3 +68,4 @@ app:
       - http://localhost:5173
       - https://bangcheck-woo-jonghos-projects.vercel.app
       - https://bangcheck.site
+      - https://api.bangcheck.site
