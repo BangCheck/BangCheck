@@ -150,14 +150,23 @@ export default function BasicInfo({ data, onChange }: Props) {
               </button>
             </div>
             <label className="flex items-center gap-1.5 mb-2 cursor-pointer">
-              <input type="checkbox" checked={data.moveInNegotiable} onChange={(e) => onChange('moveInNegotiable', e.target.checked)} className="w-4 h-4 accent-[#0A607D]" />
+              <input
+                type="checkbox"
+                checked={data.moveInNegotiable}
+                onChange={(e) => {
+                  onChange('moveInNegotiable', e.target.checked);
+                  if (e.target.checked) onChange('moveInDate', '');
+                }}
+                className="w-4 h-4 accent-[#0A607D]"
+              />
               <span className="text-[13px] text-[#232527]">협의 가능</span>
             </label>
             <input
               type="date"
               value={data.moveInDate}
               onChange={(e) => onChange('moveInDate', e.target.value)}
-              className="h-[32px] px-3 border border-[#BFBFBF] rounded-[6px] text-[14px] text-[#232527] outline-none focus:border-[#0A607D] w-[160px]"
+              disabled={data.moveInNegotiable}
+              className="h-[32px] px-3 border border-[#BFBFBF] rounded-[6px] text-[14px] text-[#232527] outline-none focus:border-[#0A607D] w-[160px] disabled:bg-[#F5F5F5] disabled:text-[#BFBFBF] disabled:cursor-not-allowed"
             />
           </div>
         </div>

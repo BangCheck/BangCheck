@@ -15,7 +15,7 @@ import type { SafetyLivingData } from './components/04_safety-living';
 import type { CustomMemoData } from './components/05_custom-memo';
 
 // ─── 섹션 탭 정의 ────────────────────────────────────────────
-const SECTION_TABS = [
+const ALL_SECTION_TABS = [
   { id: 'basic', label: '기본 정보' },
   { id: 'building', label: '건물 정보' },
   { id: 'options', label: '옵션' },
@@ -27,6 +27,8 @@ const SECTION_TABS = [
   { id: 'custom', label: '나만의 체크 항목' },
   { id: 'memo', label: '메모' },
 ] as const;
+
+const SECTION_TABS = ALL_SECTION_TABS;
 
 type SectionId = (typeof SECTION_TABS)[number]['id'];
 
@@ -197,7 +199,7 @@ export default function ChecklistNewPage() {
         ref={tabNavRef}
         className="sticky top-14 z-30 bg-white border-b border-[#E2E2E2] px-4 py-2 flex gap-2 overflow-x-auto no-scrollbar"
       >
-        {SECTION_TABS.map(({ id, label }) => (
+        {ALL_SECTION_TABS.filter((t) => isLoggedIn || t.id !== 'custom').map(({ id, label }) => (
           <button
             key={id}
             type="button"
@@ -254,6 +256,7 @@ export default function ChecklistNewPage() {
           onChange={patchCustom}
           customRef={(el) => { sectionRefs.current.custom = el; }}
           memoRef={(el) => { sectionRefs.current.memo = el; }}
+          isLoggedIn={isLoggedIn}
         />
       </main>
 
@@ -288,9 +291,9 @@ export default function ChecklistNewPage() {
 import { SelectCard, EmojiCard, SectionHeader, FieldLabel, TextInput } from './components/ui/shared';
 import { RatingCards, YesNoCards } from './components/ui/shared';
 
-const BUILDING_TYPES = ['원룸', '투룸', '빌라', '오피스텔', '아파트', '고시원'];
+const BUILDING_TYPES = ['원룸', '1.5룸', '빌라', '오피스텔', '고시원', '하숙'];
 const DIRECTIONS = ['남향', '동향', '서향', '북향'];
-const OPTION_LIST = ['에어컨', '세탁기', '냉장고', '가스레인지', '인덕션', '전자레인지', '침대', '책상', '옷장'];
+const OPTION_LIST = ['에어컨', '세탁기', '냉장고', '인터넷/와이파이', '가스레인지/인덕션', '책상/의자', '옷장/수납', '난방'];
 
 export function BuildingSections({
   data,
@@ -329,12 +332,22 @@ export function BuildingSections({
           </div>
           <div>
             <FieldLabel>층수</FieldLabel>
-            <div className="flex flex-wrap gap-3">
-              {(['저층', '중층', '고층'] as const).map((v) => (
-                <SelectCard key={v} label={v} active={data.floorLevel === v} onClick={() => onChange('floorLevel', data.floorLevel === v ? null : v)} className="flex-1 min-w-[80px]" />
-              ))}
-              <div className="flex-1 min-w-[120px]">
-                <TextInput value={data.floorDirect} onChange={(v) => onChange('floorDirect', v)} placeholder="직접 입력" suffix="층" type="number" />
+            <div className="flex items-center gap-3">
+              <SelectCard
+                label="반지하"
+                active={data.floorLevel === '반지하'}
+                onClick={() => onChange('floorLevel', data.floorLevel === '반지하' ? null : '반지하')}
+                className="shrink-0"
+              />
+              <div className="flex-1">
+                <TextInput
+                  value={data.floorDirect}
+                  onChange={(v) => onChange('floorDirect', v)}
+                  placeholder="층수 입력"
+                  suffix="층"
+                  type="number"
+                  disabled={data.floorLevel === '반지하'}
+                />
               </div>
             </div>
           </div>
@@ -434,7 +447,6 @@ export function SafetySections({
           <RatingCards label="세탁 건조 공간" value={data.laundry} onChange={(v) => onChange('laundry', v)} />
           <RatingCards label="쓰레기 배출" value={data.trash} onChange={(v) => onChange('trash', v)} />
           <YesNoCards label="자전거/킥보드 주차" value={data.bikeParking} onChange={(v) => onChange('bikeParking', v)} />
-          <YesNoCards label="인터넷/와이파이" value={data.internet} onChange={(v) => onChange('internet', v)} />
         </div>
       </section>
 
@@ -456,11 +468,13 @@ export function CustomSections({
   onChange,
   customRef,
   memoRef,
+  isLoggedIn = false,
 }: {
   data: CustomMemoData;
   onChange: <K extends keyof CustomMemoData>(key: K, value: CustomMemoData[K]) => void;
   customRef: React.RefCallback<HTMLElement>;
   memoRef: React.RefCallback<HTMLElement>;
+  isLoggedIn?: boolean;
 }) {
   const addItem = () => {
     if (data.customItems.length >= 5) return;
@@ -473,7 +487,7 @@ export function CustomSections({
 
   return (
     <>
-      <section ref={customRef}>
+      {isLoggedIn && <section ref={customRef}>
         <SectionHeader title="나만의 체크 항목" />
         <div className="flex flex-col gap-4">
           {data.customItems.map((item, idx) => (
@@ -509,7 +523,7 @@ export function CustomSections({
             </button>
           )}
         </div>
-      </section>
+      </section>}
 
       <section ref={memoRef}>
         <SectionHeader title="메모" />

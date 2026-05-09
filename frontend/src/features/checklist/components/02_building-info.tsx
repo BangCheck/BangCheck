@@ -14,9 +14,9 @@ interface Props {
   onChange: <K extends keyof BuildingInfoData>(key: K, value: BuildingInfoData[K]) => void;
 }
 
-const BUILDING_TYPES = ['원룸', '투룸', '빌라', '오피스텔', '아파트', '고시원'];
+const BUILDING_TYPES = ['원룸', '1.5룸', '빌라', '오피스텔', '고시원', '하숙'];
 const DIRECTIONS = ['남향', '동향', '서향', '북향'];
-const OPTION_LIST = ['에어컨', '세탁기', '냉장고', '가스레인지', '인덕션', '전자레인지', '침대', '책상', '옷장'];
+const OPTION_LIST = ['에어컨', '세탁기', '냉장고', '인터넷/와이파이', '가스레인지/인덕션', '책상/의자', '옷장/수납', '난방'];
 
 export default function BuildingInfo({ data, onChange }: Props) {
   const toggleOption = (v: string) =>
@@ -50,12 +50,22 @@ export default function BuildingInfo({ data, onChange }: Props) {
 
           <div>
             <FieldLabel>층수</FieldLabel>
-            <div className="flex flex-wrap gap-3">
-              {(['반지하', '저층', '중층', '고층'] as const).map((v) => (
-                <SelectCard key={v} label={v} active={data.floorLevel === v} onClick={() => onChange('floorLevel', data.floorLevel === v ? null : v)} className="flex-1 min-w-[80px]" />
-              ))}
-              <div className="flex-1 min-w-[120px]">
-                <TextInput value={data.floorDirect} onChange={(v) => onChange('floorDirect', v)} placeholder="직접 입력" suffix="층" type="number" />
+            <div className="flex items-center gap-3">
+              <SelectCard
+                label="반지하"
+                active={data.floorLevel === '반지하'}
+                onClick={() => onChange('floorLevel', data.floorLevel === '반지하' ? null : '반지하')}
+                className="shrink-0"
+              />
+              <div className="flex-1">
+                <TextInput
+                  value={data.floorDirect}
+                  onChange={(v) => onChange('floorDirect', v)}
+                  placeholder="층수 입력"
+                  suffix="층"
+                  type="number"
+                  disabled={data.floorLevel === '반지하'}
+                />
               </div>
             </div>
           </div>
