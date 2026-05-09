@@ -2,10 +2,21 @@ import type { ReactNode } from 'react';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { getQueryClient } from '@/services/get-query-client';
+import { configureApi } from '@/lib/api';
+import { loginRedirect } from '@/lib/routes';
+import { useAuthStore } from '@/store/use-auth-store';
 
-// TODO(E09-S03): configureApi({ getToken, onUnauthorized, onTokenRefresh }) 통합.
-// 현 베이스라인은 placeholder 라우트만 동작하므로 API 호출 없음.
-// LoginPage 마이그레이션 시점에 auth-store 연결 + Axios 인터셉터 hook 부착.
+configureApi({
+  getToken: () => useAuthStore.getState().accessToken,
+  onUnauthorized: () => {
+    useAuthStore.getState().logout();
+    if (typeof window !== 'undefined') window.location.href = loginRedirect('expired');
+  },
+  onTokenRefresh: (newAccessToken) => {
+    const user = useAuthStore.getState().user;
+    if (user) useAuthStore.getState().setAuth(newAccessToken, user);
+  },
+});
 
 interface AppProviderProps {
   children: ReactNode;

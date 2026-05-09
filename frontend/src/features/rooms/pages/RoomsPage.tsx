@@ -5,14 +5,13 @@ import { useGuestRoomStore } from '@/store/use-guest-room-store';
 import { useRoomsList, useDeleteRoom } from '@/features/rooms/hooks/useRoomsQuery';
 import { cn } from '@/lib/utils';
 import { ROUTES } from '@/lib/routes';
+import { GUEST_ROOM_LIMIT } from '@/lib/constants';
 import RoomCard from '@/components/RoomCard';
 import {
   LoginRequiredModal,
   ComparisonDisabledModal,
   CustomChecklistModal,
 } from '@/components/ui/Modals';
-
-const GUEST_ROOM_LIMIT = 2;
 
 // ─── Skeleton ────────────────────────────────────────────────────────────────
 

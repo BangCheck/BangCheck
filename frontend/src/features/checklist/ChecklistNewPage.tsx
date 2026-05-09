@@ -2,6 +2,9 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { useGuestRoomStore } from '@/store/use-guest-room-store';
+import { useAuthStore } from '@/store/use-auth-store';
+import { useRoomsList } from '@/features/rooms/hooks/useRoomsQuery';
+import { GUEST_ROOM_LIMIT, ROOM_LIMIT } from '@/lib/constants';
 
 import BasicInfo from './components/01_basic-info';
 
@@ -63,6 +66,9 @@ const initCustom: CustomMemoData = { customItems: [], memo: '' };
 export default function ChecklistNewPage() {
   const navigate = useNavigate();
   const { addGuestRoom, guestRooms } = useGuestRoomStore();
+  const { isLoggedIn } = useAuthStore();
+  const { data: apiRooms } = useRoomsList();
+  const loggedInRoomCount = apiRooms?.length ?? 0;
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [activeSection, setActiveSection] = useState<SectionId>('basic');
 
@@ -144,14 +150,25 @@ export default function ChecklistNewPage() {
       setSubmitError('매물정보(방 이름)를 입력해주세요.');
       return;
     }
-    if (guestRooms.length >= 2) {
-      setSubmitError('비로그인 상태에서는 방을 2개까지만 등록할 수 있어요.');
+
+    if (isLoggedIn) {
+      if (loggedInRoomCount >= ROOM_LIMIT) {
+        setSubmitError(`방은 최대 ${ROOM_LIMIT}개까지 등록할 수 있어요.`);
+        return;
+      }
+      // BE 연동은 E09-S10에서 통합 (mappers 재작성 + createChecklist mutation 부착)
+      setSubmitError('로그인 모드 체크리스트 저장은 준비 중입니다.');
+      return;
+    }
+
+    if (guestRooms.length >= GUEST_ROOM_LIMIT) {
+      setSubmitError(`비로그인 상태에서는 방을 ${GUEST_ROOM_LIMIT}개까지만 등록할 수 있어요.`);
       return;
     }
     const success = addGuestRoom({ basic, building, interior, safety, custom });
 
     if (!success) {
-      setSubmitError('비로그인 상태에서는 방을 2개까지만 등록할 수 있어요.');
+      setSubmitError(`비로그인 상태에서는 방을 ${GUEST_ROOM_LIMIT}개까지만 등록할 수 있어요.`);
       return;
     }
     navigate('/rooms');

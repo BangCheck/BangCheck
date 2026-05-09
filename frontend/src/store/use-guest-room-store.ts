@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import type { Room, RoomType, GuestRoomRaw } from '@/types/room';
+import { GUEST_ROOM_LIMIT } from '@/lib/constants';
 
 interface GuestRoomState {
   guestRooms: Room[];
@@ -98,7 +99,7 @@ export const useGuestRoomStore = create<GuestRoomState>()(
 
       addGuestRoom: (raw) => {
         const current = get().guestRooms;
-        if (current.length >= 2) return false;
+        if (current.length >= GUEST_ROOM_LIMIT) return false;
 
         const room: Room = {
           id: newId(),

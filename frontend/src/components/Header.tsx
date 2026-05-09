@@ -7,9 +7,7 @@ import { useRoomsList } from '@/features/rooms/hooks/useRoomsQuery';
 import { LogoutConfirmModal } from './ui/Modals';
 import { cn } from '@/lib/utils';
 import { ROUTES } from '@/lib/routes';
-
-const GUEST_ROOM_LIMIT = 2;
-const ROOM_LIMIT = 6;
+import { GUEST_ROOM_LIMIT, ROOM_LIMIT } from '@/lib/constants';
 
 function getInitial(nickname?: string, email?: string) {
   if (nickname && nickname.length > 0) return nickname.charAt(0);
