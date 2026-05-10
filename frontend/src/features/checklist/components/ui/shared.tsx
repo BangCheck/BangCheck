@@ -74,7 +74,7 @@ export function EmojiCard({
       type="button"
       onClick={onClick}
       className={cn(
-        'flex items-center gap-3 p-6 rounded-[6px] transition-all cursor-pointer w-full shadow-[0px_6px_8px_rgba(0,0,0,0.04)]',
+        'flex items-center gap-3 p-4 lg:p-5 rounded-[6px] transition-all cursor-pointer w-full shadow-[0px_6px_8px_rgba(0,0,0,0.04)]',
         active
           ? `${cfg.activeBg} border-2 ${cfg.activeBorder}`
           : 'bg-white border border-border-light hover:border-border-mute',
@@ -86,7 +86,7 @@ export function EmojiCard({
           className={cn('size-6', active ? cfg.activeIcon : 'text-text-caption')}
         />
       </span>
-      <span className="text-[18px] font-semibold text-text-main">
+      <span className="text-fluid-base font-semibold text-text-main">
         {label}
       </span>
     </button>
@@ -128,7 +128,7 @@ export function RatingCards({
               type="button"
               onClick={() => onChange(active ? null : val)}
               className={cn(
-                'flex items-center gap-3 p-4 rounded-[6px] transition-all cursor-pointer shadow-[0px_6px_8px_rgba(0,0,0,0.04)]',
+                'flex items-center gap-2 lg:gap-3 p-3 lg:p-4 rounded-[6px] transition-all cursor-pointer shadow-[0px_6px_8px_rgba(0,0,0,0.04)]',
                 active
                   ? `${cfg.activeBg} border-2 ${cfg.activeBorder}`
                   : 'bg-white border border-border-light hover:border-border-mute',
@@ -140,7 +140,7 @@ export function RatingCards({
                   className={cn('size-6', active ? cfg.activeIcon : 'text-text-caption')}
                 />
               </span>
-              <span className="text-[15px] font-semibold text-text-main whitespace-nowrap">
+              <span className="text-fluid-base font-semibold text-text-main whitespace-nowrap">
                 {val}
               </span>
             </button>
@@ -178,6 +178,92 @@ export function YesNoCards({
             onClick={() => onChange(value === v ? null : v)}
           />
         ))}
+      </div>
+    </div>
+  );
+}
+
+// ─── DynamicOptionCards (BE 옵션값 그대로 렌더링) ──────────────
+const OPTION_ICON: Record<string, string> = {
+  '좋음': 'uiw:smile', '보통': 'bi:emoji-neutral', '나쁨': 'bi:emoji-angry-fill',
+  '없음': 'uiw:smile', '있음': 'bi:emoji-angry-fill',
+  '안전': 'uiw:smile', '불안': 'bi:emoji-angry-fill',
+  '가깝다': 'uiw:smile', '멀다': 'bi:emoji-angry-fill',
+  '밝음': 'uiw:smile', '어두움': 'bi:emoji-angry-fill',
+  '약간': 'bi:emoji-neutral', '심함': 'bi:emoji-angry-fill',
+};
+const OPTION_ACTIVE: Record<string, { bg: string; border: string; icon: string }> = {
+  '좋음':  { bg: 'bg-[#f8fefa]', border: 'border-[#22d455]', icon: 'text-[#22d455]' },
+  '보통':  { bg: 'bg-[#fffef5]', border: 'border-[#ffdf00]', icon: 'text-[#a07d00]' },
+  '나쁨':  { bg: 'bg-[#fffafa]', border: 'border-[#f15556]', icon: 'text-[#f15556]' },
+  '없음':  { bg: 'bg-[#f8fefa]', border: 'border-[#22d455]', icon: 'text-[#22d455]' },
+  '있음':  { bg: 'bg-[#fffafa]', border: 'border-[#f15556]', icon: 'text-[#f15556]' },
+  '안전':  { bg: 'bg-[#f8fefa]', border: 'border-[#22d455]', icon: 'text-[#22d455]' },
+  '불안':  { bg: 'bg-[#fffafa]', border: 'border-[#f15556]', icon: 'text-[#f15556]' },
+  '가깝다':{ bg: 'bg-[#f8fefa]', border: 'border-[#22d455]', icon: 'text-[#22d455]' },
+  '멀다':  { bg: 'bg-[#fffafa]', border: 'border-[#f15556]', icon: 'text-[#f15556]' },
+  '밝음':  { bg: 'bg-[#f8fefa]', border: 'border-[#22d455]', icon: 'text-[#22d455]' },
+  '어두움':{ bg: 'bg-[#fffafa]', border: 'border-[#f15556]', icon: 'text-[#f15556]' },
+  '약간':  { bg: 'bg-[#fffef5]', border: 'border-[#ffdf00]', icon: 'text-[#a07d00]' },
+  '심함':  { bg: 'bg-[#fffafa]', border: 'border-[#f15556]', icon: 'text-[#f15556]' },
+};
+const FALLBACK_ACTIVE = { bg: 'bg-slot-b-bg', border: 'border-brand-primary', icon: 'text-brand-primary' };
+
+const POSITIVE_ACTIVE = { bg: 'bg-[#f8fefa]', border: 'border-[#22d455]', icon: 'text-[#22d455]' };
+const NEGATIVE_ACTIVE = { bg: 'bg-[#fffafa]', border: 'border-[#f15556]', icon: 'text-[#f15556]' };
+const POSITIVE_ICON = 'uiw:smile';
+const NEGATIVE_ICON = 'bi:emoji-angry-fill';
+
+export function DynamicOptionCards({
+  label,
+  hint,
+  options,
+  value,
+  onChange,
+  positiveValue,
+}: {
+  label: string;
+  hint?: string;
+  options: string[];
+  value: string | null;
+  onChange: (v: string | null) => void;
+  positiveValue?: string;
+}) {
+  const cols = options.length === 2 ? 'grid-cols-2' : 'grid-cols-3';
+  return (
+    <div className="flex flex-col gap-3">
+      <div>
+        <p className="text-[14px] font-semibold text-text-main">{label}</p>
+        {hint && <p className="text-[12px] text-text-caption mt-0.5">{hint}</p>}
+      </div>
+      <div className={cn('grid gap-3', cols)}>
+        {options.map((opt) => {
+          const active = value === opt;
+          const cfg = positiveValue != null
+            ? (opt === positiveValue ? POSITIVE_ACTIVE : NEGATIVE_ACTIVE)
+            : (OPTION_ACTIVE[opt] ?? FALLBACK_ACTIVE);
+          const icon = positiveValue != null
+            ? (opt === positiveValue ? POSITIVE_ICON : NEGATIVE_ICON)
+            : (OPTION_ICON[opt] ?? 'uiw:smile');
+          return (
+            <button
+              key={opt}
+              type="button"
+              onClick={() => onChange(active ? null : opt)}
+              className={cn(
+                'flex items-center gap-2 lg:gap-3 p-3 lg:p-4 rounded-[6px] transition-all cursor-pointer shadow-[0px_6px_8px_rgba(0,0,0,0.04)]',
+                active
+                  ? `${cfg.bg} border-2 ${cfg.border}`
+                  : 'bg-white border border-border-light hover:border-border-mute',
+              )}
+            >
+              <span className="flex items-center justify-center size-9 shrink-0">
+                <Icon icon={icon} className={cn('size-6', active ? cfg.icon : 'text-text-caption')} />
+              </span>
+              <span className="text-fluid-base font-semibold text-text-main whitespace-nowrap">{opt}</span>
+            </button>
+          );
+        })}
       </div>
     </div>
   );

@@ -6,6 +6,10 @@ import { useCustomizationStore } from '@/store/use-customization-store';
 import { useAuthStore } from '@/store/use-auth-store';
 import { QUERY_KEYS } from '@/lib/query-keys';
 
+// BE 시드(예: '창문 / 망충망')와 FE 상수(예: '창문/방충망') 라벨 정합. 매칭 실패로 인한 활성/저장 누락 방지.
+const normalizeLabel = (label: string): string =>
+  label.replace(/\s*\/\s*/g, '/').replace(/망충망/g, '방충망');
+
 export const useCustomization = () => {
   const queryClient = useQueryClient();
   const { isLoggedIn } = useAuthStore();
@@ -27,26 +31,37 @@ export const useCustomization = () => {
     placeholderData: (prev) => prev,
   });
 
-  // STEP3 전용: 유형 선택과 무관하게 전체 항목 유지 (별도 쿼리키로 invalidation 분리)
+  // STEP3 전용: /items/all — disabled 포함 전체 항목 + isEnabled 플래그
   const { data: rawAllItems = [] } = useQuery({
     queryKey: QUERY_KEYS.customization.allItems,
-    queryFn: customService.getCustomizedItems,
+    queryFn: customService.getAllItemsForSettings,
     enabled: isLoggedIn,
     refetchOnWindowFocus: false,
     staleTime: 1000 * 60 * 30,
     placeholderData: (prev) => prev,
   });
 
-  // itemName 기준 중복 제거 (낮은 ID 우선)
+  // itemName 기준 중복 제거 (낮은 ID 우선) + BE 라벨을 FE 라벨로 정규화
   const items = useMemo(() => {
     const seen = new Map<string, typeof rawItems[0]>();
-    for (const item of rawItems) {
+    const renamed: { from: string; to: string }[] = [];
+    for (const raw of rawItems) {
+      const normalized = normalizeLabel(raw.itemName);
+      if (normalized !== raw.itemName) renamed.push({ from: raw.itemName, to: normalized });
+      const item = { ...raw, itemName: normalized };
       const existing = seen.get(item.itemName);
       if (!existing || item.id < existing.id) {
         seen.set(item.itemName, item);
       }
     }
-    return Array.from(seen.values());
+    const result = Array.from(seen.values());
+    if (rawItems.length > 0) {
+      console.groupCollapsed(`[useCustomization] items 정규화 (raw ${rawItems.length} → 중복제거 ${result.length})`);
+      if (renamed.length > 0) console.log('정규화된 라벨:', renamed);
+      console.log('items (정규화 후):', result.map((i) => ({ id: i.id, itemName: i.itemName, isEnabled: i.isEnabled, itemType: i.itemType })));
+      console.groupEnd();
+    }
+    return result;
   }, [rawItems]);
 
   // 2. 서버 activeItemNames 동기화 (selectedTypeIds는 Zustand persist가 관리)
@@ -55,15 +70,22 @@ export const useCustomization = () => {
     if (hasSynced.current || items.length === 0) return;
     hasSynced.current = true;
     const serverActiveNames = items.filter(item => item.isEnabled).map(item => item.itemName);
+    console.groupCollapsed(`[useCustomization] BE 응답 → store 동기화 (${serverActiveNames.length}건 활성)`);
+    console.log('serverActiveNames:', serverActiveNames);
+    console.groupEnd();
     setActiveItemNames(serverActiveNames);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [items]);
 
   // 3. Mutation 정의
-  const invalidate = () => queryClient.invalidateQueries({ queryKey: QUERY_KEYS.customization.settings });
+  const invalidate = () => {
+    queryClient.invalidateQueries({ queryKey: QUERY_KEYS.customization.settings });
+    queryClient.invalidateQueries({ queryKey: QUERY_KEYS.checklist.items });
+  };
   const invalidateAll = () => {
     queryClient.invalidateQueries({ queryKey: QUERY_KEYS.customization.settings });
     queryClient.invalidateQueries({ queryKey: QUERY_KEYS.customization.allItems });
+    queryClient.invalidateQueries({ queryKey: QUERY_KEYS.checklist.items });
   };
 
   const selectTypeMutation = useMutation({
@@ -169,29 +191,40 @@ export const useCustomization = () => {
 
   const selectAllItems = useCallback(() => {
     saveSettingsMutation.mutate([]);
-    const allNames = items.filter((i) => i.itemType !== 'CUSTOM').map((i) => i.itemName);
+    const constLabels = CHECKLIST_ITEMS.map((i) => i.label);
+    const customNames = items.filter((i) => i.itemType === 'CUSTOM').map((i) => i.itemName);
+    const allNames = Array.from(new Set([...constLabels, ...customNames]));
     setActiveItemNames(allNames);
   }, [items, saveSettingsMutation, setActiveItemNames]);
 
+  const allItems = useMemo(() => {
+    const seen = new Map<string, typeof rawAllItems[0]>();
+    for (const item of rawAllItems) {
+      const existing = seen.get(item.itemName);
+      if (!existing || item.id < existing.id) seen.set(item.itemName, item);
+    }
+    return Array.from(seen.values());
+  }, [rawAllItems]);
+
   const saveCurrentSettings = useCallback(async () => {
     const activeSet = new Set(activeItemNames);
-    const disabledIds = items
+    const disabledIds = allItems
       .filter((i) => i.itemType !== 'CUSTOM' && !activeSet.has(i.itemName))
       .map((i) => Number(i.id));
     await saveSettingsMutation.mutateAsync(disabledIds);
-  }, [items, activeItemNames, saveSettingsMutation]);
+  }, [allItems, activeItemNames, saveSettingsMutation]);
 
   // 여러 항목을 한 번의 API 호출로 활성화 (카테고리 전체 선택용)
   const enableItems = useCallback((labels: string[]) => {
     const nextActiveSet = new Set([...activeItemNames, ...labels]);
-    const disabledIds = items
+    const disabledIds = allItems
       .filter((i) => i.itemType !== 'CUSTOM' && !nextActiveSet.has(i.itemName))
       .map((i) => Number(i.id));
     saveSettingsMutation.mutate(disabledIds);
     labels.forEach((label) => {
       if (!activeItemNames.includes(label)) toggleItemName(label);
     });
-  }, [items, activeItemNames, saveSettingsMutation, toggleItemName]);
+  }, [allItems, activeItemNames, saveSettingsMutation, toggleItemName]);
 
   const addCustomItem = useCallback((itemName: string) => {
     addCustomMutation.mutate(itemName);
@@ -206,25 +239,11 @@ export const useCustomization = () => {
   }, [deleteCustomMutation, activeItemNames, toggleItemName]);
 
   const counts = useMemo(() => {
-    // 실시간 피드백을 위해 전역 스토어의 activeItemNames를 기준으로 계산합니다.
     const normalLabels = CHECKLIST_ITEMS.map(i => i.label);
     const normalActiveCount = activeItemNames.filter(name => normalLabels.includes(name)).length;
     const customActiveCount = activeItemNames.length - normalActiveCount;
-    
-    return {
-      normalActiveCount,
-      customActiveCount,
-    };
+    return { normalActiveCount, customActiveCount };
   }, [activeItemNames]);
-
-  const allItems = useMemo(() => {
-    const seen = new Map<string, typeof rawAllItems[0]>();
-    for (const item of rawAllItems) {
-      const existing = seen.get(item.itemName);
-      if (!existing || item.id < existing.id) seen.set(item.itemName, item);
-    }
-    return Array.from(seen.values());
-  }, [rawAllItems]);
 
   return {
     items,

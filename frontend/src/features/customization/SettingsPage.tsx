@@ -18,14 +18,14 @@ export default function SettingsPage() {
 
   const {
     items,
-
+    allItems,
     selectedTypeIds,
     activeItemNames,
     customItems,
     isLoading,
     isPending,
     toggleUserType,
-    deselectAllTypes,
+    // deselectAllTypes,
     toggleItem,
     selectAllItems,
     saveCurrentSettings,
@@ -57,7 +57,7 @@ export default function SettingsPage() {
   }, [selectedTypeIds, items]);
 
   // ── Handlers ─────────────────────────────────────────────
-  const getServerIdByLabel = (label: string) => items.find((item) => item.itemName === label)?.id;
+  const getServerIdByLabel = (label: string) => allItems.find((item) => item.itemName === label)?.id;
 
   const handleAddCustomItem = (e: React.FormEvent) => {
     e.preventDefault();
@@ -140,7 +140,7 @@ export default function SettingsPage() {
                 number={1}
                 title="나는 이런 유형이에요"
                 description="유형을 선택하면 맞춤 항목이 자동으로 체크돼요"
-                onDeselectAll={selectedTypeIds.length > 0 ? deselectAllTypes : undefined}
+                // onDeselectAll={selectedTypeIds.length > 0 ? deselectAllTypes : undefined}
                 isFolded={folded.s1}
                 onToggleFold={() => setFolded((f) => ({ ...f, s1: !f.s1 }))}
               />
@@ -207,7 +207,11 @@ export default function SettingsPage() {
                 number={3}
                 title="추가로 확인할 항목"
                 description="전체 체크리스트에서 추가하고 싶은 항목을 직접 선택하세요"
-                onSelectAll={selectAllItems}
+                onSelectAll={() => {
+                  setFolded((f) => ({ ...f, s3: false }));
+                  setIsAllItemsVisible(true);
+                  selectAllItems();
+                }}
                 isFolded={folded.s3}
                 onToggleFold={() => setFolded((f) => ({ ...f, s3: !f.s3 }))}
               />

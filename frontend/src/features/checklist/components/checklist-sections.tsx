@@ -1,9 +1,12 @@
-import { SelectCard, EmojiCard, SectionHeader, FieldLabel, TextInput, RatingCards, YesNoCards } from './ui/shared';
+import { SelectCard, EmojiCard, SectionHeader, FieldLabel, TextInput, RatingCards, YesNoCards, DynamicOptionCards } from './ui/shared';
 import type { BuildingInfoData } from './02_building-info';
 import { BUILDING_TYPES, DIRECTIONS, OPTION_LIST } from './02_building-info';
 import type { InteriorCheckData } from './03_interior-check';
 import type { SafetyLivingData } from './04_safety-living';
 import type { CustomMemoData } from './05_custom-memo';
+import type { ChecklistAnswers } from '@/types';
+import type { ChecklistItemResponse, ChecklistCategory } from '@/types';
+import { CATEGORY_LABEL } from '../hooks/use-checklist-items';
 
 export function BuildingSections({
   data,
@@ -112,11 +115,11 @@ export function InteriorSections({
       <section ref={problemsRef}>
         <SectionHeader title="문제 요소" />
         <div className="flex flex-col gap-5">
-          <YesNoCards label="곰팡이" hint="벽지 모서리, 욕실 천장, 창문 주변, 싱크대 하부 확인" value={data.mold} onChange={(v) => onChange('mold', v)} />
-          <YesNoCards label="벌레 흔적" hint="싱크대 하부, 창틀, 몰딩 주변, 배수구 확인" value={data.pest} onChange={(v) => onChange('pest', v)} />
-          <YesNoCards label="누수/결로" hint="천장 얼룩, 창문 물기, 화장실 배관 연결부 확인" value={data.leak} onChange={(v) => onChange('leak', v)} />
-          <YesNoCards label="벽지/장판 상태" hint="찢어짐, 들뜸, 오염 확인" value={data.wallpaper} onChange={(v) => onChange('wallpaper', v)} />
-          <YesNoCards label="배수구 냄새" hint="욕실/주방 배수구 냄새 확인" value={data.drainSmell} onChange={(v) => onChange('drainSmell', v)} />
+          <YesNoCards label="곰팡이" value={data.mold} onChange={(v) => onChange('mold', v)} />
+          <YesNoCards label="벌레 흔적" value={data.pest} onChange={(v) => onChange('pest', v)} />
+          <YesNoCards label="누수/결로" value={data.leak} onChange={(v) => onChange('leak', v)} />
+          <YesNoCards label="벽지/장판 상태" value={data.wallpaper} onChange={(v) => onChange('wallpaper', v)} />
+          <YesNoCards label="배수구 냄새" value={data.drainSmell} onChange={(v) => onChange('drainSmell', v)} />
         </div>
       </section>
     </>
@@ -204,6 +207,78 @@ export function CustomSections({
           />
         </div>
       </section>
+    </>
+  );
+}
+
+// ─── DynamicChecklistSections ─────────────────────────────
+const FORM_CATEGORY_ORDER: ChecklistCategory[] = [
+  'INTERNAL_STATE', 'PROBLEM', 'SAFETY', 'CONVENIENCE', 'ENVIRONMENT', 'CUSTOM',
+];
+
+const POSITIVE_IS_있음_CATEGORIES: ChecklistCategory[] = ['SAFETY', 'CONVENIENCE'];
+
+function DynamicItem({
+  item,
+  value,
+  onChange,
+}: {
+  item: ChecklistItemResponse;
+  value: string | null;
+  onChange: (v: string | null) => void;
+}) {
+  const beOptions = item.options.map((o) => o.optionValue);
+  const isBooleanFallback = beOptions.length === 0 && item.inputType === 'BOOLEAN';
+  const options = isBooleanFallback ? ['있음', '없음'] : beOptions;
+  const positiveValue = isBooleanFallback && POSITIVE_IS_있음_CATEGORIES.includes(item.category)
+    ? '있음'
+    : undefined;
+  return (
+    <DynamicOptionCards
+      label={item.itemName}
+      hint={item.description ?? undefined}
+      options={options}
+      value={value}
+      onChange={onChange}
+      positiveValue={positiveValue}
+    />
+  );
+}
+
+export function DynamicChecklistSections({
+  items,
+  answers,
+  onChange,
+  sectionRefs = {},
+}: {
+  items: ChecklistItemResponse[];
+  answers: ChecklistAnswers;
+  onChange: (itemId: number, value: string | null) => void;
+  sectionRefs?: Partial<Record<ChecklistCategory, React.RefCallback<HTMLElement>>>;
+}) {
+  if (items.length === 0) return null;
+
+  return (
+    <>
+      {FORM_CATEGORY_ORDER.map((cat) => {
+        const catItems = items.filter((i) => i.category === cat);
+        if (catItems.length === 0) return null;
+        return (
+          <section key={cat} ref={sectionRefs[cat]}>
+            <SectionHeader title={CATEGORY_LABEL[cat]} />
+            <div className="flex flex-col gap-5">
+              {catItems.map((item) => (
+                <DynamicItem
+                  key={item.id}
+                  item={item}
+                  value={answers[item.id] ?? null}
+                  onChange={(v) => onChange(item.id, v)}
+                />
+              ))}
+            </div>
+          </section>
+        );
+      })}
     </>
   );
 }

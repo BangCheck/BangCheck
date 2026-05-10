@@ -1,4 +1,4 @@
-import type { Room, RoomListItem, BasicInfoData, BuildingInfoData, InteriorCheckData, CustomMemoData, RoomFormState } from '@/types';
+import type { Room, RoomListItem, BasicInfoData, BuildingInfoData, InteriorCheckData, CustomMemoData, RoomFormState, ChecklistAnswers } from '@/types';
 
 // ── FE → API enum maps ────────────────────────────────────────
 
@@ -47,10 +47,11 @@ const SORT_TO_API: Record<string, string> = {
 export interface ChecklistItemApi {
   id: number;
   itemName: string;
+  inputType?: string;
   options: { id: number; optionValue: string }[];
 }
 
-type CheckAnswer = { itemId: number; selectedOptionIds: number[] };
+type CheckAnswer = { itemId: number; selectedOptionIds: number[]; valueText?: string };
 
 const OPTION_NAMES = new Set(['에어컨', '세탁기', '냉장고', '인터넷/와이파이', '가스레인지/인덕션', '책상/의자', '옷장/수납', '난방']);
 
@@ -110,7 +111,7 @@ export function mapToCheckAnswers(
 // ── API response shapes ───────────────────────────────────────
 
 interface CheckResultApi {
-  itemId: number;
+  itemId: number | null;
   itemName: string;
   valueText: string | null;
   selectedOptions: { optionId?: number; optionValue?: string }[];
@@ -177,18 +178,25 @@ const INIT_INTERIOR: InteriorCheckData = {
 export function mapApiToForms(detail: RoomDetailApi): RoomFormState {
   const optionNames: string[] = [];
   const interior: InteriorCheckData = { ...INIT_INTERIOR };
+  const answers: ChecklistAnswers = {};
 
   for (const result of detail.checkResults) {
-    const optVal = result.selectedOptions[0]?.optionValue ?? null;
+    const optVal = result.selectedOptions[0]?.optionValue ?? result.valueText ?? null;
     if (OPTION_NAMES.has(result.itemName) && optVal === '있음') {
       optionNames.push(result.itemName);
     } else if (RATING_ITEM_TO_FIELD[result.itemName]) {
+      // 기존 InteriorCheckData 호환 유지
       const field = RATING_ITEM_TO_FIELD[result.itemName];
       (interior as unknown as Record<string, unknown>)[field] = optVal;
+      if (result.itemId) answers[result.itemId] = optVal;
     } else if (PROBLEM_ITEM_TO_FIELD[result.itemName]) {
       const field = PROBLEM_ITEM_TO_FIELD[result.itemName];
       const yesNo = optVal === '없음' ? '없음' : optVal ? '있음' : null;
       (interior as unknown as Record<string, unknown>)[field] = yesNo;
+      if (result.itemId) answers[result.itemId] = optVal;
+    } else if (result.itemId && optVal) {
+      // SAFETY / CONVENIENCE / ENVIRONMENT 및 기타 동적 항목
+      answers[result.itemId] = optVal;
     }
   }
 
@@ -217,8 +225,52 @@ export function mapApiToForms(detail: RoomDetailApi): RoomFormState {
       options: optionNames,
     },
     interior,
+    answers,
     custom: { customItems: [], memo: detail.memo ?? '' },
   };
+}
+
+// ChecklistAnswers + ChecklistItemApi → checkAnswers (저장용)
+export function mapAnswersToCheckAnswers(
+  answers: ChecklistAnswers,
+  building: BuildingInfoData,
+  items: ChecklistItemApi[],
+): CheckAnswer[] {
+  const result: CheckAnswer[] = [];
+
+  console.log('[mapAnswersToCheckAnswers] answers:', answers);
+  console.log('[mapAnswersToCheckAnswers] checklistItems:', items.map((i) => ({ id: i.id, name: i.itemName })));
+
+  for (const [itemIdStr, optionValue] of Object.entries(answers)) {
+    if (!optionValue) continue;
+    const itemId = Number(itemIdStr);
+    const item = items.find((i) => i.id === itemId);
+    if (!item) {
+      console.warn(`[mapAnswersToCheckAnswers] itemId ${itemId} not found in checklistItems → skipped`);
+      continue;
+    }
+    if (item.options.length === 0) {
+      result.push({ itemId, selectedOptionIds: [], valueText: optionValue });
+      continue;
+    }
+    const option = item.options.find((o) => o.optionValue === optionValue);
+    if (!option) {
+      console.warn(`[mapAnswersToCheckAnswers] optionValue "${optionValue}" not found in item "${item.itemName}" options:`, item.options);
+      continue;
+    }
+    console.log(`[mapAnswersToCheckAnswers] ✓ ${item.itemName} → ${optionValue} (optionId: ${option.id})`);
+    result.push({ itemId, selectedOptionIds: [option.id] });
+  }
+
+  for (const optName of building.options) {
+    const item = items.find((i) => i.itemName === optName);
+    if (!item) continue;
+    const option = item.options.find((o) => o.optionValue === '있음');
+    if (option) result.push({ itemId: item.id, selectedOptionIds: [option.id] });
+  }
+
+  console.log('[mapAnswersToCheckAnswers] result checkAnswers:', result);
+  return result;
 }
 
 export function buildRoomPayload(
