@@ -336,7 +336,7 @@ export default function Home() {
         <div className="w-full px-4 md:px-10 py-8">
           <div className="flex justify-between items-center mb-5">
             <p className="text-[14px] font-bold text-text-caption">
-              등록된 방 {rooms.length}개{ !isLoggedIn && '/2개' }
+              등록된 방 {rooms.length}개/6개
             </p>
             <button 
               onClick={handleStartChecklist}
