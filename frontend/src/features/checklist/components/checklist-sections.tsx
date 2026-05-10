@@ -229,10 +229,13 @@ function DynamicItem({
 }) {
   const beOptions = item.options.map((o) => o.optionValue);
   const isBooleanFallback = beOptions.length === 0 && item.inputType === 'BOOLEAN';
-  const options = isBooleanFallback ? ['있음', '없음'] : beOptions;
-  const positiveValue = isBooleanFallback && POSITIVE_IS_있음_CATEGORIES.includes(item.category)
-    ? '있음'
-    : undefined;
+  const isPositiveFirst = item.inputType === 'BOOLEAN' && POSITIVE_IS_있음_CATEGORIES.includes(item.category);
+  const options = isBooleanFallback
+    ? ['있음', '없음']
+    : isPositiveFirst
+      ? ['있음', '없음']
+      : beOptions;
+  const positiveValue = isPositiveFirst ? '있음' : undefined;
   return (
     <DynamicOptionCards
       label={item.itemName}
