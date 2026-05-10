@@ -24,8 +24,6 @@ export default function SettingsPage() {
     isLoading,
     isPending,
     toggleUserType,
-    selectAllTypes,
-    deselectAllTypes,
     toggleItem,
     selectAllItems,
     saveCurrentSettings,
@@ -132,8 +130,6 @@ export default function SettingsPage() {
                 number={1}
                 title="나는 이런 유형이에요"
                 description="유형을 선택하면 맞춤 항목이 자동으로 체크돼요"
-                onSelectAll={selectAllTypes}
-                onDeselectAll={deselectAllTypes}
                 isFolded={folded.s1}
                 onToggleFold={() => setFolded((f) => ({ ...f, s1: !f.s1 }))}
               />

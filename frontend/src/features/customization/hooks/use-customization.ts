@@ -10,12 +10,11 @@ export const useCustomization = () => {
   const queryClient = useQueryClient();
   const { isLoggedIn } = useAuthStore();
   const { 
-    selectedTypeIds, 
-    activeItemNames, 
-    setSelectedTypeIds, 
+    selectedTypeIds,
+    activeItemNames,
+    setSelectedTypeIds,
     setActiveItemNames,
-    toggleType,
-    toggleItemName 
+    toggleItemName
   } = useCustomizationStore();
 
   // 1. 서버 데이터 조회
@@ -85,31 +84,40 @@ export const useCustomization = () => {
     onSuccess: invalidate,
   });
 
-  // 4. 이벤트 핸들러 (스토어를 먼저 업데이트하여 즉각 반응 제공)
+  // 4. 이벤트 핸들러 (단일 선택 — 다른 유형은 자동 해제)
   const toggleUserType = useCallback((typeId: string) => {
     const isSelected = selectedTypeIds.includes(typeId);
+    const prevTypeId = selectedTypeIds[0];
 
     if (isSelected) {
+      // 이미 선택된 유형 클릭 → 해제
       deselectTypeMutation.mutate(typeId);
+      setSelectedTypeIds([]);
+      const customNames = items.filter(i => i.itemType === 'CUSTOM').map(i => i.itemName);
+      setActiveItemNames(customNames);
     } else {
+      // 새 유형 선택 → 기존 유형 해제 후 새 유형 선택
+      if (prevTypeId) {
+        deselectTypeMutation.mutate(prevTypeId);
+      }
       selectTypeMutation.mutate(typeId);
 
       const recommendedIds = TYPE_ITEM_MAP[typeId] || [];
       const recommendedLabels = CHECKLIST_ITEMS
         .filter(item => recommendedIds.includes(item.id))
         .map(item => item.label);
+      const customNames = items.filter(i => i.itemType === 'CUSTOM').map(i => i.itemName);
+      const nextActiveNames = Array.from(new Set([...customNames, ...recommendedLabels]));
 
-      const nextActiveNames = Array.from(new Set([...activeItemNames, ...recommendedLabels]));
       const disabledIds = items
         .filter(i => i.itemType !== 'CUSTOM')
         .filter(i => !nextActiveNames.includes(i.itemName))
         .map(i => Number(i.id));
       saveSettingsMutation.mutate(disabledIds);
-
       setActiveItemNames(nextActiveNames);
+      setSelectedTypeIds([typeId]);
     }
-    toggleType(typeId);
-  }, [items, selectedTypeIds, activeItemNames, selectTypeMutation, deselectTypeMutation, saveSettingsMutation, toggleType, setActiveItemNames]);
+  }, [items, selectedTypeIds, selectTypeMutation, deselectTypeMutation, saveSettingsMutation, setSelectedTypeIds, setActiveItemNames]);
 
   const toggleItem = useCallback((itemId: number, label: string) => {
     const willBeEnabled = !items.find(i => i.id === itemId)?.isEnabled;
