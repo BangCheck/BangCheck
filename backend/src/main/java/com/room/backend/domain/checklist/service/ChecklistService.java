@@ -42,10 +42,33 @@ public class ChecklistService {
                 .map(UserTypeSelection::getUserType)
                 .toList();
 
+        if (selectedTypes.contains(UserType.ESSENTIALS_ONLY)) {
+            return getEssentialsOnlyItems(userId);
+        }
+
         List<UserType> queryTypes = selectedTypes.contains(UserType.FIRST_TIMER)
                 ? Arrays.stream(UserType.values()).toList()
                 : selectedTypes;
         List<ChecklistItem> items = checklistItemRepository.findCustomizedItems(userId, queryTypes);
+        List<Long> disabledItemIds = userChecklistSettingRepository.findByUserIdAndIsEnabledFalse(userId)
+                .stream()
+                .map(UserChecklistSetting::getItemId)
+                .collect(Collectors.toSet())
+                .stream()
+                .toList();
+
+        return items.stream()
+                .map(item -> {
+                    List<ChecklistOption> options = checklistOptionRepository.findByChecklistItemId(item.getId());
+                    Boolean isEnabled = !disabledItemIds.contains(item.getId());
+                    return ChecklistItemResponse.of(item, options, isEnabled);
+                })
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<ChecklistItemResponse> getEssentialsOnlyItems(Long userId) {
+        List<ChecklistItem> items = checklistItemRepository.findEssentialsOnlyItems(userId);
         List<Long> disabledItemIds = userChecklistSettingRepository.findByUserIdAndIsEnabledFalse(userId)
                 .stream()
                 .map(UserChecklistSetting::getItemId)
