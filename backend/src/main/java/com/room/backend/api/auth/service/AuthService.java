@@ -1,9 +1,11 @@
 package com.room.backend.api.auth.service;
 
+import com.room.backend.api.auth.dto.request.MergeGuestDataRequestDTO;
 import com.room.backend.api.auth.dto.response.OAuthCallbackResponseDTO;
 import com.room.backend.api.auth.dto.result.OAuthCallbackResult;
 import com.room.backend.api.auth.dto.result.TokenPair;
 import com.room.backend.api.auth.exception.AuthErrorCode;
+import com.room.backend.api.room.service.RoomService;
 import com.room.backend.domain.user.entity.User;
 import com.room.backend.domain.user.entity.enums.Provider;
 import com.room.backend.domain.user.repository.UserRepository;
@@ -28,6 +30,7 @@ public class AuthService {
     private final JwtProvider jwtProvider;
     private final JwtService jwtService;
     private final OAuthService oAuthService;
+    private final RoomService roomService;
 
     @Transactional
     public OAuthCallbackResult handleOAuthCallback(String provider, String code, String state) {
@@ -101,6 +104,15 @@ public class AuthService {
     @Transactional
     public void logout(Long userId) {
         jwtService.deleteRefreshToken(userId);
+    }
+
+    @Transactional
+    public void mergeGuestData(Long userId, MergeGuestDataRequestDTO request) {
+        if (request.getRooms() == null || request.getRooms().isEmpty()) {
+            return;
+        }
+        request.getRooms().forEach(room -> roomService.createRoomWithCheckAnswers(room, userId));
+        log.info("Guest data merged - userId: {}, roomCount: {}", userId, request.getRooms().size());
     }
 
     private OAuthCallbackResult issueJwtAndReturn(User user, String logMessage, boolean isNew, boolean isReactivated) {

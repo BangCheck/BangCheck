@@ -1,5 +1,6 @@
 package com.room.backend.api.auth.controller;
 
+import com.room.backend.api.auth.dto.request.MergeGuestDataRequestDTO;
 import com.room.backend.api.auth.dto.response.GuestTokenResponseDTO;
 import com.room.backend.api.auth.dto.response.OAuthCallbackResponseDTO;
 import com.room.backend.api.auth.dto.result.OAuthCallbackResult;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -93,5 +95,12 @@ public class AuthController {
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, cookieProvider.expireRefreshTokenCookie().toString())
                 .body(ApiResponse.success(null));
+    }
+
+    @PostMapping("/merge-guest-data")
+    public ResponseEntity<ApiResponse<Void>> mergeGuestData(@RequestBody MergeGuestDataRequestDTO request) {
+        Long userId = SecurityUtil.getCurrentUserId();
+        authService.mergeGuestData(userId, request);
+        return ResponseEntity.ok(ApiResponse.success(null));
     }
 }
