@@ -18,6 +18,7 @@ export default function SettingsPage() {
 
   const {
     items,
+    allItems,
     selectedTypeIds,
     activeItemNames,
     customItems,
@@ -42,9 +43,16 @@ export default function SettingsPage() {
 
   const recommendedItems = useMemo(() => {
     if (selectedTypeIds.length === 0) return [];
-    const itemIds = new Set(selectedTypeIds.flatMap((typeId) => TYPE_ITEM_MAP[typeId] ?? []));
-    return CHECKLIST_ITEMS.filter((item) => itemIds.has(item.id));
-  }, [selectedTypeIds]);
+    const typeId = selectedTypeIds[0];
+    const mappedIds = TYPE_ITEM_MAP[typeId] ?? [];
+    if (mappedIds.length > 0) {
+      return CHECKLIST_ITEMS.filter((item) => mappedIds.includes(item.id));
+    }
+    // FIRST_TIMER / ESSENTIALS_ONLY: 서버 enabled 항목을 직접 표시
+    return items
+      .filter(i => i.itemType !== 'CUSTOM' && i.isEnabled)
+      .map(i => CHECKLIST_ITEMS.find(c => c.label === i.itemName) ?? { id: String(i.id), label: i.itemName });
+  }, [selectedTypeIds, items]);
 
   // ── Handlers ─────────────────────────────────────────────
   const getServerIdByLabel = (label: string) => items.find((item) => item.itemName === label)?.id;
@@ -232,7 +240,7 @@ export default function SettingsPage() {
                   {isAllItemsVisible && (
                     <div className="pt-4 border-t border-bg-gray space-y-10">
                       {CATEGORY_ORDER.map((cat) => {
-                        const catItems = items.filter((i) => i.itemType !== 'CUSTOM' && i.category === cat);
+                        const catItems = allItems.filter((i) => i.itemType !== 'CUSTOM' && i.category === cat);
                         if (catItems.length === 0) return null;
                         const activeCount = catItems.filter((i) => activeNamesSet.has(i.itemName)).length;
                         return (

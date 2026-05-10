@@ -27,6 +27,16 @@ export const useCustomization = () => {
     placeholderData: (prev) => prev,
   });
 
+  // STEP3 전용: 유형 선택과 무관하게 전체 항목 유지 (별도 쿼리키로 invalidation 분리)
+  const { data: rawAllItems = [] } = useQuery({
+    queryKey: QUERY_KEYS.customization.allItems,
+    queryFn: customService.getCustomizedItems,
+    enabled: isLoggedIn,
+    refetchOnWindowFocus: false,
+    staleTime: 1000 * 60 * 30,
+    placeholderData: (prev) => prev,
+  });
+
   // itemName 기준 중복 제거 (낮은 ID 우선)
   const items = useMemo(() => {
     const seen = new Map<string, typeof rawItems[0]>();
@@ -58,6 +68,10 @@ export const useCustomization = () => {
 
   // 3. Mutation 정의
   const invalidate = () => queryClient.invalidateQueries({ queryKey: QUERY_KEYS.customization.settings });
+  const invalidateAll = () => {
+    queryClient.invalidateQueries({ queryKey: QUERY_KEYS.customization.settings });
+    queryClient.invalidateQueries({ queryKey: QUERY_KEYS.customization.allItems });
+  };
 
   const selectTypeMutation = useMutation({
     mutationFn: customService.selectUserType,
@@ -76,12 +90,12 @@ export const useCustomization = () => {
 
   const addCustomMutation = useMutation({
     mutationFn: customService.addCustomItem,
-    onSuccess: invalidate,
+    onSuccess: invalidateAll,
   });
 
   const deleteCustomMutation = useMutation({
     mutationFn: customService.deleteCustomItem,
-    onSuccess: invalidate,
+    onSuccess: invalidateAll,
   });
 
   // 4. 이벤트 핸들러 (단일 선택 — 다른 유형은 자동 해제)
@@ -101,21 +115,26 @@ export const useCustomization = () => {
         deselectTypeMutation.mutate(prevTypeId);
       }
       selectTypeMutation.mutate(typeId);
-
-      const recommendedIds = TYPE_ITEM_MAP[typeId] || [];
-      const recommendedLabels = CHECKLIST_ITEMS
-        .filter(item => recommendedIds.includes(item.id))
-        .map(item => item.label);
-      const customNames = items.filter(i => i.itemType === 'CUSTOM').map(i => i.itemName);
-      const nextActiveNames = Array.from(new Set([...customNames, ...recommendedLabels]));
-
-      const disabledIds = items
-        .filter(i => i.itemType !== 'CUSTOM')
-        .filter(i => !nextActiveNames.includes(i.itemName))
-        .map(i => Number(i.id));
-      saveSettingsMutation.mutate(disabledIds);
-      setActiveItemNames(nextActiveNames);
       setSelectedTypeIds([typeId]);
+
+      const mappedIds = TYPE_ITEM_MAP[typeId] || [];
+      if (mappedIds.length > 0) {
+        // 프론트 상수로 항목 계산 가능한 유형
+        const recommendedLabels = CHECKLIST_ITEMS
+          .filter(item => mappedIds.includes(item.id))
+          .map(item => item.label);
+        const customNames = items.filter(i => i.itemType === 'CUSTOM').map(i => i.itemName);
+        const nextActiveNames = Array.from(new Set([...customNames, ...recommendedLabels]));
+        const disabledIds = items
+          .filter(i => i.itemType !== 'CUSTOM')
+          .filter(i => !nextActiveNames.includes(i.itemName))
+          .map(i => Number(i.id));
+        saveSettingsMutation.mutate(disabledIds);
+        setActiveItemNames(nextActiveNames);
+      } else {
+        // FIRST_TIMER / ESSENTIALS_ONLY: BE가 항목을 결정 → refetch 후 재동기화
+        hasSynced.current = false;
+      }
     }
   }, [items, selectedTypeIds, selectTypeMutation, deselectTypeMutation, saveSettingsMutation, setSelectedTypeIds, setActiveItemNames]);
 
@@ -193,8 +212,18 @@ export const useCustomization = () => {
     };
   }, [activeItemNames]);
 
+  const allItems = useMemo(() => {
+    const seen = new Map<string, typeof rawAllItems[0]>();
+    for (const item of rawAllItems) {
+      const existing = seen.get(item.itemName);
+      if (!existing || item.id < existing.id) seen.set(item.itemName, item);
+    }
+    return Array.from(seen.values());
+  }, [rawAllItems]);
+
   return {
     items,
+    allItems,
     selectedTypeIds,
     activeItemNames,
     customItems: items.filter(item => item.itemType === 'CUSTOM'),
