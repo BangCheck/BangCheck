@@ -1,3 +1,5 @@
+import type { ChecklistCategory } from '@/types/checklist';
+
 export const USER_TYPES = [
   {
     id: 'BUG_AVOIDER',
@@ -45,8 +47,8 @@ export const CHECKLIST_ITEMS: ChecklistItem[] = [
   { id: 'ventilation', label: '환기', category: '내부 상태' },
   { id: 'water-pressure', label: '수압 및 배수', category: '내부 상태' },
   { id: 'soundproof', label: '방음', category: '내부 상태' },
-  { id: 'window-screen', label: '창문 / 방충망', category: '내부 상태' },
-  { id: 'door-gap', label: '현관 / 문틈', category: '내부 상태' },
+  { id: 'window-screen', label: '창문/방충망', category: '내부 상태' },
+  { id: 'door-gap', label: '현관/문틈', category: '내부 상태' },
 
   // 문제 요소
   { id: 'mold', label: '곰팡이', category: '문제 요소', isDefault: true },
@@ -54,7 +56,7 @@ export const CHECKLIST_ITEMS: ChecklistItem[] = [
   { id: 'bug-trace', label: '벌레 흔적', category: '문제 요소', isDefault: true },
   { id: 'noise-all', label: '내/외부 소음', category: '문제 요소' },
   { id: 'smell', label: '하수구/곰팡이 냄새', category: '문제 요소' },
-  { id: 'moisture', label: '습기 / 결로', category: '문제 요소' },
+  { id: 'moisture', label: '습기/결로', category: '문제 요소' },
 
   // 안전/보안
   { id: 'entrance-security', label: '공동 현관', category: '안전/보안', isDefault: true },
@@ -63,21 +65,21 @@ export const CHECKLIST_ITEMS: ChecklistItem[] = [
   { id: 'night-light', label: '야간 조명', category: '안전/보안' },
   { id: 'police', label: '경찰서 근처', category: '안전/보안' },
   { id: 'night-safety', label: '밤길 안전도', category: '안전/보안' },
-  { id: 'accessibility', label: '접근성(큰길/골목)', category: '안전/보안' },
+  { id: 'accessibility', label: '접근성', category: '안전/보안' },
   { id: 'fire-safety', label: '소화기/화재 경보', category: '안전/보안' },
 
   // 생활 편의
-  { id: 'study-space', label: '카페 / 공부 공간', category: '생활 편의', isDefault: true },
+  { id: 'study-space', label: '카페/공부 공간', category: '생활 편의', isDefault: true },
   { id: 'laundry', label: '코인세탁소', category: '생활 편의' },
-  { id: 'parking', label: '자전거 / 차량 주차', category: '생활 편의' },
-  { id: 'pharmacy', label: '병원 / 약국', category: '생활 편의' },
+  { id: 'parking', label: '자전거/차량 주차', category: '생활 편의' },
+  { id: 'pharmacy', label: '병원/약국', category: '생활 편의' },
   { id: 'outlets', label: '콘센트 수', category: '생활 편의' },
   { id: 'landlord', label: '집주인 거주 여부', category: '생활 편의' },
   { id: 'delivery', label: '택배 보관 환경', category: '생활 편의' },
   { id: 'dry-space', label: '세탁 건조 공간', category: '생활 편의' },
 
   // 주변 환경
-  { id: 'convenience', label: '편의점 / 마트', category: '주변 환경', isDefault: true },
+  { id: 'convenience', label: '편의점/마트', category: '주변 환경', isDefault: true },
   { id: 'transport', label: '대중교통 접근성', category: '주변 환경' },
   { id: 'night-business', label: '야간 상권 인접도', category: '주변 환경' },
   { id: 'greenery', label: '녹지/산 인접도', category: '주변 환경' },
@@ -97,3 +99,19 @@ export const TYPE_ITEM_MAP: Record<string, string[]> = {
   'PERFORMANCE_TYPE': ['water-pressure', 'noise-all', 'laundry', 'outlets', 'dry-space'],
   'FIRST_TIMER': ['mold', 'leak-trace', 'bug-trace', 'entrance-security', 'window-lock', 'convenience'],
 };
+
+export const CATEGORY_LABEL: Record<ChecklistCategory, string> = {
+  BASIC_INFO: '기본 정보',
+  BUILDING_INFO: '건물 정보',
+  OPTION: '기본 옵션',
+  INTERNAL_STATE: '내부 상태',
+  PROBLEM: '문제 요소',
+  SAFETY: '안전/보안',
+  CONVENIENCE: '생활 편의',
+  ENVIRONMENT: '주변 환경',
+  CUSTOM: '나만의 항목',
+};
+
+export const CATEGORY_ORDER: ChecklistCategory[] = [
+  'OPTION', 'INTERNAL_STATE', 'PROBLEM', 'SAFETY', 'CONVENIENCE', 'ENVIRONMENT',
+];

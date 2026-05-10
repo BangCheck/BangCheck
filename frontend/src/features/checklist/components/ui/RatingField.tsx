@@ -30,14 +30,14 @@ export default function RatingField({ label, value, onChange, max = 5 }: RatingF
               )}
             >
               <span className="text-[20px]">{EMOJI[i]}</span>
-              <span
+              {/* <span
                 className={cn(
                   'text-[12px] font-semibold',
                   isSelected ? 'text-brand-primary' : 'text-text-caption'
                 )}
               >
                 {score}
-              </span>
+              </span> */}
             </button>
           );
         })}

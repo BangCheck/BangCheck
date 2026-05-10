@@ -90,18 +90,6 @@ function RoomHeader({ rooms }: { rooms: Room[] }) {
   );
 }
 
-function ScoreRow({ rooms }: { rooms: Room[] }) {
-  return (
-    <div className="flex border-t-2 border-brand-primary bg-brand-primary/5">
-      <div className={`${LABEL_CLS} font-bold text-brand-primary`}>총점</div>
-      {rooms.map((r) => (
-        <div key={r.id} className={`${CELL_CLS} font-bold text-brand-primary`}>
-          {r.score}점
-        </div>
-      ))}
-    </div>
-  );
-}
 
 function SectionCard({
   id,
@@ -180,7 +168,6 @@ export function CompareTable({ rooms, activeSections }: Props) {
               raw?.basic.moveInDate || (raw?.basic.moveInNegotiable ? '협의 가능' : '-'),
             )}
           />
-          <ScoreRow rooms={rooms} />
         </SectionCard>
       )}
 

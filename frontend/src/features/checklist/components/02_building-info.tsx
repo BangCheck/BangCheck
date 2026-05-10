@@ -14,9 +14,9 @@ interface Props {
   onChange: <K extends keyof BuildingInfoData>(key: K, value: BuildingInfoData[K]) => void;
 }
 
-const BUILDING_TYPES = ['원룸', '1.5룸', '빌라', '오피스텔', '고시원', '하숙'];
-const DIRECTIONS = ['남향', '동향', '서향', '북향'];
-const OPTION_LIST = ['에어컨', '세탁기', '냉장고', '인터넷/와이파이', '가스레인지/인덕션', '책상/의자', '옷장/수납', '난방'];
+export const BUILDING_TYPES = ['원룸', '1.5룸', '빌라', '오피스텔', '고시원', '하숙'];
+export const DIRECTIONS = ['남향', '동향', '서향', '북향'];
+export const OPTION_LIST = ['에어컨', '세탁기', '냉장고', '인터넷/와이파이', '가스레인지/인덕션', '책상/의자', '옷장/수납', '난방'];
 
 export default function BuildingInfo({ data, onChange }: Props) {
   const toggleOption = (v: string) =>
@@ -43,7 +43,7 @@ export default function BuildingInfo({ data, onChange }: Props) {
             <FieldLabel>엘리베이터</FieldLabel>
             <div className="grid grid-cols-2 gap-3">
               {(['있음', '없음'] as const).map((v) => (
-                <EmojiCard key={v} emoji={v === '있음' ? '😊' : '😞'} label={v} active={data.elevator === v} onClick={() => onChange('elevator', data.elevator === v ? null : v)} />
+                <EmojiCard key={v} label={v} active={data.elevator === v} onClick={() => onChange('elevator', data.elevator === v ? null : v)} />
               ))}
             </div>
           </div>

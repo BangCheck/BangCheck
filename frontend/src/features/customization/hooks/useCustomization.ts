@@ -18,13 +18,25 @@ export const useCustomization = () => {
   } = useCustomizationStore();
 
   // 1. 서버 데이터 조회
-  const { data: items = [], isLoading } = useQuery({
+  const { data: rawItems = [], isLoading } = useQuery({
     queryKey: ['customChecklistItems'],
     queryFn: customService.getCustomizedItems,
-    enabled: isLoggedIn, // 로그인 상태일 때만 서버에서 데이터를 가져옴
-    refetchOnWindowFocus: false, // 창 포커스 시 재로딩 방지
-    staleTime: 1000 * 60 * 5, // 5분간 데이터 유지
+    enabled: isLoggedIn,
+    refetchOnWindowFocus: false,
+    staleTime: 1000 * 60 * 5,
   });
+
+  // itemName 기준 중복 제거 (낮은 ID 우선)
+  const items = useMemo(() => {
+    const seen = new Map<string, typeof rawItems[0]>();
+    for (const item of rawItems) {
+      const existing = seen.get(item.itemName);
+      if (!existing || item.id < existing.id) {
+        seen.set(item.itemName, item);
+      }
+    }
+    return Array.from(seen.values());
+  }, [rawItems]);
 
   // 2. 서버 데이터와 전역 스토어 동기화 (최초 로드 시나 서버 변경 시)
   useEffect(() => {
@@ -132,6 +144,14 @@ export const useCustomization = () => {
     setActiveItemNames(allNames);
   }, [items, saveSettingsMutation, setActiveItemNames]);
 
+  const saveCurrentSettings = useCallback(async () => {
+    const activeSet = new Set(activeItemNames);
+    const disabledIds = items
+      .filter((i) => i.itemType !== 'CUSTOM' && !activeSet.has(i.itemName))
+      .map((i) => Number(i.id));
+    await saveSettingsMutation.mutateAsync(disabledIds);
+  }, [items, activeItemNames, saveSettingsMutation]);
+
   const addCustomItem = useCallback((itemName: string) => {
     addCustomMutation.mutate(itemName);
     toggleItemName(itemName);
@@ -172,6 +192,7 @@ export const useCustomization = () => {
     selectAllTypes,
     toggleItem,
     selectAllItems,
+    saveCurrentSettings,
     toggleItemLocally,
     addCustomItem,
     removeCustomItem,

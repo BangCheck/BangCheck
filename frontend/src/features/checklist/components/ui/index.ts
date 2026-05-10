@@ -10,3 +10,6 @@ export { default as OptionCardSmall } from './OptionCardSmall';
 export { default as OptionCardMedium } from './OptionCardMedium';
 export { default as RatingField } from './RatingField';
 export { default as SectionContainer } from './SectionContainer';
+export { ChecklistPageHeader } from './ChecklistPageHeader';
+export { ChecklistTabNav } from './ChecklistTabNav';
+export { ChecklistSubmitFooter } from './ChecklistSubmitFooter';

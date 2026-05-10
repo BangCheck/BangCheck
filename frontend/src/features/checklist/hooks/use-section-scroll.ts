@@ -11,7 +11,7 @@ export function useSectionScroll() {
     basic: null, building: null, options: null, interior: null, problems: null,
     safety: null, living: null, surround: null, custom: null, memo: null,
   });
-  const tabNavRef = useRef<HTMLDivElement>(null);
+  const tabNavRef = useRef<HTMLElement>(null);
 
   // 단일 IntersectionObserver로 가시성이 가장 높은 섹션을 activeSection으로 설정
   useEffect(() => {

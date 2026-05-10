@@ -110,7 +110,7 @@ export default function BasicInfo({ data, onChange }: Props) {
             <FieldLabel>융자 여부</FieldLabel>
             <div className="grid grid-cols-2 gap-3">
               {(['없음', '있음'] as const).map((v) => (
-                <EmojiCard key={v} emoji={v === '없음' ? '😊' : '😞'} label={v} active={data.loanStatus === v} onClick={() => onChange('loanStatus', data.loanStatus === v ? null : v)} />
+                <EmojiCard key={v} label={v} active={data.loanStatus === v} onClick={() => onChange('loanStatus', data.loanStatus === v ? null : v)} />
               ))}
             </div>
             {data.loanStatus === '있음' && (
@@ -132,7 +132,7 @@ export default function BasicInfo({ data, onChange }: Props) {
             <FieldLabel>전입신고 가능여부</FieldLabel>
             <div className="grid grid-cols-2 gap-3">
               {(['가능', '불가능'] as const).map((v) => (
-                <EmojiCard key={v} emoji={v === '가능' ? '😊' : '😞'} label={v} active={data.moveInReport === v} onClick={() => onChange('moveInReport', data.moveInReport === v ? null : v)} />
+                <EmojiCard key={v} label={v} active={data.moveInReport === v} onClick={() => onChange('moveInReport', data.moveInReport === v ? null : v)} />
               ))}
             </div>
           </div>
