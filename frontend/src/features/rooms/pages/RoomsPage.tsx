@@ -87,7 +87,7 @@ function TransactionDropdown({
   onClose: () => void;
 }) {
   return (
-    <div className="absolute top-full left-0 mt-2 w-[280px] bg-white border border-border-light rounded-[12px] shadow-xl z-50 p-5 animate-in fade-in zoom-in-95 duration-150">
+    <div className="absolute top-full left-0 mt-2 w-max bg-white border border-border-light rounded-[12px] shadow-xl z-50 p-5 animate-in fade-in zoom-in-95 duration-150">
       <h4 className="text-[14px] font-bold text-text-main mb-4">거래방식</h4>
       <div className="flex gap-2">
         {['전체', '전세', '월세', '단기임대'].map((type) => (
@@ -121,7 +121,7 @@ function SortDropdown({
   onClose: () => void;
 }) {
   return (
-    <div className="absolute top-full left-0 mt-2 w-[320px] bg-white border border-border-light rounded-[12px] shadow-xl z-50 p-5 animate-in fade-in zoom-in-95 duration-150">
+    <div className="absolute top-full left-0 mt-2 w-max bg-white border border-border-light rounded-[12px] shadow-xl z-50 p-5 animate-in fade-in zoom-in-95 duration-150">
       <div className="flex justify-between items-center mb-4">
         <h4 className="text-[14px] font-bold text-text-main">정렬</h4>
         <button onClick={onReset} className="text-[11px] text-text-caption hover:text-text-main transition-colors cursor-pointer">
