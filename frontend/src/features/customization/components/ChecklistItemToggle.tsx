@@ -21,10 +21,10 @@ export const ChecklistItemToggle: React.FC<ChecklistItemToggleProps> = ({
       onClick={onToggle}
       disabled={disabled}
       className={cn(
-        'flex items-center gap-3 p-6 rounded-[6px] border transition-all w-full text-left drop-shadow-[0px_6px_8px_rgba(0,0,0,0.04)]',
+        'flex items-center gap-3 p-6 rounded-[6px] border-2 transition-all w-full text-left drop-shadow-[0px_6px_8px_rgba(0,0,0,0.04)]',
         isActive
-          ? 'bg-slot-b-bg border-2 border-brand-primary'
-          : 'bg-white border border-border-light hover:border-border-mute',
+          ? 'bg-slot-b-bg border-brand-primary'
+          : 'bg-white border-border-light hover:border-border-mute',
         disabled && 'opacity-50 cursor-not-allowed',
       )}
     >

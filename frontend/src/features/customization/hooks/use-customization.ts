@@ -49,27 +49,13 @@ export const useCustomization = () => {
     return Array.from(seen.values());
   }, [rawItems]);
 
-  // 2. 서버 데이터와 전역 스토어 동기화
-  // hasSynced: activeItemNames 동기화 여부 (FIRST_TIMER/ESSENTIALS_ONLY 선택 후 재동기화 허용)
-  // hasSyncedTypes: selectedTypeIds는 최초 1회만 서버에서 복원 (사용자 선택 후 덮어쓰기 방지)
+  // 2. 서버 activeItemNames 동기화 (selectedTypeIds는 Zustand persist가 관리)
   const hasSynced = useRef(false);
-  const hasSyncedTypes = useRef(false);
   useEffect(() => {
     if (hasSynced.current || items.length === 0) return;
     hasSynced.current = true;
-
     const serverActiveNames = items.filter(item => item.isEnabled).map(item => item.itemName);
     setActiveItemNames(serverActiveNames);
-
-    if (!hasSyncedTypes.current) {
-      hasSyncedTypes.current = true;
-      const serverTypes = new Set<string>();
-      items.forEach(item => {
-        if (item.isEnabled && item.userType) serverTypes.add(item.userType);
-      });
-      // 단일 선택: 여러 유형이 활성화되어 있어도 첫 번째만 사용
-      setSelectedTypeIds(Array.from(serverTypes).slice(0, 1));
-    }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [items]);
 
