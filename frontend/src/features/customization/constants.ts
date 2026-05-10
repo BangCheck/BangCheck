@@ -21,15 +21,21 @@ export const USER_TYPES = [
   },
   {
     id: 'PERFORMANCE_TYPE',
-    label: '핵심만 빠르게',
-    description: '필수만 빠르게',
+    label: '생활성능형',
+    description: '거주 편의성/기능 집중',
     icon: 'lightning',
   },
   {
     id: 'FIRST_TIMER',
     label: '첫 자취',
     description: '처음이라 다 확인!',
-    icon: 'home',
+    icon: 'house',
+  },
+  {
+    id: 'ESSENTIALS_ONLY',
+    label: '핵심만 빠르게',
+    description: '필수만 빠르게 확인',
+    icon: 'lightning',
   },
 ] as const;
 
@@ -97,7 +103,8 @@ export const TYPE_ITEM_MAP: Record<string, string[]> = {
   'NOISE_SENSITIVE': ['soundproof', 'noise-all', 'transport', 'night-business', 'crowd', 'construction'],
   'CLEAN_FREAK': ['sunlight', 'ventilation', 'mold', 'moisture', 'greenery', 'food-density'],
   'PERFORMANCE_TYPE': ['water-pressure', 'noise-all', 'laundry', 'outlets', 'dry-space'],
-  'FIRST_TIMER': ['mold', 'leak-trace', 'bug-trace', 'entrance-security', 'window-lock', 'convenience'],
+  'FIRST_TIMER': [], // BE가 전체 항목 반환
+  'ESSENTIALS_ONLY': [], // BE가 기본 항목만 반환
 };
 
 export const CATEGORY_LABEL: Record<ChecklistCategory, string> = {

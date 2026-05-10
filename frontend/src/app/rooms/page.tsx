@@ -2,7 +2,7 @@
 
 import { useAuthStore } from '@/store/use-auth-store';
 import { useGuestRoomStore } from '@/store/use-guest-room-store';
-import { useRoomsList, useDeleteRoom } from '@/features/rooms/hooks/useRoomsQuery';
+import { useRoomsList, useDeleteRoom } from '@/features/rooms/hooks/use-rooms-query';
 import { cn } from '@/lib/utils';
 import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';

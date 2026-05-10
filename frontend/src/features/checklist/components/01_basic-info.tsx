@@ -1,20 +1,7 @@
 import { SelectCard, EmojiCard, SectionHeader, FieldLabel, TextInput } from './ui/shared';
+import type { BasicInfoData } from '@/types';
 
-export interface BasicInfoData {
-  name: string;
-  address: string;
-  transactionType: string | null;
-  deposit: string;
-  monthlyRent: string;
-  managementFee: string;
-  includeMgmtInRent: boolean;
-  isMgmtUnknown: boolean;
-  loanStatus: '있음' | '없음' | null;
-  loanAmount: string;
-  moveInReport: '가능' | '불가능' | null;
-  moveInDate: string;
-  moveInNegotiable: boolean;
-}
+export type { BasicInfoData };
 
 interface Props {
   data: BasicInfoData;
@@ -132,7 +119,7 @@ export default function BasicInfo({ data, onChange }: Props) {
             <FieldLabel>전입신고 가능여부</FieldLabel>
             <div className="grid grid-cols-2 gap-3">
               {(['가능', '불가능'] as const).map((v) => (
-                <EmojiCard key={v} label={v} active={data.moveInReport === v} onClick={() => onChange('moveInReport', data.moveInReport === v ? null : v)} />
+                <EmojiCard key={v} label={v} variant="binary" active={data.moveInReport === v} onClick={() => onChange('moveInReport', data.moveInReport === v ? null : v)} />
               ))}
             </div>
           </div>
@@ -165,6 +152,7 @@ export default function BasicInfo({ data, onChange }: Props) {
               type="date"
               value={data.moveInDate}
               onChange={(e) => onChange('moveInDate', e.target.value)}
+              min={new Date().toISOString().split('T')[0]}
               disabled={data.moveInNegotiable}
               className="h-[32px] px-3 border border-border-mute rounded-[6px] text-[14px] text-text-main outline-none focus:border-brand-primary w-[160px] disabled:bg-bg-gray disabled:text-border-mute disabled:cursor-not-allowed"
             />

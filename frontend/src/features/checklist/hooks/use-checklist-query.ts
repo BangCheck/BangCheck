@@ -3,16 +3,12 @@ import { useAuthStore } from '@/store/use-auth-store';
 import * as checklistService from '@/services/checklist-service';
 import { mapResponseToForm } from '@/features/checklist/mappers';
 import type { ChecklistInput } from '@/types';
-
-export const CHECKLIST_KEYS = {
-  all: ['checklists'] as const,
-  detail: (id: string) => ['checklists', id] as const,
-};
+import { QUERY_KEYS } from '@/lib/query-keys';
 
 export const useChecklist = (id: string) => {
   const { isLoggedIn } = useAuthStore();
   return useQuery({
-    queryKey: CHECKLIST_KEYS.detail(id),
+    queryKey: QUERY_KEYS.checklist.detail(id),
     queryFn: () => checklistService.getChecklist(id),
     enabled: isLoggedIn && !!id,
     select: (data) => mapResponseToForm(data),
@@ -24,7 +20,7 @@ export const useCreateChecklist = () => {
   return useMutation({
     mutationFn: (input: ChecklistInput) => checklistService.createChecklist(input),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: CHECKLIST_KEYS.all });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.checklist.all });
     },
   });
 };
@@ -34,8 +30,8 @@ export const useUpdateChecklist = (id: string) => {
   return useMutation({
     mutationFn: (input: ChecklistInput) => checklistService.updateChecklist(id, input),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: CHECKLIST_KEYS.all });
-      queryClient.invalidateQueries({ queryKey: CHECKLIST_KEYS.detail(id) });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.checklist.all });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.checklist.detail(id) });
     },
   });
 };
@@ -45,7 +41,7 @@ export const useDeleteChecklist = () => {
   return useMutation({
     mutationFn: (id: string) => checklistService.deleteChecklist(id),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: CHECKLIST_KEYS.all });
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.checklist.all });
     },
   });
 };

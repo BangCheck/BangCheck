@@ -34,21 +34,41 @@ export function SelectCard({
 }
 
 // ─── EmojiCard ────────────────────────────────────────────
-const EMOJI_CARD_CONFIG: Record<string, { icon: string; activeBg: string; activeBorder: string; activeIcon: string }> = {
-  '없음': { icon: 'uiw:smile',          activeBg: 'bg-[#f8fefa]', activeBorder: 'border-[#22d455]', activeIcon: 'text-[#22d455]' },
-  '있음': { icon: 'bi:emoji-angry-fill', activeBg: 'bg-[#fffafa]', activeBorder: 'border-[#f15556]', activeIcon: 'text-[#f15556]' },
+type EmojiCfg = { icon: string; activeBg: string; activeBorder: string; activeIcon: string };
+
+// problem: 없음=좋음(green), 있음=나쁨(red) — 문제요소·융자 등
+const PROBLEM_CFG: Record<string, EmojiCfg> = {
+  '없음':   { icon: 'uiw:smile',           activeBg: 'bg-[#f8fefa]', activeBorder: 'border-[#22d455]', activeIcon: 'text-[#22d455]' },
+  '있음':   { icon: 'bi:emoji-angry-fill', activeBg: 'bg-[#fffafa]', activeBorder: 'border-[#f15556]', activeIcon: 'text-[#f15556]' },
 };
+
+// feature: 있음=좋음(green), 없음=나쁨(gray) — 엘리베이터·설비 유무 등
+const FEATURE_CFG: Record<string, EmojiCfg> = {
+  '있음':   { icon: 'uiw:smile',           activeBg: 'bg-[#f8fefa]', activeBorder: 'border-[#22d455]', activeIcon: 'text-[#22d455]' },
+  '없음':   { icon: 'bi:emoji-dizzy',      activeBg: 'bg-[#f8f8f8]', activeBorder: 'border-[#aaaaaa]', activeIcon: 'text-[#888888]' },
+};
+
+// binary: 가능=좋음(green), 불가능=나쁨(red)
+const BINARY_CFG: Record<string, EmojiCfg> = {
+  '가능':   { icon: 'uiw:smile',           activeBg: 'bg-[#f8fefa]', activeBorder: 'border-[#22d455]', activeIcon: 'text-[#22d455]' },
+  '불가능': { icon: 'bi:emoji-angry-fill', activeBg: 'bg-[#fffafa]', activeBorder: 'border-[#f15556]', activeIcon: 'text-[#f15556]' },
+};
+
+const FALLBACK_CFG: EmojiCfg = { icon: 'uiw:smile', activeBg: 'bg-slot-b-bg', activeBorder: 'border-brand-primary', activeIcon: 'text-brand-primary' };
 
 export function EmojiCard({
   label,
   active,
   onClick,
+  variant = 'problem',
 }: {
   label: string;
   active: boolean;
   onClick: () => void;
+  variant?: 'problem' | 'feature' | 'binary';
 }) {
-  const cfg = EMOJI_CARD_CONFIG[label] ?? { icon: 'uiw:smile', activeBg: 'bg-slot-b-bg', activeBorder: 'border-brand-primary', activeIcon: 'text-brand-primary' };
+  const cfgMap = variant === 'feature' ? FEATURE_CFG : variant === 'binary' ? BINARY_CFG : PROBLEM_CFG;
+  const cfg = cfgMap[label] ?? FALLBACK_CFG;
   return (
     <button
       type="button"
@@ -211,6 +231,8 @@ export function TextInput({
         type={type}
         value={value}
         onChange={(e) => onChange(e.target.value)}
+        onKeyDown={type === 'number' ? (e) => { if (e.key === '-' || e.key === 'e' || e.key === '+') e.preventDefault(); } : undefined}
+        min={type === 'number' ? 0 : undefined}
         placeholder={placeholder}
         disabled={disabled}
         className={cn(

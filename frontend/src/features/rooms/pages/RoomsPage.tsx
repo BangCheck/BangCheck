@@ -2,10 +2,10 @@ import { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/store/use-auth-store';
 import { useGuestRoomStore } from '@/store/use-guest-room-store';
-import { useRoomsList, useDeleteRoom } from '@/features/rooms/hooks/useRoomsQuery';
+import { useRoomsList, useDeleteRoom } from '@/features/rooms/hooks/use-rooms-query';
 import { cn } from '@/lib/utils';
 import { ROUTES } from '@/lib/routes';
-import { GUEST_ROOM_LIMIT, STORAGE_KEY_ONBOARDING } from '@/lib/constants';
+import { GUEST_ROOM_LIMIT, ROOM_LIMIT, STORAGE_KEY_ONBOARDING } from '@/lib/constants';
 import RoomCard from '@/components/RoomCard';
 import {
   LoginRequiredModal,
@@ -333,7 +333,7 @@ export default function RoomsPage() {
       {/* 방 카운터 + 메인 컨텐츠 */}
       <div className="flex-1 flex flex-col px-4 md:px-10 lg:px-20 pb-10 max-w-screen-2xl mx-auto w-full">
         <p className="text-fluid-lg font-semibold text-text-caption py-5">
-          등록된 방 {rooms.length}개{!isLoggedIn ? `/${GUEST_ROOM_LIMIT}개` : ''}
+          등록된 방 {rooms.length}개/{isLoggedIn ? ROOM_LIMIT : GUEST_ROOM_LIMIT}개
         </p>
         {showEmpty ? (
           <EmptyState onStart={handleStartChecklist} />

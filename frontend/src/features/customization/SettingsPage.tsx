@@ -6,7 +6,7 @@ import { Spinner } from '@/components/ui/Spinner';
 import { USER_TYPES, CHECKLIST_ITEMS, TYPE_ITEM_MAP, CATEGORY_LABEL, CATEGORY_ORDER } from '@/features/customization/constants';
 import { UserTypeCard } from '@/features/customization/components/UserTypeCard';
 import { ChecklistItemToggle } from '@/features/customization/components/ChecklistItemToggle';
-import { useCustomization } from '@/features/customization/hooks/useCustomization';
+import { useCustomization } from '@/features/customization/hooks/use-customization';
 import { ItemIcons } from '@/features/customization/components/Icons';
 import { SectionHeader } from '@/features/customization/components/SectionHeader';
 import { BannerLoggedOut } from '@/features/customization/components/BannerLoggedOut';
@@ -25,6 +25,7 @@ export default function SettingsPage() {
     isPending,
     toggleUserType,
     selectAllTypes,
+    deselectAllTypes,
     toggleItem,
     selectAllItems,
     saveCurrentSettings,
@@ -42,7 +43,7 @@ export default function SettingsPage() {
   const activeNamesSet = useMemo(() => new Set(activeItemNames), [activeItemNames]);
 
   const recommendedItems = useMemo(() => {
-    if (selectedTypeIds.length === 0) return CHECKLIST_ITEMS.filter((item) => item.isDefault);
+    if (selectedTypeIds.length === 0) return [];
     const itemIds = new Set(selectedTypeIds.flatMap((typeId) => TYPE_ITEM_MAP[typeId] ?? []));
     return CHECKLIST_ITEMS.filter((item) => itemIds.has(item.id));
   }, [selectedTypeIds]);
@@ -132,6 +133,7 @@ export default function SettingsPage() {
                 title="나는 이런 유형이에요"
                 description="유형을 선택하면 맞춤 항목이 자동으로 체크돼요"
                 onSelectAll={selectAllTypes}
+                onDeselectAll={deselectAllTypes}
                 isFolded={folded.s1}
                 onToggleFold={() => setFolded((f) => ({ ...f, s1: !f.s1 }))}
               />

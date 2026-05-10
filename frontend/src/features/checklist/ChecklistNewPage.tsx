@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '@/lib/routes';
 import { useGuestRoomStore } from '@/store/use-guest-room-store';
 import { useAuthStore } from '@/store/use-auth-store';
-import { useRoomsList, useCreateRoom } from '@/features/rooms/hooks/useRoomsQuery';
+import { useRoomsList, useCreateRoom } from '@/features/rooms/hooks/use-rooms-query';
 import { GUEST_ROOM_LIMIT, ROOM_LIMIT } from '@/lib/constants';
 
 import { useChecklistState } from './hooks/use-checklist-state';
@@ -109,7 +109,6 @@ export default function ChecklistNewPage() {
           onChange={patchCustom}
           customRef={(el) => { sectionRefs.current.custom = el; }}
           memoRef={(el) => { sectionRefs.current.memo = el; }}
-          isLoggedIn={isLoggedIn}
         />
       </main>
 

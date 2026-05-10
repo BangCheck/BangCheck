@@ -1,5 +1,81 @@
 import type { RoomType } from './room';
 
+// ── Form data shapes (shared between checklist components and service layer) ──
+
+export type Rating = '좋음' | '보통' | '나쁨' | null;
+export type YesNo = '있음' | '없음' | null;
+
+export interface BasicInfoData {
+  name: string;
+  address: string;
+  transactionType: string | null;
+  deposit: string;
+  monthlyRent: string;
+  managementFee: string;
+  includeMgmtInRent: boolean;
+  isMgmtUnknown: boolean;
+  loanStatus: '있음' | '없음' | null;
+  loanAmount: string;
+  moveInReport: '가능' | '불가능' | null;
+  moveInDate: string;
+  moveInNegotiable: boolean;
+}
+
+export interface BuildingInfoData {
+  buildingType: string | null;
+  elevator: '있음' | '없음' | null;
+  floorLevel: string | null;
+  floorDirect: string;
+  direction: string | null;
+  options: string[];
+}
+
+export interface InteriorCheckData {
+  lighting: Rating;
+  ventilation: Rating;
+  floorNoise: Rating;
+  waterPressure: Rating;
+  soundProof: Rating;
+  heating: Rating;
+  mold: YesNo;
+  pest: YesNo;
+  leak: YesNo;
+  wallpaper: YesNo;
+  drainSmell: YesNo;
+}
+
+export interface SafetyLivingData {
+  doorLock: Rating;
+  windowLock: Rating;
+  cctv: Rating;
+  fireSafety: Rating;
+  hallLight: Rating;
+  securityState: Rating;
+  windowScreen: Rating;
+  laundry: Rating;
+  trash: Rating;
+  bikeParking: YesNo;
+  internet: YesNo;
+  surroundNoise: Rating;
+  amenity: Rating;
+  transit: Rating;
+  nightSafety: Rating;
+}
+
+export interface CustomMemoData {
+  customItems: { label: string; value: string }[];
+  memo: string;
+}
+
+export interface RoomFormState {
+  basic: BasicInfoData;
+  building: BuildingInfoData;
+  interior: InteriorCheckData;
+  custom: CustomMemoData;
+}
+
+// ── Legacy domain types ──
+
 export type LoanStatus = '없음' | '있음';
 export type ElevatorStatus = '없음' | '있음';
 export type ParkingStatus = '없음' | '있음';
@@ -26,7 +102,8 @@ export type UserType =
   | 'NOISE_SENSITIVE'
   | 'CLEAN_FREAK'
   | 'PERFORMANCE_TYPE'
-  | 'FIRST_TIMER';
+  | 'FIRST_TIMER'
+  | 'ESSENTIALS_ONLY';
 
 export type InputType = 
   | 'TEXT' 

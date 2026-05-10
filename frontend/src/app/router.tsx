@@ -37,12 +37,12 @@ export const Router = () => (
     <Route path="/" element={<LandingPage />} />
     <Route path="/login-error" element={<LoginErrorPage />} />
     <Route path="/auth/callback/:provider" element={<AuthCallbackPage />} />
-    <Route path="/checklist/new" element={<ChecklistNewPage />} />
-    <Route path="/checklist/:id" element={<ChecklistDetailPage />} />
 
     {/* 헤더 있는 페이지 */}
     <Route element={<AppLayout />}>
       <Route path="/login" element={<LoginPage />} />
+      <Route path="/checklist/new" element={<ChecklistNewPage />} />
+      <Route path="/checklist/:id" element={<ChecklistDetailPage />} />
       <Route path="/rooms" element={<RoomsPage />} />
       <Route path="/report" element={<ReportPage />} />
       <Route path="/custom" element={<SettingsPage />} />

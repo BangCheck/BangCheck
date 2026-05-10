@@ -3,32 +3,38 @@ import { useNavigate } from 'react-router-dom';
 import { Icon } from '@iconify/react';
 import { ROUTES } from '@/lib/routes';
 import { useGuestRoomStore } from '@/store/use-guest-room-store';
+import { useAuthStore } from '@/store/use-auth-store';
+import { useRoomsList } from '@/features/rooms/hooks/use-rooms-query';
 import { ConfigCard } from './components/ConfigCard';
 import { FilterToggle } from './components/FilterToggle';
 import { CompareTable } from './components/CompareTable';
 import { SectionTabNav } from './components/SectionTabNav';
 import { ALL_REPORT_SECTION_IDS, REPORT_MAX_SELECT, REPORT_MIN_SELECT, type ReportSectionId } from './lib/sections';
+import { LoginRequiredModal } from '@/components/ui/Modals';
 
 export default function ReportPage() {
   const navigate = useNavigate();
+  const { isLoggedIn } = useAuthStore();
   const { guestRooms } = useGuestRoomStore();
+  const { data: apiRooms = [] } = useRoomsList();
+  const rooms = isLoggedIn ? apiRooms : guestRooms;
 
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [activeSections, setActiveSections] = useState<ReportSectionId[]>([...ALL_REPORT_SECTION_IDS]);
   const [isConfigOpen, setIsConfigOpen] = useState(true);
 
   useEffect(() => {
-    if (guestRooms.length >= REPORT_MIN_SELECT && selectedIds.length === 0) {
-      setSelectedIds(guestRooms.slice(0, REPORT_MIN_SELECT).map((r) => r.id));
+    if (rooms.length >= REPORT_MIN_SELECT && selectedIds.length === 0) {
+      setSelectedIds(rooms.slice(0, REPORT_MIN_SELECT).map((r) => r.id));
     }
-  }, [guestRooms, selectedIds.length]);
+  }, [rooms, selectedIds.length]);
 
   const selectedRooms = useMemo(() => {
     const idSet = new Set(selectedIds);
-    return guestRooms.filter((r) => idSet.has(r.id));
-  }, [guestRooms, selectedIds]);
+    return rooms.filter((r) => idSet.has(r.id));
+  }, [rooms, selectedIds]);
 
-  const isLockedSelection = guestRooms.length <= REPORT_MIN_SELECT;
+  const isLockedSelection = rooms.length <= REPORT_MIN_SELECT;
 
   const toggleRoom = (id: string) => {
     if (isLockedSelection) return;
@@ -47,15 +53,17 @@ export default function ReportPage() {
     });
 
   const resetConfig = () => {
-    setSelectedIds(guestRooms.slice(0, REPORT_MIN_SELECT).map((r) => r.id));
+    setSelectedIds(rooms.slice(0, REPORT_MIN_SELECT).map((r) => r.id));
     setActiveSections([...ALL_REPORT_SECTION_IDS]);
   };
 
   const canSelectMore = selectedIds.length < REPORT_MAX_SELECT;
   const hasEnoughRooms = selectedRooms.length >= REPORT_MIN_SELECT;
 
+  const [pdfLoginModalOpen, setPdfLoginModalOpen] = useState(false);
+
   // ── 빈 상태 ──────────────────────────────────────────────────
-  if (guestRooms.length < REPORT_MIN_SELECT) {
+  if (rooms.length < REPORT_MIN_SELECT) {
     return (
       <div className="flex-1 bg-bg-footer min-h-[calc(100vh-64px)] flex items-center justify-center px-6">
         <div className="flex flex-col items-center gap-6 max-w-[360px] text-center">
@@ -66,7 +74,7 @@ export default function ReportPage() {
           <div className="space-y-2">
             <h2 className="text-[18px] font-bold text-text-main">비교하려면 방이 2개 이상 필요해요</h2>
             <p className="text-[13px] text-text-caption leading-relaxed">
-              현재 등록된 방: {guestRooms.length}개<br />
+              현재 등록된 방: {rooms.length}개<br />
               체크리스트를 추가해 비교 리포트를 받아보세요.
             </p>
           </div>
@@ -113,7 +121,7 @@ export default function ReportPage() {
             <button
               type="button"
               aria-label="PDF 다운로드"
-              onClick={() => window.print()}
+              onClick={() => isLoggedIn ? window.print() : setPdfLoginModalOpen(true)}
               className="inline-flex h-8 items-center gap-2.5 rounded-[4px] border border-border-light px-4 py-2 text-xs font-semibold text-text-main hover:bg-bg-gray"
             >
               <Icon icon="material-symbols:download-rounded" width={16} height={16} />
@@ -128,7 +136,7 @@ export default function ReportPage() {
         <div className="bg-white border-b border-border-light">
           <div className="max-w-screen-xl mx-auto px-4 md:px-10 py-6">
             <ConfigCard
-              rooms={guestRooms}
+              rooms={rooms}
               selectedRoomIds={selectedIds}
               onToggleRoom={toggleRoom}
               canSelectMore={canSelectMore}
@@ -153,6 +161,12 @@ export default function ReportPage() {
           <CompareTable rooms={selectedRooms} activeSections={activeSections} />
         </div>
       )}
+      <LoginRequiredModal
+        isOpen={pdfLoginModalOpen}
+        onClose={() => setPdfLoginModalOpen(false)}
+        onContinueAsGuest={() => setPdfLoginModalOpen(false)}
+        onLogin={() => { setPdfLoginModalOpen(false); navigate(ROUTES.LOGIN); }}
+      />
     </div>
   );
 }

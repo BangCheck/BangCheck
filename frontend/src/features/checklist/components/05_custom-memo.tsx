@@ -1,9 +1,7 @@
 import { SectionHeader, FieldLabel } from './ui/shared';
+import type { CustomMemoData } from '@/types';
 
-export interface CustomMemoData {
-  customItems: { label: string; value: string }[];
-  memo: string;
-}
+export type { CustomMemoData };
 
 interface Props {
   data: CustomMemoData;

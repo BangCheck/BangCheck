@@ -34,7 +34,7 @@ export default function RoomCard({
   };
 
   const formattedPrice = price || (type === '전세'
-    ? formatAmount(deposit)
+    ? `${formatAmount(deposit)}${managementFee ? `/${managementFee}만` : ''}`
     : `${formatAmount(deposit)}/${formatAmount(rent)}/${managementFee || 0}만`);
 
   // 3. 문제 요소 설정
