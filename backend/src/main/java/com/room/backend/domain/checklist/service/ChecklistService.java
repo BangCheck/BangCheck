@@ -85,6 +85,25 @@ public class ChecklistService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
+    public List<ChecklistItemResponse> getAllItemsForSettings(Long userId) {
+        List<ChecklistItem> items = checklistItemRepository.findAllForSettings(userId);
+        List<Long> disabledItemIds = userChecklistSettingRepository.findByUserIdAndIsEnabledFalse(userId)
+                .stream()
+                .map(UserChecklistSetting::getItemId)
+                .collect(Collectors.toSet())
+                .stream()
+                .toList();
+
+        return items.stream()
+                .map(item -> {
+                    List<ChecklistOption> options = checklistOptionRepository.findByChecklistItemId(item.getId());
+                    Boolean isEnabled = !disabledItemIds.contains(item.getId());
+                    return ChecklistItemResponse.of(item, options, isEnabled);
+                })
+                .toList();
+    }
+
     public void selectUserType(Long userId, UserType userType) {
         userTypeSelectionRepository.findByUserIdAndUserType(userId, userType)
                 .ifPresentOrElse(
