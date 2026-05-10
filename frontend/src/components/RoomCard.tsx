@@ -122,11 +122,11 @@ export default function RoomCard({
       {/* 3. 요약 정보 (Chips) - 블루 테마 적용 */}
       <div className="flex flex-wrap gap-2 mb-4">
         {[buildingType, floor, direction].filter(Boolean).map((tag, idx) => (
-          <span key={idx} className="bg-bg-brand-lighter text-brand-primary text-fluid-base font-bold px-3 py-1 rounded-[4px]">
+          <span key={idx} className="bg-bg-brand-lighter text-brand-primary text-fluid-base font-bold px-3 py-1 rounded-[4px] whitespace-nowrap">
             {tag}
           </span>
         ))}
-        <span className="bg-bg-brand-lighter text-brand-primary text-[14px] font-bold px-3 py-1 rounded-[4px]">
+        <span className="bg-bg-brand-lighter text-brand-primary text-fluid-base font-bold px-3 py-1 rounded-[4px] whitespace-nowrap">
           {formattedPrice}
         </span>
       </div>
