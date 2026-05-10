@@ -230,7 +230,7 @@ function DynamicItem({
   const beOptions = item.options.map((o) => o.optionValue);
   const isBooleanFallback = beOptions.length === 0 && item.inputType === 'BOOLEAN';
   const options = isBooleanFallback ? ['있음', '없음'] : beOptions;
-  const positiveValue = isBooleanFallback && POSITIVE_IS_있음_CATEGORIES.includes(item.category)
+  const positiveValue = item.inputType === 'BOOLEAN' && POSITIVE_IS_있음_CATEGORIES.includes(item.category)
     ? '있음'
     : undefined;
   return (
