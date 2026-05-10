@@ -48,7 +48,7 @@ function QuoteCard({ quote }: { quote: Quote }) {
           className="w-full h-full object-contain"
         />
       </div>
-      <p className="font-bold text-[12px] md:text-[24px] leading-[1.5] tracking-[-0.13px] md:tracking-[-0.264px] whitespace-nowrap relative z-10">
+      <p className="font-bold text-fluid-xs md:text-fluid-3xl leading-[1.5] tracking-[-0.13px] whitespace-nowrap relative z-10">
         {quote.text[0]}<br />{quote.text[1]}
       </p>
     </div>
@@ -59,10 +59,10 @@ export default function TestimonialsSection() {
   return (
     <SectionWrapper className="bg-bg-dark flex flex-col gap-[50px] md:gap-[100px] items-start px-6 py-[120px] md:px-[190px] md:py-[140px]">
       <div className="flex flex-col gap-[16px] md:gap-[60px] items-center md:items-start text-white tracking-[-0.5px] w-full max-w-[837px] mx-auto md:mx-0 text-center md:text-left">
-        <h2 className="font-bold text-[20px] md:text-[40px] leading-[1.22] not-italic">
+        <h2 className="font-bold text-fluid-5xl leading-[1.22] not-italic">
           서대문구 자취생을 위한 필수 체크리스트
         </h2>
-        <p className="font-light text-[13px] md:text-[20px] text-text-caption md:text-white leading-[1.3] not-italic">
+        <p className="font-light text-fluid-md text-text-caption md:text-white leading-[1.3] not-italic">
           자취방 계약 후 후회하는 건, 결국 그때 못 본 작은 것들 때문입니다.<br />
           이 체크리스트는 먼저 살아본 자취생들의 후회 경험과<br />
           서대문구의 동네 특성을 담아, 놓치면 안 될 것만 모았습니다.
@@ -82,10 +82,10 @@ export default function TestimonialsSection() {
         </div>
 
         <div className="flex flex-col gap-2 md:gap-9 items-center md:items-start max-w-[837px] text-center md:text-left">
-          <h3 className="font-bold text-[16px] md:text-[30px] text-white tracking-[-0.5px] leading-[1.22] not-italic">
+          <h3 className="font-bold text-fluid-4xl text-white tracking-[-0.5px] leading-[1.22] not-italic">
             설문을 통해 기준을 세웠습니다.
           </h3>
-          <p className="font-light text-[12px] md:text-[20px] text-text-caption md:text-white tracking-[-0.5px] leading-[1.3] not-italic">
+          <p className="font-light text-fluid-md text-text-caption md:text-white tracking-[-0.5px] leading-[1.3] not-italic">
             설문조사를 통해 자취방을 구할 때 후회했던 경험을 수집하고,<br />
             실제 선택에 도움이 되는 기준으로 정리했습니다.
           </p>

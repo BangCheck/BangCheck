@@ -58,20 +58,20 @@ function FeatureRowMobile({ feature, isFirst }: { feature: Feature; isFirst: boo
 
       <div className="flex flex-col gap-[18px] items-center w-full">
         <div className="flex flex-col gap-1 items-center w-full">
-          <h3 className="font-bold text-[18px] text-text-main tracking-[-0.18px] leading-[1.3] text-center">
+          <h3 className="font-bold text-fluid-2xl text-text-main tracking-[-0.18px] leading-[1.3] text-center">
             {feature.title}
           </h3>
-          <p className="font-medium text-[16px] text-text-sub tracking-[-0.18px] leading-[1.3] text-center">
+          <p className="font-medium text-fluid-xl text-text-sub tracking-[-0.18px] leading-[1.3] text-center">
             &ldquo;{feature.subtitle}&rdquo;
           </p>
         </div>
-        <p className="text-[12px] text-text-mute tracking-[-0.2px] leading-[1.3] text-center px-5">
+        <p className="text-fluid-xs text-text-mute tracking-[-0.2px] leading-[1.3] text-center px-5">
           {feature.description}
         </p>
         {feature.cta && (
           <Link
             to={feature.cta.href}
-            className="flex items-center gap-1.5 bg-brand-primary text-white font-semibold text-[14px] tracking-[-0.18px] pl-4 pr-3 py-3 rounded shadow-[0_12px_11px_rgba(10,96,125,0.27)] hover:bg-brand-primary-dark transition-colors"
+            className="flex items-center gap-1.5 bg-brand-primary text-white font-semibold text-fluid-base tracking-[-0.18px] pl-4 pr-3 py-3 rounded shadow-[0_12px_11px_rgba(10,96,125,0.27)] hover:bg-brand-primary-dark transition-colors"
           >
             {feature.cta.label}
             <ChevronRight className="w-3.5 h-3.5" />
@@ -91,20 +91,20 @@ function FeatureRowDesktop({ feature }: { feature: Feature }) {
 
       <div className="flex flex-col gap-[33px] items-start w-[310px] flex-none">
         <div className="flex flex-col gap-2 items-start">
-          <h3 className="font-bold text-[32px] text-text-main tracking-[-0.5px] leading-[1.3]">
+          <h3 className="font-bold text-fluid-4xl text-text-main tracking-[-0.5px] leading-[1.3]">
             {feature.title}
           </h3>
-          <p className="font-medium text-[20px] text-text-main tracking-[-0.5px] leading-[1.3] text-center">
+          <p className="font-medium text-fluid-3xl text-text-main tracking-[-0.5px] leading-[1.3] text-center">
             &ldquo;{feature.subtitle}&rdquo;
           </p>
         </div>
-        <p className="text-[16px] text-text-main tracking-[-0.5px] leading-[1.7]">
+        <p className="text-fluid-xl text-text-main tracking-[-0.5px] leading-[1.7]">
           {feature.description}
         </p>
         {feature.cta && (
           <Link
             to={feature.cta.href}
-            className="flex items-center gap-2 bg-border-light text-text-main font-bold text-[16px] tracking-[-0.5px] px-[10px] py-[16px] rounded-[12px] w-[210px] justify-center hover:bg-[#d0d0d0] transition-colors"
+            className="flex items-center gap-2 bg-border-light text-text-main font-bold text-fluid-xl tracking-[-0.5px] px-[10px] py-[16px] rounded-[12px] w-[210px] justify-center hover:bg-bg-gray-hover transition-colors"
           >
             {feature.cta.label}
             <ChevronRight className="w-4 h-4" />
@@ -120,10 +120,10 @@ export default function FeaturesSection() {
     <SectionWrapper className="bg-white px-6 py-[70px] md:px-[190px] md:py-[140px]">
       <div className="flex flex-col gap-[50px] md:gap-[100px] items-start max-w-[962px]">
         <div className="flex flex-col gap-[40px] md:gap-[60px] items-start tracking-[-0.5px]">
-          <p className="font-bold text-[16px] md:text-[20px] text-brand-primary leading-[1.7]">
+          <p className="font-bold text-fluid-xl text-brand-primary leading-[1.7]">
             Key Features
           </p>
-          <h2 className="font-bold text-[22px] md:text-[40px] text-text-main leading-[1.35] md:leading-[1.22]">
+          <h2 className="font-bold text-fluid-5xl text-text-main leading-[1.35] md:leading-[1.22]">
             막막했던 첫 독립이 설렘이 되는 순간,<br />
             그 시작을 자취생들이 직접 만든 체크리스트가 함께합니다.
           </h2>

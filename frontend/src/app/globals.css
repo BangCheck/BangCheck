@@ -90,6 +90,8 @@
   .text-fluid-2xl  { font-size: clamp(1.125rem,  1.8vw, 1.375rem);  } /* 18→22px */
   .text-fluid-3xl  { font-size: clamp(1.25rem,   2.0vw, 1.5rem);    } /* 20→24px */
   .text-fluid-4xl  { font-size: clamp(1.5rem,    2.5vw, 1.875rem);  } /* 24→30px */
+  .text-fluid-5xl  { font-size: clamp(1.25rem,   2.0vw, 2.5rem);    } /* 20→40px */
+  .text-fluid-6xl  { font-size: clamp(1.5rem,    3.2vw, 3.5rem);    } /* 24→56px */
 }
 
 /* TODO(E06-S06): html2canvas + jsPDF 도입 후 이 print CSS는 제거 예정 */
