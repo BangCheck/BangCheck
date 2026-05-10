@@ -22,7 +22,7 @@ export function SectionChip({ section, label, selected, disabled = false, onTogg
       onClick={() => !disabled && onToggle(section)}
       disabled={disabled}
       aria-pressed={selected}
-      className={`inline-flex items-center gap-2.5 rounded-[4px] border px-4 py-1.5 text-sm font-semibold transition-colors ${tone}`}
+      className={`inline-flex items-center gap-2.5 rounded-[4px] border px-4 py-1.5 text-sm font-semibold transition-colors whitespace-nowrap ${tone}`}
     >
       <SectionIcon section={section} size={16} />
       <span>{label}</span>

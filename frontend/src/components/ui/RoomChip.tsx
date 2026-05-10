@@ -17,7 +17,7 @@ type Props = {
 export function RoomChip({ slot, children, className = '' }: Props) {
   return (
     <span
-      className={`inline-flex items-center justify-center rounded-[2px] px-1 py-[2px] text-xs font-semibold leading-[1.3] ${SLOT_CLASS[slot]} ${className}`}
+      className={`inline-flex items-center justify-center rounded-[2px] px-1 py-[2px] text-xs font-semibold leading-[1.3] whitespace-nowrap ${SLOT_CLASS[slot]} ${className}`}
     >
       {children}
     </span>
