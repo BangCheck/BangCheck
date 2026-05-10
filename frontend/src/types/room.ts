@@ -1,6 +1,18 @@
 // 하위호환 타입 (RoomCard, use-guest-room-store 등 기존 코드용)
 export type RoomType = '전세' | '월세' | '단기임대';
 
+// BE /api/v1/rooms 목록 응답 DTO
+export interface RoomListItem {
+  id: number;
+  name: string;
+  address: string;
+  rentType: 'MONTHLY' | 'JEONSE' | 'SHORT_TERM';
+  deposit: number;
+  rent: number;
+  buildingType: string;
+  createdAt: string;
+}
+
 export interface RoomIssues {
   mold: boolean;
   leak: boolean;
@@ -26,6 +38,16 @@ export interface Room {
   buildingType?: string;
   floor?: string;
   direction?: string;
+  // 비로그인 sessionStorage 전용: 5섹션 원본 폼 데이터 (수정 페이지 복원용)
+  raw?: GuestRoomRaw;
+}
+
+export interface GuestRoomRaw {
+  basic: import('@/features/checklist/components/01_basic-info').BasicInfoData;
+  building: import('@/features/checklist/components/02_building-info').BuildingInfoData;
+  interior: import('@/features/checklist/components/03_interior-check').InteriorCheckData;
+  safety: import('@/features/checklist/components/04_safety-living').SafetyLivingData;
+  custom: import('@/features/checklist/components/05_custom-memo').CustomMemoData;
 }
 
 export interface PaginatedResponse<T> {

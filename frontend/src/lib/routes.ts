@@ -1,18 +1,20 @@
 export const ROUTES = {
-  HOME: '/',
-  ROOMS: '/rooms',
+  HOME: '/rooms',
   LOGIN: '/login',
+  LOGIN_ERROR: '/login-error',
   AUTH_CALLBACK: (provider: string) => `/auth/callback/${provider}`,
   REPORT: '/report',
-  SETTINGS: '/settings',
+  SETTINGS: '/custom',
   CHECKLIST_NEW: '/checklist/new',
   CHECKLIST_DETAIL: (id: string) => `/checklist/${id}`,
-  LANDING: '/landing',
+  LANDING: '/',
 } as const;
 
-export const PROTECTED_ROUTES: readonly string[] = [
-  ROUTES.REPORT,
-];
+export const loginRedirect = (_reason?: string) => ROUTES.LOGIN;
 
-export const loginRedirect = (reason: 'expired' | 'auth_failed' | 'invalid_params'): string =>
-  `${ROUTES.LOGIN}?error=${reason}`;
+export const PROTECTED_ROUTES: readonly string[] = [
+  ROUTES.HOME,
+  ROUTES.REPORT,
+  ROUTES.SETTINGS,
+  ROUTES.CHECKLIST_NEW,
+];

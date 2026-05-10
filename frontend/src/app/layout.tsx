@@ -40,7 +40,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko" className="h-full">
-      <body className="min-h-full flex flex-col font-['Pretendard',sans-serif]">
+      <body className="min-h-full bg-white font-['Pretendard',sans-serif]">
         <ReactQueryProvider>
           <Header />
           <main className="flex-1 flex flex-col pb-[80px] md:pb-0">

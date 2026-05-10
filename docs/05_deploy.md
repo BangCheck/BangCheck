@@ -52,11 +52,24 @@ java -jar build/libs/backend-*.jar \
 
 ### 수동 배포 순서 (FE)
 
+> **⚠️ 2026-05-06 변경**: Next.js → Vite 마이그레이션(E09)으로 `npm run start` 폐기.
+> Vite는 정적 빌드 산출물(`dist/`)을 S3 + CloudFront 또는 Vercel(Static)로 배포.
+
 ```bash
-npm run build
-npm run start
-# 또는 Vercel / Nginx 연동
+npm run build       # tsc --noEmit && vite build → dist/ 생성
+npm run preview     # 로컬 정적 미리보기 (port 4173)
+# 배포: dist/ 디렉토리를 S3 sync 또는 Vercel deploy
 ```
+
+### Vercel 사용 시 — 대시보드 설정 변경 필수
+
+마이그레이션 머지 전 Vercel 대시보드에서:
+- **Framework Preset**: `Next.js` → `Vite`
+- **Build Command**: `npm run build` (자동 인식 가능)
+- **Output Directory**: `dist`
+- **Install Command**: `npm install`
+
+설정 변경 없이 머지하면 Vercel 자동 빌드가 Next.js로 시도하다 실패함.
 
 ---
 

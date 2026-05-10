@@ -19,13 +19,14 @@ export type ChecklistCategory =
   | 'ENVIRONMENT'
   | 'CUSTOM';
 
-export type ItemType = 'DEFAULT' | 'CUSTOM';
+export type ItemType = 'DEFAULT' | 'CUSTOM' | 'USER_TYPE';
 
-export type UserType = 
-  | 'BUG_AVOIDER' 
-  | 'NOISE_SENSITIVE' 
-  | 'CLEAN_FREAK' 
-  | 'PERFORMANCE_TYPE';
+export type UserType =
+  | 'BUG_AVOIDER'
+  | 'NOISE_SENSITIVE'
+  | 'CLEAN_FREAK'
+  | 'PERFORMANCE_TYPE'
+  | 'FIRST_TIMER';
 
 export type InputType = 
   | 'TEXT' 

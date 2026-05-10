@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/use-auth-store';
+import { ROUTES } from '@/lib/routes';
 import type { User } from '@/types';
 
 // ⚠️ 무한 만료 토큰 — BE에서 새 토큰 발급 시 교체 (2026-05-02)
@@ -26,13 +27,13 @@ export function DevLoginButton() {
   const router = useRouter();
   const { setAuth } = useAuthStore();
 
-  if (process.env.NODE_ENV !== 'development') return null;
+  if (!import.meta.env.DEV) return null;
 
   const token = DEV_TOKENS[ACTIVE_USER_ID];
 
   const handleDevLogin = () => {
     setAuth(token, DEV_USER);
-    router.push('/');
+    router.push(ROUTES.HOME);
   };
 
   return (

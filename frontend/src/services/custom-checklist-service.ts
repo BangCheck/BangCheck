@@ -1,28 +1,27 @@
 import { api } from '@/lib/api';
-import type { ChecklistItemResponse, UserType } from '@/types';
+import type { ChecklistItemResponse } from '@/types';
 
 export const getCustomizedItems = async (): Promise<ChecklistItemResponse[]> => {
-  const response = await api.get<ChecklistItemResponse[]>('/api/v1/checklist/items');
+  const response = await api.get<ChecklistItemResponse[]>('/api/checklist/items');
   return response.data;
 };
 
 export const selectUserType = async (userType: string): Promise<void> => {
-  await api.post(`/api/v1/checklist/types/${userType}`);
+  await api.post(`/api/checklist/types/${userType}`);
 };
 
 export const deselectUserType = async (userType: string): Promise<void> => {
-  await api.delete(`/api/v1/checklist/types/${userType}`);
+  await api.delete(`/api/checklist/types/${userType}`);
 };
 
-export const toggleItem = async (itemId: number): Promise<void> => {
-  await api.patch(`/api/v1/checklist/items/${itemId}/toggle`);
+export const saveSettings = async (disabledItemIds: number[]): Promise<void> => {
+  await api.post('/api/checklist/items/settings', { disabledItemIds });
 };
 
-export const addCustomItem = async (itemName: string): Promise<ChecklistItemResponse> => {
-  const response = await api.post<ChecklistItemResponse>('/api/v1/checklist/items/custom', { itemName });
-  return response.data;
+export const addCustomItem = async (itemName: string): Promise<void> => {
+  await api.post('/api/checklist/items/custom', { itemName });
 };
 
 export const deleteCustomItem = async (customItemId: number): Promise<void> => {
-  await api.delete(`/api/v1/checklist/items/custom/${customItemId}`);
+  await api.delete(`/api/checklist/items/custom/${customItemId}`);
 };

@@ -1,3 +1,102 @@
 # Sprint Status
 login: Woo-JongHo
-stories: []
+
+epics:
+  - id: E1
+    title: 프론트엔드 코드 리팩토링
+    status: done
+    branch: woo-dev-v2
+    completed_at: 2026-05-05
+    stories:
+      - id: E1-S1
+        title: 구조 레이어 분리 베이스
+        status: done
+        files:
+          - src/lib/cookie.ts
+          - src/store/use-auth-store.ts
+          - src/lib/routes.ts
+          - src/features/dev/DevLoginSection.tsx
+          - src/services/checklist-service.ts
+        notes: "cookie IO 분리, PROTECTED_ROUTES 정정, tmp 파일 삭제"
+
+      - id: E1-S2
+        title: mappers / TanStack Query 훅 계층 신설
+        status: done
+        files:
+          - src/features/checklist/mappers.ts
+          - src/features/checklist/hooks/useChecklistQuery.ts
+          - src/features/rooms/hooks/useRoomsQuery.ts
+        notes: "Form↔API 양방향 매핑, RENT_TYPE_MAP/DIRECTION_MAP/SCORE_MAP lookup table"
+
+  - id: E2
+    title: 페이지별 백엔드 API 연동
+    status: in-progress
+    branch: woo-dev-v2
+    stories:
+      - id: E2-S1
+        title: rooms 페이지 API 연동
+        status: done
+        files:
+          - src/app/rooms/page.tsx
+          - src/app/auth/callback/[provider]/page.tsx
+        notes: "useRoomsList 훅 적용, deleteRoomById 연동, auth callback 서비스 위임"
+
+      - id: E2-S2
+        title: checklist 페이지 API 연동
+        status: done
+        files:
+          - src/app/checklist/new/page.tsx
+          - src/app/checklist/[id]/page.tsx
+          - src/app/report/page.tsx
+          - src/services/custom-checklist-service.ts
+        notes: "useCreateChecklist/useChecklist/useUpdateChecklist 훅 적용, TODO(be) 마커"
+
+      - id: E2-S3
+        title: report / settings / customization API 연동
+        status: todo
+        target_session: session-next
+        notes: "report 비교 데이터 API, settings 유저 설정 저장, customization activeItemCount 주입"
+
+  - id: E3
+    title: 페이지별 디자인 점검
+    status: in-progress
+    branch: woo-dev-v2
+    stories:
+      - id: E3-S1
+        title: 1차 디자인 패치 (alert 제거, Skeleton, 반응형)
+        status: done
+        files:
+          - src/app/login/page.tsx
+          - src/app/rooms/page.tsx
+          - src/app/checklist/new/page.tsx
+          - src/app/checklist/[id]/page.tsx
+          - src/app/report/page.tsx
+          - src/components/BottomNavigation.tsx
+          - src/components/RoomCard.tsx
+          - src/features/checklist/components/Step3DetailedCheck.tsx
+        notes: "alert→인라인 에러, Skeleton UI, px-4 md:px-10 반응형, 이모지→SVG"
+
+      - id: E3-S2
+        title: 페이지별 디자인 정밀 점검 (/, /login)
+        status: todo
+        target_session: session-next
+        target_routes:
+          - /
+          - /login
+
+      - id: E3-S3
+        title: 페이지별 디자인 정밀 점검 (/rooms, /checklist/new)
+        status: todo
+        target_session: session-next
+        target_routes:
+          - /rooms
+          - /checklist/new
+
+      - id: E3-S4
+        title: 페이지별 디자인 정밀 점검 (/checklist/[id], /report, /settings)
+        status: todo
+        target_session: session-next
+        target_routes:
+          - /checklist/[id]
+          - /report
+          - /settings

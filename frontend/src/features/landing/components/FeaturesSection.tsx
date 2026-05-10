@@ -1,17 +1,25 @@
-import Link from 'next/link';
-import Image from 'next/image';
+import { Link } from 'react-router-dom';
 import { ROUTES } from '@/lib/routes';
 import { ChevronRight } from '@/components/ui/ChevronRight';
 import { SectionWrapper } from './SectionWrapper';
 
-const FEATURES = [
+type Feature = {
+  imageSrc: string;
+  imageAlt: string;
+  title: string;
+  subtitle: string;
+  description: string;
+  cta?: { label: string; href: string };
+};
+
+const FEATURES: readonly Feature[] = [
   {
     imageSrc: '/images/landing/feature-checklist.png',
     imageAlt: '자취 체크리스트 화면',
     title: '자취 체크리스트',
     subtitle: '놓치기 쉬운 항목, 확인하는 방법까지',
     description: '곰팡이, 수압, 방음 등 초보 자취생이 챙겨야 할 필수 항목과 항목별 확인 가이드를 함께 제공합니다. 계약 전, 무엇을 확인해야 할지 미리 점검해보세요',
-    cta: { label: '체크리스트 시작하기', href: ROUTES.CHECKLIST_NEW },
+    cta: { label: '체크리스트 시작하기', href: ROUTES.HOME },
   },
   {
     imageSrc: '/images/landing/feature-distance.png',
@@ -36,40 +44,69 @@ const FEATURES = [
   },
 ] as const;
 
-interface FeatureRowProps {
-  imageSrc: string;
-  imageAlt: string;
-  title: string;
-  subtitle: string;
-  description: string;
-  cta?: { label: string; href: string };
+function FeatureRowMobile({ feature, isFirst }: { feature: Feature; isFirst: boolean }) {
+  return (
+    <div className="flex flex-col gap-[36px] items-start w-full">
+      <div
+        className={
+          'border border-border-light rounded-[3px] overflow-hidden w-full ' +
+          (isFirst ? 'aspect-[333/254]' : 'aspect-[220/158]')
+        }
+      >
+        <img src={feature.imageSrc} alt={feature.imageAlt} className="w-full h-full object-cover" loading="lazy" />
+      </div>
+
+      <div className="flex flex-col gap-[18px] items-center w-full">
+        <div className="flex flex-col gap-1 items-center w-full">
+          <h3 className="font-bold text-fluid-2xl text-text-main tracking-[-0.18px] leading-[1.3] text-center">
+            {feature.title}
+          </h3>
+          <p className="font-medium text-fluid-xl text-text-sub tracking-[-0.18px] leading-[1.3] text-center">
+            &ldquo;{feature.subtitle}&rdquo;
+          </p>
+        </div>
+        <p className="text-fluid-xs text-text-mute tracking-[-0.2px] leading-[1.3] text-center px-5">
+          {feature.description}
+        </p>
+        {feature.cta && (
+          <Link
+            to={feature.cta.href}
+            className="flex items-center gap-1.5 bg-brand-primary text-white font-semibold text-fluid-base tracking-[-0.18px] pl-4 pr-3 py-3 rounded shadow-[0_12px_11px_rgba(10,96,125,0.27)] hover:bg-brand-primary-dark transition-colors"
+          >
+            {feature.cta.label}
+            <ChevronRight className="w-3.5 h-3.5" />
+          </Link>
+        )}
+      </div>
+    </div>
+  );
 }
 
-function FeatureRow({ imageSrc, imageAlt, title, subtitle, description, cta }: FeatureRowProps) {
+function FeatureRowDesktop({ feature }: { feature: Feature }) {
   return (
     <div className="flex items-start justify-between w-full gap-10">
-      <div className="border border-[#191b1e] rounded-[8px] overflow-hidden flex-none w-[568px] h-[434px] relative">
-        <Image src={imageSrc} alt={imageAlt} fill className="object-cover" />
+      <div className="border border-bg-dark rounded-[8px] overflow-hidden flex-none w-[568px] h-[434px] relative">
+        <img src={feature.imageSrc} alt={feature.imageAlt} className="w-full h-full object-cover" loading="lazy" />
       </div>
 
       <div className="flex flex-col gap-[33px] items-start w-[310px] flex-none">
         <div className="flex flex-col gap-2 items-start">
-          <h3 className="font-bold text-[32px] text-[#232527] tracking-[-0.5px] leading-[1.3]">
-            {title}
+          <h3 className="font-bold text-fluid-4xl text-text-main tracking-[-0.5px] leading-[1.3]">
+            {feature.title}
           </h3>
-          <p className="font-medium text-[20px] text-[#232527] tracking-[-0.5px] leading-[1.3] text-center">
-            &ldquo;{subtitle}&rdquo;
+          <p className="font-medium text-fluid-3xl text-text-main tracking-[-0.5px] leading-[1.3] text-center">
+            &ldquo;{feature.subtitle}&rdquo;
           </p>
         </div>
-        <p className="text-[16px] text-[#232527] tracking-[-0.5px] leading-[1.7]">
-          {description}
+        <p className="text-fluid-xl text-text-main tracking-[-0.5px] leading-[1.7]">
+          {feature.description}
         </p>
-        {cta && (
+        {feature.cta && (
           <Link
-            href={cta.href}
-            className="flex items-center gap-2 bg-[#e2e2e2] text-[#232527] font-bold text-[16px] tracking-[-0.5px] px-[10px] py-[16px] rounded-[12px] w-[210px] justify-center hover:bg-[#d0d0d0] transition-colors"
+            to={feature.cta.href}
+            className="flex items-center gap-2 bg-border-light text-text-main font-bold text-fluid-xl tracking-[-0.5px] px-[10px] py-[16px] rounded-[12px] w-[210px] justify-center hover:bg-bg-gray-hover transition-colors"
           >
-            {cta.label}
+            {feature.cta.label}
             <ChevronRight className="w-4 h-4" />
           </Link>
         )}
@@ -80,21 +117,28 @@ function FeatureRow({ imageSrc, imageAlt, title, subtitle, description, cta }: F
 
 export default function FeaturesSection() {
   return (
-    <SectionWrapper className="bg-white">
-      <div className="flex flex-col gap-[100px] items-start max-w-[962px]">
-        <div className="flex flex-col gap-[60px] items-start tracking-[-0.5px]">
-          <p className="font-bold text-[20px] text-[#0a607d] leading-[1.7]">
+    <SectionWrapper className="bg-white px-6 py-[70px] md:px-[190px] md:py-[140px]">
+      <div className="flex flex-col gap-[50px] md:gap-[100px] items-start max-w-[962px]">
+        <div className="flex flex-col gap-[40px] md:gap-[60px] items-start tracking-[-0.5px]">
+          <p className="font-bold text-fluid-xl text-brand-primary leading-[1.7]">
             Key Features
           </p>
-          <h2 className="font-bold text-[32px] md:text-[40px] text-[#232527] leading-[1.22]">
+          <h2 className="font-bold text-fluid-5xl text-text-main leading-[1.35] md:leading-[1.22]">
             막막했던 첫 독립이 설렘이 되는 순간,<br />
             그 시작을 자취생들이 직접 만든 체크리스트가 함께합니다.
           </h2>
         </div>
 
-        <div className="flex flex-col gap-[100px] items-start w-full">
-          {FEATURES.map((feature) => (
-            <FeatureRow key={feature.title} {...feature} />
+        <div className="flex flex-col gap-[90px] md:gap-[100px] items-start w-full">
+          {FEATURES.map((feature, i) => (
+            <div key={feature.title} className="w-full">
+              <div className="md:hidden">
+                <FeatureRowMobile feature={feature} isFirst={i === 0} />
+              </div>
+              <div className="hidden md:block">
+                <FeatureRowDesktop feature={feature} />
+              </div>
+            </div>
           ))}
         </div>
       </div>

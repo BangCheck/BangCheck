@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { User } from '@/types';
+import { setTokenCookie, deleteTokenCookie } from '@/lib/cookie';
 
 interface AuthState {
   user: User | null;
@@ -10,21 +11,6 @@ interface AuthState {
   logout: () => void;
 }
 
-const setCookie = (name: string, value: string, days: number) => {
-  const expires = new Date(Date.now() + days * 864e5).toUTCString();
-  document.cookie = `${name}=${value}; expires=${expires}; path=/; SameSite=Lax`;
-};
-
-const deleteCookie = (name: string) => {
-  document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
-};
-
-const setAuthCookie = (token: string) => {
-  if (typeof window !== 'undefined') {
-    setCookie('accessToken', token, 7);
-  }
-};
-
 export const useAuthStore = create<AuthState>()(
   persist(
     (set) => ({
@@ -32,11 +18,11 @@ export const useAuthStore = create<AuthState>()(
       accessToken: null,
       isLoggedIn: false,
       setAuth: (accessToken, user) => {
-        setAuthCookie(accessToken);
+        setTokenCookie(accessToken);
         set({ accessToken, user, isLoggedIn: true });
       },
       logout: () => {
-        deleteCookie('accessToken');
+        deleteTokenCookie();
         set({ accessToken: null, user: null, isLoggedIn: false });
       },
     }),

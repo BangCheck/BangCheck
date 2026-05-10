@@ -9,14 +9,17 @@ import { cn } from "@/lib/utils";
 
 export default function LoginPage() {
   const [isLoading, setIsLoading] = useState<string | null>(null);
+  const [loginError, setLoginError] = useState<string | null>(null);
 
   const handleLogin = async (provider: "naver" | "google") => {
     setIsLoading(provider);
+    setLoginError(null);
     try {
       await getOAuthUrl(provider);
     } catch (error) {
       console.error(error);
       setIsLoading(null);
+      setLoginError('로그인 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.');
     }
   };
 
@@ -30,14 +33,21 @@ export default function LoginPage() {
             <div className="flex flex-col items-center gap-[20px] md:gap-[18px]">
               <LogoWithText size={38} textClassName="text-[30px]" />
               <div className="text-center space-y-1">
-                <h1 className="text-[#232527] text-[22px] md:text-[24px] font-bold leading-tight">
+                <h1 className="text-text-main text-[22px] md:text-[24px] font-bold leading-tight">
                   방체크에 오신 걸 환영해요.
                 </h1>
-                <p className="text-[#232527] text-[18px] md:text-[24px] font-medium opacity-70 leading-tight">
+                <p className="text-text-main text-[18px] md:text-[24px] font-medium opacity-70 leading-tight">
                   소셜 계정으로 간편하게 시작하세요
                 </p>
               </div>
             </div>
+
+            {/* Error Message */}
+            {loginError && (
+              <div className="w-full px-4 py-3 bg-red-50 border border-red-200 rounded-lg text-[13px] text-red-600 font-medium text-center">
+                {loginError}
+              </div>
+            )}
 
             {/* Social Buttons */}
             <div className="flex flex-col gap-[12px] w-full">
@@ -67,7 +77,7 @@ export default function LoginPage() {
                 onClick={() => handleLogin("google")}
                 disabled={!!isLoading}
                 className={cn(
-                  "flex items-center justify-center gap-[10px] w-full py-[14px] md:py-[12px] bg-white border border-[#E2E2E2] rounded-[8px] md:rounded-[6px] transition-all cursor-pointer hover:bg-gray-50 active:scale-[0.98]",
+                  "flex items-center justify-center gap-[10px] w-full py-[14px] md:py-[12px] bg-white border border-border-light rounded-[8px] md:rounded-[6px] transition-all cursor-pointer hover:bg-gray-50 active:scale-[0.98]",
                   isLoading === "google" && "opacity-50 cursor-wait",
                 )}
                 aria-label="Google로 시작하기"
@@ -80,7 +90,7 @@ export default function LoginPage() {
                     className="object-contain"
                   />
                 </div>
-                <span className="text-[#232527] text-[15px] md:text-[12px] font-bold leading-tight">
+                <span className="text-text-main text-[15px] md:text-[12px] font-bold leading-tight">
                   {isLoading === "google" ? "연결 중..." : "Google로 시작하기"}
                 </span>
               </button>
@@ -88,15 +98,15 @@ export default function LoginPage() {
           </div>
 
           {/* Legal Notice */}
-          <p className="text-[#a0a0a0] text-[12px] md:text-[12px] text-center leading-relaxed max-w-[280px] md:max-w-none">
+          <p className="text-text-caption text-[12px] md:text-[12px] text-center leading-relaxed max-w-[280px] md:max-w-none">
             시작하기를 누르면{" "}
-            <Link href="/terms" className="text-[#0A607D] font-bold underline">
+            <Link href="/terms" className="text-brand-primary font-bold underline">
               이용약관
             </Link>{" "}
             및{" "}
             <Link
               href="/privacy"
-              className="text-[#0A607D] font-bold underline"
+              className="text-brand-primary font-bold underline"
             >
               개인정보 처리방침
             </Link>

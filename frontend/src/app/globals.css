@@ -2,11 +2,44 @@
 
 @theme {
   --color-brand-primary: #0a607d;
+  --color-brand-primary-dark: #084e6d;
   --color-text-main: #232527;
+  --color-text-sub: #444444;
+  --color-text-mute: #777777;
   --color-text-caption: #a0a0a0;
   --color-border-light: #e2e2e2;
+  --color-border-mute: #bfbfbf;
   --color-bg-gray: #f5f5f5;
+  --color-bg-gray-soft: #efefef;
+  --color-bg-dark: #191b1e;
   --color-bg-footer: #fafafa;
+  --color-bg-primary-soft: #f7fafb;
+  --color-bg-gray-hover: #e5e5e5;
+  --color-bg-avatar: #718096;
+  --color-btn-dark: #404040;
+  --color-bg-gray-light: #f9f9f9;
+  --color-bg-brand-lighter: #f0f7ff;
+  --color-border-mid: #d9d9d9;
+  --color-text-mid: #636363;
+
+  /* Room Slot Palette — 비교 리포트에서 방을 구분 (E06 SCR-COMPARE) */
+  --color-slot-a-bg: #f9e8f0;
+  --color-slot-a-text: #461a2b;
+  --color-slot-b-bg: #f4f7ff;
+  --color-slot-b-text: #004cbd;
+  /* Slot C는 brand-primary 재사용 — 별도 토큰 없음 */
+
+  /* Status Chip 3색 시스템 — 위험·양호·주의 (E06) */
+  --color-status-danger-bg: #fff0f0;
+  --color-status-danger-border: #fc9a9b;
+  --color-status-danger-text: #f83233;
+  --color-status-safe-bg: #f5faf7;
+  --color-status-safe-border: #76be95;
+  --color-status-safe-text: #00873c;
+  --color-status-warning-bg: #fffef5;
+  --color-status-warning-border: #ffdf00;
+  /* WCAG AA 대비 — Figma 원본 #fbdb00은 흰배경 대비 부족, darker 톤으로 대체 */
+  --color-status-warning-text: #a07d00;
 }
 
 @layer components {
@@ -42,4 +75,35 @@
   .pt-safe {
     padding-top: env(safe-area-inset-top);
   }
+  /* 마우스 포인터 장치(데스크탑)에서는 창 크기와 무관하게 숨김 */
+  .touch-device-only {
+    @media (hover: hover) and (pointer: fine) {
+      display: none !important;
+    }
+  }
+
+  .scrollbar-none {
+    scrollbar-width: none;
+    &::-webkit-scrollbar { display: none; }
+  }
+
+  /* Fluid typography — scales between mobile(430px) and desktop(1440px) */
+  .text-fluid-xs   { font-size: clamp(0.625rem,  1.0vw, 0.75rem);   } /* 10→12px */
+  .text-fluid-sm   { font-size: clamp(0.6875rem, 1.1vw, 0.8125rem); } /* 11→13px */
+  .text-fluid-base { font-size: clamp(0.75rem,   1.2vw, 0.875rem);  } /* 12→14px */
+  .text-fluid-md   { font-size: clamp(0.8125rem, 1.3vw, 0.9375rem); } /* 13→15px */
+  .text-fluid-lg   { font-size: clamp(0.875rem,  1.4vw, 1rem);      } /* 14→16px */
+  .text-fluid-xl   { font-size: clamp(1rem,      1.5vw, 1.125rem);  } /* 16→18px */
+  .text-fluid-2xl  { font-size: clamp(1.125rem,  1.8vw, 1.375rem);  } /* 18→22px */
+  .text-fluid-3xl  { font-size: clamp(1.25rem,   2.0vw, 1.5rem);    } /* 20→24px */
+  .text-fluid-4xl  { font-size: clamp(1.5rem,    2.5vw, 1.875rem);  } /* 24→30px */
+  .text-fluid-5xl  { font-size: clamp(1.25rem,   2.0vw, 2.5rem);    } /* 20→40px */
+  .text-fluid-6xl  { font-size: clamp(1.5rem,    3.2vw, 3.5rem);    } /* 24→56px */
+}
+
+/* TODO(E06-S06): html2canvas + jsPDF 도입 후 이 print CSS는 제거 예정 */
+@media print {
+  header, nav, .no-print { display: none !important; }
+  body { background: white; }
+  .scroll-mt-\\[160px\\] { scroll-margin-top: 0; }
 }

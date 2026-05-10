@@ -1,7 +1,11 @@
 import axios from 'axios';
 import { loginRedirect } from '@/lib/routes';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
+if (import.meta.env.PROD && !import.meta.env.VITE_API_URL) {
+  throw new Error('VITE_API_URL is required in production builds');
+}
+
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
 export const api = axios.create({
   baseURL: API_BASE_URL,

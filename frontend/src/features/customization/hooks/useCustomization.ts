@@ -1,8 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useCallback, useMemo, useEffect } from 'react';
 import * as customService from '@/services/custom-checklist-service';
-import { ChecklistItemResponse } from '@/types/checklist';
-import { TYPE_ITEM_MAP, CHECKLIST_ITEMS } from '../constants';
+import { TYPE_ITEM_MAP, CHECKLIST_ITEMS, USER_TYPES } from '../constants';
 import { useCustomizationStore } from '@/store/use-customization-store';
 import { useAuthStore } from '@/store/use-auth-store';
 
@@ -19,13 +18,25 @@ export const useCustomization = () => {
   } = useCustomizationStore();
 
   // 1. 서버 데이터 조회
-  const { data: items = [], isLoading } = useQuery({
+  const { data: rawItems = [], isLoading } = useQuery({
     queryKey: ['customChecklistItems'],
     queryFn: customService.getCustomizedItems,
-    enabled: isLoggedIn, // 로그인 상태일 때만 서버에서 데이터를 가져옴
-    refetchOnWindowFocus: false, // 창 포커스 시 재로딩 방지
-    staleTime: 1000 * 60 * 5, // 5분간 데이터 유지
+    enabled: isLoggedIn,
+    refetchOnWindowFocus: false,
+    staleTime: 1000 * 60 * 5,
   });
+
+  // itemName 기준 중복 제거 (낮은 ID 우선)
+  const items = useMemo(() => {
+    const seen = new Map<string, typeof rawItems[0]>();
+    for (const item of rawItems) {
+      const existing = seen.get(item.itemName);
+      if (!existing || item.id < existing.id) {
+        seen.set(item.itemName, item);
+      }
+    }
+    return Array.from(seen.values());
+  }, [rawItems]);
 
   // 2. 서버 데이터와 전역 스토어 동기화 (최초 로드 시나 서버 변경 시)
   useEffect(() => {
@@ -37,9 +48,17 @@ export const useCustomization = () => {
       items.forEach(item => {
         if (item.isEnabled && item.userType) serverTypes.add(item.userType);
       });
-      setSelectedTypeIds(Array.from(serverTypes));
+      const typeArray = Array.from(serverTypes);
+      setSelectedTypeIds(typeArray);
+
+      // 처음 진입 시 (서버에 선택된 유형이 없으면) FIRST_TIMER 자동 선택
+      if (typeArray.length === 0 && isLoggedIn) {
+        selectTypeMutation.mutate('FIRST_TIMER');
+        setSelectedTypeIds(['FIRST_TIMER']);
+      }
     }
-  }, [items, setActiveItemNames, setSelectedTypeIds]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [items]);
 
   // 3. Mutation 정의
   const invalidate = () => queryClient.invalidateQueries({ queryKey: ['customChecklistItems'] });
@@ -54,8 +73,8 @@ export const useCustomization = () => {
     onSuccess: invalidate,
   });
 
-  const toggleItemMutation = useMutation({
-    mutationFn: customService.toggleItem,
+  const saveSettingsMutation = useMutation({
+    mutationFn: customService.saveSettings,
     onSuccess: invalidate,
   });
 
@@ -72,42 +91,66 @@ export const useCustomization = () => {
   // 4. 이벤트 핸들러 (스토어를 먼저 업데이트하여 즉각 반응 제공)
   const toggleUserType = useCallback((typeId: string) => {
     const isSelected = selectedTypeIds.includes(typeId);
-    
+
     if (isSelected) {
       deselectTypeMutation.mutate(typeId);
     } else {
       selectTypeMutation.mutate(typeId);
 
-      // 유형 선택 시 해당 유형의 추천 항목들을 자동으로 활성화(체크)
       const recommendedIds = TYPE_ITEM_MAP[typeId] || [];
       const recommendedLabels = CHECKLIST_ITEMS
         .filter(item => recommendedIds.includes(item.id))
         .map(item => item.label);
 
-      // 서버 상태 반영
-      recommendedLabels.forEach(label => {
-        const item = items.find(i => i.itemName === label);
-        if (item && !item.isEnabled) {
-          toggleItemMutation.mutate(item.id);
-        }
-      });
-
-      // 스토어 업데이트 (추천 항목 일괄 추가)
       const nextActiveNames = Array.from(new Set([...activeItemNames, ...recommendedLabels]));
+      const disabledIds = items
+        .filter(i => i.itemType !== 'CUSTOM')
+        .filter(i => !nextActiveNames.includes(i.itemName))
+        .map(i => Number(i.id));
+      saveSettingsMutation.mutate(disabledIds);
+
       setActiveItemNames(nextActiveNames);
     }
     toggleType(typeId);
-  }, [items, selectedTypeIds, activeItemNames, selectTypeMutation, deselectTypeMutation, toggleItemMutation, toggleType, setActiveItemNames]);
+  }, [items, selectedTypeIds, activeItemNames, selectTypeMutation, deselectTypeMutation, saveSettingsMutation, toggleType, setActiveItemNames]);
 
   const toggleItem = useCallback((itemId: number, label: string) => {
-    toggleItemMutation.mutate(itemId);
+    const willBeEnabled = !items.find(i => i.id === itemId)?.isEnabled;
+    const disabledIds = items
+      .filter(i => i.itemType !== 'CUSTOM')
+      .filter(i => (i.id === itemId ? !willBeEnabled : !i.isEnabled))
+      .map(i => Number(i.id));
+    saveSettingsMutation.mutate(disabledIds);
     toggleItemName(label);
-  }, [toggleItemMutation, toggleItemName]);
+  }, [items, saveSettingsMutation, toggleItemName]);
 
   // 서버 ID가 없을 때의 임시 토글 (UI 반응용)
   const toggleItemLocally = useCallback((label: string) => {
     toggleItemName(label);
   }, [toggleItemName]);
+
+  const selectAllTypes = useCallback(() => {
+    USER_TYPES.forEach((t) => {
+      if (!selectedTypeIds.includes(t.id)) {
+        selectTypeMutation.mutate(t.id);
+      }
+    });
+    setSelectedTypeIds(USER_TYPES.map((t) => t.id));
+  }, [selectedTypeIds, selectTypeMutation, setSelectedTypeIds]);
+
+  const selectAllItems = useCallback(() => {
+    saveSettingsMutation.mutate([]);
+    const allNames = items.filter((i) => i.itemType !== 'CUSTOM').map((i) => i.itemName);
+    setActiveItemNames(allNames);
+  }, [items, saveSettingsMutation, setActiveItemNames]);
+
+  const saveCurrentSettings = useCallback(async () => {
+    const activeSet = new Set(activeItemNames);
+    const disabledIds = items
+      .filter((i) => i.itemType !== 'CUSTOM' && !activeSet.has(i.itemName))
+      .map((i) => Number(i.id));
+    await saveSettingsMutation.mutateAsync(disabledIds);
+  }, [items, activeItemNames, saveSettingsMutation]);
 
   const addCustomItem = useCallback((itemName: string) => {
     addCustomMutation.mutate(itemName);
@@ -139,14 +182,17 @@ export const useCustomization = () => {
     activeItemNames,
     customItems: items.filter(item => item.itemType === 'CUSTOM'),
     isLoading,
-    isPending: 
-      selectTypeMutation.isPending || 
-      deselectTypeMutation.isPending || 
-      toggleItemMutation.isPending || 
-      addCustomMutation.isPending || 
+    isPending:
+      selectTypeMutation.isPending ||
+      deselectTypeMutation.isPending ||
+      saveSettingsMutation.isPending ||
+      addCustomMutation.isPending ||
       deleteCustomMutation.isPending,
     toggleUserType,
+    selectAllTypes,
     toggleItem,
+    selectAllItems,
+    saveCurrentSettings,
     toggleItemLocally,
     addCustomItem,
     removeCustomItem,
