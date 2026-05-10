@@ -5,7 +5,7 @@ import { useGuestRoomStore } from '@/store/use-guest-room-store';
 import { useRoomsList, useDeleteRoom } from '@/features/rooms/hooks/useRoomsQuery';
 import { cn } from '@/lib/utils';
 import { ROUTES } from '@/lib/routes';
-import { GUEST_ROOM_LIMIT } from '@/lib/constants';
+import { GUEST_ROOM_LIMIT, STORAGE_KEY_ONBOARDING } from '@/lib/constants';
 import RoomCard from '@/components/RoomCard';
 import {
   LoginRequiredModal,
@@ -185,12 +185,12 @@ export default function RoomsPage() {
   const rooms = isLoggedIn ? apiRooms : guestFiltered;
   const isGuestAtLimit = !isLoggedIn && guestRooms.length >= GUEST_ROOM_LIMIT;
 
-  // 로그인 직후 온보딩 모달 자동 노출
+  // 로그인 상태 + 방 목록 없음 → 온보딩 모달 노출
   useEffect(() => {
-    if (isLoggedIn && !localStorage.getItem('onboarding_custom_checklist')) {
+    if (isLoggedIn && isFetched && rooms.length === 0 && !localStorage.getItem(STORAGE_KEY_ONBOARDING)) {
       setIsCustomModalOpen(true);
     }
-  }, [isLoggedIn]);
+  }, [isLoggedIn, isFetched, rooms.length]);
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -211,7 +211,7 @@ export default function RoomsPage() {
       navigate(ROUTES.CHECKLIST_NEW);
       return;
     }
-    const hasSeenOnboarding = localStorage.getItem('onboarding_custom_checklist');
+    const hasSeenOnboarding = localStorage.getItem(STORAGE_KEY_ONBOARDING);
     if (!hasSeenOnboarding) {
       setIsCustomModalOpen(true);
     } else {
@@ -258,7 +258,7 @@ export default function RoomsPage() {
       </div>
 
       {/* 필터 바 */}
-      <div className="border-b border-border-light bg-white sticky top-16 z-40">
+      <div className="border-b border-border-light bg-white sticky top-14 md:top-16 z-40">
         <div className="px-4 md:px-10 lg:px-20 py-3 flex justify-between items-center max-w-screen-2xl mx-auto w-full">
           <div className="flex gap-2.5 relative" ref={dropdownRef}>
             <button
@@ -338,7 +338,7 @@ export default function RoomsPage() {
         {showEmpty ? (
           <EmptyState onStart={handleStartChecklist} />
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {rooms.map((room) => (
               <RoomCard
                 key={room.id}
@@ -377,12 +377,12 @@ export default function RoomsPage() {
         isOpen={isCustomModalOpen}
         onClose={() => setIsCustomModalOpen(false)}
         onLater={() => {
-          localStorage.setItem('onboarding_custom_checklist', 'true');
+          localStorage.setItem(STORAGE_KEY_ONBOARDING, 'true');
           setIsCustomModalOpen(false);
           navigate(ROUTES.CHECKLIST_NEW);
         }}
         onSetup={() => {
-          localStorage.setItem('onboarding_custom_checklist', 'true');
+          localStorage.setItem(STORAGE_KEY_ONBOARDING, 'true');
           setIsCustomModalOpen(false);
           navigate(ROUTES.SETTINGS);
         }}

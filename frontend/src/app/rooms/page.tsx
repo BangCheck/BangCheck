@@ -264,7 +264,7 @@ export default function Home() {
       </div>
 
       {/* 필터 바 */}
-      <div className="border-b border-border-light bg-white sticky top-16 z-40">
+      <div className="border-b border-border-light bg-white sticky top-14 md:top-16 z-40">
         <div className="px-4 md:px-10 py-3 flex justify-between items-center">
           <div className="flex gap-2.5 relative" ref={dropdownRef}>
             <button 

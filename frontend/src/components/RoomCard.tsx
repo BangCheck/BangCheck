@@ -73,11 +73,11 @@ export default function RoomCard({
       onClick={() => onClick?.(id)}
       onKeyDown={handleKeyDown}
       className={cn(
-        "relative p-6 rounded-[16px] bg-white border border-border-light shadow-[0_2px_12px_rgba(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.08)] transition-all cursor-pointer group flex flex-col h-full"
+        "relative p-4 lg:p-5 rounded-[12px] bg-white border border-border-light shadow-[0_2px_12px_rgba(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.08)] transition-all cursor-pointer group flex flex-col h-full"
       )}
     >
       {/* 1. 상단: 등록일자 및 액션 */}
-      <div className="flex justify-between items-center mb-4">
+      <div className="flex justify-between items-center mb-3">
         <div className="flex items-center gap-2">
           <div className="w-3 h-3 rounded-full" style={{ backgroundColor: themeColor }} />
           <span className="text-text-caption text-fluid-base font-medium">등록일시 {formatDateTime(createdAt)}</span>
@@ -93,12 +93,12 @@ export default function RoomCard({
             }}
             className="text-border-mid hover:text-status-danger-text transition-colors cursor-pointer"
           >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <path d="M3 6h18m-2 0v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6m3 0V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
             </svg>
           </button>
           <div className="text-border-mid">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
               <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zM7 9c0-2.76 2.24-5 5-5s5 2.24 5 5c0 2.88-2.88 7.19-5 9.88C9.92 16.21 7 11.85 7 9z"/>
               <circle cx="12" cy="9" r="2.5"/>
             </svg>
@@ -107,8 +107,8 @@ export default function RoomCard({
       </div>
 
       {/* 2. 매물명 및 주소 */}
-      <div className="mb-5">
-        <h3 className="text-fluid-3xl font-bold text-text-main truncate mb-1 tracking-tight">
+      <div className="mb-3">
+        <h3 className="text-fluid-2xl font-bold text-text-main truncate mb-1 tracking-tight">
           {name}
         </h3>
         <div className="flex items-center gap-1 text-text-caption">
@@ -120,23 +120,23 @@ export default function RoomCard({
       </div>
 
       {/* 3. 요약 정보 (Chips) - 블루 테마 적용 */}
-      <div className="flex flex-wrap gap-2 mb-4">
+      <div className="flex flex-wrap gap-1.5 mb-3">
         {[buildingType, floor, direction].filter(Boolean).map((tag, idx) => (
-          <span key={idx} className="bg-bg-brand-lighter text-brand-primary text-fluid-base font-bold px-3 py-1 rounded-[4px] whitespace-nowrap">
+          <span key={idx} className="bg-bg-brand-lighter text-brand-primary text-fluid-base font-bold px-2 py-0.5 rounded-[4px] whitespace-nowrap">
             {tag}
           </span>
         ))}
-        <span className="bg-bg-brand-lighter text-brand-primary text-fluid-base font-bold px-3 py-1 rounded-[4px] whitespace-nowrap">
+        <span className="bg-bg-brand-lighter text-brand-primary text-fluid-base font-bold px-2 py-0.5 rounded-[4px] whitespace-nowrap">
           {formattedPrice}
         </span>
       </div>
 
       {/* 4. 문제 요소 */}
-      <div className="flex items-center gap-4 mb-6 min-h-[24px]">
+      <div className="flex items-center gap-3 mb-4 min-h-[20px]">
         {activeIssues.length === 0 ? (
           <span className="text-fluid-base text-border-light font-medium tracking-tight">문제사항 없음</span>
         ) : (
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
             {displayIssues.map((issue) => (
               <div key={issue.key} className={cn("flex items-center gap-1 text-fluid-base font-medium", issue.color)}>
                 <span className="w-5 h-5 flex items-center justify-center">
@@ -155,7 +155,7 @@ export default function RoomCard({
       </div>
 
       {/* 구분선 */}
-      <div className="h-[1px] bg-border-light w-full mb-5" />
+      <div className="h-[1px] bg-border-light w-full mb-3" />
 
       {/* 6. 하단 메모 */}
       <div className="flex items-start gap-1">

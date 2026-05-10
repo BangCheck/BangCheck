@@ -1,13 +1,15 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { cn } from '@/lib/utils';
+import { ROUTES } from '@/lib/routes';
 import { useGuestRoomStore } from '@/store/use-guest-room-store';
 import { useAuthStore } from '@/store/use-auth-store';
 import { useRoomDetail, useUpdateRoom, useDeleteRoom } from '@/features/rooms/hooks/useRoomsQuery';
 
-import { SECTION_TABS } from './checklist-constants';
 import { useChecklistState } from './hooks/use-checklist-state';
 import { useSectionScroll } from './hooks/use-section-scroll';
+import { ChecklistPageHeader } from './components/ui/ChecklistPageHeader';
+import { ChecklistTabNav } from './components/ui/ChecklistTabNav';
+import { ChecklistSubmitFooter } from './components/ui/ChecklistSubmitFooter';
 
 import BasicInfo from './components/01_basic-info';
 import {
@@ -31,21 +33,22 @@ export default function ChecklistDetailPage() {
   const { basic, setBasic, building, setBuilding, interior, setInterior, safety, setSafety, custom, setCustom, patchBasic, patchBuilding, patchInterior, patchSafety, patchCustom } = useChecklistState();
   const { activeSection, sectionRefs, tabNavRef, scrollToSection } = useSectionScroll();
 
-  // 로그인 상태 — BE에서 방 데이터 로드
   const { data: beRoom, isError: beError } = useRoomDetail(isLoggedIn ? id : undefined);
   const updateRoom = useUpdateRoom();
   const deleteRoom = useDeleteRoom();
 
-  // BE 데이터로 폼 초기화
+  // 로그인 — BE 데이터로 폼 초기화 (에러 시 notFound)
   useEffect(() => {
-    if (!isLoggedIn || !beRoom) return;
+    if (!isLoggedIn) return;
+    if (beError) { setNotFound(true); return; }
+    if (!beRoom) return;
     setBasic(beRoom.basic);
     setBuilding(beRoom.building);
     setInterior(beRoom.interior);
     setCustom(beRoom.custom);
-  }, [isLoggedIn, beRoom, setBasic, setBuilding, setInterior, setCustom]);
+  }, [isLoggedIn, beRoom, beError, setBasic, setBuilding, setInterior, setCustom]);
 
-  // 비로그인 상태 — sessionStorage에서 방 데이터 로드
+  // 비로그인 — sessionStorage에서 방 데이터 로드
   useEffect(() => {
     if (isLoggedIn) return;
     if (!id) { setNotFound(true); return; }
@@ -58,11 +61,6 @@ export default function ChecklistDetailPage() {
     setCustom(room.raw.custom);
   }, [isLoggedIn, id, getGuestRoom, setBasic, setBuilding, setInterior, setSafety, setCustom]);
 
-  // BE 조회 실패 처리
-  useEffect(() => {
-    if (isLoggedIn && beError) setNotFound(true);
-  }, [isLoggedIn, beError]);
-
   const handleUpdate = async () => {
     if (!id || !basic.name.trim()) {
       setSubmitError('매물정보(방 이름)를 입력해주세요.');
@@ -74,7 +72,7 @@ export default function ChecklistDetailPage() {
       setSubmitError(null);
       try {
         await updateRoom.mutateAsync({ roomId: id, basic, building, interior, custom });
-        navigate('/rooms');
+        navigate(ROUTES.HOME);
       } catch (err: unknown) {
         const msg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message;
         setSubmitError(msg ?? '수정 중 오류가 발생했습니다. 다시 시도해주세요.');
@@ -89,7 +87,7 @@ export default function ChecklistDetailPage() {
       setSubmitError('수정에 실패했습니다. 방 정보를 찾을 수 없어요.');
       return;
     }
-    navigate('/rooms');
+    navigate(ROUTES.HOME);
   };
 
   const handleDelete = async () => {
@@ -103,7 +101,7 @@ export default function ChecklistDetailPage() {
     } else {
       deleteGuestRoom(id);
     }
-    navigate('/rooms');
+    navigate(ROUTES.HOME);
   };
 
   if (notFound) {
@@ -115,7 +113,7 @@ export default function ChecklistDetailPage() {
         </p>
         <button
           type="button"
-          onClick={() => navigate('/rooms')}
+          onClick={() => navigate(ROUTES.HOME)}
           className="mt-2 px-6 py-2.5 rounded-[6px] bg-brand-primary text-white text-[14px] font-bold cursor-pointer"
         >
           내 방 목록으로
@@ -126,48 +124,26 @@ export default function ChecklistDetailPage() {
 
   return (
     <div className="min-h-screen bg-white flex flex-col">
-      <header className="sticky top-0 z-40 bg-white border-b border-border-light h-14 flex items-center px-4 gap-3">
-        <button
-          type="button"
-          onClick={() => navigate('/rooms')}
-          className="p-1 text-text-main cursor-pointer"
-          aria-label="뒤로 가기"
-        >
-          <BackChevron />
-        </button>
-        <h1 className="text-[16px] font-semibold text-text-main flex-1">체크리스트 수정</h1>
-        <button
-          type="button"
-          onClick={() => setConfirmDelete(true)}
-          className="text-[13px] text-red-500 hover:text-red-600 font-medium cursor-pointer"
-        >
-          삭제
-        </button>
-      </header>
-
-      <nav
-        ref={tabNavRef}
-        className="sticky top-14 z-30 bg-white border-b border-border-light px-4 py-2 flex gap-2 overflow-x-auto no-scrollbar"
-      >
-        {SECTION_TABS.map(({ id: sid, label }) => (
+      <ChecklistPageHeader
+        title="체크리스트 수정"
+        onBack={() => navigate(ROUTES.HOME)}
+        actions={
           <button
-            key={sid}
             type="button"
-            data-tab={sid}
-            onClick={() => scrollToSection(sid)}
-            className={cn(
-              'shrink-0 px-4 py-1.5 rounded-[4px] text-[13px] font-semibold transition-all cursor-pointer whitespace-nowrap',
-              activeSection === sid
-                ? 'bg-bg-primary-soft border border-brand-primary text-brand-primary'
-                : 'bg-bg-gray-soft text-text-mute hover:bg-bg-gray-hover',
-            )}
+            onClick={() => setConfirmDelete(true)}
+            className="text-[13px] text-red-500 hover:text-red-600 font-medium cursor-pointer"
           >
-            {label}
+            삭제
           </button>
-        ))}
-      </nav>
+        }
+      />
+      <ChecklistTabNav
+        tabNavRef={tabNavRef}
+        activeSection={activeSection}
+        onScrollTo={scrollToSection}
+      />
 
-      <main className="flex-1 w-full max-w-2xl md:max-w-3xl lg:max-w-4xl mx-auto px-4 sm:px-6 lg:px-10 py-8 pb-32 flex flex-col gap-10">
+      <main className="flex-1 w-full max-w-2xl md:max-w-3xl lg:max-w-4xl mx-auto px-4 sm:px-6 lg:px-10 py-6 pb-28 flex flex-col gap-8">
         <section ref={(el) => { sectionRefs.current.basic = el; }}>
           <BasicInfo data={basic} onChange={patchBasic} />
         </section>
@@ -199,26 +175,13 @@ export default function ChecklistDetailPage() {
         />
       </main>
 
-      <div className="fixed bottom-0 left-0 right-0 md:sticky md:bottom-auto bg-white border-t border-border-light px-4 py-4 z-30">
-        <div className="max-w-2xl md:max-w-3xl lg:max-w-4xl mx-auto flex flex-col gap-2">
-          {submitError && (
-            <p className="text-fluid-base text-red-500 text-center">{submitError}</p>
-          )}
-          <button
-            type="button"
-            onClick={handleUpdate}
-            disabled={!basic.name.trim() || isSubmitting}
-            className={cn(
-              'w-full py-3.5 rounded-[6px] text-fluid-lg font-bold transition-all',
-              !basic.name.trim() || isSubmitting
-                ? 'bg-border-mute text-white cursor-not-allowed'
-                : 'bg-brand-primary text-white hover:bg-brand-primary-dark cursor-pointer',
-            )}
-          >
-            {isSubmitting ? '저장 중...' : '수정 완료'}
-          </button>
-        </div>
-      </div>
+      <ChecklistSubmitFooter
+        label="수정 완료"
+        disabled={!basic.name.trim() || isSubmitting}
+        isSubmitting={isSubmitting}
+        error={submitError}
+        onClick={handleUpdate}
+      />
 
       {confirmDelete && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
@@ -250,10 +213,3 @@ export default function ChecklistDetailPage() {
   );
 }
 
-function BackChevron() {
-  return (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <polyline points="15 18 9 12 15 6" />
-    </svg>
-  );
-}

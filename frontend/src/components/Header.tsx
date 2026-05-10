@@ -46,7 +46,7 @@ export default function Header() {
 
   return (
     <>
-      <header className="flex items-center h-16 px-4 md:px-10 lg:px-20 border-b border-border-light bg-white w-full sticky top-0 z-50">
+      <header className="flex items-center h-14 md:h-16 px-4 md:px-10 lg:px-20 border-b border-border-light bg-white w-full sticky top-0 z-50">
         <div className="flex-1 flex justify-start z-10">
           <Link to={ROUTES.HOME}>
             <LogoWithText size={20} textClassName="text-base md:text-lg" />

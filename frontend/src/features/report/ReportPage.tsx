@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Icon } from '@iconify/react';
+import { ROUTES } from '@/lib/routes';
 import { useGuestRoomStore } from '@/store/use-guest-room-store';
 import { ConfigCard } from './components/ConfigCard';
 import { FilterToggle } from './components/FilterToggle';
@@ -22,10 +23,10 @@ export default function ReportPage() {
     }
   }, [guestRooms, selectedIds.length]);
 
-  const selectedRooms = useMemo(
-    () => guestRooms.filter((r) => selectedIds.includes(r.id)),
-    [guestRooms, selectedIds],
-  );
+  const selectedRooms = useMemo(() => {
+    const idSet = new Set(selectedIds);
+    return guestRooms.filter((r) => idSet.has(r.id));
+  }, [guestRooms, selectedIds]);
 
   const isLockedSelection = guestRooms.length <= REPORT_MIN_SELECT;
 
@@ -51,6 +52,7 @@ export default function ReportPage() {
   };
 
   const canSelectMore = selectedIds.length < REPORT_MAX_SELECT;
+  const hasEnoughRooms = selectedRooms.length >= REPORT_MIN_SELECT;
 
   // ── 빈 상태 ──────────────────────────────────────────────────
   if (guestRooms.length < REPORT_MIN_SELECT) {
@@ -70,7 +72,7 @@ export default function ReportPage() {
           </div>
           <button
             type="button"
-            onClick={() => navigate('/checklist/new')}
+            onClick={() => navigate(ROUTES.CHECKLIST_NEW)}
             className="px-6 py-3 rounded-[6px] bg-brand-primary text-white text-[14px] font-bold hover:bg-brand-primary-dark cursor-pointer"
           >
             체크리스트 추가하기
@@ -83,11 +85,11 @@ export default function ReportPage() {
   return (
     <div className="flex-1 bg-bg-footer min-h-screen">
       {/* ── 서브 헤더 ── */}
-      <div className="bg-white border-b border-border-light sticky top-16 z-30">
+      <div className="bg-white border-b border-border-light sticky top-14 md:top-16 z-30">
         <div className="max-w-screen-xl mx-auto px-4 md:px-10 py-4 flex items-center gap-4">
           <button
             type="button"
-            onClick={() => navigate('/rooms')}
+            onClick={() => navigate(ROUTES.HOME)}
             aria-label="방 목록으로 돌아가기"
             className="p-1 -ml-1 text-text-main hover:bg-bg-gray rounded-[4px]"
           >
@@ -141,12 +143,12 @@ export default function ReportPage() {
       )}
 
       {/* ── 섹션 탭 내비게이션 ── */}
-      {selectedRooms.length >= REPORT_MIN_SELECT && (
+      {hasEnoughRooms && (
         <SectionTabNav activeSections={activeSections} />
       )}
 
       {/* ── 비교 테이블 ── */}
-      {selectedRooms.length >= REPORT_MIN_SELECT && (
+      {hasEnoughRooms && (
         <div className="max-w-screen-xl mx-auto px-4 md:px-10 py-10 space-y-10">
           <CompareTable rooms={selectedRooms} activeSections={activeSections} />
         </div>
