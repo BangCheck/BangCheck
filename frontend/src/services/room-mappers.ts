@@ -47,7 +47,7 @@ const SORT_TO_API: Record<string, string> = {
 export interface ChecklistItemApi {
   id: number;
   itemName: string;
-  options: { id: number; value: string }[];
+  options: { id: number; optionValue: string }[];
 }
 
 type CheckAnswer = { itemId: number; selectedOptionIds: number[] };
@@ -66,7 +66,7 @@ export function buildLookup(items: ChecklistItemApi[]) {
   return new Map(
     items.map((item) => [
       item.itemName,
-      { id: item.id, optByValue: new Map(item.options.map((o) => [o.value, o.id])) },
+      { id: item.id, optByValue: new Map(item.options.map((o) => [o.optionValue, o.id])) },
     ]),
   );
 }
