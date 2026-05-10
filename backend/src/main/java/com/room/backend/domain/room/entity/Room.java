@@ -179,12 +179,17 @@ public class Room extends BaseEntity {
         return room;
     }
 
-    public void update(RoomUpdateRequestDTO request) {
+    public void update(RoomUpdateRequestDTO request, BigDecimal lat, BigDecimal lon) {
         this.name = request.getName();
+        if (request.getAddress() != null) {
+            this.address = request.getAddress();
+            this.lat = lat;
+            this.lon = lon;
+        }
         this.rentType = request.getRentType();
         this.deposit = request.getDeposit();
         this.monthlyRent = request.getRent();
-        this.isManagementFeeUnknown = request.getIsManagementFeeUnknown();
+        this.isManagementFeeUnknown = request.getIsManagementFeeUnknown() != null ? request.getIsManagementFeeUnknown() : false;
         this.maintenanceFee = request.getManagementFee();
         this.maintenanceStatus = this.isManagementFeeUnknown ? MaintenanceStatus.UNKNOWN :
                 (this.maintenanceFee != null ? MaintenanceStatus.INCLUDED : MaintenanceStatus.NONE);
