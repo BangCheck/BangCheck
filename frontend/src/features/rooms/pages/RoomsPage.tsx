@@ -264,7 +264,7 @@ export default function RoomsPage() {
             <button
               onClick={() => setActiveDropdown(activeDropdown === 'transaction' ? null : 'transaction')}
               className={cn(
-                'border rounded-[6px] px-3 py-1.5 text-fluid-md font-medium flex items-center gap-1.5 transition-all cursor-pointer bg-white',
+                'border rounded-[6px] px-3 py-1.5 text-fluid-md font-medium flex items-center gap-1.5 transition-all cursor-pointer bg-white whitespace-nowrap',
                 activeDropdown === 'transaction' || transactionType !== '전체'
                   ? 'border-brand-primary text-brand-primary'
                   : 'border-border-mute text-text-sub'
@@ -282,7 +282,7 @@ export default function RoomsPage() {
             <button
               onClick={() => setActiveDropdown(activeDropdown === 'sort' ? null : 'sort')}
               className={cn(
-                'border rounded-[6px] px-3 py-1.5 text-fluid-md font-medium flex items-center gap-1.5 transition-all cursor-pointer bg-white',
+                'border rounded-[6px] px-3 py-1.5 text-fluid-md font-medium flex items-center gap-1.5 transition-all cursor-pointer bg-white whitespace-nowrap',
                 activeDropdown === 'sort' || sortOption !== '보증금 낮은순'
                   ? 'border-brand-primary text-brand-primary'
                   : 'border-border-mute text-text-sub'
