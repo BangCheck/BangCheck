@@ -13,6 +13,7 @@ export interface RoomListItem {
   createdAt: string;
   floor?: number | null;
   specialFloor?: string | null;
+  managementFee?: number | null;
   direction?: string | null;
 }
 

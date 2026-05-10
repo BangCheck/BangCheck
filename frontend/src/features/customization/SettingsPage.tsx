@@ -126,7 +126,7 @@ export default function SettingsPage() {
           {/* Main content — dimmed + locked when not logged in */}
           <div
             className={cn(
-              'space-y-16 md:space-y-[100px] transition-opacity duration-300',
+              'space-y-10 md:space-y-16 transition-opacity duration-300',
               !isLoggedIn && 'opacity-45 pointer-events-none',
               !isLoggedIn && 'lg:pt-[200px]',
             )}
@@ -300,38 +300,42 @@ export default function SettingsPage() {
                         <span className="text-[14px] font-bold text-text-mute">{customItems.length}건</span>
                       </div>
                     </div>
-                    <form onSubmit={handleAddCustomItem} className="flex gap-3">
-                      <input
-                        type="text"
-                        value={newCustomItem}
-                        onChange={(e) => setNewCustomItem(e.target.value)}
-                        placeholder="예 : 초인종 여부, 환기 상태"
-                        className="flex-1 bg-white border border-border-mute rounded-[6px] px-3 py-[6px] text-[14px] outline-none focus:border-brand-primary"
-                      />
-                      <button
-                        type="submit"
-                        disabled={isPending || !newCustomItem.trim()}
-                        className="w-9 h-9 bg-white border border-border-mute rounded-[6px] flex items-center justify-center disabled:opacity-50 shrink-0"
-                        aria-label="항목 추가"
-                      >
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#BFBFBF" strokeWidth="2.5" strokeLinecap="round">
-                          <line x1="12" y1="5" x2="12" y2="19" />
-                          <line x1="5" y1="12" x2="19" y2="12" />
-                        </svg>
-                      </button>
-                    </form>
+                    {customItems.length >= 3 ? (
+                      <p className="text-[13px] text-text-mute">최대 3개까지 추가할 수 있어요</p>
+                    ) : (
+                      <form onSubmit={handleAddCustomItem} className="flex gap-3">
+                        <input
+                          type="text"
+                          value={newCustomItem}
+                          onChange={(e) => setNewCustomItem(e.target.value)}
+                          placeholder="예 : 초인종 여부, 환기 상태"
+                          className="flex-1 bg-white border border-border-mute rounded-[6px] px-3 py-[6px] text-[14px] outline-none focus:border-brand-primary"
+                        />
+                        <button
+                          type="submit"
+                          disabled={isPending || !newCustomItem.trim()}
+                          className="w-9 h-9 bg-white border border-border-mute rounded-[6px] flex items-center justify-center disabled:opacity-50 shrink-0"
+                          aria-label="항목 추가"
+                        >
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#BFBFBF" strokeWidth="2.5" strokeLinecap="round">
+                            <line x1="12" y1="5" x2="12" y2="19" />
+                            <line x1="5" y1="12" x2="19" y2="12" />
+                          </svg>
+                        </button>
+                      </form>
+                    )}
                     {customItems.length > 0 && (
                       <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
                         {customItems.map((item) => (
                           <div
                             key={item.id}
-                            className="flex items-center justify-between gap-3 bg-slot-b-bg border-2 border-brand-primary rounded-[6px] p-6 drop-shadow-[0px_6px_8px_rgba(0,0,0,0.04)]"
+                            className="flex items-center justify-between gap-3 bg-slot-b-bg border-2 border-brand-primary rounded-[6px] p-3 lg:p-4 drop-shadow-[0px_6px_8px_rgba(0,0,0,0.04)]"
                           >
                             <div className="flex items-center gap-3">
-                              <div className="w-9 h-9 flex items-center justify-center shrink-0">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="#0A607D"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75z" /></svg>
+                              <div className="w-7 h-7 flex items-center justify-center shrink-0">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="#0A607D"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75z" /></svg>
                               </div>
-                              <span className="text-[18px] font-semibold text-text-main leading-[1.3]">{item.itemName}</span>
+                              <span className="text-fluid-base font-semibold text-text-main leading-[1.3]">{item.itemName}</span>
                             </div>
                             <button
                               onClick={() => removeCustomItem(item.id, item.itemName)}

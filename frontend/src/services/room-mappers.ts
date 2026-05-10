@@ -158,6 +158,7 @@ export function mapApiRoomToRoom(item: RoomListItem): Room {
     rent: item.rent,
     buildingType: API_TO_BUILDING_TYPE[item.buildingType] ?? item.buildingType,
     floor: formatFloor(item.floor, item.specialFloor),
+    managementFee: item.managementFee ?? undefined,
     direction: item.direction ? API_TO_DIRECTION[item.direction] ?? undefined : undefined,
     price: '',
     tags: [],
