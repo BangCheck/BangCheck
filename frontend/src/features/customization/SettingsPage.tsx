@@ -28,6 +28,7 @@ export default function SettingsPage() {
     toggleItem,
     selectAllItems,
     saveCurrentSettings,
+    enableItems,
     toggleItemLocally,
     addCustomItem,
     removeCustomItem,
@@ -255,13 +256,11 @@ export default function SettingsPage() {
                               <button
                                 className="text-[14px] font-medium text-text-main hover:text-brand-primary"
                                 onClick={() => {
-                                  catConstItems.forEach((constItem) => {
-                                    if (!activeNamesSet.has(constItem.label)) {
-                                      const si = items.find((s) => s.itemName === constItem.label);
-                                      if (si) toggleItem(Number(si.id), constItem.label);
-                                      else toggleItemLocally(constItem.label);
-                                    }
-                                  });
+                                  const toActivate = catConstItems
+                                    .filter((c) => !activeNamesSet.has(c.label))
+                                    .map((c) => c.label);
+                                  if (toActivate.length === 0) return;
+                                  enableItems(toActivate);
                                 }}
                               >
                                 전체 선택

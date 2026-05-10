@@ -195,6 +195,18 @@ export const useCustomization = () => {
     await saveSettingsMutation.mutateAsync(disabledIds);
   }, [items, activeItemNames, saveSettingsMutation]);
 
+  // 여러 항목을 한 번의 API 호출로 활성화 (카테고리 전체 선택용)
+  const enableItems = useCallback((labels: string[]) => {
+    const nextActiveSet = new Set([...activeItemNames, ...labels]);
+    const disabledIds = items
+      .filter((i) => i.itemType !== 'CUSTOM' && !nextActiveSet.has(i.itemName))
+      .map((i) => Number(i.id));
+    saveSettingsMutation.mutate(disabledIds);
+    labels.forEach((label) => {
+      if (!activeItemNames.includes(label)) toggleItemName(label);
+    });
+  }, [items, activeItemNames, saveSettingsMutation, toggleItemName]);
+
   const addCustomItem = useCallback((itemName: string) => {
     addCustomMutation.mutate(itemName);
     toggleItemName(itemName);
@@ -247,6 +259,7 @@ export const useCustomization = () => {
     toggleItem,
     selectAllItems,
     saveCurrentSettings,
+    enableItems,
     toggleItemLocally,
     addCustomItem,
     removeCustomItem,
