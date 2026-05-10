@@ -1,7 +1,11 @@
-import { Link } from 'react-router-dom';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '@/lib/routes';
 import { ChevronRight } from '@/components/ui/ChevronRight';
 import { SectionWrapper } from './SectionWrapper';
+import { LoginRequiredModal } from '@/components/ui/Modals';
+import { useAuthStore } from '@/store/use-auth-store';
+import { SESSION_KEY_LANDING_MODAL_SHOWN } from '@/lib/constants';
 
 type Feature = {
   imageSrc: string;
@@ -44,6 +48,41 @@ const FEATURES: readonly Feature[] = [
   },
 ] as const;
 
+function ChecklistStartButton({ className }: { className?: string }) {
+  const { isLoggedIn } = useAuthStore();
+  const navigate = useNavigate();
+  const [modalOpen, setModalOpen] = useState(false);
+
+  const handleClick = () => {
+    if (isLoggedIn) {
+      navigate(ROUTES.HOME);
+      return;
+    }
+    const alreadyShown = sessionStorage.getItem(SESSION_KEY_LANDING_MODAL_SHOWN);
+    if (alreadyShown) {
+      navigate(ROUTES.HOME);
+      return;
+    }
+    sessionStorage.setItem(SESSION_KEY_LANDING_MODAL_SHOWN, '1');
+    setModalOpen(true);
+  };
+
+  return (
+    <>
+      <button type="button" onClick={handleClick} className={className}>
+        체크리스트 시작하기
+        <ChevronRight className="w-3.5 h-3.5 md:w-4 md:h-4" />
+      </button>
+      <LoginRequiredModal
+        isOpen={modalOpen}
+        onClose={() => setModalOpen(false)}
+        onContinueAsGuest={() => { setModalOpen(false); navigate(ROUTES.HOME); }}
+        onLogin={() => { setModalOpen(false); navigate(ROUTES.LOGIN); }}
+      />
+    </>
+  );
+}
+
 function FeatureRowMobile({ feature, isFirst }: { feature: Feature; isFirst: boolean }) {
   return (
     <div className="flex flex-col gap-[36px] items-start w-full">
@@ -69,13 +108,7 @@ function FeatureRowMobile({ feature, isFirst }: { feature: Feature; isFirst: boo
           {feature.description}
         </p>
         {feature.cta && (
-          <Link
-            to={feature.cta.href}
-            className="flex items-center gap-1.5 bg-brand-primary text-white font-semibold text-fluid-base tracking-[-0.18px] pl-4 pr-3 py-3 rounded shadow-[0_12px_11px_rgba(10,96,125,0.27)] hover:bg-brand-primary-dark transition-colors"
-          >
-            {feature.cta.label}
-            <ChevronRight className="w-3.5 h-3.5" />
-          </Link>
+          <ChecklistStartButton className="flex items-center gap-1.5 bg-brand-primary text-white font-semibold text-fluid-base tracking-[-0.18px] pl-4 pr-3 py-3 rounded shadow-[0_12px_11px_rgba(10,96,125,0.27)] hover:bg-brand-primary-dark transition-colors cursor-pointer" />
         )}
       </div>
     </div>
@@ -102,13 +135,7 @@ function FeatureRowDesktop({ feature }: { feature: Feature }) {
           {feature.description}
         </p>
         {feature.cta && (
-          <Link
-            to={feature.cta.href}
-            className="flex items-center gap-2 bg-border-light text-text-main font-bold text-fluid-xl tracking-[-0.5px] px-[10px] py-[16px] rounded-[12px] w-[210px] justify-center hover:bg-bg-gray-hover transition-colors"
-          >
-            {feature.cta.label}
-            <ChevronRight className="w-4 h-4" />
-          </Link>
+          <ChecklistStartButton className="flex items-center gap-2 bg-border-light text-text-main font-bold text-fluid-xl tracking-[-0.5px] px-[10px] py-[16px] rounded-[12px] w-[210px] justify-center hover:bg-bg-gray-hover transition-colors cursor-pointer" />
         )}
       </div>
     </div>

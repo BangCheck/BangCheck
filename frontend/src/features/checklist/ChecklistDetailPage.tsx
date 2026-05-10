@@ -3,7 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { ROUTES } from '@/lib/routes';
 import { useGuestRoomStore } from '@/store/use-guest-room-store';
 import { useAuthStore } from '@/store/use-auth-store';
-import { useRoomDetail, useUpdateRoom, useDeleteRoom } from '@/features/rooms/hooks/useRoomsQuery';
+import { useRoomDetail, useUpdateRoom, useDeleteRoom } from '@/features/rooms/hooks/use-rooms-query';
 
 import { useChecklistState } from './hooks/use-checklist-state';
 import { useSectionScroll } from './hooks/use-section-scroll';
@@ -30,7 +30,14 @@ export default function ChecklistDetailPage() {
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [notFound, setNotFound] = useState(false);
 
-  const { basic, setBasic, building, setBuilding, interior, setInterior, safety, setSafety, custom, setCustom, patchBasic, patchBuilding, patchInterior, patchSafety, patchCustom } = useChecklistState();
+  const {
+    basic, setBasic,
+    building, setBuilding,
+    interior, setInterior,
+    safety, setSafety,
+    custom, setCustom,
+    patchBasic, patchBuilding, patchInterior, patchSafety, patchCustom,
+  } = useChecklistState();
   const { activeSection, sectionRefs, tabNavRef, scrollToSection } = useSectionScroll();
 
   const { data: beRoom, isError: beError } = useRoomDetail(isLoggedIn ? id : undefined);
@@ -95,12 +102,14 @@ export default function ChecklistDetailPage() {
     if (isLoggedIn) {
       try {
         await deleteRoom.mutateAsync(id);
-      } catch {
-        // 삭제 실패 시에도 목록으로 이동
+        navigate(ROUTES.HOME);
+      } catch (err) {
+        console.error('[ChecklistDetailPage] delete failed', err);
+        setSubmitError('삭제 중 오류가 발생했습니다. 다시 시도해주세요.');
       }
-    } else {
-      deleteGuestRoom(id);
+      return;
     }
+    deleteGuestRoom(id);
     navigate(ROUTES.HOME);
   };
 

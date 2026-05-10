@@ -3,7 +3,7 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { LogoWithText } from './Logo';
 import { useAuthStore } from '@/store/use-auth-store';
 import { useGuestRoomStore } from '@/store/use-guest-room-store';
-import { useRoomsList } from '@/features/rooms/hooks/useRoomsQuery';
+import { useRoomsList } from '@/features/rooms/hooks/use-rooms-query';
 import { LogoutConfirmModal } from './ui/Modals';
 import { cn } from '@/lib/utils';
 import { ROUTES } from '@/lib/routes';

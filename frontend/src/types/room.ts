@@ -11,6 +11,10 @@ export interface RoomListItem {
   rent: number;
   buildingType: string;
   createdAt: string;
+  floor?: number | null;
+  specialFloor?: string | null;
+  managementFee?: number | null;
+  direction?: string | null;
 }
 
 export interface RoomIssues {
@@ -43,11 +47,11 @@ export interface Room {
 }
 
 export interface GuestRoomRaw {
-  basic: import('@/features/checklist/components/01_basic-info').BasicInfoData;
-  building: import('@/features/checklist/components/02_building-info').BuildingInfoData;
-  interior: import('@/features/checklist/components/03_interior-check').InteriorCheckData;
-  safety: import('@/features/checklist/components/04_safety-living').SafetyLivingData;
-  custom: import('@/features/checklist/components/05_custom-memo').CustomMemoData;
+  basic: import('./checklist').BasicInfoData;
+  building: import('./checklist').BuildingInfoData;
+  interior: import('./checklist').InteriorCheckData;
+  safety: import('./checklist').SafetyLivingData;
+  custom: import('./checklist').CustomMemoData;
 }
 
 export interface PaginatedResponse<T> {

@@ -21,6 +21,8 @@ const IconCustom = ({ active }: { active: boolean }) => (
 const BottomNavigation = () => {
   const { pathname } = useLocation();
 
+  if (pathname.startsWith('/checklist/')) return null;
+
   const navItems = [
     { label: '방 목록', icon: IconRoomList, href: ROUTES.HOME },
     { label: '시작', icon: null, href: ROUTES.CHECKLIST_NEW, isCenter: true },

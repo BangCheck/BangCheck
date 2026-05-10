@@ -1,13 +1,7 @@
 import { SelectCard, EmojiCard, SectionHeader, FieldLabel, TextInput } from './ui/shared';
+import type { BuildingInfoData } from '@/types';
 
-export interface BuildingInfoData {
-  buildingType: string | null;
-  elevator: '있음' | '없음' | null;
-  floorLevel: string | null;
-  floorDirect: string;
-  direction: string | null;
-  options: string[];
-}
+export type { BuildingInfoData };
 
 interface Props {
   data: BuildingInfoData;
@@ -43,7 +37,7 @@ export default function BuildingInfo({ data, onChange }: Props) {
             <FieldLabel>엘리베이터</FieldLabel>
             <div className="grid grid-cols-2 gap-3">
               {(['있음', '없음'] as const).map((v) => (
-                <EmojiCard key={v} label={v} active={data.elevator === v} onClick={() => onChange('elevator', data.elevator === v ? null : v)} />
+                <EmojiCard key={v} label={v} variant="feature" active={data.elevator === v} onClick={() => onChange('elevator', data.elevator === v ? null : v)} />
               ))}
             </div>
           </div>

@@ -2,7 +2,7 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import { SECTION_TABS } from '../checklist-constants';
 import type { SectionId } from '../checklist-constants';
 
-const HEADER_OFFSET = 112; // 헤더(56px) + 탭바(56px) + 여백(16px)
+const HEADER_OFFSET = 168; // 글로벌헤더(56px) + 페이지헤더(56px) + 탭바(48px) + 여백(8px)
 
 export function useSectionScroll() {
   const [activeSection, setActiveSection] = useState<SectionId>('basic');

@@ -6,7 +6,7 @@ import { Spinner } from '@/components/ui/Spinner';
 import { USER_TYPES, CHECKLIST_ITEMS, TYPE_ITEM_MAP, CATEGORY_LABEL, CATEGORY_ORDER } from '@/features/customization/constants';
 import { UserTypeCard } from '@/features/customization/components/UserTypeCard';
 import { ChecklistItemToggle } from '@/features/customization/components/ChecklistItemToggle';
-import { useCustomization } from '@/features/customization/hooks/useCustomization';
+import { useCustomization } from '@/features/customization/hooks/use-customization';
 import { ItemIcons } from '@/features/customization/components/Icons';
 import { SectionHeader } from '@/features/customization/components/SectionHeader';
 import { BannerLoggedOut } from '@/features/customization/components/BannerLoggedOut';
@@ -18,16 +18,18 @@ export default function SettingsPage() {
 
   const {
     items,
+    allItems,
     selectedTypeIds,
     activeItemNames,
     customItems,
     isLoading,
     isPending,
     toggleUserType,
-    selectAllTypes,
+    // deselectAllTypes,
     toggleItem,
     selectAllItems,
     saveCurrentSettings,
+    enableItems,
     toggleItemLocally,
     addCustomItem,
     removeCustomItem,
@@ -42,13 +44,20 @@ export default function SettingsPage() {
   const activeNamesSet = useMemo(() => new Set(activeItemNames), [activeItemNames]);
 
   const recommendedItems = useMemo(() => {
-    if (selectedTypeIds.length === 0) return CHECKLIST_ITEMS.filter((item) => item.isDefault);
-    const itemIds = new Set(selectedTypeIds.flatMap((typeId) => TYPE_ITEM_MAP[typeId] ?? []));
-    return CHECKLIST_ITEMS.filter((item) => itemIds.has(item.id));
-  }, [selectedTypeIds]);
+    if (selectedTypeIds.length === 0) return [];
+    const typeId = selectedTypeIds[0];
+    const mappedIds = TYPE_ITEM_MAP[typeId] ?? [];
+    if (mappedIds.length > 0) {
+      return CHECKLIST_ITEMS.filter((item) => mappedIds.includes(item.id));
+    }
+    // FIRST_TIMER / ESSENTIALS_ONLY: 서버 enabled 항목을 직접 표시
+    return items
+      .filter(i => i.itemType !== 'CUSTOM' && i.isEnabled)
+      .map(i => CHECKLIST_ITEMS.find(c => c.label === i.itemName) ?? { id: String(i.id), label: i.itemName });
+  }, [selectedTypeIds, items]);
 
   // ── Handlers ─────────────────────────────────────────────
-  const getServerIdByLabel = (label: string) => items.find((item) => item.itemName === label)?.id;
+  const getServerIdByLabel = (label: string) => allItems.find((item) => item.itemName === label)?.id;
 
   const handleAddCustomItem = (e: React.FormEvent) => {
     e.preventDefault();
@@ -117,7 +126,7 @@ export default function SettingsPage() {
           {/* Main content — dimmed + locked when not logged in */}
           <div
             className={cn(
-              'space-y-16 md:space-y-[100px] transition-opacity duration-300',
+              'space-y-10 md:space-y-16 transition-opacity duration-300',
               !isLoggedIn && 'opacity-45 pointer-events-none',
               !isLoggedIn && 'lg:pt-[200px]',
             )}
@@ -131,7 +140,7 @@ export default function SettingsPage() {
                 number={1}
                 title="나는 이런 유형이에요"
                 description="유형을 선택하면 맞춤 항목이 자동으로 체크돼요"
-                onSelectAll={selectAllTypes}
+                // onDeselectAll={selectedTypeIds.length > 0 ? deselectAllTypes : undefined}
                 isFolded={folded.s1}
                 onToggleFold={() => setFolded((f) => ({ ...f, s1: !f.s1 }))}
               />
@@ -198,7 +207,11 @@ export default function SettingsPage() {
                 number={3}
                 title="추가로 확인할 항목"
                 description="전체 체크리스트에서 추가하고 싶은 항목을 직접 선택하세요"
-                onSelectAll={selectAllItems}
+                onSelectAll={() => {
+                  setFolded((f) => ({ ...f, s3: false }));
+                  setIsAllItemsVisible(true);
+                  selectAllItems();
+                }}
                 isFolded={folded.s3}
                 onToggleFold={() => setFolded((f) => ({ ...f, s3: !f.s3 }))}
               />
@@ -234,38 +247,45 @@ export default function SettingsPage() {
                   {isAllItemsVisible && (
                     <div className="pt-4 border-t border-bg-gray space-y-10">
                       {CATEGORY_ORDER.map((cat) => {
-                        const catItems = items.filter((i) => i.itemType !== 'CUSTOM' && i.category === cat);
-                        if (catItems.length === 0) return null;
-                        const activeCount = catItems.filter((i) => activeNamesSet.has(i.itemName)).length;
+                        const catLabel = CATEGORY_LABEL[cat];
+                        // 서버 데이터가 타입 필터되므로 프론트 상수 기준으로 전체 항목 렌더링
+                        const catConstItems = CHECKLIST_ITEMS.filter((i) => i.category === catLabel);
+                        if (catConstItems.length === 0) return null;
+                        const activeCount = catConstItems.filter((i) => activeNamesSet.has(i.label)).length;
                         return (
                           <div key={cat} className="space-y-4">
                             <div className="flex items-center justify-between">
                               <div className="flex items-center gap-2">
-                                <h4 className="text-[14px] font-bold text-text-main">{CATEGORY_LABEL[cat]}</h4>
-                                <span className="text-[14px] font-bold text-text-mute">{activeCount}/{catItems.length}</span>
+                                <h4 className="text-[14px] font-bold text-text-main">{catLabel}</h4>
+                                <span className="text-[14px] font-bold text-text-mute">{activeCount}/{catConstItems.length}</span>
                               </div>
                               <button
                                 className="text-[14px] font-medium text-text-main hover:text-brand-primary"
                                 onClick={() => {
-                                  catItems.forEach((i) => {
-                                    if (!activeNamesSet.has(i.itemName)) toggleItem(Number(i.id), i.itemName);
-                                  });
+                                  const toActivate = catConstItems
+                                    .filter((c) => !activeNamesSet.has(c.label))
+                                    .map((c) => c.label);
+                                  if (toActivate.length === 0) return;
+                                  enableItems(toActivate);
                                 }}
                               >
                                 전체 선택
                               </button>
                             </div>
                             <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
-                              {catItems.map((serverItem) => {
-                                const frontItem = CHECKLIST_ITEMS.find((c) => c.label === serverItem.itemName);
-                                const icon = frontItem ? ItemIcons[frontItem.id] || ItemIcons.default : ItemIcons.default;
+                              {catConstItems.map((constItem) => {
+                                const icon = ItemIcons[constItem.id] || ItemIcons.default;
+                                const si = items.find((s) => s.itemName === constItem.label);
                                 return (
                                   <ChecklistItemToggle
-                                    key={serverItem.id}
-                                    label={serverItem.itemName}
+                                    key={constItem.id}
+                                    label={constItem.label}
                                     icon={icon}
-                                    isActive={activeNamesSet.has(serverItem.itemName)}
-                                    onToggle={() => toggleItem(Number(serverItem.id), serverItem.itemName)}
+                                    isActive={activeNamesSet.has(constItem.label)}
+                                    onToggle={() => {
+                                      if (si) toggleItem(Number(si.id), constItem.label);
+                                      else toggleItemLocally(constItem.label);
+                                    }}
                                   />
                                 );
                               })}
@@ -284,38 +304,42 @@ export default function SettingsPage() {
                         <span className="text-[14px] font-bold text-text-mute">{customItems.length}건</span>
                       </div>
                     </div>
-                    <form onSubmit={handleAddCustomItem} className="flex gap-3">
-                      <input
-                        type="text"
-                        value={newCustomItem}
-                        onChange={(e) => setNewCustomItem(e.target.value)}
-                        placeholder="예 : 초인종 여부, 환기 상태"
-                        className="flex-1 bg-white border border-border-mute rounded-[6px] px-3 py-[6px] text-[14px] outline-none focus:border-brand-primary"
-                      />
-                      <button
-                        type="submit"
-                        disabled={isPending || !newCustomItem.trim()}
-                        className="w-9 h-9 bg-white border border-border-mute rounded-[6px] flex items-center justify-center disabled:opacity-50 shrink-0"
-                        aria-label="항목 추가"
-                      >
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#BFBFBF" strokeWidth="2.5" strokeLinecap="round">
-                          <line x1="12" y1="5" x2="12" y2="19" />
-                          <line x1="5" y1="12" x2="19" y2="12" />
-                        </svg>
-                      </button>
-                    </form>
+                    {customItems.length >= 3 ? (
+                      <p className="text-[13px] text-text-mute">최대 3개까지 추가할 수 있어요</p>
+                    ) : (
+                      <form onSubmit={handleAddCustomItem} className="flex gap-3">
+                        <input
+                          type="text"
+                          value={newCustomItem}
+                          onChange={(e) => setNewCustomItem(e.target.value)}
+                          placeholder="예 : 초인종 여부, 환기 상태"
+                          className="flex-1 bg-white border border-border-mute rounded-[6px] px-3 py-[6px] text-[14px] outline-none focus:border-brand-primary"
+                        />
+                        <button
+                          type="submit"
+                          disabled={isPending || !newCustomItem.trim()}
+                          className="w-9 h-9 bg-white border border-border-mute rounded-[6px] flex items-center justify-center disabled:opacity-50 shrink-0"
+                          aria-label="항목 추가"
+                        >
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#BFBFBF" strokeWidth="2.5" strokeLinecap="round">
+                            <line x1="12" y1="5" x2="12" y2="19" />
+                            <line x1="5" y1="12" x2="19" y2="12" />
+                          </svg>
+                        </button>
+                      </form>
+                    )}
                     {customItems.length > 0 && (
                       <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
                         {customItems.map((item) => (
                           <div
                             key={item.id}
-                            className="flex items-center justify-between gap-3 bg-slot-b-bg border-2 border-brand-primary rounded-[6px] p-6 drop-shadow-[0px_6px_8px_rgba(0,0,0,0.04)]"
+                            className="flex items-center justify-between gap-3 bg-slot-b-bg border-2 border-brand-primary rounded-[6px] p-3 lg:p-4 drop-shadow-[0px_6px_8px_rgba(0,0,0,0.04)]"
                           >
                             <div className="flex items-center gap-3">
-                              <div className="w-9 h-9 flex items-center justify-center shrink-0">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="#0A607D"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75z" /></svg>
+                              <div className="w-7 h-7 flex items-center justify-center shrink-0">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="#0A607D"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75z" /></svg>
                               </div>
-                              <span className="text-[18px] font-semibold text-text-main leading-[1.3]">{item.itemName}</span>
+                              <span className="text-fluid-base font-semibold text-text-main leading-[1.3]">{item.itemName}</span>
                             </div>
                             <button
                               onClick={() => removeCustomItem(item.id, item.itemName)}

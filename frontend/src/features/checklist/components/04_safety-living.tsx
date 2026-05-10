@@ -1,23 +1,7 @@
 import { RatingCards, YesNoCards, SectionHeader } from './ui/shared';
-import type { Rating, YesNo } from './ui/shared';
+import type { SafetyLivingData } from '@/types';
 
-export interface SafetyLivingData {
-  doorLock: Rating;
-  windowLock: Rating;
-  cctv: Rating;
-  fireSafety: Rating;
-  hallLight: Rating;
-  securityState: Rating;
-  windowScreen: Rating;
-  laundry: Rating;
-  trash: Rating;
-  bikeParking: YesNo;
-  internet: YesNo;
-  surroundNoise: Rating;
-  amenity: Rating;
-  transit: Rating;
-  nightSafety: Rating;
-}
+export type { SafetyLivingData };
 
 interface Props {
   data: SafetyLivingData;

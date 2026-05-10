@@ -28,7 +28,12 @@ export function SectionTabNav({ activeSections }: Props) {
   }, [activeSections]);
 
   const scrollTo = (id: ReportSectionId) => {
-    document.getElementById(`section-${id}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    const el = document.getElementById(`section-${id}`);
+    if (!el) return;
+    // sticky 헤더(56px) + 서브헤더(~64px) + 섹션탭(45px) + 여백(16px)
+    const OFFSET = 56 + 64 + 45 + 16;
+    const top = el.getBoundingClientRect().top + window.scrollY - OFFSET;
+    window.scrollTo({ top, behavior: 'smooth' });
     setActiveTab(id);
   };
 

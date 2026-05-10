@@ -2,7 +2,7 @@
 
 import { useAuthStore } from '@/store/use-auth-store';
 import { useGuestRoomStore } from '@/store/use-guest-room-store';
-import { useRoomsList, useDeleteRoom } from '@/features/rooms/hooks/useRoomsQuery';
+import { useRoomsList, useDeleteRoom } from '@/features/rooms/hooks/use-rooms-query';
 import { cn } from '@/lib/utils';
 import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
@@ -194,6 +194,13 @@ export default function Home() {
     }
   }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage, isLoggedIn]);
 
+  // 첫 로그인 시 온보딩 모달 자동 표시
+  useEffect(() => {
+    if (isLoggedIn && !localStorage.getItem('onboarding_custom_checklist')) {
+      setIsCustomModalOpen(true);
+    }
+  }, [isLoggedIn]);
+
   // 드롭다운 외부 클릭 시 닫기
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -336,7 +343,7 @@ export default function Home() {
         <div className="w-full px-4 md:px-10 py-8">
           <div className="flex justify-between items-center mb-5">
             <p className="text-[14px] font-bold text-text-caption">
-              등록된 방 {rooms.length}개{ !isLoggedIn && '/2개' }
+              등록된 방 {rooms.length}개/6개
             </p>
             <button 
               onClick={handleStartChecklist}

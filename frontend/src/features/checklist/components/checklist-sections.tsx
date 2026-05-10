@@ -1,9 +1,12 @@
-import { SelectCard, EmojiCard, SectionHeader, FieldLabel, TextInput, RatingCards, YesNoCards } from './ui/shared';
+import { SelectCard, EmojiCard, SectionHeader, FieldLabel, TextInput, RatingCards, YesNoCards, DynamicOptionCards } from './ui/shared';
 import type { BuildingInfoData } from './02_building-info';
 import { BUILDING_TYPES, DIRECTIONS, OPTION_LIST } from './02_building-info';
 import type { InteriorCheckData } from './03_interior-check';
 import type { SafetyLivingData } from './04_safety-living';
 import type { CustomMemoData } from './05_custom-memo';
+import type { ChecklistAnswers } from '@/types';
+import type { ChecklistItemResponse, ChecklistCategory } from '@/types';
+import { CATEGORY_LABEL } from '../hooks/use-checklist-items';
 
 export function BuildingSections({
   data,
@@ -36,7 +39,7 @@ export function BuildingSections({
             <FieldLabel>엘리베이터</FieldLabel>
             <div className="grid grid-cols-2 gap-3">
               {(['있음', '없음'] as const).map((v) => (
-                <EmojiCard key={v} label={v} active={data.elevator === v} onClick={() => onChange('elevator', data.elevator === v ? null : v)} />
+                <EmojiCard key={v} label={v} variant="feature" active={data.elevator === v} onClick={() => onChange('elevator', data.elevator === v ? null : v)} />
               ))}
             </div>
           </div>
@@ -112,11 +115,11 @@ export function InteriorSections({
       <section ref={problemsRef}>
         <SectionHeader title="문제 요소" />
         <div className="flex flex-col gap-5">
-          <YesNoCards label="곰팡이" hint="벽지 모서리, 욕실 천장, 창문 주변, 싱크대 하부 확인" value={data.mold} onChange={(v) => onChange('mold', v)} />
-          <YesNoCards label="벌레 흔적" hint="싱크대 하부, 창틀, 몰딩 주변, 배수구 확인" value={data.pest} onChange={(v) => onChange('pest', v)} />
-          <YesNoCards label="누수/결로" hint="천장 얼룩, 창문 물기, 화장실 배관 연결부 확인" value={data.leak} onChange={(v) => onChange('leak', v)} />
-          <YesNoCards label="벽지/장판 상태" hint="찢어짐, 들뜸, 오염 확인" value={data.wallpaper} onChange={(v) => onChange('wallpaper', v)} />
-          <YesNoCards label="배수구 냄새" hint="욕실/주방 배수구 냄새 확인" value={data.drainSmell} onChange={(v) => onChange('drainSmell', v)} />
+          <YesNoCards label="곰팡이" value={data.mold} onChange={(v) => onChange('mold', v)} />
+          <YesNoCards label="벌레 흔적" value={data.pest} onChange={(v) => onChange('pest', v)} />
+          <YesNoCards label="누수/결로" value={data.leak} onChange={(v) => onChange('leak', v)} />
+          <YesNoCards label="벽지/장판 상태" value={data.wallpaper} onChange={(v) => onChange('wallpaper', v)} />
+          <YesNoCards label="배수구 냄새" value={data.drainSmell} onChange={(v) => onChange('drainSmell', v)} />
         </div>
       </section>
     </>
@@ -177,67 +180,16 @@ export function SafetySections({
 export function CustomSections({
   data,
   onChange,
-  customRef,
   memoRef,
-  isLoggedIn = false,
 }: {
   data: CustomMemoData;
   onChange: <K extends keyof CustomMemoData>(key: K, value: CustomMemoData[K]) => void;
-  customRef: React.RefCallback<HTMLElement>;
+  customRef?: React.RefCallback<HTMLElement>;
   memoRef: React.RefCallback<HTMLElement>;
   isLoggedIn?: boolean;
 }) {
-  const addItem = () => {
-    if (data.customItems.length >= 5) return;
-    onChange('customItems', [...data.customItems, { label: `항목 ${data.customItems.length + 1}`, value: '' }]);
-  };
-  const removeItem = (idx: number) =>
-    onChange('customItems', data.customItems.filter((_, i) => i !== idx));
-  const updateItem = (idx: number, field: 'label' | 'value', val: string) =>
-    onChange('customItems', data.customItems.map((it, i) => i === idx ? { ...it, [field]: val } : it));
-
   return (
     <>
-      {isLoggedIn && (
-        <section ref={customRef}>
-          <SectionHeader title="나만의 체크 항목" />
-          <div className="flex flex-col gap-4">
-            {data.customItems.map((item, idx) => (
-              <div key={idx} className="flex flex-col gap-2 p-4 bg-bg-gray-light rounded-[8px] border border-border-light">
-                <div className="flex items-center gap-2">
-                  <span className="text-[18px]">✏️</span>
-                  <input
-                    value={item.label}
-                    onChange={(e) => updateItem(idx, 'label', e.target.value)}
-                    placeholder="항목 이름"
-                    className="flex-1 text-[14px] font-medium text-text-main bg-transparent outline-none border-b border-border-light pb-0.5 focus:border-brand-primary"
-                  />
-                  <button type="button" onClick={() => removeItem(idx)} className="text-[12px] text-text-caption hover:text-red-400 cursor-pointer shrink-0">
-                    삭제
-                  </button>
-                </div>
-                <input
-                  value={item.value}
-                  onChange={(e) => updateItem(idx, 'value', e.target.value)}
-                  placeholder="답변을 입력하세요"
-                  className="w-full h-[36px] px-3 rounded-[6px] border border-border-mute bg-white text-[14px] text-text-main placeholder:text-text-caption outline-none focus:border-brand-primary"
-                />
-              </div>
-            ))}
-            {data.customItems.length < 5 && (
-              <button
-                type="button"
-                onClick={addItem}
-                className="flex items-center justify-center gap-2 py-3 border border-dashed border-border-mute rounded-[6px] text-[14px] text-text-mute hover:border-brand-primary hover:text-brand-primary transition-colors cursor-pointer"
-              >
-                <span className="text-[18px] leading-none">+</span>
-                항목 추가 ({data.customItems.length}/5)
-              </button>
-            )}
-          </div>
-        </section>
-      )}
-
       <section ref={memoRef}>
         <SectionHeader title="메모" />
         <div className="flex flex-col gap-2">
@@ -255,6 +207,81 @@ export function CustomSections({
           />
         </div>
       </section>
+    </>
+  );
+}
+
+// ─── DynamicChecklistSections ─────────────────────────────
+const FORM_CATEGORY_ORDER: ChecklistCategory[] = [
+  'INTERNAL_STATE', 'PROBLEM', 'SAFETY', 'CONVENIENCE', 'ENVIRONMENT', 'CUSTOM',
+];
+
+const POSITIVE_IS_있음_CATEGORIES: ChecklistCategory[] = ['SAFETY', 'CONVENIENCE'];
+
+function DynamicItem({
+  item,
+  value,
+  onChange,
+}: {
+  item: ChecklistItemResponse;
+  value: string | null;
+  onChange: (v: string | null) => void;
+}) {
+  const beOptions = item.options.map((o) => o.optionValue);
+  const isBooleanFallback = beOptions.length === 0 && item.inputType === 'BOOLEAN';
+  const isPositiveFirst = item.inputType === 'BOOLEAN' && POSITIVE_IS_있음_CATEGORIES.includes(item.category);
+  const options = isBooleanFallback
+    ? ['있음', '없음']
+    : isPositiveFirst
+      ? ['있음', '없음']
+      : beOptions;
+  const positiveValue = isPositiveFirst ? '있음' : undefined;
+  return (
+    <DynamicOptionCards
+      label={item.itemName}
+      hint={item.description ?? undefined}
+      options={options}
+      value={value}
+      onChange={onChange}
+      positiveValue={positiveValue}
+    />
+  );
+}
+
+export function DynamicChecklistSections({
+  items,
+  answers,
+  onChange,
+  sectionRefs = {},
+}: {
+  items: ChecklistItemResponse[];
+  answers: ChecklistAnswers;
+  onChange: (itemId: number, value: string | null) => void;
+  sectionRefs?: Partial<Record<ChecklistCategory, React.RefCallback<HTMLElement>>>;
+}) {
+  if (items.length === 0) return null;
+
+  return (
+    <>
+      {FORM_CATEGORY_ORDER.map((cat) => {
+        const catItems = items.filter((i) => i.category === cat);
+        if (catItems.length === 0) return null;
+        return (
+          <section key={cat} ref={sectionRefs[cat]}>
+            <SectionHeader title={CATEGORY_LABEL[cat]} />
+            <div className="flex flex-col gap-5">
+              {catItems.map((item) => (
+                <DynamicItem
+                  key={item.id}
+                  item={item}
+                  value={answers[item.id] ?? null}
+                  onChange={(v) => onChange(item.id, v)}
+                />
+              ))}
+            </div>
+          </section>
+        );
+      })}
     </>
   );
 }

@@ -6,11 +6,12 @@ type Props = {
   title: string;
   description: string;
   onSelectAll?: () => void;
+  onDeselectAll?: () => void;
   isFolded?: boolean;
   onToggleFold?: () => void;
 };
 
-export function SectionHeader({ number, title, description, onSelectAll, isFolded, onToggleFold }: Props) {
+export function SectionHeader({ number, title, description, onSelectAll, onDeselectAll, isFolded, onToggleFold }: Props) {
   return (
     <div className="flex items-start justify-between mb-5 md:mb-6">
       <div className="space-y-1.5 md:space-y-2 max-w-[70%] md:max-w-none">
@@ -36,6 +37,19 @@ export function SectionHeader({ number, title, description, onSelectAll, isFolde
               </svg>
             </div>
             <span className="text-[10px] md:text-[12px] font-semibold text-text-main">전체선택</span>
+          </button>
+        )}
+        {onDeselectAll && (
+          <button
+            onClick={onDeselectAll}
+            className="h-7 md:h-8 px-2.5 md:px-4 bg-white border border-border-light rounded-[4px] flex items-center gap-1.5 md:gap-2.5 hover:bg-gray-50 transition-all"
+          >
+            <div className="w-3.5 h-3.5 md:w-[18px] md:h-[18px] border border-border-light rounded-[2px] flex items-center justify-center">
+              <svg width="10" height="2" viewBox="0 0 10 2" fill="none" className="md:w-3">
+                <path d="M1 1H9" stroke="#232527" strokeWidth="2" strokeLinecap="round" />
+              </svg>
+            </div>
+            <span className="text-[10px] md:text-[12px] font-semibold text-text-main">전체해제</span>
           </button>
         )}
         {onToggleFold && (

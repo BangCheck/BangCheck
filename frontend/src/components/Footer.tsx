@@ -1,7 +1,10 @@
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { LogoWithText } from './Logo';
 
 export default function Footer() {
+  const { pathname } = useLocation();
+  if (pathname.startsWith('/checklist/')) return null;
+
   return (
     <footer className="flex flex-col md:flex-row md:items-center md:justify-between px-4 md:px-10 py-7 bg-bg-footer border-t border-border-light w-full gap-6 md:gap-0">
       <div className="flex flex-col gap-2">

@@ -147,8 +147,16 @@ public class RoomService {
     public Room updateRoom(RoomUpdateRequestDTO request, Long roomId, Long userId){
         Room room = roomRepository.findByIdAndUserIdAndIsDeletedFalse(roomId, userId)
                 .orElseThrow(() -> new GeneralException(RoomErrorCode.ROOM_NOT_FOUND));
-        
-        room.update(request);
+
+        BigDecimal lat = null;
+        BigDecimal lon = null;
+        if (request.getAddress() != null) {
+            BigDecimal[] coordinates = geocodingService.getCoordinates(request.getAddress());
+            lat = coordinates != null ? coordinates[0] : null;
+            lon = coordinates != null ? coordinates[1] : null;
+        }
+
+        room.update(request, lat, lon);
         return room;
     }
 

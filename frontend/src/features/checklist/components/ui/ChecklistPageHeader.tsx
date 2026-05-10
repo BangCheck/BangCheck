@@ -9,7 +9,7 @@ type Props = {
 
 export function ChecklistPageHeader({ title, onBack, actions }: Props) {
   return (
-    <header className="sticky top-0 z-40 bg-white border-b border-border-light h-14 flex items-center px-4 gap-3">
+    <header className="sticky top-14 md:top-16 z-40 bg-white border-b border-border-light h-14 flex items-center px-4 gap-3">
       <button
         type="button"
         onClick={onBack}

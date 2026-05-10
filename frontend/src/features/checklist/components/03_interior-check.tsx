@@ -1,19 +1,7 @@
 import { RatingCards, YesNoCards, SectionHeader } from './ui/shared';
-import type { Rating, YesNo } from './ui/shared';
+import type { InteriorCheckData } from '@/types';
 
-export interface InteriorCheckData {
-  lighting: Rating;
-  ventilation: Rating;
-  floorNoise: Rating;
-  waterPressure: Rating;
-  soundProof: Rating;
-  heating: Rating;
-  mold: YesNo;
-  pest: YesNo;
-  leak: YesNo;
-  wallpaper: YesNo;
-  drainSmell: YesNo;
-}
+export type { InteriorCheckData };
 
 interface Props {
   data: InteriorCheckData;
