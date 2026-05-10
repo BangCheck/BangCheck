@@ -1,3 +1,4 @@
+import { Icon } from '@iconify/react';
 import { cn } from '@/lib/utils';
 
 export type Rating = '좋음' | '보통' | '나쁨' | null;
@@ -33,37 +34,52 @@ export function SelectCard({
 }
 
 // ─── EmojiCard ────────────────────────────────────────────
+const EMOJI_CARD_CONFIG: Record<string, { icon: string; activeBg: string; activeBorder: string; activeIcon: string }> = {
+  '없음': { icon: 'uiw:smile',          activeBg: 'bg-[#f8fefa]', activeBorder: 'border-[#22d455]', activeIcon: 'text-[#22d455]' },
+  '있음': { icon: 'bi:emoji-angry-fill', activeBg: 'bg-[#fffafa]', activeBorder: 'border-[#f15556]', activeIcon: 'text-[#f15556]' },
+};
+
 export function EmojiCard({
-  emoji,
   label,
   active,
   onClick,
 }: {
-  emoji: string;
   label: string;
   active: boolean;
   onClick: () => void;
 }) {
+  const cfg = EMOJI_CARD_CONFIG[label] ?? { icon: 'uiw:smile', activeBg: 'bg-slot-b-bg', activeBorder: 'border-brand-primary', activeIcon: 'text-brand-primary' };
   return (
     <button
       type="button"
       onClick={onClick}
       className={cn(
-        'flex items-center gap-3 py-5 px-6 rounded-[6px] transition-all cursor-pointer w-full',
+        'flex items-center gap-3 p-6 rounded-[6px] transition-all cursor-pointer w-full shadow-[0px_6px_8px_rgba(0,0,0,0.04)]',
         active
-          ? 'bg-slot-b-bg border-2 border-brand-primary'
-          : 'bg-white border border-border-light shadow-sm hover:border-border-mute',
+          ? `${cfg.activeBg} border-2 ${cfg.activeBorder}`
+          : 'bg-white border border-border-light hover:border-border-mute',
       )}
     >
-      <span className="text-[26px] leading-none">{emoji}</span>
-      <span className={cn('text-[15px] font-semibold', active ? 'text-brand-primary' : 'text-text-main')}>
+      <span className="flex items-center justify-center size-9 shrink-0">
+        <Icon
+          icon={cfg.icon}
+          className={cn('size-6', active ? cfg.activeIcon : 'text-text-caption')}
+        />
+      </span>
+      <span className="text-[18px] font-semibold text-text-main">
         {label}
       </span>
     </button>
   );
 }
 
-// ─── RatingCards (😊 😐 😞) ───────────────────────────────
+// ─── RatingCards (좋음 / 보통 / 나쁨) ────────────────────────
+const RATING_CONFIG: Record<NonNullable<Rating>, { icon: string; activeBg: string; activeBorder: string; activeIcon: string }> = {
+  '좋음': { icon: 'uiw:smile',          activeBg: 'bg-[#f8fefa]', activeBorder: 'border-[#22d455]', activeIcon: 'text-[#22d455]' },
+  '보통': { icon: 'bi:emoji-neutral',   activeBg: 'bg-[#fffef5]', activeBorder: 'border-[#ffdf00]', activeIcon: 'text-[#a07d00]' },
+  '나쁨': { icon: 'bi:emoji-angry-fill', activeBg: 'bg-[#fffafa]', activeBorder: 'border-[#f15556]', activeIcon: 'text-[#f15556]' },
+};
+
 export function RatingCards({
   label,
   hint,
@@ -75,11 +91,7 @@ export function RatingCards({
   value: Rating;
   onChange: (v: Rating) => void;
 }) {
-  const opts: { emoji: string; val: NonNullable<Rating> }[] = [
-    { emoji: '😊', val: '좋음' },
-    { emoji: '😐', val: '보통' },
-    { emoji: '😞', val: '나쁨' },
-  ];
+  const opts = (Object.keys(RATING_CONFIG) as NonNullable<Rating>[]);
   return (
     <div className="flex flex-col gap-3">
       <div>
@@ -87,24 +99,33 @@ export function RatingCards({
         {hint && <p className="text-[12px] text-text-caption mt-0.5">{hint}</p>}
       </div>
       <div className="grid grid-cols-3 gap-3">
-        {opts.map(({ emoji, val }) => (
-          <button
-            key={val}
-            type="button"
-            onClick={() => onChange(value === val ? null : val)}
-            className={cn(
-              'flex flex-col items-center justify-center py-4 rounded-[6px] gap-1 transition-all cursor-pointer',
-              value === val
-                ? 'bg-slot-b-bg border-2 border-brand-primary'
-                : 'bg-white border border-border-light shadow-sm hover:border-border-mute',
-            )}
-          >
-            <span className="text-[22px]">{emoji}</span>
-            <span className={cn('text-[12px] font-medium', value === val ? 'text-brand-primary' : 'text-text-mute')}>
-              {val}
-            </span>
-          </button>
-        ))}
+        {opts.map((val) => {
+          const cfg = RATING_CONFIG[val];
+          const active = value === val;
+          return (
+            <button
+              key={val}
+              type="button"
+              onClick={() => onChange(active ? null : val)}
+              className={cn(
+                'flex items-center gap-3 p-4 rounded-[6px] transition-all cursor-pointer shadow-[0px_6px_8px_rgba(0,0,0,0.04)]',
+                active
+                  ? `${cfg.activeBg} border-2 ${cfg.activeBorder}`
+                  : 'bg-white border border-border-light hover:border-border-mute',
+              )}
+            >
+              <span className="flex items-center justify-center size-9 shrink-0">
+                <Icon
+                  icon={cfg.icon}
+                  className={cn('size-6', active ? cfg.activeIcon : 'text-text-caption')}
+                />
+              </span>
+              <span className="text-[15px] font-semibold text-text-main whitespace-nowrap">
+                {val}
+              </span>
+            </button>
+          );
+        })}
       </div>
     </div>
   );
@@ -132,7 +153,6 @@ export function YesNoCards({
         {(['없음', '있음'] as const).map((v) => (
           <EmojiCard
             key={v}
-            emoji={v === '없음' ? '😊' : '😞'}
             label={v}
             active={value === v}
             onClick={() => onChange(value === v ? null : v)}
