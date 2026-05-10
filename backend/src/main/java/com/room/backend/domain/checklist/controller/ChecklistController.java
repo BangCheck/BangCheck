@@ -26,6 +26,13 @@ public class ChecklistController {
         return ResponseEntity.ok(items);
     }
 
+    @GetMapping("/items/all")
+    public ResponseEntity<List<ChecklistItemResponse>> getAllItemsForSettings() {
+        Long userId = SecurityUtil.getCurrentUserId();
+        List<ChecklistItemResponse> items = checklistService.getAllItemsForSettings(userId);
+        return ResponseEntity.ok(items);
+    }
+
     @PostMapping("/types/{userType}")
     public ResponseEntity<List<ChecklistItemResponse>> selectUserType(@PathVariable UserType userType) {
         Long userId = SecurityUtil.getCurrentUserId();
