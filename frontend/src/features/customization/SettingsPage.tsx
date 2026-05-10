@@ -18,7 +18,7 @@ export default function SettingsPage() {
 
   const {
     items,
-    allItems,
+
     selectedTypeIds,
     activeItemNames,
     customItems,
@@ -240,21 +240,27 @@ export default function SettingsPage() {
                   {isAllItemsVisible && (
                     <div className="pt-4 border-t border-bg-gray space-y-10">
                       {CATEGORY_ORDER.map((cat) => {
-                        const catItems = allItems.filter((i) => i.itemType !== 'CUSTOM' && i.category === cat);
-                        if (catItems.length === 0) return null;
-                        const activeCount = catItems.filter((i) => activeNamesSet.has(i.itemName)).length;
+                        const catLabel = CATEGORY_LABEL[cat];
+                        // 서버 데이터가 타입 필터되므로 프론트 상수 기준으로 전체 항목 렌더링
+                        const catConstItems = CHECKLIST_ITEMS.filter((i) => i.category === catLabel);
+                        if (catConstItems.length === 0) return null;
+                        const activeCount = catConstItems.filter((i) => activeNamesSet.has(i.label)).length;
                         return (
                           <div key={cat} className="space-y-4">
                             <div className="flex items-center justify-between">
                               <div className="flex items-center gap-2">
-                                <h4 className="text-[14px] font-bold text-text-main">{CATEGORY_LABEL[cat]}</h4>
-                                <span className="text-[14px] font-bold text-text-mute">{activeCount}/{catItems.length}</span>
+                                <h4 className="text-[14px] font-bold text-text-main">{catLabel}</h4>
+                                <span className="text-[14px] font-bold text-text-mute">{activeCount}/{catConstItems.length}</span>
                               </div>
                               <button
                                 className="text-[14px] font-medium text-text-main hover:text-brand-primary"
                                 onClick={() => {
-                                  catItems.forEach((i) => {
-                                    if (!activeNamesSet.has(i.itemName)) toggleItem(Number(i.id), i.itemName);
+                                  catConstItems.forEach((constItem) => {
+                                    if (!activeNamesSet.has(constItem.label)) {
+                                      const si = items.find((s) => s.itemName === constItem.label);
+                                      if (si) toggleItem(Number(si.id), constItem.label);
+                                      else toggleItemLocally(constItem.label);
+                                    }
                                   });
                                 }}
                               >
@@ -262,16 +268,19 @@ export default function SettingsPage() {
                               </button>
                             </div>
                             <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
-                              {catItems.map((serverItem) => {
-                                const frontItem = CHECKLIST_ITEMS.find((c) => c.label === serverItem.itemName);
-                                const icon = frontItem ? ItemIcons[frontItem.id] || ItemIcons.default : ItemIcons.default;
+                              {catConstItems.map((constItem) => {
+                                const icon = ItemIcons[constItem.id] || ItemIcons.default;
+                                const si = items.find((s) => s.itemName === constItem.label);
                                 return (
                                   <ChecklistItemToggle
-                                    key={serverItem.id}
-                                    label={serverItem.itemName}
+                                    key={constItem.id}
+                                    label={constItem.label}
                                     icon={icon}
-                                    isActive={activeNamesSet.has(serverItem.itemName)}
-                                    onToggle={() => toggleItem(Number(serverItem.id), serverItem.itemName)}
+                                    isActive={activeNamesSet.has(constItem.label)}
+                                    onToggle={() => {
+                                      if (si) toggleItem(Number(si.id), constItem.label);
+                                      else toggleItemLocally(constItem.label);
+                                    }}
                                   />
                                 );
                               })}

@@ -62,7 +62,8 @@ export const useCustomization = () => {
     items.forEach(item => {
       if (item.isEnabled && item.userType) serverTypes.add(item.userType);
     });
-    setSelectedTypeIds(Array.from(serverTypes));
+    // 단일 선택: 여러 유형이 활성화되어 있어도 첫 번째만 사용
+    setSelectedTypeIds(Array.from(serverTypes).slice(0, 1));
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [items]);
 
