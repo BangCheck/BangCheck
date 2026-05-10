@@ -7,6 +7,8 @@ import com.room.backend.domain.room.entity.enums.MaintenanceStatus;
 import com.room.backend.domain.room.entity.enums.RentType;
 import com.room.backend.domain.room.entity.enums.SpecialFloor;
 import com.room.backend.global.common.entity.BaseEntity;
+import com.room.backend.global.common.exception.GeneralException;
+import com.room.backend.global.common.exception.RoomErrorCode;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -126,14 +128,14 @@ public class Room extends BaseEntity {
     ) {
         if (rentType == RentType.JEONSE) {
             if (deposit == null) {
-                throw new IllegalArgumentException("전세는 보증금이 필수입니다.");
+                throw new GeneralException(RoomErrorCode.JEONSE_DEPOSIT_REQUIRED);
             }
             rent = null;
         }
 
         if (rentType == RentType.MONTHLY) {
             if (rent == null) {
-                throw new IllegalArgumentException("월세는 월세 금액이 필수입니다.");
+                throw new GeneralException(RoomErrorCode.MONTHLY_RENT_REQUIRED);
             }
         }
 
@@ -141,7 +143,7 @@ public class Room extends BaseEntity {
             loanAmount = null;
         } else {
             if (loanAmount == null) {
-                throw new IllegalArgumentException("융자가 있는 경우 금액은 필수입니다.");
+                throw new GeneralException(RoomErrorCode.LOAN_AMOUNT_REQUIRED);
             }
         }
 
