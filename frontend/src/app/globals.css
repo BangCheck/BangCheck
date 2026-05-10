@@ -75,6 +75,13 @@
   .pt-safe {
     padding-top: env(safe-area-inset-top);
   }
+  /* 마우스 포인터 장치(데스크탑)에서는 창 크기와 무관하게 숨김 */
+  .touch-device-only {
+    @media (hover: hover) and (pointer: fine) {
+      display: none !important;
+    }
+  }
+
   .scrollbar-none {
     scrollbar-width: none;
     &::-webkit-scrollbar { display: none; }
