@@ -194,6 +194,13 @@ export default function Home() {
     }
   }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage, isLoggedIn]);
 
+  // 첫 로그인 시 온보딩 모달 자동 표시
+  useEffect(() => {
+    if (isLoggedIn && !localStorage.getItem('onboarding_custom_checklist')) {
+      setIsCustomModalOpen(true);
+    }
+  }, [isLoggedIn]);
+
   // 드롭다운 외부 클릭 시 닫기
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {

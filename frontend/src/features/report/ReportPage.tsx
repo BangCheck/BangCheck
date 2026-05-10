@@ -16,7 +16,7 @@ export default function ReportPage() {
   const navigate = useNavigate();
   const { isLoggedIn } = useAuthStore();
   const { guestRooms } = useGuestRoomStore();
-  const { data: apiRooms = [] } = useRoomsList();
+  const { data: apiRooms = [], isLoading: isRoomsLoading } = useRoomsList();
   const rooms = isLoggedIn ? apiRooms : guestRooms;
 
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
@@ -61,6 +61,15 @@ export default function ReportPage() {
   const hasEnoughRooms = selectedRooms.length >= REPORT_MIN_SELECT;
 
   const [pdfLoginModalOpen, setPdfLoginModalOpen] = useState(false);
+
+  // ── 로딩 중 ──────────────────────────────────────────────────
+  if (isLoggedIn && isRoomsLoading) {
+    return (
+      <div className="flex-1 bg-bg-footer min-h-[calc(100vh-64px)] flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-brand-primary border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
 
   // ── 빈 상태 ──────────────────────────────────────────────────
   if (rooms.length < REPORT_MIN_SELECT) {

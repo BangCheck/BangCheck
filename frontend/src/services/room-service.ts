@@ -70,5 +70,8 @@ export const updateRoomWithChecklist = async (
     console.warn('[room-service] checklist items fetch failed, proceeding without check answers', err);
   }
 
-  await api.put(`/api/v1/rooms/${roomId}`, buildRoomPayload(basic, building, checkAnswers, custom));
+  await api.put(`/api/v1/rooms/${roomId}`, {
+    address: basic.address,
+    ...buildRoomPayload(basic, building, checkAnswers, custom),
+  });
 };
