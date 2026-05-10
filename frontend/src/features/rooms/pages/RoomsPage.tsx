@@ -95,7 +95,7 @@ function TransactionDropdown({
             key={type}
             onClick={() => { onChange(type); onClose(); }}
             className={cn(
-              'px-4 py-2 rounded-lg text-[13px] font-medium transition-all cursor-pointer',
+              'px-4 py-2 rounded-lg text-[13px] font-medium transition-all cursor-pointer whitespace-nowrap',
               value === type
                 ? 'border border-brand-primary text-brand-primary bg-white'
                 : 'bg-bg-gray text-text-caption border border-transparent'
@@ -134,7 +134,7 @@ function SortDropdown({
             key={opt}
             onClick={() => { onChange(opt); onClose(); }}
             className={cn(
-              'px-4 py-2 rounded-lg text-[13px] font-medium transition-all cursor-pointer',
+              'px-4 py-2 rounded-lg text-[13px] font-medium transition-all cursor-pointer whitespace-nowrap',
               value === opt
                 ? 'border border-brand-primary text-brand-primary bg-white'
                 : 'bg-bg-gray text-text-caption border border-transparent'
