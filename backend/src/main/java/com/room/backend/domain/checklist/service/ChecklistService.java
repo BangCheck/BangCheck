@@ -118,6 +118,7 @@ public class ChecklistService {
 
     public void saveSettings(Long userId, List<Long> disabledItemIds) {
         userChecklistSettingRepository.deleteByUserId(userId);
+        userChecklistSettingRepository.flush();
         List<UserChecklistSetting> settings = disabledItemIds.stream()
                 .map(itemId -> UserChecklistSetting.of(userId, itemId, false))
                 .toList();
