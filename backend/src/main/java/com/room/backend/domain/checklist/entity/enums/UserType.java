@@ -5,5 +5,6 @@ public enum UserType {
     NOISE_SENSITIVE,
     CLEAN_FREAK,
     PERFORMANCE_TYPE,
-    FIRST_TIMER
+    FIRST_TIMER,
+    ESSENTIALS_ONLY
 }
