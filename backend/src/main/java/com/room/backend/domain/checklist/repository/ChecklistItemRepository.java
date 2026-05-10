@@ -33,4 +33,16 @@ public interface ChecklistItemRepository extends JpaRepository<ChecklistItem, Lo
             """)
     List<ChecklistItem> findCustomizedItems(@Param("userId") Long userId,
                                              @Param("userTypes") List<UserType> userTypes);
+
+    @Query("""
+            SELECT ci FROM ChecklistItem ci
+            WHERE ci.isDeleted = false
+            AND ci.itemType = 'DEFAULT'
+            AND ci.id NOT IN (
+              SELECT cs.itemId FROM UserChecklistSetting cs
+              WHERE cs.userId = :userId AND cs.isEnabled = false
+            )
+            ORDER BY ci.displayOrder
+            """)
+    List<ChecklistItem> findEssentialsOnlyItems(@Param("userId") Long userId);
 }
