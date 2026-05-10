@@ -1,10 +1,13 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useQueries } from '@tanstack/react-query';
 import { Icon } from '@iconify/react';
 import { ROUTES } from '@/lib/routes';
 import { useGuestRoomStore } from '@/store/use-guest-room-store';
 import { useAuthStore } from '@/store/use-auth-store';
 import { useRoomsList } from '@/features/rooms/hooks/use-rooms-query';
+import { getRoomDetail } from '@/services/room-service';
+import { QUERY_KEYS } from '@/lib/query-keys';
 import { ConfigCard } from './components/ConfigCard';
 import { FilterToggle } from './components/FilterToggle';
 import { CompareTable } from './components/CompareTable';
@@ -33,6 +36,16 @@ export default function ReportPage() {
     const idSet = new Set(selectedIds);
     return rooms.filter((r) => idSet.has(r.id));
   }, [rooms, selectedIds]);
+
+  const detailQueries = useQueries({
+    queries: selectedRooms.map((r) => ({
+      queryKey: QUERY_KEYS.rooms.detail(r.id),
+      queryFn: () => getRoomDetail(r.id),
+      enabled: isLoggedIn && !!r.id,
+      staleTime: 1000 * 60 * 5,
+    })),
+  });
+  const roomDetails = detailQueries.map((q) => q.data ?? null);
 
   const isLockedSelection = rooms.length <= REPORT_MIN_SELECT;
 
@@ -167,7 +180,7 @@ export default function ReportPage() {
       {/* ── 비교 테이블 ── */}
       {hasEnoughRooms && (
         <div className="max-w-screen-xl mx-auto px-4 md:px-10 py-10 space-y-10">
-          <CompareTable rooms={selectedRooms} activeSections={activeSections} />
+          <CompareTable rooms={selectedRooms} activeSections={activeSections} details={roomDetails} />
         </div>
       )}
       <LoginRequiredModal
