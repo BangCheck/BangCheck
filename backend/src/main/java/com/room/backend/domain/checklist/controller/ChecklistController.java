@@ -48,6 +48,13 @@ public class ChecklistController {
         return ResponseEntity.ok().build();
     }
 
+    @GetMapping("/types")
+    public ResponseEntity<List<UserType>> getSelectedUserTypes() {
+        Long userId = SecurityUtil.getCurrentUserId();
+        List<UserType> types = checklistService.getSelectedUserTypes(userId);
+        return ResponseEntity.ok(types);
+    }
+
     @PostMapping("/items/settings")
     public ResponseEntity<Void> saveSettings(@RequestBody ChecklistSettingsRequest request) {
         Long userId = SecurityUtil.getCurrentUserId();
