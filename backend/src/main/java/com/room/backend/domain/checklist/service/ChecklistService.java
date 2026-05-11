@@ -116,6 +116,14 @@ public class ChecklistService {
         userTypeSelectionRepository.deleteByUserIdAndUserType(userId, userType);
     }
 
+    @Transactional(readOnly = true)
+    public List<UserType> getSelectedUserTypes(Long userId) {
+        return userTypeSelectionRepository.findByUserId(userId)
+                .stream()
+                .map(UserTypeSelection::getUserType)
+                .toList();
+    }
+
     public void saveSettings(Long userId, List<Long> disabledItemIds) {
         userChecklistSettingRepository.deleteByUserId(userId);
         userChecklistSettingRepository.flush();
