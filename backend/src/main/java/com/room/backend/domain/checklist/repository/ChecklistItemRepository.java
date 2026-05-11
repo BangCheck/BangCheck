@@ -29,7 +29,7 @@ public interface ChecklistItemRepository extends JpaRepository<ChecklistItem, Lo
               SELECT cs.itemId FROM UserChecklistSetting cs
               WHERE cs.userId = :userId AND cs.isEnabled = false
             )
-            ORDER BY ci.displayOrder
+            ORDER BY ci.displayOrder NULLS LAST, ci.id
             """)
     List<ChecklistItem> findCustomizedItems(@Param("userId") Long userId,
                                              @Param("userTypes") List<UserType> userTypes);
@@ -42,7 +42,7 @@ public interface ChecklistItemRepository extends JpaRepository<ChecklistItem, Lo
               SELECT cs.itemId FROM UserChecklistSetting cs
               WHERE cs.userId = :userId AND cs.isEnabled = false
             )
-            ORDER BY ci.displayOrder
+            ORDER BY ci.displayOrder NULLS LAST, ci.id
             """)
     List<ChecklistItem> findEssentialsOnlyItems(@Param("userId") Long userId);
 
@@ -54,7 +54,7 @@ public interface ChecklistItemRepository extends JpaRepository<ChecklistItem, Lo
               OR ci.itemType = 'USER_TYPE'
               OR (ci.itemType = 'CUSTOM' AND ci.ownerUserId = :userId)
             )
-            ORDER BY ci.displayOrder
+            ORDER BY ci.displayOrder NULLS LAST, ci.id
             """)
     List<ChecklistItem> findAllForSettings(@Param("userId") Long userId);
 }
