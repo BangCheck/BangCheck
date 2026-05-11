@@ -42,6 +42,8 @@ export const useCustomization = () => {
   });
 
   // itemName 기준 중복 제거 (낮은 ID 우선) + BE 라벨을 FE 라벨로 정규화
+  // id ASC 정렬: BE displayOrder NULL인 CUSTOM 항목들이 매 refetch마다 순서가 흔들리는 이슈 회피.
+  // BE 측 근본 해소(ORDER BY displayOrder NULLS LAST, id) 머지 전까지의 FE 안전망.
   const items = useMemo(() => {
     const seen = new Map<string, typeof rawItems[0]>();
     for (const raw of rawItems) {
@@ -52,7 +54,7 @@ export const useCustomization = () => {
         seen.set(item.itemName, item);
       }
     }
-    return Array.from(seen.values());
+    return Array.from(seen.values()).sort((a, b) => Number(a.id) - Number(b.id));
   }, [rawItems]);
 
   // P1: server 활성 항목 시그니처가 바뀔 때마다 store 재동기화 (영구 latch 제거).
@@ -211,7 +213,7 @@ export const useCustomization = () => {
       const existing = seen.get(item.itemName);
       if (!existing || item.id < existing.id) seen.set(item.itemName, item);
     }
-    return Array.from(seen.values());
+    return Array.from(seen.values()).sort((a, b) => Number(a.id) - Number(b.id));
   }, [rawAllItems]);
 
   const saveCurrentSettings = useCallback(async () => {
