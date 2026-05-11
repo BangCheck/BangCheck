@@ -159,19 +159,12 @@ export const useCustomization = () => {
     // FIRST_TIMER / ESSENTIALS_ONLY: BE가 활성 항목을 결정 → P1 signature 동기화로 자동 정합
   }, [items, selectedTypeIds, activeItemNames, selectTypeMutation, deselectTypeMutation, saveSettingsMutation, setSelectedTypeIds, setActiveItemNames]);
 
-  // P3: source-of-truth = activeItemNames (optimistic 로컬 상태). 서버 isEnabled 의존 제거.
+  // Option A: 토글은 로컬 state만 갱신. BE 저장은 "맞춤 설정 완료" 버튼에서 일괄 (saveCurrentSettings).
+  // 매 클릭 POST + 2회 refetch로 인한 카드 재배치/오버레이 깜빡임/트래픽 과다 회피.
   const toggleItem = useCallback((itemId: number, label: string) => {
     void itemId;
-    const isCurrentlyActive = activeItemNames.includes(label);
-    const nextActiveSet = new Set(activeItemNames);
-    if (isCurrentlyActive) nextActiveSet.delete(label);
-    else nextActiveSet.add(label);
-    const disabledIds = items
-      .filter(i => i.itemType !== 'CUSTOM' && !nextActiveSet.has(i.itemName))
-      .map(i => Number(i.id));
-    saveSettingsMutation.mutate(disabledIds);
     toggleItemName(label);
-  }, [items, activeItemNames, saveSettingsMutation, toggleItemName]);
+  }, [toggleItemName]);
 
   // 서버 ID가 없을 때의 임시 토글 (UI 반응용)
   const toggleItemLocally = useCallback((label: string) => {
@@ -199,13 +192,13 @@ export const useCustomization = () => {
     setActiveItemNames(customNames);
   }, [selectedTypeIds, deselectTypeMutation, setSelectedTypeIds, items, setActiveItemNames]);
 
+  // Option A: 로컬 state만 갱신
   const selectAllItems = useCallback(() => {
-    saveSettingsMutation.mutate([]);
     const constLabels = CHECKLIST_ITEMS.map((i) => i.label);
     const customNames = items.filter((i) => i.itemType === 'CUSTOM').map((i) => i.itemName);
     const allNames = Array.from(new Set([...constLabels, ...customNames]));
     setActiveItemNames(allNames);
-  }, [items, saveSettingsMutation, setActiveItemNames]);
+  }, [items, setActiveItemNames]);
 
   const allItems = useMemo(() => {
     const seen = new Map<string, typeof rawAllItems[0]>();
@@ -224,16 +217,11 @@ export const useCustomization = () => {
     await saveSettingsMutation.mutateAsync(disabledIds);
   }, [allItems, activeItemNames, saveSettingsMutation]);
 
-  // P10: 라벨별 toggleItemName 루프(stale snapshot) 대신 setActiveItemNames로 batch.
+  // Option A: 로컬 batch 갱신만, BE 저장은 버튼에서 일괄
   const enableItems = useCallback((labels: string[]) => {
     const nextActiveSet = new Set([...activeItemNames, ...labels]);
-    const nextActiveNames = Array.from(nextActiveSet);
-    const disabledIds = allItems
-      .filter((i) => i.itemType !== 'CUSTOM' && !nextActiveSet.has(i.itemName))
-      .map((i) => Number(i.id));
-    saveSettingsMutation.mutate(disabledIds);
-    setActiveItemNames(nextActiveNames);
-  }, [allItems, activeItemNames, saveSettingsMutation, setActiveItemNames]);
+    setActiveItemNames(Array.from(nextActiveSet));
+  }, [activeItemNames, setActiveItemNames]);
 
   const addCustomItem = useCallback((itemName: string) => {
     addCustomMutation.mutate(itemName);
