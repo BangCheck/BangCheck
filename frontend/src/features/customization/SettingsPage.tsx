@@ -24,8 +24,9 @@ export default function SettingsPage() {
     customItems,
     isLoading,
     isPending,
+    isError,
+    refetch,
     toggleUserType,
-    // deselectAllTypes,
     toggleItem,
     selectAllItems,
     saveCurrentSettings,
@@ -39,6 +40,7 @@ export default function SettingsPage() {
   const [folded, setFolded] = useState({ s1: false, s2: false, s3: false });
   const [isAllItemsVisible, setIsAllItemsVisible] = useState(false);
   const [newCustomItem, setNewCustomItem] = useState('');
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   // ── Derived / memoized ───────────────────────────────────
   const activeNamesSet = useMemo(() => new Set(activeItemNames), [activeItemNames]);
@@ -79,6 +81,28 @@ export default function SettingsPage() {
     );
   }
 
+  // P8: 로그인 사용자에 한해 에러 분기 UI (auth 만료/500 시 stale empty 고착 회피)
+  if (isError && isLoggedIn) {
+    return (
+      <div className="flex-1 bg-white flex items-center justify-center min-h-screen px-4">
+        <div className="flex flex-col items-center gap-4 max-w-md text-center">
+          <p className="text-fluid-lg font-semibold text-text-main">설정을 불러오지 못했어요</p>
+          <p className="text-[14px] text-text-mute">잠시 후 다시 시도하거나, 로그인이 만료된 경우 다시 로그인해주세요.</p>
+          <div className="flex gap-3">
+            <button
+              onClick={() => refetch()}
+              className="bg-brand-primary text-white px-4 py-2 rounded-[6px] font-medium"
+            >다시 시도</button>
+            <button
+              onClick={() => navigate(`${ROUTES.LOGIN}?redirect=${ROUTES.SETTINGS}`)}
+              className="bg-white border border-border-mute text-text-main px-4 py-2 rounded-[6px] font-medium"
+            >로그인</button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex-1 bg-white flex flex-col min-h-screen relative">
       {isPending && (
@@ -93,6 +117,17 @@ export default function SettingsPage() {
           isLoggedIn ? 'pb-40' : 'pb-20',
         )}
       >
+        {errorMessage && (
+          <div role="alert" className="mb-6 bg-[#FFF5F5] border border-[#F5A8A8] rounded-[6px] p-3 flex items-center justify-between gap-3">
+            <p className="text-[14px] text-[#9B2C2C] font-medium">{errorMessage}</p>
+            <button
+              onClick={() => setErrorMessage(null)}
+              className="text-[12px] text-[#9B2C2C] underline shrink-0"
+              aria-label="알림 닫기"
+            >닫기</button>
+          </div>
+        )}
+
         <section className="mb-8 md:mb-12">
           <h1 className="text-fluid-4xl font-bold text-text-main mb-2 md:mb-3">
             체크리스트 맞춤 설정
@@ -124,15 +159,15 @@ export default function SettingsPage() {
           )}
 
           {/* Main content — dimmed + locked when not logged in */}
+          {/* P6: React 19 native inert (boolean attr) + aria-hidden. 타입 세탁 제거 */}
           <div
             className={cn(
               'space-y-10 md:space-y-16 transition-opacity duration-300',
               !isLoggedIn && 'opacity-45 pointer-events-none',
               !isLoggedIn && 'lg:pt-[200px]',
             )}
-            {...(!isLoggedIn
-              ? ({ inert: true, 'aria-hidden': 'true' } as React.HTMLAttributes<HTMLDivElement>)
-              : {})}
+            inert={!isLoggedIn || undefined}
+            aria-hidden={!isLoggedIn || undefined}
           >
             {/* ── STEP 1 — 사용자 유형 ── */}
             <section>
@@ -151,7 +186,10 @@ export default function SettingsPage() {
                       key={type.id}
                       {...type}
                       isSelected={selectedTypeIds.includes(type.id)}
-                      onClick={() => toggleUserType(type.id)}
+                      onClick={() => {
+                        if (isPending) return; // P7: 더블클릭/연타 가드
+                        void toggleUserType(type.id);
+                      }}
                     />
                   ))}
                 </div>
@@ -188,6 +226,7 @@ export default function SettingsPage() {
                             icon={ItemIcons[item.id] || ItemIcons.default}
                             isActive={activeNamesSet.has(item.label)}
                             onToggle={() => {
+                              if (isPending) return; // P7: 더블클릭/연타 가드
                               const serverId = getServerIdByLabel(item.label);
                               if (serverId) toggleItem(serverId, item.label);
                               else toggleItemLocally(item.label);
@@ -283,6 +322,7 @@ export default function SettingsPage() {
                                     icon={icon}
                                     isActive={activeNamesSet.has(constItem.label)}
                                     onToggle={() => {
+                                      if (isPending) return; // P7: 더블클릭/연타 가드
                                       if (si) toggleItem(Number(si.id), constItem.label);
                                       else toggleItemLocally(constItem.label);
                                     }}
@@ -373,8 +413,14 @@ export default function SettingsPage() {
             </div>
             <button
               onClick={async () => {
-                await saveCurrentSettings();
-                navigate(ROUTES.HOME);
+                // P5: 저장 실패 시 navigate 차단 + 사용자에 알림
+                try {
+                  setErrorMessage(null);
+                  await saveCurrentSettings();
+                  navigate(ROUTES.HOME);
+                } catch {
+                  setErrorMessage('설정 저장에 실패했어요. 잠시 후 다시 시도해주세요.');
+                }
               }}
               disabled={isPending}
               className="w-full bg-brand-primary text-white py-3 rounded-[6px] font-semibold text-fluid-lg hover:bg-brand-primary-dark transition-colors disabled:opacity-60"
