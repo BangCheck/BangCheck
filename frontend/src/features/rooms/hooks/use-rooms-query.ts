@@ -1,7 +1,8 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuthStore } from '@/store/use-auth-store';
 import { getRooms, deleteRoom, createRoomWithChecklist, getRoomDetail, updateRoomWithChecklist } from '@/services/room-service';
-import type { BasicInfoData, BuildingInfoData, InteriorCheckData, CustomMemoData } from '@/types';
+import type { BasicInfoData, BuildingInfoData, InteriorCheckData, CustomMemoData, ChecklistAnswers } from '@/types';
+import type { ChecklistItemApi } from '@/services/room-mappers';
 import { QUERY_KEYS } from '@/lib/query-keys';
 
 export const useRoomsList = (transactionType?: string, sortOption?: string) => {
@@ -29,13 +30,15 @@ interface CreateRoomArgs {
   building: BuildingInfoData;
   interior: InteriorCheckData;
   custom: CustomMemoData;
+  answers: ChecklistAnswers;
+  items: ChecklistItemApi[];
 }
 
 export const useCreateRoom = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ basic, building, interior, custom }: CreateRoomArgs) =>
-      createRoomWithChecklist(basic, building, interior, custom),
+    mutationFn: ({ basic, building, interior, custom, answers, items }: CreateRoomArgs) =>
+      createRoomWithChecklist(basic, building, interior, custom, answers, items),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.rooms.all });
     },
@@ -59,8 +62,8 @@ interface UpdateRoomArgs extends CreateRoomArgs {
 export const useUpdateRoom = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ roomId, basic, building, interior, custom }: UpdateRoomArgs) =>
-      updateRoomWithChecklist(roomId, basic, building, interior, custom),
+    mutationFn: ({ roomId, basic, building, interior, custom, answers, items }: UpdateRoomArgs) =>
+      updateRoomWithChecklist(roomId, basic, building, interior, custom, answers, items),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.rooms.all });
     },

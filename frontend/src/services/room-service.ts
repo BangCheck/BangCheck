@@ -1,11 +1,10 @@
 import { api } from '@/lib/api';
-import type { Room, RoomDetail, RoomListItem, BasicInfoData, BuildingInfoData, InteriorCheckData, CustomMemoData, RoomFormState } from '@/types';
+import type { Room, RoomDetail, RoomListItem, BasicInfoData, BuildingInfoData, InteriorCheckData, CustomMemoData, RoomFormState, ChecklistAnswers } from '@/types';
 import {
   mapApiRoomToRoom,
   mapApiToForms,
   buildRoomPayload,
-  buildLookup,
-  mapToCheckAnswers,
+  mapAnswersToCheckAnswers,
   SORT_TO_API,
   RENT_TYPE_TO_API,
 } from './room-mappers';
@@ -38,16 +37,12 @@ export const getRoomDetail = async (roomId: string): Promise<RoomFormState> => {
 export const createRoomWithChecklist = async (
   basic: BasicInfoData,
   building: BuildingInfoData,
-  interior: InteriorCheckData,
+  _interior: InteriorCheckData,
   custom: CustomMemoData,
+  answers: ChecklistAnswers,
+  items: ChecklistItemApi[],
 ): Promise<void> => {
-  let checkAnswers: ReturnType<typeof mapToCheckAnswers> = [];
-  try {
-    const res = await api.get<ChecklistItemApi[]>('/api/checklist/items');
-    checkAnswers = mapToCheckAnswers(interior, building, buildLookup(res.data));
-  } catch (err) {
-    console.warn('[room-service] checklist items fetch failed, proceeding without check answers', err);
-  }
+  const checkAnswers = mapAnswersToCheckAnswers(answers, building, items);
 
   await api.post('/api/v1/rooms/check-results', {
     address: basic.address,
@@ -59,16 +54,12 @@ export const updateRoomWithChecklist = async (
   roomId: string,
   basic: BasicInfoData,
   building: BuildingInfoData,
-  interior: InteriorCheckData,
+  _interior: InteriorCheckData,
   custom: CustomMemoData,
+  answers: ChecklistAnswers,
+  items: ChecklistItemApi[],
 ): Promise<void> => {
-  let checkAnswers: ReturnType<typeof mapToCheckAnswers> = [];
-  try {
-    const res = await api.get<ChecklistItemApi[]>('/api/checklist/items');
-    checkAnswers = mapToCheckAnswers(interior, building, buildLookup(res.data));
-  } catch (err) {
-    console.warn('[room-service] checklist items fetch failed, proceeding without check answers', err);
-  }
+  const checkAnswers = mapAnswersToCheckAnswers(answers, building, items);
 
   await api.put(`/api/v1/rooms/${roomId}`, {
     address: basic.address,

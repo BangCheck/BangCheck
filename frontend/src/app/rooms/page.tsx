@@ -7,7 +7,6 @@ import { cn } from '@/lib/utils';
 import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { useInView } from 'react-intersection-observer';
 import RoomCard from '@/components/RoomCard';
 import {
   LoginRequiredModal,
@@ -170,29 +169,17 @@ export default function Home() {
   
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // 무한 스크롤 설정
-  const { ref, inView } = useInView();
 
   const {
     data,
     isLoading,
     isFetched,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
   } = useRoomsList(transactionType, sortOption);
 
   const { mutate: deleteRoomById } = useDeleteRoom();
 
-  const apiRooms = data?.pages.flat() || [];
+  const apiRooms = data ?? [];
   const rooms = isLoggedIn ? apiRooms : guestRooms;
-
-  // 스크롤이 끝에 닿으면 다음 페이지 로드
-  useEffect(() => {
-    if (inView && hasNextPage && !isFetchingNextPage && isLoggedIn) {
-      fetchNextPage();
-    }
-  }, [inView, hasNextPage, isFetchingNextPage, fetchNextPage, isLoggedIn]);
 
   // 첫 로그인 시 온보딩 모달 자동 표시
   useEffect(() => {
@@ -400,14 +387,6 @@ export default function Home() {
                 />
               ))}
               
-              {/* 무한 스크롤 관찰 대상 */}
-              {isLoggedIn && (
-                <div ref={ref} className="col-span-full h-20 flex items-center justify-center">
-                  {isFetchingNextPage && (
-                    <div className="w-6 h-6 border-2 border-brand-primary/30 border-t-brand-primary rounded-full animate-spin" />
-                  )}
-                </div>
-              )}
             </div>
           )}
         </div>

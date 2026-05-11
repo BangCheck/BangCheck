@@ -67,11 +67,15 @@ export interface CustomMemoData {
   memo: string;
 }
 
+// Dynamic checklist answers keyed by itemId → selected optionValue
+export type ChecklistAnswers = Record<number, string | null>;
+
 export interface RoomFormState {
   basic: BasicInfoData;
   building: BuildingInfoData;
   interior: InteriorCheckData;
   custom: CustomMemoData;
+  answers?: ChecklistAnswers;
 }
 
 // ── Legacy domain types ──

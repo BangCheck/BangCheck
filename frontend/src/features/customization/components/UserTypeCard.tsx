@@ -40,7 +40,7 @@ export const UserTypeCard: React.FC<UserTypeCardProps> = ({
     <button
       onClick={onClick}
       className={cn(
-        "flex flex-col items-start p-6 rounded-[6px] border transition-all w-full bg-white drop-shadow-[0px_6px_8px_rgba(0,0,0,0.04)]",
+        "flex flex-col items-start p-3 lg:p-5 rounded-[6px] border transition-all w-full bg-white drop-shadow-[0px_6px_8px_rgba(0,0,0,0.04)]",
         isSelected
           ? "bg-slot-b-bg border-2 border-brand-primary"
           : "border-border-light hover:border-border-mute"
@@ -53,10 +53,10 @@ export const UserTypeCard: React.FC<UserTypeCardProps> = ({
         {IconComponent && <IconComponent />}
       </div>
       <div className="space-y-1">
-        <h3 className="text-[18px] font-semibold leading-tight text-text-main">
+        <h3 className="text-fluid-base font-semibold leading-tight text-text-main">
           {label}
         </h3>
-        <p className="text-[12px] font-normal leading-[1.3] text-text-mute">
+        <p className="text-[11px] lg:text-[12px] font-normal leading-[1.3] text-text-mute">
           {description}
         </p>
       </div>

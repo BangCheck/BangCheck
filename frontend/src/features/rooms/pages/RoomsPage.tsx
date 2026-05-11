@@ -250,7 +250,10 @@ export default function RoomsPage() {
             <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><rect x="2" y="3" width="9" height="9" rx="1" /><rect x="13" y="3" width="9" height="9" rx="1" /><rect x="2" y="14" width="9" height="9" rx="1" /><rect x="13" y="14" width="9" height="9" rx="1" /></svg>
             카드로 보기
           </button>
-          <button className="flex items-center gap-[10px] px-[16px] py-[12px] text-text-caption font-bold text-fluid-xl cursor-pointer hover:text-text-sub transition-colors">
+          <button
+            onClick={() => navigate(ROUTES.MAP)}
+            className="flex items-center gap-[10px] px-[16px] py-[12px] text-text-caption font-bold text-fluid-xl cursor-pointer hover:text-text-sub transition-colors"
+          >
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6" /><line x1="8" y1="2" x2="8" y2="18" /><line x1="16" y1="6" x2="16" y2="22" /></svg>
             지도로 보기
           </button>
@@ -338,7 +341,7 @@ export default function RoomsPage() {
         {showEmpty ? (
           <EmptyState onStart={handleStartChecklist} />
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {rooms.map((room) => (
               <RoomCard
                 key={room.id}

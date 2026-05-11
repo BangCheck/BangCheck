@@ -3,38 +3,38 @@ import type { ChecklistCategory } from '@/types/checklist';
 export const USER_TYPES = [
   {
     id: 'BUG_AVOIDER',
-    label: '벌레 민감형',
-    description: '벌레/위생 관련 집중',
+    label: '벌레회피형',
+    description: '위생 및 벌레 유입 가능성을 고려',
     icon: 'bug',
   },
   {
     id: 'NOISE_SENSITIVE',
-    label: '조용한 곳 선호',
-    description: '소음/방음 집중',
+    label: '소음민감형',
+    description: '주거 환경의 소음 수준을 중요시',
     icon: 'mute',
   },
   {
     id: 'CLEAN_FREAK',
-    label: '채광 중요형',
-    description: '햇빛/환기/곰팡이',
+    label: '쾌적환경형',
+    description: '공기 질·환기·냄새 등 실내 쾌적성',
     icon: 'sun',
   },
   {
     id: 'PERFORMANCE_TYPE',
     label: '생활성능형',
-    description: '거주 편의성/기능 집중',
+    description: '거주 편의성·기능 요소 중심',
     icon: 'lightning',
   },
   {
     id: 'FIRST_TIMER',
-    label: '첫 자취',
-    description: '처음이라 다 확인!',
+    label: '첫 자취형',
+    description: '경험이 없어 모든 항목을 폭넓게',
     icon: 'house',
   },
   {
     id: 'ESSENTIALS_ONLY',
     label: '핵심만 빠르게',
-    description: '필수만 빠르게 확인',
+    description: '최소한의 필수 항목만 빠르게',
     icon: 'lightning',
   },
 ] as const;

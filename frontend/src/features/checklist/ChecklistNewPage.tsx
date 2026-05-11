@@ -7,6 +7,7 @@ import { useRoomsList, useCreateRoom } from '@/features/rooms/hooks/use-rooms-qu
 import { GUEST_ROOM_LIMIT, ROOM_LIMIT } from '@/lib/constants';
 
 import { useChecklistState } from './hooks/use-checklist-state';
+import { useChecklistItems } from './hooks/use-checklist-items';
 import { useSectionScroll } from './hooks/use-section-scroll';
 import { ChecklistPageHeader } from './components/ui/ChecklistPageHeader';
 import { ChecklistTabNav } from './components/ui/ChecklistTabNav';
@@ -15,8 +16,7 @@ import { ChecklistSubmitFooter } from './components/ui/ChecklistSubmitFooter';
 import BasicInfo from './components/01_basic-info';
 import {
   BuildingSections,
-  InteriorSections,
-  SafetySections,
+  DynamicChecklistSections,
   CustomSections,
 } from './components/checklist-sections';
 
@@ -30,7 +30,8 @@ export default function ChecklistNewPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const createRoom = useCreateRoom();
 
-  const { basic, building, interior, safety, custom, patchBasic, patchBuilding, patchInterior, patchSafety, patchCustom } = useChecklistState();
+  const { basic, building, interior, safety, custom, answers, patchBasic, patchBuilding, patchCustom, patchAnswer } = useChecklistState();
+  const { data: checklistItems = [] } = useChecklistItems();
   const { activeSection, sectionRefs, tabNavRef, scrollToSection } = useSectionScroll();
 
   const handleSubmit = async () => {
@@ -47,7 +48,7 @@ export default function ChecklistNewPage() {
       setIsSubmitting(true);
       setSubmitError(null);
       try {
-        await createRoom.mutateAsync({ basic, building, interior, custom });
+        await createRoom.mutateAsync({ basic, building, interior, custom, answers, items: checklistItems });
         navigate(ROUTES.HOME);
       } catch (err: unknown) {
         const msg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message;
@@ -91,18 +92,18 @@ export default function ChecklistNewPage() {
           buildingRef={(el) => { sectionRefs.current.building = el; }}
           optionsRef={(el) => { sectionRefs.current.options = el; }}
         />
-        <InteriorSections
-          data={interior}
-          onChange={patchInterior}
-          interiorRef={(el) => { sectionRefs.current.interior = el; }}
-          problemsRef={(el) => { sectionRefs.current.problems = el; }}
-        />
-        <SafetySections
-          data={safety}
-          onChange={patchSafety}
-          safetyRef={(el) => { sectionRefs.current.safety = el; }}
-          livingRef={(el) => { sectionRefs.current.living = el; }}
-          surroundRef={(el) => { sectionRefs.current.surround = el; }}
+        <DynamicChecklistSections
+          items={checklistItems}
+          answers={answers}
+          onChange={patchAnswer}
+          sectionRefs={{
+            INTERNAL_STATE: (el) => { sectionRefs.current.interior = el; },
+            PROBLEM: (el) => { sectionRefs.current.problems = el; },
+            SAFETY: (el) => { sectionRefs.current.safety = el; },
+            CONVENIENCE: (el) => { sectionRefs.current.living = el; },
+            ENVIRONMENT: (el) => { sectionRefs.current.surround = el; },
+            CUSTOM: (el) => { sectionRefs.current.custom = el; },
+          }}
         />
         <CustomSections
           data={custom}
@@ -122,4 +123,3 @@ export default function ChecklistNewPage() {
     </div>
   );
 }
-

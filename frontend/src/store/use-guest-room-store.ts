@@ -30,7 +30,7 @@ const buildTags = (raw: GuestRoomRaw): string[] => {
   const tags: string[] = [];
   if (raw.building.buildingType) tags.push(raw.building.buildingType);
   if (raw.building.floorLevel) tags.push(`${raw.building.floorLevel}층`);
-  if (raw.building.direction) tags.push(`${raw.building.direction}향`);
+  if (raw.building.direction) tags.push(raw.building.direction);
   return tags;
 };
 

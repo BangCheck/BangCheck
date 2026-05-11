@@ -6,6 +6,7 @@ import { useAuthStore } from '@/store/use-auth-store';
 import { useRoomDetail, useUpdateRoom, useDeleteRoom } from '@/features/rooms/hooks/use-rooms-query';
 
 import { useChecklistState } from './hooks/use-checklist-state';
+import { useChecklistItems } from './hooks/use-checklist-items';
 import { useSectionScroll } from './hooks/use-section-scroll';
 import { ChecklistPageHeader } from './components/ui/ChecklistPageHeader';
 import { ChecklistTabNav } from './components/ui/ChecklistTabNav';
@@ -14,8 +15,7 @@ import { ChecklistSubmitFooter } from './components/ui/ChecklistSubmitFooter';
 import BasicInfo from './components/01_basic-info';
 import {
   BuildingSections,
-  InteriorSections,
-  SafetySections,
+  DynamicChecklistSections,
   CustomSections,
 } from './components/checklist-sections';
 
@@ -36,8 +36,10 @@ export default function ChecklistDetailPage() {
     interior, setInterior,
     safety, setSafety,
     custom, setCustom,
-    patchBasic, patchBuilding, patchInterior, patchSafety, patchCustom,
+    answers, setAnswers,
+    patchBasic, patchBuilding, patchCustom, patchAnswer,
   } = useChecklistState();
+  const { data: checklistItems = [] } = useChecklistItems();
   const { activeSection, sectionRefs, tabNavRef, scrollToSection } = useSectionScroll();
 
   const { data: beRoom, isError: beError } = useRoomDetail(isLoggedIn ? id : undefined);
@@ -49,11 +51,14 @@ export default function ChecklistDetailPage() {
     if (!isLoggedIn) return;
     if (beError) { setNotFound(true); return; }
     if (!beRoom) return;
+    console.log('[ChecklistDetailPage] beRoom loaded:', beRoom);
+    console.log('[ChecklistDetailPage] answers restored:', beRoom.answers);
     setBasic(beRoom.basic);
     setBuilding(beRoom.building);
     setInterior(beRoom.interior);
+    setAnswers(beRoom.answers ?? {});
     setCustom(beRoom.custom);
-  }, [isLoggedIn, beRoom, beError, setBasic, setBuilding, setInterior, setCustom]);
+  }, [isLoggedIn, beRoom, beError, setBasic, setBuilding, setInterior, setAnswers, setCustom]);
 
   // 비로그인 — sessionStorage에서 방 데이터 로드
   useEffect(() => {
@@ -78,7 +83,7 @@ export default function ChecklistDetailPage() {
       setIsSubmitting(true);
       setSubmitError(null);
       try {
-        await updateRoom.mutateAsync({ roomId: id, basic, building, interior, custom });
+        await updateRoom.mutateAsync({ roomId: id, basic, building, interior, custom, answers, items: checklistItems });
         navigate(ROUTES.HOME);
       } catch (err: unknown) {
         const msg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message;
@@ -163,18 +168,18 @@ export default function ChecklistDetailPage() {
           buildingRef={(el) => { sectionRefs.current.building = el; }}
           optionsRef={(el) => { sectionRefs.current.options = el; }}
         />
-        <InteriorSections
-          data={interior}
-          onChange={patchInterior}
-          interiorRef={(el) => { sectionRefs.current.interior = el; }}
-          problemsRef={(el) => { sectionRefs.current.problems = el; }}
-        />
-        <SafetySections
-          data={safety}
-          onChange={patchSafety}
-          safetyRef={(el) => { sectionRefs.current.safety = el; }}
-          livingRef={(el) => { sectionRefs.current.living = el; }}
-          surroundRef={(el) => { sectionRefs.current.surround = el; }}
+        <DynamicChecklistSections
+          items={checklistItems}
+          answers={answers}
+          onChange={patchAnswer}
+          sectionRefs={{
+            INTERNAL_STATE: (el) => { sectionRefs.current.interior = el; },
+            PROBLEM: (el) => { sectionRefs.current.problems = el; },
+            SAFETY: (el) => { sectionRefs.current.safety = el; },
+            CONVENIENCE: (el) => { sectionRefs.current.living = el; },
+            ENVIRONMENT: (el) => { sectionRefs.current.surround = el; },
+            CUSTOM: (el) => { sectionRefs.current.custom = el; },
+          }}
         />
         <CustomSections
           data={custom}
@@ -221,4 +226,3 @@ export default function ChecklistDetailPage() {
     </div>
   );
 }
-

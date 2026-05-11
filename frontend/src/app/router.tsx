@@ -8,6 +8,7 @@ import ChecklistDetailPage from '@/features/checklist/ChecklistDetailPage';
 import RoomsPage from '@/features/rooms/pages/RoomsPage';
 import ReportPage from '@/features/report/ReportPage';
 import SettingsPage from '@/features/customization/SettingsPage';
+import MapPage from '@/features/map/MapPage';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import BottomNavigation from '@/components/BottomNavigation';
@@ -44,6 +45,7 @@ export const Router = () => (
       <Route path="/checklist/new" element={<ChecklistNewPage />} />
       <Route path="/checklist/:id" element={<ChecklistDetailPage />} />
       <Route path="/rooms" element={<RoomsPage />} />
+      <Route path="/map" element={<MapPage />} />
       <Route path="/report" element={<ReportPage />} />
       <Route path="/custom" element={<SettingsPage />} />
       <Route path="/settings" element={<Navigate to="/custom" replace />} />

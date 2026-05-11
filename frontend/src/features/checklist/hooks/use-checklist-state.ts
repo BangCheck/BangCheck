@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { initBasic, initBuilding, initInterior, initSafety, initCustom } from '../checklist-constants';
 import type { BasicInfoData } from '../components/01_basic-info';
 import type { BuildingInfoData } from '../components/02_building-info';
 import type { InteriorCheckData } from '../components/03_interior-check';
 import type { SafetyLivingData } from '../components/04_safety-living';
 import type { CustomMemoData } from '../components/05_custom-memo';
+import type { ChecklistAnswers } from '@/types';
 
 export function useChecklistState() {
   const [basic, setBasic] = useState<BasicInfoData>(initBasic);
@@ -12,6 +13,7 @@ export function useChecklistState() {
   const [interior, setInterior] = useState<InteriorCheckData>(initInterior);
   const [safety, setSafety] = useState<SafetyLivingData>(initSafety);
   const [custom, setCustom] = useState<CustomMemoData>(initCustom);
+  const [answers, setAnswers] = useState<ChecklistAnswers>({});
 
   function patchBasic<K extends keyof BasicInfoData>(key: K, value: BasicInfoData[K]) {
     setBasic((prev) => ({ ...prev, [key]: value }));
@@ -28,6 +30,9 @@ export function useChecklistState() {
   function patchCustom<K extends keyof CustomMemoData>(key: K, value: CustomMemoData[K]) {
     setCustom((prev) => ({ ...prev, [key]: value }));
   }
+  const patchAnswer = useCallback((itemId: number, value: string | null) => {
+    setAnswers((prev) => ({ ...prev, [itemId]: value }));
+  }, []);
 
   return {
     basic, setBasic,
@@ -35,6 +40,7 @@ export function useChecklistState() {
     interior, setInterior,
     safety, setSafety,
     custom, setCustom,
-    patchBasic, patchBuilding, patchInterior, patchSafety, patchCustom,
+    answers, setAnswers,
+    patchBasic, patchBuilding, patchInterior, patchSafety, patchCustom, patchAnswer,
   };
 }

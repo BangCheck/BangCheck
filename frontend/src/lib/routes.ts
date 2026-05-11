@@ -7,6 +7,7 @@ export const ROUTES = {
   SETTINGS: '/custom',
   CHECKLIST_NEW: '/checklist/new',
   CHECKLIST_DETAIL: (id: string) => `/checklist/${id}`,
+  MAP: '/map',
   LANDING: '/',
 } as const;
 
