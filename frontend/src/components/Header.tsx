@@ -113,7 +113,7 @@ export default function Header() {
               </div>
               <button
                 onClick={() => setIsLogoutModalOpen(true)}
-                className="flex items-center gap-1.5 text-[12px] text-text-caption hover:text-text-main transition-all cursor-pointer border border-border-light rounded-md px-2.5 py-1.5 bg-white"
+                className="flex items-center gap-2.5 text-[12px] font-semibold text-text-main hover:bg-bg-gray transition-all cursor-pointer border border-border-light rounded-[4px] px-4 py-2 bg-white whitespace-nowrap"
               >
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />

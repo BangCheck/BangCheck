@@ -19,6 +19,50 @@ const ISSUE_LABELS: Record<string, string> = {
   drainSmell: '냄새',
 };
 
+const ISSUE_ICONS: Record<string, { color: string; path: React.ReactElement }> = {
+  mold: {
+    color: '#2EA86E',
+    path: (
+      <>
+        <path d="M12 2C9 5 7 8 7 12c0 3.5 2.5 6 5 6s5-2.5 5-6c0-4-2-7-5-10z" />
+        <circle cx="10" cy="11" r="1.2" />
+        <circle cx="14" cy="13" r="1" />
+        <circle cx="11.5" cy="15" r="0.8" />
+      </>
+    ),
+  },
+  leak: {
+    color: '#2D8CFF',
+    path: <path d="M12 3c-3.5 5-6 8.5-6 12a6 6 0 0 0 12 0c0-3.5-2.5-7-6-12z" />,
+  },
+  bug: {
+    color: '#E5484D',
+    path: (
+      <>
+        <ellipse cx="12" cy="13" rx="5" ry="6" />
+        <path d="M7 11l-2-1M7 14h-2M7 17l-2 1M17 11l2-1M17 14h2M17 17l2 1M12 7V4M10 4l2-2 2 2" />
+      </>
+    ),
+  },
+  condensation: {
+    color: '#0EA5E9',
+    path: (
+      <>
+        <path d="M8 4c-1.5 2-3 4-3 6a3 3 0 0 0 6 0c0-2-1.5-4-3-6z" />
+        <path d="M16 11c-1.5 2-3 4-3 6a3 3 0 0 0 6 0c0-2-1.5-4-3-6z" />
+      </>
+    ),
+  },
+  drainSmell: {
+    color: '#A855F7',
+    path: (
+      <>
+        <path d="M5 9c2-2 4-2 6 0s4 2 6 0M5 14c2-2 4-2 6 0s4 2 6 0M5 19c2-2 4-2 6 0s4 2 6 0" />
+      </>
+    ),
+  },
+};
+
 export default function RoomCard({
   room,
   onDelete,
@@ -123,15 +167,22 @@ export default function RoomCard({
             <span className="text-[12px] text-border-light font-medium">문제사항 없음</span>
           ) : (
             <>
-              {displayIssues.map((issue) => (
-                <div key={issue.key} className="flex items-center gap-1 border border-border-light text-text-main text-[12px] font-medium pl-1 pr-1.5 py-1 rounded-[4px]">
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <circle cx="12" cy="12" r="9" />
-                    <path d="M12 8v4M12 16h.01" />
-                  </svg>
-                  {issue.label}
-                </div>
-              ))}
+              {displayIssues.map((issue) => {
+                const icon = ISSUE_ICONS[issue.key];
+                return (
+                  <div key={issue.key} className="flex items-center gap-1 border border-border-light text-text-main text-[12px] font-medium pl-1 pr-1.5 py-1 rounded-[4px]">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={icon?.color ?? 'currentColor'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      {icon?.path ?? (
+                        <>
+                          <circle cx="12" cy="12" r="9" />
+                          <path d="M12 8v4M12 16h.01" />
+                        </>
+                      )}
+                    </svg>
+                    {issue.label}
+                  </div>
+                );
+              })}
               {extraCount > 0 && (
                 <span className="text-text-mute text-[12px] font-medium">
                   + {extraCount}개의 문제사항

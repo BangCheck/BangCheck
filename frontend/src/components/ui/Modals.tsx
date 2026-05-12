@@ -160,7 +160,7 @@ export function DeleteRoomModal({
           </button>
           <button
             onClick={onConfirm}
-            className="flex-1 py-3 px-4 bg-brand-primary text-white text-[15px] font-semibold rounded-[6px] hover:bg-brand-primary-dark transition-colors active:scale-[0.98] cursor-pointer"
+            className="flex-1 py-3 px-4 bg-brand-primary text-white text-[15px] font-semibold rounded-[4px] hover:bg-brand-primary-dark transition-colors active:scale-[0.98] cursor-pointer"
           >
             삭제
           </button>

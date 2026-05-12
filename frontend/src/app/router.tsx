@@ -49,6 +49,7 @@ export const Router = () => (
       <Route path="/report" element={<ReportPage />} />
       <Route path="/custom" element={<SettingsPage />} />
       <Route path="/settings" element={<Navigate to="/custom" replace />} />
+      <Route path="/my" element={<Placeholder name="마이" />} />
       <Route path="*" element={<Placeholder name="404" />} />
     </Route>
   </Routes>

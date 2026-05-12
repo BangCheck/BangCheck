@@ -1,6 +1,9 @@
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { ROUTES } from '@/lib/routes';
+import { useAuthStore } from '@/store/use-auth-store';
+import { useGuestRoomStore } from '@/store/use-guest-room-store';
+import { useRoomsList } from '@/features/rooms/hooks/use-rooms-query';
 
 const IconRoomList = ({ active }: { active: boolean }) => (
   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -27,16 +30,30 @@ const IconCustom = ({ active }: { active: boolean }) => (
   </svg>
 );
 
+const IconMy = ({ active }: { active: boolean }) => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M12 12C14.2091 12 16 10.2091 16 8C16 5.79086 14.2091 4 12 4C9.79086 4 8 5.79086 8 8C8 10.2091 9.79086 12 12 12Z" stroke={active ? '#0A607D' : '#A0A0A0'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    <path d="M4 21C4 16.5817 7.58172 13 12 13C16.4183 13 20 16.5817 20 21" stroke={active ? '#0A607D' : '#A0A0A0'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
+
 const BottomNavigation = () => {
   const { pathname } = useLocation();
+  const { isLoggedIn } = useAuthStore();
+  const { guestRooms } = useGuestRoomStore();
+  const { data: apiRooms } = useRoomsList();
 
   if (pathname.startsWith('/checklist/')) return null;
 
+  const roomsCount = isLoggedIn ? (apiRooms?.length ?? 0) : guestRooms.length;
+  const isCompareDisabled = roomsCount < 2;
+
   const navItems = [
     { label: '방 목록', icon: IconRoomList, href: ROUTES.HOME },
-    { label: '비교 리포트', icon: IconCompare, href: ROUTES.REPORT },
+    { label: '비교 리포트', icon: IconCompare, href: ROUTES.REPORT, disabled: isCompareDisabled },
     { label: '시작', icon: null, href: ROUTES.CHECKLIST_NEW, isCenter: true },
     { label: '커스텀', icon: IconCustom, href: ROUTES.SETTINGS },
+    { label: '마이', icon: IconMy, href: ROUTES.MY },
   ];
 
   return (
@@ -58,6 +75,23 @@ const BottomNavigation = () => {
         }
 
         const Icon = item.icon!;
+        const isDisabled = item.disabled;
+
+        if (isDisabled) {
+          return (
+            <div
+              key={idx}
+              aria-disabled="true"
+              className="flex flex-col items-center gap-1 min-w-[64px] opacity-40 pointer-events-none"
+            >
+              <Icon active={false} />
+              <span className="text-[12px] font-medium text-text-caption">
+                {item.label}
+              </span>
+            </div>
+          );
+        }
+
         return (
           <Link key={idx} to={item.href} className="flex flex-col items-center gap-1 min-w-[64px] active:opacity-70 transition-opacity">
             <Icon active={isActive} />

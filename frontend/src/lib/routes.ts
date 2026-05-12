@@ -9,6 +9,7 @@ export const ROUTES = {
   CHECKLIST_DETAIL: (id: string) => `/checklist/${id}`,
   MAP: '/map',
   LANDING: '/',
+  MY: '/my',
 } as const;
 
 export const loginRedirect = (_reason?: string) => ROUTES.LOGIN;

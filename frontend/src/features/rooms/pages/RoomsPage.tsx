@@ -171,6 +171,81 @@ function SortDropdown({
   );
 }
 
+// 모바일 통합 필터 — 거래방식 + 정렬 단일 패널 (Figma 515:23024)
+function UnifiedFilterDropdown({
+  transactionType,
+  onTransactionChange,
+  sortOption,
+  onSortChange,
+  onReset,
+  onClose,
+}: {
+  transactionType: string;
+  onTransactionChange: (v: string) => void;
+  sortOption: string;
+  onSortChange: (v: string) => void;
+  onReset: () => void;
+  onClose: () => void;
+}) {
+  return (
+    <div className="absolute top-full right-0 mt-2 w-[280px] bg-white border border-border-light rounded-[12px] shadow-xl z-50 p-5 animate-in fade-in zoom-in-95 duration-150">
+      <div className="flex justify-between items-center mb-4">
+        <h4 className="text-[14px] font-bold text-text-main">필터</h4>
+        <button onClick={onReset} className="text-[11px] text-text-caption hover:text-text-main transition-colors cursor-pointer">
+          초기화
+        </button>
+      </div>
+
+      <div className="mb-4">
+        <p className="text-[12px] font-semibold text-text-sub mb-2">거래방식</p>
+        <div className="flex flex-wrap gap-1.5">
+          {['전체', '전세', '월세', '단기임대'].map((type) => (
+            <button
+              key={type}
+              onClick={() => onTransactionChange(type)}
+              className={cn(
+                'px-3 py-1.5 rounded-lg text-[12px] font-medium transition-all cursor-pointer whitespace-nowrap',
+                transactionType === type
+                  ? 'border border-brand-primary text-brand-primary bg-white'
+                  : 'bg-bg-gray text-text-caption border border-transparent'
+              )}
+            >
+              {type}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="mb-4">
+        <p className="text-[12px] font-semibold text-text-sub mb-2">정렬</p>
+        <div className="flex flex-wrap gap-1.5">
+          {['보증금 낮은순', '월세 낮은순', '관리비 낮은순'].map((opt) => (
+            <button
+              key={opt}
+              onClick={() => onSortChange(opt)}
+              className={cn(
+                'px-3 py-1.5 rounded-lg text-[12px] font-medium transition-all cursor-pointer whitespace-nowrap',
+                sortOption === opt
+                  ? 'border border-brand-primary text-brand-primary bg-white'
+                  : 'bg-bg-gray text-text-caption border border-transparent'
+              )}
+            >
+              {opt}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <button
+        onClick={onClose}
+        className="w-full bg-brand-primary text-white text-[13px] font-semibold py-2.5 rounded-lg hover:bg-brand-primary-dark transition-colors cursor-pointer"
+      >
+        적용
+      </button>
+    </div>
+  );
+}
+
 // ─── RoomsPage ────────────────────────────────────────────────────────────────
 
 export default function RoomsPage() {
@@ -373,54 +448,38 @@ export default function RoomsPage() {
         </div>
       </div>
 
-      {/* Room_Number — MOBILE (sm 미만) — 카운터(좌) + 필터 드롭다운(우) 1행 */}
+      {/* Room_Number — MOBILE (sm 미만) — 카운터(좌) + 통합 필터(우) Figma 515:23024 */}
       <div className="sm:hidden border-b border-border-light bg-white sticky top-14 z-40">
         <div className="px-4 py-3 flex justify-between items-center">
           <p className="text-[14px] font-semibold text-text-caption">
             등록된 방 {rooms.length}개/{isLoggedIn ? ROOM_LIMIT : GUEST_ROOM_LIMIT}개
           </p>
-          <div className="flex gap-2 relative" ref={dropdownRefMobile}>
+          <div className="relative" ref={dropdownRefMobile}>
             <button
               onClick={() => setActiveDropdown(activeDropdown === 'transaction' ? null : 'transaction')}
               className={cn(
-                'border rounded-[6px] px-2.5 py-1 text-[12px] font-medium flex items-center gap-1 transition-all cursor-pointer bg-white whitespace-nowrap',
-                activeDropdown === 'transaction' || transactionType !== '전체'
+                'border rounded-[6px] pl-3 pr-2 py-1.5 text-[14px] font-medium flex items-center gap-1 transition-all cursor-pointer bg-white whitespace-nowrap',
+                activeDropdown === 'transaction' || transactionType !== '전체' || sortOption !== '보증금 낮은순'
                   ? 'border-brand-primary text-brand-primary'
                   : 'border-border-mute text-text-sub'
               )}
             >
-              거래방식{transactionType !== '전체' ? ` · ${transactionType}` : ''}
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={cn('transition-transform', activeDropdown === 'transaction' ? 'rotate-180' : '')}>
-                <path d="m6 9 6 6 6-6" />
-              </svg>
-            </button>
-            <button
-              onClick={() => setActiveDropdown(activeDropdown === 'sort' ? null : 'sort')}
-              className={cn(
-                'border rounded-[6px] px-2.5 py-1 text-[12px] font-medium flex items-center gap-1 transition-all cursor-pointer bg-white whitespace-nowrap',
-                activeDropdown === 'sort' || sortOption !== '보증금 낮은순'
-                  ? 'border-brand-primary text-brand-primary'
-                  : 'border-border-mute text-text-sub'
-              )}
-            >
-              정렬
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={cn('transition-transform', activeDropdown === 'sort' ? 'rotate-180' : '')}>
+              거래방식 (정렬)
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={cn('transition-transform', activeDropdown === 'transaction' ? 'rotate-180' : '')}>
                 <path d="m6 9 6 6 6-6" />
               </svg>
             </button>
 
             {activeDropdown === 'transaction' && (
-              <TransactionDropdown
-                value={transactionType}
-                onChange={setTransactionType}
-                onClose={() => setActiveDropdown(null)}
-              />
-            )}
-            {activeDropdown === 'sort' && (
-              <SortDropdown
-                value={sortOption}
-                onChange={setSortOption}
-                onReset={() => setSortOption('보증금 낮은순')}
+              <UnifiedFilterDropdown
+                transactionType={transactionType}
+                onTransactionChange={setTransactionType}
+                sortOption={sortOption}
+                onSortChange={setSortOption}
+                onReset={() => {
+                  setTransactionType('전체');
+                  setSortOption('보증금 낮은순');
+                }}
                 onClose={() => setActiveDropdown(null)}
               />
             )}
