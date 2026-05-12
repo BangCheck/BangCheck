@@ -1,6 +1,6 @@
 'use client';
 
-import { ConfirmModal } from './Modal';
+import { ConfirmModal, Modal } from './Modal';
 
 interface BaseModalProps {
   isOpen: boolean;
@@ -109,12 +109,12 @@ export function CustomChecklistModal({
 /**
  * 01_비로그인 수정 제한 안내 모달
  */
-export function GuestEditDisabledModal({ 
-  isOpen, 
-  onClose, 
-  onLogin 
-}: BaseModalProps & { 
-  onLogin: () => void; 
+export function GuestEditDisabledModal({
+  isOpen,
+  onClose,
+  onLogin
+}: BaseModalProps & {
+  onLogin: () => void;
 }) {
   return (
     <ConfirmModal
@@ -127,5 +127,45 @@ export function GuestEditDisabledModal({
       onLeftClick={onClose}
       onRightClick={onLogin}
     />
+  );
+}
+
+/**
+ * 방 카드 삭제 확인 모달 — Figma `373:19945` (E12-S03 SCR-HOME 모바일)
+ */
+export function DeleteRoomModal({
+  isOpen,
+  onClose,
+  onConfirm,
+}: BaseModalProps & {
+  onConfirm: () => void;
+}) {
+  return (
+    <Modal isOpen={isOpen} onClose={onClose} className="pt-8 pb-5 px-4">
+      <div className="flex flex-col gap-5 items-center w-full">
+        <div className="flex flex-col gap-2 items-center text-center w-full">
+          <h3 className="text-[18px] font-bold text-text-main leading-[1.3]">
+            해당 방 기록을 삭제하시겠어요?
+          </h3>
+          <p className="text-[14px] font-normal text-text-mute text-center leading-[1.3]">
+            삭제 시, 데이터를 복구할 수 없습니다.
+          </p>
+        </div>
+        <div className="flex gap-2 items-center w-full">
+          <button
+            onClick={onClose}
+            className="flex-1 py-3 px-4 bg-bg-gray-soft text-text-sub text-[15px] font-semibold rounded-[6px] hover:bg-bg-gray-hover transition-colors active:scale-[0.98] cursor-pointer"
+          >
+            취소
+          </button>
+          <button
+            onClick={onConfirm}
+            className="flex-1 py-3 px-4 bg-brand-primary text-white text-[15px] font-semibold rounded-[6px] hover:bg-brand-primary-dark transition-colors active:scale-[0.98] cursor-pointer"
+          >
+            삭제
+          </button>
+        </div>
+      </div>
+    </Modal>
   );
 }

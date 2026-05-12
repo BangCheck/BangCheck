@@ -1,12 +1,15 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/store/use-auth-store';
 import { useGuestRoomStore } from '@/store/use-guest-room-store';
+import { useCustomizationStore } from '@/store/use-customization-store';
 import { useRoomsList, useDeleteRoom } from '@/features/rooms/hooks/use-rooms-query';
 import { cn } from '@/lib/utils';
 import { ROUTES } from '@/lib/routes';
 import { GUEST_ROOM_LIMIT, ROOM_LIMIT, STORAGE_KEY_ONBOARDING } from '@/lib/constants';
+import { BASE_ITEM_LABELS } from '@/features/customization/constants';
 import RoomCard from '@/components/RoomCard';
+import { RoomBanner } from '@/features/rooms/components/RoomBanner';
 import {
   LoginRequiredModal,
   ComparisonDisabledModal,
@@ -42,20 +45,20 @@ function RoomsPageSkeleton() {
 
 // ─── Empty State ─────────────────────────────────────────────────────────────
 
-function EmptyState({ onStart }: { onStart: () => void }) {
+function EmptyStateOnboarding({ onStart }: { onStart: () => void }) {
   return (
     <div className="flex items-center justify-center py-[120px]">
       <div className="flex flex-col items-center gap-[40px] w-[256px]">
         <div className="flex flex-col items-center gap-[28px]">
-          <svg width="70" height="70" viewBox="0 0 24 24" fill="none" stroke="#BFBFBF" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
+          <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#BFBFBF" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
             <rect x="8" y="2" width="8" height="4" rx="1" ry="1" />
             <path d="M9 14l2 2 4-4" />
           </svg>
-          <p className="text-[20px] font-bold text-text-main text-center leading-[1.3]">
+          <p className="text-[18px] font-bold text-text-main text-center leading-[1.3]">
             아직 등록된 체크리스트가 없어요
           </p>
-          <div className="text-[16px] text-text-main text-center leading-[1.3]">
+          <div className="text-[14px] font-normal text-text-main text-center leading-[1.3]">
             <p>방체크에서</p>
             <p>체크리스트를 기록해보세요</p>
           </div>
@@ -70,6 +73,26 @@ function EmptyState({ onStart }: { onStart: () => void }) {
           </svg>
           체크리스트 시작하기
         </button>
+      </div>
+    </div>
+  );
+}
+
+function EmptyStateFiltered() {
+  return (
+    <div className="flex items-center justify-center py-[40px] px-4">
+      <div className="flex flex-col items-center gap-[20px]">
+        <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#BFBFBF" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
+          <rect x="8" y="2" width="8" height="4" rx="1" ry="1" />
+        </svg>
+        <p className="text-[18px] font-bold text-text-main text-center leading-[1.3]">
+          조건에 맞는 방이 없어요
+        </p>
+        <div className="text-[14px] font-normal text-text-main text-center leading-[1.3]">
+          <p>다른 필터를 선택하거나</p>
+          <p>전체를 확인해보세요</p>
+        </div>
       </div>
     </div>
   );
@@ -163,6 +186,7 @@ export default function RoomsPage() {
   const [sortOption, setSortOption] = useState('보증금 낮은순');
 
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const dropdownRefMobile = useRef<HTMLDivElement>(null);
 
   const { data: apiRoomsData, isLoading, isFetched } =
     useRoomsList(transactionType, sortOption);
@@ -185,6 +209,19 @@ export default function RoomsPage() {
   const rooms = isLoggedIn ? apiRooms : guestFiltered;
   const isGuestAtLimit = !isLoggedIn && guestRooms.length >= GUEST_ROOM_LIMIT;
 
+  // Banner 데이터 (활성/커스텀 항목 카운트)
+  const { activeItemNames } = useCustomizationStore();
+  const { activeCount, customCount } = useMemo(() => {
+    const baseSet = new Set(BASE_ITEM_LABELS);
+    return {
+      activeCount: activeItemNames.length,
+      customCount: activeItemNames.filter((n) => !baseSet.has(n)).length,
+    };
+  }, [activeItemNames]);
+
+  // EmptyState 분기 — 필터 활성 상태(전체가 아닌 거래방식 또는 비-기본 정렬)이면 EmptyStateFiltered, 그 외 EmptyStateOnboarding
+  const isFilterActive = transactionType !== '전체' || sortOption !== '보증금 낮은순';
+
   // 로그인 상태 + 방 목록 없음 → 온보딩 모달 노출
   useEffect(() => {
     if (isLoggedIn && isFetched && rooms.length === 0 && !localStorage.getItem(STORAGE_KEY_ONBOARDING)) {
@@ -194,7 +231,10 @@ export default function RoomsPage() {
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+      const target = e.target as Node;
+      const insideDesktop = dropdownRef.current?.contains(target);
+      const insideMobile = dropdownRefMobile.current?.contains(target);
+      if (!insideDesktop && !insideMobile) {
         setActiveDropdown(null);
       }
     }
@@ -260,8 +300,8 @@ export default function RoomsPage() {
         </div>
       </div>
 
-      {/* 필터 바 */}
-      <div className="border-b border-border-light bg-white sticky top-14 md:top-16 z-40">
+      {/* 필터 바 — DESKTOP (sm 이상) — 기존 유지 */}
+      <div className="hidden sm:block border-b border-border-light bg-white sticky top-14 md:top-16 z-40">
         <div className="px-4 md:px-10 lg:px-20 py-3 flex justify-between items-center max-w-screen-2xl mx-auto w-full">
           <div className="flex gap-2.5 relative" ref={dropdownRef}>
             <button
@@ -333,13 +373,79 @@ export default function RoomsPage() {
         </div>
       </div>
 
-      {/* 방 카운터 + 메인 컨텐츠 */}
+      {/* Room_Number — MOBILE (sm 미만) — 카운터(좌) + 필터 드롭다운(우) 1행 */}
+      <div className="sm:hidden border-b border-border-light bg-white sticky top-14 z-40">
+        <div className="px-4 py-3 flex justify-between items-center">
+          <p className="text-[14px] font-semibold text-text-caption">
+            등록된 방 {rooms.length}개/{isLoggedIn ? ROOM_LIMIT : GUEST_ROOM_LIMIT}개
+          </p>
+          <div className="flex gap-2 relative" ref={dropdownRefMobile}>
+            <button
+              onClick={() => setActiveDropdown(activeDropdown === 'transaction' ? null : 'transaction')}
+              className={cn(
+                'border rounded-[6px] px-2.5 py-1 text-[12px] font-medium flex items-center gap-1 transition-all cursor-pointer bg-white whitespace-nowrap',
+                activeDropdown === 'transaction' || transactionType !== '전체'
+                  ? 'border-brand-primary text-brand-primary'
+                  : 'border-border-mute text-text-sub'
+              )}
+            >
+              거래방식{transactionType !== '전체' ? ` · ${transactionType}` : ''}
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={cn('transition-transform', activeDropdown === 'transaction' ? 'rotate-180' : '')}>
+                <path d="m6 9 6 6 6-6" />
+              </svg>
+            </button>
+            <button
+              onClick={() => setActiveDropdown(activeDropdown === 'sort' ? null : 'sort')}
+              className={cn(
+                'border rounded-[6px] px-2.5 py-1 text-[12px] font-medium flex items-center gap-1 transition-all cursor-pointer bg-white whitespace-nowrap',
+                activeDropdown === 'sort' || sortOption !== '보증금 낮은순'
+                  ? 'border-brand-primary text-brand-primary'
+                  : 'border-border-mute text-text-sub'
+              )}
+            >
+              정렬
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={cn('transition-transform', activeDropdown === 'sort' ? 'rotate-180' : '')}>
+                <path d="m6 9 6 6 6-6" />
+              </svg>
+            </button>
+
+            {activeDropdown === 'transaction' && (
+              <TransactionDropdown
+                value={transactionType}
+                onChange={setTransactionType}
+                onClose={() => setActiveDropdown(null)}
+              />
+            )}
+            {activeDropdown === 'sort' && (
+              <SortDropdown
+                value={sortOption}
+                onChange={setSortOption}
+                onReset={() => setSortOption('보증금 낮은순')}
+                onClose={() => setActiveDropdown(null)}
+              />
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Banner — 항상 노출 (D5), 활성 항목 ≥ 1일 때만 */}
+      {activeCount > 0 && (
+        <div className="max-w-screen-2xl mx-auto w-full sm:px-10 lg:px-20">
+          <RoomBanner activeCount={activeCount} customCount={customCount} />
+        </div>
+      )}
+
+      {/* 방 카운터 (DESKTOP) + 메인 컨텐츠 */}
       <div className="flex-1 flex flex-col px-4 md:px-10 lg:px-20 pb-10 max-w-screen-2xl mx-auto w-full">
-        <p className="text-fluid-lg font-semibold text-text-caption py-5">
+        <p className="hidden sm:block text-fluid-lg font-semibold text-text-caption py-5">
           등록된 방 {rooms.length}개/{isLoggedIn ? ROOM_LIMIT : GUEST_ROOM_LIMIT}개
         </p>
         {showEmpty ? (
-          <EmptyState onStart={handleStartChecklist} />
+          isFilterActive ? (
+            <EmptyStateFiltered />
+          ) : (
+            <EmptyStateOnboarding onStart={handleStartChecklist} />
+          )
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {rooms.map((room) => (

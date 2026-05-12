@@ -11,6 +11,15 @@ const IconRoomList = ({ active }: { active: boolean }) => (
   </svg>
 );
 
+const IconCompare = ({ active }: { active: boolean }) => (
+  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M14 2H6C4.89543 2 4 2.89543 4 4V20C4 21.1046 4.89543 22 6 22H18C19.1046 22 20 21.1046 20 20V8L14 2Z" stroke={active ? '#0A607D' : '#A0A0A0'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    <path d="M14 2V8H20" stroke={active ? '#0A607D' : '#A0A0A0'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    <path d="M8 13H16" stroke={active ? '#0A607D' : '#A0A0A0'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    <path d="M8 17H16" stroke={active ? '#0A607D' : '#A0A0A0'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
+
 const IconCustom = ({ active }: { active: boolean }) => (
   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path d="M12 15C13.6569 15 15 13.6569 15 12C15 10.3431 13.6569 9 12 9C10.3431 9 9 10.3431 9 12C9 13.6569 10.3431 15 12 15Z" stroke={active ? '#0A607D' : '#A0A0A0'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
@@ -25,6 +34,7 @@ const BottomNavigation = () => {
 
   const navItems = [
     { label: '방 목록', icon: IconRoomList, href: ROUTES.HOME },
+    { label: '비교 리포트', icon: IconCompare, href: ROUTES.REPORT },
     { label: '시작', icon: null, href: ROUTES.CHECKLIST_NEW, isCenter: true },
     { label: '커스텀', icon: IconCustom, href: ROUTES.SETTINGS },
   ];
@@ -51,7 +61,7 @@ const BottomNavigation = () => {
         return (
           <Link key={idx} to={item.href} className="flex flex-col items-center gap-1 min-w-[64px] active:opacity-70 transition-opacity">
             <Icon active={isActive} />
-            <span className={cn('text-[12px] font-medium', isActive ? 'text-text-caption' : 'text-border-light')}>
+            <span className={cn('text-[12px] font-medium', isActive ? 'text-brand-primary' : 'text-text-caption')}>
               {item.label}
             </span>
           </Link>

@@ -75,13 +75,13 @@ export default function Header() {
         </nav>
 
         <div className="flex-1 flex justify-end items-center gap-3 z-10">
-          {/* 체크리스트 시작하기 — Figma 373:19998(활성) / 373:20132(비활성). 랜딩 + /rooms empty state에서는 숨김. */}
+          {/* 모바일(sm 미만)에서는 BottomNav FAB로 일원화 — Figma 캔버스 외부 가이드 의도 (E12-S03) */}
           {!hideStartButton && (startDisabled ? (
             <button
               type="button"
               disabled
               aria-label={disabledLabel}
-              className="flex h-8 px-3 sm:px-4 py-2 rounded-[4px] bg-border-mute items-center gap-[6px] sm:gap-[10px] cursor-not-allowed"
+              className="hidden sm:flex h-8 px-3 sm:px-4 py-2 rounded-[4px] bg-border-mute items-center gap-[6px] sm:gap-[10px] cursor-not-allowed"
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <line x1="12" y1="5" x2="12" y2="19" />
@@ -92,7 +92,7 @@ export default function Header() {
           ) : (
             <Link
               to={ROUTES.CHECKLIST_NEW}
-              className="flex h-8 px-3 sm:px-4 py-2 rounded-[4px] bg-brand-primary items-center gap-[6px] sm:gap-[10px] hover:bg-brand-primary-dark transition-colors"
+              className="hidden sm:flex h-8 px-3 sm:px-4 py-2 rounded-[4px] bg-brand-primary items-center gap-[6px] sm:gap-[10px] hover:bg-brand-primary-dark transition-colors"
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <line x1="12" y1="5" x2="12" y2="19" />
