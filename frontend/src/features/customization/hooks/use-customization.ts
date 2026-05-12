@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useCallback, useMemo, useEffect, useRef } from 'react';
 import * as customService from '@/services/custom-checklist-service';
-import { TYPE_ITEM_MAP, CHECKLIST_ITEMS, USER_TYPES } from '../constants';
+import { TYPE_ITEM_MAP, CHECKLIST_ITEMS, USER_TYPES, BASE_ITEM_LABELS } from '../constants';
 import { useCustomizationStore } from '@/store/use-customization-store';
 import { useAuthStore } from '@/store/use-auth-store';
 import { QUERY_KEYS } from '@/lib/query-keys';
@@ -68,9 +68,25 @@ export const useCustomization = () => {
     if (items.length === 0) return;
     if (lastSyncedSignatureRef.current === serverActiveSignature) return;
     const serverActiveNames = items.filter(item => item.isEnabled).map(item => item.itemName);
+    // eslint-disable-next-line no-console
+    console.log('[#182 signature sync]', {
+      serverActiveCount: serverActiveNames.length,
+      itemsCount: items.length,
+      signature: serverActiveSignature.slice(0, 80) + (serverActiveSignature.length > 80 ? '…' : ''),
+    });
     setActiveItemNames(serverActiveNames);
     lastSyncedSignatureRef.current = serverActiveSignature;
   }, [serverActiveSignature, items, setActiveItemNames]);
+
+  // allItems: STEP3 전용 /items/all (disabled 포함) — toggleUserType의 disabledIds 계산에도 사용
+  const allItems = useMemo(() => {
+    const seen = new Map<string, typeof rawAllItems[0]>();
+    for (const item of rawAllItems) {
+      const existing = seen.get(item.itemName);
+      if (!existing || item.id < existing.id) seen.set(item.itemName, item);
+    }
+    return Array.from(seen.values()).sort((a, b) => Number(a.id) - Number(b.id));
+  }, [rawAllItems]);
 
   // 3. Mutation 정의
   const invalidate = () => {
@@ -148,16 +164,28 @@ export const useCustomization = () => {
       const recommendedLabels = CHECKLIST_ITEMS
         .filter(item => mappedIds.includes(item.id))
         .map(item => item.label);
-      const nextActiveNames = Array.from(new Set([...allCustomNames, ...recommendedLabels]));
-      const disabledIds = items
+      // X 시맨틱: 유형 = 프리셋 덮어쓰기 → 기본 15개도 항상 활성으로 복원
+      const nextActiveNames = Array.from(new Set([...BASE_ITEM_LABELS, ...allCustomNames, ...recommendedLabels]));
+      // #182 fix: items(활성만) → allItems(비활성 포함). 직전 유형에서 비활성된 항목까지 disabledIds에 포함되어
+      // BE 상태가 새 유형 추천 셋과 정확히 정합. 안 그러면 다시 그 유형 돌아왔을 때 N개 누락 발생.
+      const disabledIds = allItems
         .filter(i => i.itemType !== 'CUSTOM')
         .filter(i => !nextActiveNames.includes(i.itemName))
         .map(i => Number(i.id));
+      // eslint-disable-next-line no-console
+      console.log('[#182 toggleUserType]', {
+        typeId,
+        recommendedCount: recommendedLabels.length,
+        nextActiveCount: nextActiveNames.length,
+        disabledCount: disabledIds.length,
+        allItemsCount: allItems.length,
+        itemsCount: items.length,
+      });
       await saveSettingsMutation.mutateAsync(disabledIds);
       setActiveItemNames(nextActiveNames);
     }
     // FIRST_TIMER / ESSENTIALS_ONLY: BE가 활성 항목을 결정 → P1 signature 동기화로 자동 정합
-  }, [items, selectedTypeIds, activeItemNames, selectTypeMutation, deselectTypeMutation, saveSettingsMutation, setSelectedTypeIds, setActiveItemNames]);
+  }, [items, allItems, selectedTypeIds, activeItemNames, selectTypeMutation, deselectTypeMutation, saveSettingsMutation, setSelectedTypeIds, setActiveItemNames]);
 
   // Option A: 토글은 로컬 state만 갱신. BE 저장은 "맞춤 설정 완료" 버튼에서 일괄 (saveCurrentSettings).
   // 매 클릭 POST + 2회 refetch로 인한 카드 재배치/오버레이 깜빡임/트래픽 과다 회피.
@@ -199,15 +227,6 @@ export const useCustomization = () => {
     const allNames = Array.from(new Set([...constLabels, ...customNames]));
     setActiveItemNames(allNames);
   }, [items, setActiveItemNames]);
-
-  const allItems = useMemo(() => {
-    const seen = new Map<string, typeof rawAllItems[0]>();
-    for (const item of rawAllItems) {
-      const existing = seen.get(item.itemName);
-      if (!existing || item.id < existing.id) seen.set(item.itemName, item);
-    }
-    return Array.from(seen.values()).sort((a, b) => Number(a.id) - Number(b.id));
-  }, [rawAllItems]);
 
   const saveCurrentSettings = useCallback(async () => {
     const activeSet = new Set(activeItemNames);

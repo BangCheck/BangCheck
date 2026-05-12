@@ -48,6 +48,16 @@ export interface ChecklistItem {
 }
 
 export const CHECKLIST_ITEMS: ChecklistItem[] = [
+  // 기본 옵션 (BE OPTION 카테고리)
+  { id: 'aircon', label: '에어컨', category: '기본 옵션' },
+  { id: 'washer', label: '세탁기', category: '기본 옵션' },
+  { id: 'fridge', label: '냉장고', category: '기본 옵션' },
+  { id: 'wifi', label: '인터넷/와이파이', category: '기본 옵션' },
+  { id: 'gas-stove', label: '가스레인지/인덕션', category: '기본 옵션' },
+  { id: 'desk-chair', label: '책상/의자', category: '기본 옵션' },
+  { id: 'closet', label: '옷장/수납', category: '기본 옵션' },
+  { id: 'heating', label: '난방', category: '기본 옵션' },
+
   // 내부 상태
   { id: 'sunlight', label: '채광', category: '내부 상태' },
   { id: 'ventilation', label: '환기', category: '내부 상태' },
@@ -95,7 +105,18 @@ export const CHECKLIST_ITEMS: ChecklistItem[] = [
   { id: 'slope', label: '언덕 경사', category: '주변 환경' },
 ];
 
-export const CATEGORIES = ['내부 상태', '문제 요소', '안전/보안', '생활 편의', '주변 환경'];
+export const CATEGORIES = ['기본 옵션', '내부 상태', '문제 요소', '안전/보안', '생활 편의', '주변 환경'];
+
+// 기본 항목 라벨 셋 (15개) — 모든 사용자에게 초기 ON, /custom에 항상 표시, 해제 가능
+// 유형 클릭 시 항상 활성으로 복원 (프리셋 시맨틱)
+export const BASE_ITEM_LABELS: string[] = [
+  '에어컨', '세탁기', '냉장고', '인터넷/와이파이',
+  '채광', '환기', '수압 및 배수',
+  '곰팡이', '벌레 흔적',
+  '공동 현관', '창문 잠금장치',
+  '카페/공부 공간', '코인세탁소',
+  '편의점/마트', '대중교통 접근성',
+];
 
 // 사용자 유형별 추천 항목 매핑 (기능명세서 기반)
 export const TYPE_ITEM_MAP: Record<string, string[]> = {

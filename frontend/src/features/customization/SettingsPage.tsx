@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/store/use-auth-store';
 import { cn } from '@/lib/utils';
 import { Spinner } from '@/components/ui/Spinner';
-import { USER_TYPES, CHECKLIST_ITEMS, TYPE_ITEM_MAP, CATEGORY_LABEL, CATEGORY_ORDER } from '@/features/customization/constants';
+import { USER_TYPES, CHECKLIST_ITEMS, TYPE_ITEM_MAP, CATEGORY_LABEL, CATEGORY_ORDER, BASE_ITEM_LABELS } from '@/features/customization/constants';
 import { UserTypeCard } from '@/features/customization/components/UserTypeCard';
 import { ChecklistItemToggle } from '@/features/customization/components/ChecklistItemToggle';
 import { useCustomization } from '@/features/customization/hooks/use-customization';
@@ -204,7 +204,7 @@ export default function SettingsPage() {
                 description={
                   selectedTypeIds.length === 0
                     ? 'Step 1에서 유형을 선택하면 추천 항목이 표시돼요'
-                    : `${activeItemNames.length}개 항목이 자동 체크되었어요 · 클릭하면 해제할 수 있어요`
+                    : `${recommendedItems.filter((r) => activeNamesSet.has(r.label)).length}/${recommendedItems.length}개 추천 항목이 체크되었어요 · 클릭하면 해제할 수 있어요`
                 }
                 isFolded={folded.s2}
                 onToggleFold={() => setFolded((f) => ({ ...f, s2: !f.s2 }))}
@@ -283,12 +283,46 @@ export default function SettingsPage() {
                     </button>
                   </div>
 
+                  {/* 기본 항목 — 토글 OFF여도 항상 표시 */}
+                  <div className="pt-4 border-t border-bg-gray">
+                    <div className="space-y-4">
+                      <div className="flex items-center gap-2">
+                        <h4 className="text-[14px] font-bold text-text-main">기본 항목</h4>
+                        <span className="text-[14px] font-bold text-text-mute">
+                          {BASE_ITEM_LABELS.filter((l) => activeNamesSet.has(l)).length}/{BASE_ITEM_LABELS.length}
+                        </span>
+                      </div>
+                      <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
+                        {BASE_ITEM_LABELS.map((label) => {
+                          const constItem = CHECKLIST_ITEMS.find((c) => c.label === label);
+                          const icon = constItem ? (ItemIcons[constItem.id] || ItemIcons.default) : ItemIcons.default;
+                          const si = items.find((s) => s.itemName === label);
+                          return (
+                            <ChecklistItemToggle
+                              key={label}
+                              label={label}
+                              icon={icon}
+                              isActive={activeNamesSet.has(label)}
+                              onToggle={() => {
+                                if (isPending) return;
+                                if (si) toggleItem(Number(si.id), label);
+                                else toggleItemLocally(label);
+                              }}
+                            />
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </div>
+
                   {isAllItemsVisible && (
                     <div className="pt-4 border-t border-bg-gray space-y-10">
                       {CATEGORY_ORDER.map((cat) => {
                         const catLabel = CATEGORY_LABEL[cat];
-                        // 서버 데이터가 타입 필터되므로 프론트 상수 기준으로 전체 항목 렌더링
-                        const catConstItems = CHECKLIST_ITEMS.filter((i) => i.category === catLabel);
+                        // 기본 항목은 위에서 따로 렌더 → 비기본만 카테고리별로 표시
+                        const catConstItems = CHECKLIST_ITEMS
+                          .filter((i) => i.category === catLabel)
+                          .filter((i) => !BASE_ITEM_LABELS.includes(i.label));
                         if (catConstItems.length === 0) return null;
                         const activeCount = catConstItems.filter((i) => activeNamesSet.has(i.label)).length;
                         return (
