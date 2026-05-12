@@ -211,8 +211,27 @@ const FALLBACK_ACTIVE = { bg: 'bg-slot-b-bg', border: 'border-brand-primary', ic
 
 const POSITIVE_ACTIVE = { bg: 'bg-[#f8fefa]', border: 'border-[#22d455]', icon: 'text-[#22d455]' };
 const NEGATIVE_ACTIVE = { bg: 'bg-[#fffafa]', border: 'border-[#f15556]', icon: 'text-[#f15556]' };
+const NEUTRAL_ACTIVE  = { bg: 'bg-[#fffef5]', border: 'border-[#ffdf00]', icon: 'text-[#a07d00]' };
 const POSITIVE_ICON = 'uiw:smile';
 const NEGATIVE_ICON = 'bi:emoji-angry-fill';
+const NEUTRAL_ICON  = 'bi:emoji-neutral';
+
+// '없음'이 이중 의미를 가지므로(문제 없음=좋음 vs 편의시설 없음=나쁨),
+// 옵션 시퀀스로 amenity 패턴을 감지해 색을 반전한다.
+const AMENITY_TRIPLE = ['없음', '보통', '많음'];
+function isAmenityOptions(options: string[]): boolean {
+  return options.length === 3 && AMENITY_TRIPLE.every((o) => options.includes(o));
+}
+const AMENITY_ACTIVE: Record<string, { bg: string; border: string; icon: string }> = {
+  '없음': NEGATIVE_ACTIVE,
+  '보통': NEUTRAL_ACTIVE,
+  '많음': POSITIVE_ACTIVE,
+};
+const AMENITY_ICON: Record<string, string> = {
+  '없음': NEGATIVE_ICON,
+  '보통': NEUTRAL_ICON,
+  '많음': POSITIVE_ICON,
+};
 
 export function DynamicOptionCards({
   label,
@@ -230,6 +249,7 @@ export function DynamicOptionCards({
   positiveValue?: string;
 }) {
   const cols = options.length === 2 ? 'grid-cols-2' : 'grid-cols-3';
+  const amenity = positiveValue == null && isAmenityOptions(options);
   return (
     <div className="flex flex-col gap-3">
       <div>
@@ -241,10 +261,14 @@ export function DynamicOptionCards({
           const active = value === opt;
           const cfg = positiveValue != null
             ? (opt === positiveValue ? POSITIVE_ACTIVE : NEGATIVE_ACTIVE)
-            : (OPTION_ACTIVE[opt] ?? FALLBACK_ACTIVE);
+            : amenity
+              ? (AMENITY_ACTIVE[opt] ?? FALLBACK_ACTIVE)
+              : (OPTION_ACTIVE[opt] ?? FALLBACK_ACTIVE);
           const icon = positiveValue != null
             ? (opt === positiveValue ? POSITIVE_ICON : NEGATIVE_ICON)
-            : (OPTION_ICON[opt] ?? 'uiw:smile');
+            : amenity
+              ? (AMENITY_ICON[opt] ?? 'uiw:smile')
+              : (OPTION_ICON[opt] ?? 'uiw:smile');
           return (
             <button
               key={opt}
