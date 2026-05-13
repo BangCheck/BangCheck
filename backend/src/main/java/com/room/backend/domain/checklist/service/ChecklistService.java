@@ -17,10 +17,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -34,6 +31,12 @@ public class ChecklistService {
     private final UserChecklistSettingRepository userChecklistSettingRepository;
 
     private static final int MAX_CUSTOM_ITEMS = 3;
+    private static final List<UserType> CHECKLIST_USER_TYPES = List.of(
+            UserType.BUG_AVOIDER,
+            UserType.NOISE_SENSITIVE,
+            UserType.CLEAN_FREAK,
+            UserType.PERFORMANCE_TYPE
+    );
 
     @Transactional(readOnly = true)
     public List<ChecklistItemResponse> getCustomizedItems(Long userId) {
@@ -46,10 +49,17 @@ public class ChecklistService {
             return getEssentialsOnlyItems(userId);
         }
 
-        List<UserType> queryTypes = selectedTypes.contains(UserType.FIRST_TIMER)
-                ? Arrays.stream(UserType.values()).toList()
-                : selectedTypes;
-        List<ChecklistItem> items = checklistItemRepository.findCustomizedItems(userId, queryTypes);
+        List<ChecklistItem> items;
+        if (selectedTypes.contains(UserType.FIRST_TIMER)) {
+            items = checklistItemRepository.findFirstTimerItems(userId);
+        } else {
+            List<UserType> queryTypes = selectedTypes.stream()
+                    .filter(CHECKLIST_USER_TYPES::contains)
+                    .toList();
+            items = queryTypes.isEmpty()
+                    ? checklistItemRepository.findDefaultAndCustomItems(userId)
+                    : checklistItemRepository.findCustomizedItems(userId, queryTypes);
+        }
         List<Long> disabledItemIds = userChecklistSettingRepository.findByUserIdAndIsEnabledFalse(userId)
                 .stream()
                 .map(UserChecklistSetting::getItemId)
