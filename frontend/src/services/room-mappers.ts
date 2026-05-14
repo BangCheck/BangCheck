@@ -1,4 +1,4 @@
-import type { Room, RoomListItem, BasicInfoData, BuildingInfoData, InteriorCheckData, CustomMemoData, RoomFormState, ChecklistAnswers } from '@/types';
+import type { Room, RoomListItem, BasicInfoData, BuildingInfoData, InteriorCheckData, CustomMemoData, RoomFormState, ChecklistAnswers, ChecklistCategory } from '@/types';
 
 // ── FE → API enum maps ────────────────────────────────────────
 
@@ -47,13 +47,12 @@ const SORT_TO_API: Record<string, string> = {
 export interface ChecklistItemApi {
   id: number;
   itemName: string;
+  category?: ChecklistCategory;
   inputType?: string;
   options: { id: number; optionValue: string }[];
 }
 
 type CheckAnswer = { itemId: number; selectedOptionIds: number[]; valueText?: string };
-
-const OPTION_NAMES = new Set(['에어컨', '세탁기', '냉장고', '인터넷/와이파이', '가스레인지/인덕션', '책상/의자', '옷장/수납', '난방']);
 
 const RATING_ITEM_TO_FIELD: Record<string, keyof InteriorCheckData> = {
   채광: 'lighting', 환기: 'ventilation', '수압 및 배수': 'waterPressure', 방음: 'soundProof',
@@ -177,14 +176,19 @@ const INIT_INTERIOR: InteriorCheckData = {
   noise: null, humidity: null,
 };
 
-export function mapApiToForms(detail: RoomDetailApi): RoomFormState {
+export function mapApiToForms(detail: RoomDetailApi, items?: ChecklistItemApi[]): RoomFormState {
   const optionNames: string[] = [];
   const interior: InteriorCheckData = { ...INIT_INTERIOR };
   const answers: ChecklistAnswers = {};
 
+  // 동적 OPTION 카테고리 라벨 set (items 미제공 시 빈 set → OPTION 매칭 없음, 모두 answers로 적재됨)
+  const optionNameSet = new Set(
+    (items ?? []).filter((i) => i.category === 'OPTION').map((i) => i.itemName),
+  );
+
   for (const result of detail.checkResults) {
     const optVal = result.selectedOptions[0]?.optionValue ?? result.valueText ?? null;
-    if (OPTION_NAMES.has(result.itemName) && optVal === '있음') {
+    if (optionNameSet.has(result.itemName) && optVal === '있음') {
       optionNames.push(result.itemName);
     } else if (RATING_ITEM_TO_FIELD[result.itemName]) {
       // 기존 InteriorCheckData 호환 유지

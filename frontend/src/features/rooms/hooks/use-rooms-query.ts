@@ -45,11 +45,11 @@ export const useCreateRoom = () => {
   });
 };
 
-export const useRoomDetail = (roomId: string | undefined) => {
+export const useRoomDetail = (roomId: string | undefined, items?: ChecklistItemApi[]) => {
   const { isLoggedIn } = useAuthStore();
   return useQuery({
     queryKey: QUERY_KEYS.rooms.detail(roomId),
-    queryFn: () => getRoomDetail(roomId!),
+    queryFn: () => getRoomDetail(roomId!, items),
     enabled: isLoggedIn && !!roomId,
     staleTime: 1000 * 60,
   });

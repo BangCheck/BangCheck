@@ -40,9 +40,10 @@ export default function ChecklistDetailPage() {
     patchBasic, patchBuilding, patchCustom, patchAnswer,
   } = useChecklistState();
   const { data: checklistItems = [] } = useChecklistItems();
+  const optionItems = checklistItems.filter((i) => i.category === 'OPTION');
   const { activeSection, sectionRefs, tabNavRef, scrollToSection } = useSectionScroll();
 
-  const { data: beRoom, isError: beError } = useRoomDetail(isLoggedIn ? id : undefined);
+  const { data: beRoom, isError: beError } = useRoomDetail(isLoggedIn ? id : undefined, checklistItems);
   const updateRoom = useUpdateRoom();
   const deleteRoom = useDeleteRoom();
 
@@ -165,6 +166,7 @@ export default function ChecklistDetailPage() {
         <BuildingSections
           data={building}
           onChange={patchBuilding}
+          optionItems={optionItems}
           buildingRef={(el) => { sectionRefs.current.building = el; }}
           optionsRef={(el) => { sectionRefs.current.options = el; }}
         />

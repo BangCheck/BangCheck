@@ -29,9 +29,9 @@ export const deleteRoom = async (roomId: string): Promise<void> => {
   await api.delete(`/api/v1/rooms/${roomId}`);
 };
 
-export const getRoomDetail = async (roomId: string): Promise<RoomFormState> => {
+export const getRoomDetail = async (roomId: string, items?: ChecklistItemApi[]): Promise<RoomFormState> => {
   const res = await api.get<{ data: RoomDetailApi }>(`/api/v1/rooms/${roomId}`);
-  return mapApiToForms(res.data.data);
+  return mapApiToForms(res.data.data, items);
 };
 
 export const createRoomWithChecklist = async (

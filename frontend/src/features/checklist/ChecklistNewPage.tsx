@@ -37,6 +37,7 @@ export default function ChecklistNewPage() {
     patchBasic, patchBuilding, patchCustom, patchAnswer,
   } = useChecklistState();
   const { data: checklistItems = [] } = useChecklistItems();
+  const optionItems = checklistItems.filter((i) => i.category === 'OPTION');
   const { activeSection, sectionRefs, tabNavRef, scrollToSection } = useSectionScroll();
 
   const handleSubmit = async () => {
@@ -99,6 +100,7 @@ export default function ChecklistNewPage() {
         <BuildingSections
           data={building}
           onChange={patchBuilding}
+          optionItems={optionItems}
           buildingRef={(el) => { sectionRefs.current.building = el; }}
           optionsRef={(el) => { sectionRefs.current.options = el; }}
         />

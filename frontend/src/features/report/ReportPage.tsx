@@ -6,6 +6,7 @@ import { ROUTES } from '@/lib/routes';
 import { useGuestRoomStore } from '@/store/use-guest-room-store';
 import { useAuthStore } from '@/store/use-auth-store';
 import { useRoomsList } from '@/features/rooms/hooks/use-rooms-query';
+import { useChecklistItems } from '@/features/checklist/hooks/use-checklist-items';
 import { getRoomDetail } from '@/services/room-service';
 import { QUERY_KEYS } from '@/lib/query-keys';
 import { ConfigCard } from './components/ConfigCard';
@@ -20,6 +21,7 @@ export default function ReportPage() {
   const { isLoggedIn } = useAuthStore();
   const { guestRooms } = useGuestRoomStore();
   const { data: apiRooms = [], isLoading: isRoomsLoading } = useRoomsList();
+  const { data: checklistItems = [] } = useChecklistItems();
   const rooms = isLoggedIn ? apiRooms : guestRooms;
 
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
@@ -40,7 +42,7 @@ export default function ReportPage() {
   const detailQueries = useQueries({
     queries: selectedRooms.map((r) => ({
       queryKey: QUERY_KEYS.rooms.detail(r.id),
-      queryFn: () => getRoomDetail(r.id),
+      queryFn: () => getRoomDetail(r.id, checklistItems),
       enabled: isLoggedIn && !!r.id,
       staleTime: 1000 * 60 * 5,
     })),

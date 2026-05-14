@@ -4,7 +4,7 @@ import { GuideToggleButton, GuidePanel } from './ui/GuidePanel';
 import { CHECKLIST_GUIDES, getGuideByItemName } from '../checklist-guides';
 import type { ChecklistGuide } from '../checklist-guides';
 import type { BuildingInfoData } from './02_building-info';
-import { BUILDING_TYPES, DIRECTIONS, OPTION_LIST } from './02_building-info';
+import { BUILDING_TYPES, DIRECTIONS } from './02_building-info';
 import type { InteriorCheckData } from './03_interior-check';
 
 /** 항목 카드 + (가이드가 있으면) 토글 + 모달 wrapper — static key 기반 */
@@ -48,11 +48,13 @@ import { CATEGORY_LABEL } from '../hooks/use-checklist-items';
 export function BuildingSections({
   data,
   onChange,
+  optionItems,
   buildingRef,
   optionsRef,
 }: {
   data: BuildingInfoData;
   onChange: <K extends keyof BuildingInfoData>(key: K, value: BuildingInfoData[K]) => void;
+  optionItems: ChecklistItemResponse[];
   buildingRef: React.RefCallback<HTMLElement>;
   optionsRef: React.RefCallback<HTMLElement>;
 }) {
@@ -112,14 +114,21 @@ export function BuildingSections({
         </div>
       </section>
 
-      <section ref={optionsRef}>
-        <SectionHeader title="옵션 (다중 선택)" />
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-          {OPTION_LIST.map((opt) => (
-            <SelectCard key={opt} label={opt} active={data.options.includes(opt)} onClick={() => toggleOption(opt)} />
-          ))}
-        </div>
-      </section>
+      {optionItems.length > 0 && (
+        <section ref={optionsRef}>
+          <SectionHeader title="옵션 (다중 선택)" />
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            {optionItems.map((item) => (
+              <SelectCard
+                key={item.id}
+                label={item.itemName}
+                active={data.options.includes(item.itemName)}
+                onClick={() => toggleOption(item.itemName)}
+              />
+            ))}
+          </div>
+        </section>
+      )}
     </>
   );
 }
