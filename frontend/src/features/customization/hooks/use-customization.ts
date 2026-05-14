@@ -1,5 +1,5 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useCallback, useMemo, useEffect, useRef } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useCallback, useMemo, useEffect, useRef, useState } from 'react';
 import * as customService from '@/services/custom-checklist-service';
 import { TYPE_ITEM_MAP, CHECKLIST_ITEMS, USER_TYPES, BASE_ITEM_LABELS } from '../constants';
 import { useCustomizationStore } from '@/store/use-customization-store';
@@ -13,15 +13,15 @@ const normalizeLabel = (label: string): string =>
 export const useCustomization = () => {
   const queryClient = useQueryClient();
   const { isLoggedIn } = useAuthStore();
-  const { 
+  const {
     selectedTypeIds,
     activeItemNames,
     setSelectedTypeIds,
     setActiveItemNames,
-    toggleItemName
+    toggleItemName,
   } = useCustomizationStore();
 
-  // 1. 서버 데이터 조회
+  // ── 서버 조회 ─────────────────────────────────────────
   const { data: rawItems = [], isLoading, isError, error, refetch } = useQuery({
     queryKey: QUERY_KEYS.customization.settings,
     queryFn: customService.getCustomizedItems,
@@ -31,7 +31,6 @@ export const useCustomization = () => {
     placeholderData: (prev) => prev,
   });
 
-  // STEP3 전용: /items/all — disabled 포함 전체 항목 + isEnabled 플래그
   const { data: rawAllItems = [], refetch: refetchAllItems } = useQuery({
     queryKey: QUERY_KEYS.customization.allItems,
     queryFn: customService.getAllItemsForSettings,
@@ -41,47 +40,27 @@ export const useCustomization = () => {
     placeholderData: (prev) => prev,
   });
 
-  // itemName 기준 중복 제거 (낮은 ID 우선) + BE 라벨을 FE 라벨로 정규화
-  // id ASC 정렬: BE displayOrder NULL인 CUSTOM 항목들이 매 refetch마다 순서가 흔들리는 이슈 회피.
-  // BE 측 근본 해소(ORDER BY displayOrder NULLS LAST, id) 머지 전까지의 FE 안전망.
+  const { data: serverSelectedTypes = [], refetch: refetchTypes } = useQuery({
+    queryKey: QUERY_KEYS.customization.types,
+    queryFn: customService.getSelectedUserTypes,
+    enabled: isLoggedIn,
+    refetchOnWindowFocus: false,
+    staleTime: 1000 * 60 * 5,
+    placeholderData: (prev) => prev,
+  });
+
+  // ── 정규화/중복 제거 ───────────────────────────────────
   const items = useMemo(() => {
     const seen = new Map<string, typeof rawItems[0]>();
     for (const raw of rawItems) {
       const normalized = normalizeLabel(raw.itemName);
       const item = { ...raw, itemName: normalized };
       const existing = seen.get(item.itemName);
-      if (!existing || item.id < existing.id) {
-        seen.set(item.itemName, item);
-      }
+      if (!existing || item.id < existing.id) seen.set(item.itemName, item);
     }
     return Array.from(seen.values()).sort((a, b) => Number(a.id) - Number(b.id));
   }, [rawItems]);
 
-  // P1: server 활성 항목 시그니처가 바뀔 때마다 store 재동기화 (영구 latch 제거).
-  // 같은 시그니처에 대해선 setActiveItemNames 미호출 → 무한 루프/optimistic 덮어쓰기 회피.
-  const serverActiveSignature = useMemo(
-    () => items.filter(i => i.isEnabled).map(i => i.itemName).sort().join('|'),
-    [items],
-  );
-  const lastSyncedSignatureRef = useRef<string | null>(null);
-  useEffect(() => {
-    if (items.length === 0) return;
-    if (lastSyncedSignatureRef.current === serverActiveSignature) return;
-    const serverActiveNames = items.filter(item => item.isEnabled).map(item => item.itemName);
-    // eslint-disable-next-line no-console
-    console.log('[#182 signature sync]', {
-      serverActiveCount: serverActiveNames.length,
-      itemsCount: items.length,
-      signature: serverActiveSignature.slice(0, 80) + (serverActiveSignature.length > 80 ? '…' : ''),
-    });
-    setActiveItemNames(serverActiveNames);
-    lastSyncedSignatureRef.current = serverActiveSignature;
-  }, [serverActiveSignature, items, setActiveItemNames]);
-
-  // allItems: STEP3 전용 /items/all (disabled 포함) — toggleUserType의 disabledIds 계산에도 사용
-  // items와 동일하게 normalizeLabel 적용해야 activeItemNames(정규화)와 itemName 매칭 정합.
-  // 미적용 시 BE 원본('카페 / 공부 공간')과 store 라벨('카페/공부 공간') 불일치 → 활성 표시 누락
-  // + saveCurrentSettings의 disabledIds 계산에서 잘못 disabled로 포함되어 BE에 매번 저장되는 잔재 발생.
   const allItems = useMemo(() => {
     const seen = new Map<string, typeof rawAllItems[0]>();
     for (const raw of rawAllItems) {
@@ -93,199 +72,179 @@ export const useCustomization = () => {
     return Array.from(seen.values()).sort((a, b) => Number(a.id) - Number(b.id));
   }, [rawAllItems]);
 
-  // 3. Mutation 정의
-  const invalidate = () => {
-    queryClient.invalidateQueries({ queryKey: QUERY_KEYS.customization.settings });
-    queryClient.invalidateQueries({ queryKey: QUERY_KEYS.checklist.items });
-  };
-  const invalidateAll = () => {
-    queryClient.invalidateQueries({ queryKey: QUERY_KEYS.customization.settings });
-    queryClient.invalidateQueries({ queryKey: QUERY_KEYS.customization.allItems });
-    queryClient.invalidateQueries({ queryKey: QUERY_KEYS.checklist.items });
-  };
+  // ── 로컬 pending state (BE 미반영) ──────────────────
+  const [pendingCustomAdds, setPendingCustomAdds] = useState<{ tempId: number; name: string }[]>([]);
+  const [pendingCustomDeleteIds, setPendingCustomDeleteIds] = useState<number[]>([]);
+  const [isSaving, setIsSaving] = useState(false);
 
-  // P4: onError에서도 invalidate → 서버 상태 강제 재페치로 optimistic 롤백.
-  // P1 시그니처 동기화가 활성 항목을 다시 정합 상태로 끌어옴.
-  const selectTypeMutation = useMutation({
-    mutationFn: customService.selectUserType,
-    onSuccess: invalidate,
-    onError: invalidate,
-  });
+  // ── 베이스라인 동기화: 서버 응답이 바뀔 때만 store 재설정 ──
+  // pending state는 saveCurrentSettings 성공 시점에만 비우고, baseline 변화로는 비우지 않는다
+  // (사용자가 입력 중인 pending 항목이 refetch에 의해 사라지는 사태 회피).
+  const serverActiveSignature = useMemo(
+    () => items.filter((i) => i.isEnabled).map((i) => i.itemName).sort().join('|'),
+    [items],
+  );
+  const serverTypeSignature = useMemo(() => [...serverSelectedTypes].sort().join('|'), [serverSelectedTypes]);
+  const lastSyncedActiveRef = useRef<string | null>(null);
+  const lastSyncedTypeRef = useRef<string | null>(null);
 
-  const deselectTypeMutation = useMutation({
-    mutationFn: customService.deselectUserType,
-    onSuccess: invalidate,
-    onError: invalidate,
-  });
+  useEffect(() => {
+    if (items.length === 0) return;
+    if (lastSyncedActiveRef.current === serverActiveSignature) return;
+    const serverActiveNames = items.filter((i) => i.isEnabled).map((i) => i.itemName);
+    setActiveItemNames(serverActiveNames);
+    lastSyncedActiveRef.current = serverActiveSignature;
+  }, [serverActiveSignature, items, setActiveItemNames]);
 
-  const saveSettingsMutation = useMutation({
-    mutationFn: customService.saveSettings,
-    onSuccess: invalidate,
-    onError: invalidate,
-  });
+  useEffect(() => {
+    if (lastSyncedTypeRef.current === serverTypeSignature) return;
+    setSelectedTypeIds(serverSelectedTypes);
+    lastSyncedTypeRef.current = serverTypeSignature;
+  }, [serverTypeSignature, serverSelectedTypes, setSelectedTypeIds]);
 
-  const addCustomMutation = useMutation({
-    mutationFn: customService.addCustomItem,
-    onSuccess: invalidateAll,
-    onError: invalidateAll,
-  });
+  // ── customItems 합성: BE custom (- deleted) + pending adds ──
+  const customItems = useMemo(() => {
+    const beCustoms = items
+      .filter((i) => i.itemType === 'CUSTOM')
+      .filter((i) => !pendingCustomDeleteIds.includes(Number(i.id)))
+      .map((i) => ({ id: Number(i.id), itemName: i.itemName }));
+    const localCustoms = pendingCustomAdds.map((p) => ({ id: p.tempId, itemName: p.name }));
+    return [...beCustoms, ...localCustoms];
+  }, [items, pendingCustomAdds, pendingCustomDeleteIds]);
 
-  const deleteCustomMutation = useMutation({
-    mutationFn: customService.deleteCustomItem,
-    onSuccess: invalidateAll,
-    onError: invalidateAll,
-  });
+  // ── 추천 라벨 계산 ─────────────────────────────────────
+  const computeRecommendedLabels = useCallback((typeId: string): string[] => {
+    if (typeId === 'FIRST_TIMER') return CHECKLIST_ITEMS.map((c) => c.label);
+    if (typeId === 'ESSENTIALS_ONLY') return BASE_ITEM_LABELS.slice();
+    const mappedIds = TYPE_ITEM_MAP[typeId] ?? [];
+    return CHECKLIST_ITEMS.filter((item) => mappedIds.includes(item.id)).map((i) => i.label);
+  }, []);
 
-  // 4. 이벤트 핸들러 (단일 선택 — 다른 유형은 자동 해제)
-  // P2: deselect → select → save를 await 체이닝으로 순서 보장 (BE race 회피).
-  // P9: 유형 토글 시 BE에 아직 등록되지 않은 세션-신규 custom 라벨도 보존.
-  const toggleUserType = useCallback(async (typeId: string) => {
+  // ── 핸들러: 모두 로컬 store만 갱신 (BE 호출 없음) ──
+  const toggleUserType = useCallback((typeId: string) => {
     const isSelected = selectedTypeIds.includes(typeId);
-    const prevTypeId = selectedTypeIds[0];
-
-    const persistedCustomNames = items.filter(i => i.itemType === 'CUSTOM').map(i => i.itemName);
-    const knownConstLabels = new Set(CHECKLIST_ITEMS.map(c => c.label));
-    const knownPersistedSet = new Set(persistedCustomNames);
-    const sessionCustomNames = activeItemNames.filter(
-      n => !knownConstLabels.has(n) && !knownPersistedSet.has(n),
-    );
-    const allCustomNames = Array.from(new Set([...persistedCustomNames, ...sessionCustomNames]));
-
+    const customNames = customItems.map((c) => c.itemName);
     if (isSelected) {
-      await deselectTypeMutation.mutateAsync(typeId);
       setSelectedTypeIds([]);
-      setActiveItemNames(allCustomNames);
+      setActiveItemNames(activeItemNames.filter((n) => customNames.includes(n)));
       return;
     }
-
-    if (prevTypeId) {
-      await deselectTypeMutation.mutateAsync(prevTypeId);
-    }
-    await selectTypeMutation.mutateAsync(typeId);
     setSelectedTypeIds([typeId]);
+    const recommendedLabels = computeRecommendedLabels(typeId);
+    setActiveItemNames(Array.from(new Set([...customNames, ...recommendedLabels])));
+  }, [selectedTypeIds, activeItemNames, customItems, computeRecommendedLabels, setSelectedTypeIds, setActiveItemNames]);
 
-    const mappedIds = TYPE_ITEM_MAP[typeId] || [];
-    if (mappedIds.length > 0) {
-      const recommendedLabels = CHECKLIST_ITEMS
-        .filter(item => mappedIds.includes(item.id))
-        .map(item => item.label);
-      // X 시맨틱: 유형 = 프리셋 덮어쓰기 → 기본 15개도 항상 활성으로 복원
-      const nextActiveNames = Array.from(new Set([...BASE_ITEM_LABELS, ...allCustomNames, ...recommendedLabels]));
-      // #182 fix: items(활성만) → allItems(비활성 포함). 직전 유형에서 비활성된 항목까지 disabledIds에 포함되어
-      // BE 상태가 새 유형 추천 셋과 정확히 정합. 안 그러면 다시 그 유형 돌아왔을 때 N개 누락 발생.
-      const disabledIds = allItems
-        .filter(i => i.itemType !== 'CUSTOM')
-        .filter(i => !nextActiveNames.includes(i.itemName))
-        .map(i => Number(i.id));
-      // eslint-disable-next-line no-console
-      console.log('[#182 toggleUserType]', {
-        typeId,
-        recommendedCount: recommendedLabels.length,
-        nextActiveCount: nextActiveNames.length,
-        disabledCount: disabledIds.length,
-        allItemsCount: allItems.length,
-        itemsCount: items.length,
-      });
-      await saveSettingsMutation.mutateAsync(disabledIds);
-      setActiveItemNames(nextActiveNames);
-    } else if (typeId === 'FIRST_TIMER' || typeId === 'ESSENTIALS_ONLY') {
-      // FIRST_TIMER / ESSENTIALS_ONLY 잔재 청소:
-      // 이전 유형에서 disabled로 박힌 USER_TYPE 항목들이 user_checklist_settings에 남아있으면
-      // BE의 findFirstTimerItems / findEssentialsOnlyItems가 NOT IN (disabled) 절로 빼서
-      // 응답 항목 수가 기대값(44 / 15)보다 줄어듦. saveSettings([])로 disabled 전체 비움.
-      // BE가 itemType 분기로 응답 결정하므로 FE는 잔재만 청소.
-      await saveSettingsMutation.mutateAsync([]);
-    }
-    // 위 분기 후엔 P1 signature 동기화가 BE 응답 기준으로 activeItemNames 정합
-  }, [items, allItems, selectedTypeIds, activeItemNames, selectTypeMutation, deselectTypeMutation, saveSettingsMutation, setSelectedTypeIds, setActiveItemNames]);
+  const selectAllTypes = useCallback(() => {
+    setSelectedTypeIds(USER_TYPES.map((t) => t.id));
+  }, [setSelectedTypeIds]);
 
-  // Option A: 토글은 로컬 state만 갱신. BE 저장은 "맞춤 설정 완료" 버튼에서 일괄 (saveCurrentSettings).
-  // 매 클릭 POST + 2회 refetch로 인한 카드 재배치/오버레이 깜빡임/트래픽 과다 회피.
-  const toggleItem = useCallback((itemId: number, label: string) => {
-    void itemId;
+  const deselectAllTypes = useCallback(() => {
+    const customNames = customItems.map((c) => c.itemName);
+    setSelectedTypeIds([]);
+    setActiveItemNames(activeItemNames.filter((n) => customNames.includes(n)));
+  }, [customItems, activeItemNames, setSelectedTypeIds, setActiveItemNames]);
+
+  const toggleItem = useCallback((_itemId: number, label: string) => {
     toggleItemName(label);
   }, [toggleItemName]);
 
-  // 서버 ID가 없을 때의 임시 토글 (UI 반응용)
   const toggleItemLocally = useCallback((label: string) => {
     toggleItemName(label);
   }, [toggleItemName]);
 
-  const selectAllTypes = useCallback(() => {
-    USER_TYPES.forEach((t) => {
-      if (!selectedTypeIds.includes(t.id)) {
-        selectTypeMutation.mutate(t.id);
-      }
-    });
-    setSelectedTypeIds(USER_TYPES.map((t) => t.id));
-  }, [selectedTypeIds, selectTypeMutation, setSelectedTypeIds]);
-
-  const deselectAllTypes = useCallback(() => {
-    USER_TYPES.forEach((t) => {
-      if (selectedTypeIds.includes(t.id)) {
-        deselectTypeMutation.mutate(t.id);
-      }
-    });
-    setSelectedTypeIds([]);
-    // Also clear active items (keep only custom ones)
-    const customNames = items.filter(i => i.itemType === 'CUSTOM').map(i => i.itemName);
-    setActiveItemNames(customNames);
-  }, [selectedTypeIds, deselectTypeMutation, setSelectedTypeIds, items, setActiveItemNames]);
-
-  // Option A: 로컬 state만 갱신
   const selectAllItems = useCallback(() => {
     const constLabels = CHECKLIST_ITEMS.map((i) => i.label);
-    const customNames = items.filter((i) => i.itemType === 'CUSTOM').map((i) => i.itemName);
-    const allNames = Array.from(new Set([...constLabels, ...customNames]));
-    setActiveItemNames(allNames);
-  }, [items, setActiveItemNames]);
+    const customNames = customItems.map((c) => c.itemName);
+    setActiveItemNames(Array.from(new Set([...constLabels, ...customNames])));
+  }, [customItems, setActiveItemNames]);
 
-  const saveCurrentSettings = useCallback(async () => {
-    const activeSet = new Set(activeItemNames);
-    const disabledIds = allItems
-      .filter((i) => i.itemType !== 'CUSTOM' && !activeSet.has(i.itemName))
-      .map((i) => Number(i.id));
-    await saveSettingsMutation.mutateAsync(disabledIds);
-  }, [allItems, activeItemNames, saveSettingsMutation]);
-
-  // Option A: 로컬 batch 갱신만, BE 저장은 버튼에서 일괄
   const enableItems = useCallback((labels: string[]) => {
-    const nextActiveSet = new Set([...activeItemNames, ...labels]);
-    setActiveItemNames(Array.from(nextActiveSet));
+    setActiveItemNames(Array.from(new Set([...activeItemNames, ...labels])));
   }, [activeItemNames, setActiveItemNames]);
 
-  // UX-WEB-07: trim + dedupe + error 전파.
-  // 기존 버전은 raw input 전송 + 결과 미확인 → BE reject 시 사용자에 무피드백("미작동" 체감 원인).
-  const addCustomItem = useCallback(async (itemName: string) => {
+  const addCustomItem = useCallback((itemName: string) => {
     const trimmed = itemName.trim();
-    if (!trimmed) {
-      throw new Error('항목명을 입력해주세요');
-    }
-    const duplicate = items.some(i => i.itemType === 'CUSTOM' && i.itemName === trimmed);
-    if (duplicate) {
-      throw new Error('이미 추가된 항목이에요');
-    }
-    try {
-      await addCustomMutation.mutateAsync(trimmed);
-    } catch {
-      // 네트워크/BE 에러는 친화 메시지로 일원화 (axios "Request failed..." 누출 차단)
-      throw new Error('항목 추가에 실패했어요. 잠시 후 다시 시도해주세요.');
-    }
+    if (!trimmed) return;
+    const tempId = -(Date.now() * 1000 + Math.floor(Math.random() * 1000));
+    setPendingCustomAdds((prev) => [...prev, { tempId, name: trimmed }]);
     if (!activeItemNames.includes(trimmed)) {
-      toggleItemName(trimmed);
+      setActiveItemNames([...activeItemNames, trimmed]);
     }
-  }, [addCustomMutation, toggleItemName, items, activeItemNames]);
+  }, [activeItemNames, setActiveItemNames]);
 
   const removeCustomItem = useCallback((customItemId: number, label: string) => {
-    deleteCustomMutation.mutate(customItemId);
-    if (activeItemNames.includes(label)) {
-      toggleItemName(label);
+    if (customItemId < 0) {
+      setPendingCustomAdds((prev) => prev.filter((p) => p.tempId !== customItemId));
+    } else {
+      setPendingCustomDeleteIds((prev) => (prev.includes(customItemId) ? prev : [...prev, customItemId]));
     }
-  }, [deleteCustomMutation, activeItemNames, toggleItemName]);
+    if (activeItemNames.includes(label)) {
+      setActiveItemNames(activeItemNames.filter((n) => n !== label));
+    }
+  }, [activeItemNames, setActiveItemNames]);
+
+  // ── "맞춤 설정 완료" — 모든 diff 일괄 적용 ──
+  const saveCurrentSettings = useCallback(async () => {
+    setIsSaving(true);
+    try {
+      // 1) Type diff
+      const baselineTypeSet = new Set(serverSelectedTypes);
+      const currentTypeSet = new Set(selectedTypeIds);
+      const toDeselect = serverSelectedTypes.filter((t) => !currentTypeSet.has(t));
+      const toSelect = selectedTypeIds.filter((t) => !baselineTypeSet.has(t));
+
+      // BE race 회피: deselect → select 순차
+      for (const t of toDeselect) await customService.deselectUserType(t);
+      for (const t of toSelect) await customService.selectUserType(t);
+
+      // 2) Custom delete (BE-id)
+      for (const id of pendingCustomDeleteIds) await customService.deleteCustomItem(id);
+
+      // 3) Custom add (temp-id → BE)
+      const addedNames = new Set<string>();
+      for (const c of pendingCustomAdds) {
+        await customService.addCustomItem(c.name);
+        addedNames.add(c.name);
+      }
+
+      // 4) disabledIds 계산 — type/custom 변경 후 allItems 베이스로
+      // 새로 추가된 custom들은 아직 allItems에 없으므로 disabled 계산에서 자연히 빠짐 (problem 없음)
+      const activeSet = new Set(activeItemNames);
+      const disabledIds = allItems
+        .filter((i) => i.itemType !== 'CUSTOM' && !activeSet.has(i.itemName))
+        .map((i) => Number(i.id));
+      await customService.saveSettings(disabledIds);
+
+      // 5) Reset pending + refetch all
+      setPendingCustomAdds([]);
+      setPendingCustomDeleteIds([]);
+      // baseline sync ref 무효화 → 다음 useEffect에서 서버값 재반영
+      lastSyncedActiveRef.current = null;
+      lastSyncedTypeRef.current = null;
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.customization.settings }),
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.customization.allItems }),
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.customization.types }),
+        queryClient.invalidateQueries({ queryKey: QUERY_KEYS.checklist.items }),
+      ]);
+    } finally {
+      setIsSaving(false);
+    }
+  }, [serverSelectedTypes, selectedTypeIds, activeItemNames, allItems, pendingCustomAdds, pendingCustomDeleteIds, queryClient]);
+
+  // ── isDirty 판정 ──────────────────────────────────────
+  const isDirty = useMemo(() => {
+    if (pendingCustomAdds.length > 0) return true;
+    if (pendingCustomDeleteIds.length > 0) return true;
+    if (serverTypeSignature !== [...selectedTypeIds].sort().join('|')) return true;
+    const currentActive = [...activeItemNames].sort().join('|');
+    if (serverActiveSignature !== currentActive) return true;
+    return false;
+  }, [pendingCustomAdds, pendingCustomDeleteIds, serverTypeSignature, selectedTypeIds, serverActiveSignature, activeItemNames]);
 
   const counts = useMemo(() => {
-    const normalLabels = CHECKLIST_ITEMS.map(i => i.label);
-    const normalActiveCount = activeItemNames.filter(name => normalLabels.includes(name)).length;
+    const normalLabels = CHECKLIST_ITEMS.map((i) => i.label);
+    const normalActiveCount = activeItemNames.filter((name) => normalLabels.includes(name)).length;
     const customActiveCount = activeItemNames.length - normalActiveCount;
     return { normalActiveCount, customActiveCount };
   }, [activeItemNames]);
@@ -295,17 +254,13 @@ export const useCustomization = () => {
     allItems,
     selectedTypeIds,
     activeItemNames,
-    customItems: items.filter(item => item.itemType === 'CUSTOM'),
+    customItems,
     isLoading,
     isError,
     error,
-    refetch: () => { refetch(); refetchAllItems(); },
-    isPending:
-      selectTypeMutation.isPending ||
-      deselectTypeMutation.isPending ||
-      saveSettingsMutation.isPending ||
-      addCustomMutation.isPending ||
-      deleteCustomMutation.isPending,
+    refetch: () => { refetch(); refetchAllItems(); refetchTypes(); },
+    isPending: isSaving,
+    isDirty,
     toggleUserType,
     selectAllTypes,
     deselectAllTypes,

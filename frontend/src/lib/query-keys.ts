@@ -12,5 +12,6 @@ export const QUERY_KEYS = {
   customization: {
     settings: ['customization', 'settings'] as const,
     allItems: ['customization', 'allItems'] as const,
+    types: ['customization', 'types'] as const,
   },
 } as const;

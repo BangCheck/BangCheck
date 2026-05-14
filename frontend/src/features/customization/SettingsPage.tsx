@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/store/use-auth-store';
 import { cn } from '@/lib/utils';
@@ -34,7 +34,21 @@ export default function SettingsPage() {
     toggleItemLocally,
     addCustomItem,
     removeCustomItem,
+    selectAllTypes,
+    deselectAllTypes,
+    isDirty,
   } = useCustomization();
+
+  // 이탈 가드: dirty 상태에서 새로고침/탭닫기/외부 링크 클릭 시 브라우저 confirm
+  useEffect(() => {
+    if (!isDirty) return;
+    const handler = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+      e.returnValue = '';
+    };
+    window.addEventListener('beforeunload', handler);
+    return () => window.removeEventListener('beforeunload', handler);
+  }, [isDirty]);
 
   // ── UI state ──────────────────────────────────────────────
   const [folded, setFolded] = useState({ s1: false, s2: false, s3: false });
@@ -48,25 +62,13 @@ export default function SettingsPage() {
   const recommendedItems = useMemo(() => {
     if (selectedTypeIds.length === 0) return [];
     const typeId = selectedTypeIds[0];
-
-    // FIRST_TIMER / ESSENTIALS_ONLY: 서버 enabled 항목을 직접 표시
-    if (typeId === 'FIRST_TIMER' || typeId === 'ESSENTIALS_ONLY') {
-      return items
-        .filter(i => i.itemType !== 'CUSTOM' && i.isEnabled)
-        .map(i => CHECKLIST_ITEMS.find(c => c.label === i.itemName) ?? { id: String(i.id), label: i.itemName });
+    if (typeId === 'FIRST_TIMER') return CHECKLIST_ITEMS;
+    if (typeId === 'ESSENTIALS_ONLY') {
+      return CHECKLIST_ITEMS.filter((c) => BASE_ITEM_LABELS.includes(c.label));
     }
-
-    // 일반 유형(BUG_AVOIDER 등): DEFAULT 15 항상 포함 + 유형 매핑 항목 (중복 통합)
-    const baseItems = CHECKLIST_ITEMS.filter((item) => BASE_ITEM_LABELS.includes(item.label));
     const mappedIds = TYPE_ITEM_MAP[typeId] ?? [];
-    const mappedItems = CHECKLIST_ITEMS.filter((item) => mappedIds.includes(item.id));
-    const seen = new Set<string>();
-    return [...baseItems, ...mappedItems].filter((item) => {
-      if (seen.has(item.label)) return false;
-      seen.add(item.label);
-      return true;
-    });
-  }, [selectedTypeIds, items]);
+    return CHECKLIST_ITEMS.filter((item) => mappedIds.includes(item.id));
+  }, [selectedTypeIds]);
 
   // ── Handlers ─────────────────────────────────────────────
   const getServerIdByLabel = (label: string) => allItems.find((item) => item.itemName === label)?.id;
@@ -146,6 +148,15 @@ export default function SettingsPage() {
           </div>
         )}
 
+        {isLoggedIn && isDirty && (
+          <div className="mb-6 bg-[#FFFBEB] border border-[#FBBF24] rounded-[6px] p-3 flex items-center gap-2.5">
+            <svg className="w-[18px] h-[18px] shrink-0 text-[#B45309]" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2 1 21h22L12 2zm0 6 7.53 13H4.47L12 8zm-1 4v4h2v-4h-2zm0 5v2h2v-2h-2z"/>
+            </svg>
+            <p className="text-[12px] md:text-[14px] text-[#B45309] font-medium">저장되지 않은 변경사항이 있어요. 하단의 '맞춤 설정 완료' 버튼을 눌러주세요.</p>
+          </div>
+        )}
+
         <section className="mb-8 md:mb-12">
           <h1 className="text-fluid-4xl font-bold text-text-main mb-2 md:mb-3">
             체크리스트 맞춤 설정
@@ -193,7 +204,8 @@ export default function SettingsPage() {
                 number={1}
                 title="나는 이런 유형이에요"
                 description="유형을 선택하면 맞춤 항목이 자동으로 체크돼요"
-                // onDeselectAll={selectedTypeIds.length > 0 ? deselectAllTypes : undefined}
+                onSelectAll={selectedTypeIds.length < USER_TYPES.length ? selectAllTypes : undefined}
+                onDeselectAll={selectedTypeIds.length > 0 && selectedTypeIds.length === USER_TYPES.length ? deselectAllTypes : undefined}
                 isFolded={folded.s1}
                 onToggleFold={() => setFolded((f) => ({ ...f, s1: !f.s1 }))}
               />
@@ -224,15 +236,26 @@ export default function SettingsPage() {
                     ? 'Step 1에서 유형을 선택하면 추천 항목이 표시돼요'
                     : `${recommendedItems.filter((r) => activeNamesSet.has(r.label)).length}개의 추천항목이 체크되었어요`
                 }
+                onSelectAll={
+                  recommendedItems.length > 0
+                    ? () => {
+                        setFolded((f) => ({ ...f, s2: false }));
+                        const labelsToEnable = recommendedItems
+                          .map((r) => r.label)
+                          .filter((l) => !activeNamesSet.has(l));
+                        if (labelsToEnable.length > 0) enableItems(labelsToEnable);
+                      }
+                    : undefined
+                }
                 isFolded={folded.s2}
                 onToggleFold={() => setFolded((f) => ({ ...f, s2: !f.s2 }))}
               />
               {!folded.s2 && (
                 <>
                   {recommendedItems.length === 0 ? (
-                    <div className="bg-bg-gray border border-border-light rounded-[6px] p-3 md:p-4 flex items-center gap-2 text-text-mute">
-                      <svg className="w-[18px] h-[18px] shrink-0" viewBox="0 0 24 24" fill="currentColor"><path d="M9 11.75a1.25 1.25 0 1 0 0-2.5 1.25 1.25 0 0 0 0 2.5Zm6 0a1.25 1.25 0 1 0 0-2.5 1.25 1.25 0 0 0 0 2.5ZM12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2Z" /></svg>
-                      <p className="text-[14px] font-medium">위에서 유형을 먼저 선택해주세요</p>
+                    <div className="bg-bg-gray border border-border-light rounded-[6px] p-3 flex items-center gap-2.5 text-text-mute">
+                      <svg className="w-[18px] h-[18px] shrink-0" viewBox="0 0 24 24" fill="currentColor"><path d="M11 22h6a2 2 0 0 0 2-2v-7a2 2 0 0 0-2-2h-3V4a2 2 0 0 0-4 0v9.5l-1.5-1.5a2 2 0 0 0-2.83 2.83l4.92 4.92A3 3 0 0 0 11 22z"/></svg>
+                      <p className="text-[12px] md:text-[14px] font-medium">위에서 유형을 먼저 선택해주세요</p>
                     </div>
                   ) : (
                     <div className="bg-white rounded-[6px] border border-border-light p-4 md:p-6 shadow-sm">
@@ -263,7 +286,7 @@ export default function SettingsPage() {
               <SectionHeader
                 number={3}
                 title="추가로 확인할 항목"
-                description="전체 체크리스트에서 추가하고 싶은 항목을 직접 선택하세요"
+                description="전체 체크리스트에서 추가할 항목을 직접 선택하세요."
                 onSelectAll={() => {
                   setFolded((f) => ({ ...f, s3: false }));
                   setIsAllItemsVisible(true);
@@ -499,10 +522,10 @@ export default function SettingsPage() {
                   setErrorMessage('설정 저장에 실패했어요. 잠시 후 다시 시도해주세요.');
                 }
               }}
-              disabled={isPending}
+              disabled={isPending || !isDirty}
               className="w-full bg-brand-primary text-white py-3 rounded-[6px] font-semibold text-fluid-lg hover:bg-brand-primary-dark transition-colors disabled:opacity-60"
             >
-              맞춤 설정 완료
+              {isPending ? '저장 중...' : isDirty ? '맞춤 설정 완료' : '변경사항 없음'}
             </button>
           </div>
         </div>
