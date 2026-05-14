@@ -3,7 +3,6 @@ package com.room.backend.domain.checklist.entity;
 import com.room.backend.domain.checklist.entity.enums.ChecklistCategory;
 import com.room.backend.domain.checklist.entity.enums.InputType;
 import com.room.backend.domain.checklist.entity.enums.ItemType;
-import com.room.backend.domain.checklist.entity.enums.UserType;
 import com.room.backend.global.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
@@ -29,10 +28,6 @@ public class ChecklistItem extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 30)
     private ItemType itemType;
-
-    @Enumerated(EnumType.STRING)
-    @Column(length = 30)
-    private UserType userType;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = true, length = 30)

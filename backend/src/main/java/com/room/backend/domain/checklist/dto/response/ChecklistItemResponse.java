@@ -31,7 +31,7 @@ public class ChecklistItemResponse {
                 .itemName(item.getItemName())
                 .category(item.getCategory())
                 .itemType(item.getItemType())
-                .userType(item.getUserType())
+                .userType(null)
                 .inputType(item.getInputType())
                 .description(item.getDescription())
                 .displayOrder(item.getDisplayOrder())

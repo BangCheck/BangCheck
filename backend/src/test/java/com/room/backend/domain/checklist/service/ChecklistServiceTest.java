@@ -67,7 +67,6 @@ class ChecklistServiceTest {
                 .itemName("채광")
                 .category(ChecklistCategory.OPTION)
                 .itemType(ItemType.USER_TYPE)
-                .userType(UserType.NOISE_SENSITIVE)
                 .inputType(InputType.BOOLEAN)
                 .build();
 
