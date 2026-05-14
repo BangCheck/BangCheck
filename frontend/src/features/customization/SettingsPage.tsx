@@ -48,14 +48,24 @@ export default function SettingsPage() {
   const recommendedItems = useMemo(() => {
     if (selectedTypeIds.length === 0) return [];
     const typeId = selectedTypeIds[0];
-    const mappedIds = TYPE_ITEM_MAP[typeId] ?? [];
-    if (mappedIds.length > 0) {
-      return CHECKLIST_ITEMS.filter((item) => mappedIds.includes(item.id));
-    }
+
     // FIRST_TIMER / ESSENTIALS_ONLY: 서버 enabled 항목을 직접 표시
-    return items
-      .filter(i => i.itemType !== 'CUSTOM' && i.isEnabled)
-      .map(i => CHECKLIST_ITEMS.find(c => c.label === i.itemName) ?? { id: String(i.id), label: i.itemName });
+    if (typeId === 'FIRST_TIMER' || typeId === 'ESSENTIALS_ONLY') {
+      return items
+        .filter(i => i.itemType !== 'CUSTOM' && i.isEnabled)
+        .map(i => CHECKLIST_ITEMS.find(c => c.label === i.itemName) ?? { id: String(i.id), label: i.itemName });
+    }
+
+    // 일반 유형(BUG_AVOIDER 등): DEFAULT 15 항상 포함 + 유형 매핑 항목 (중복 통합)
+    const baseItems = CHECKLIST_ITEMS.filter((item) => BASE_ITEM_LABELS.includes(item.label));
+    const mappedIds = TYPE_ITEM_MAP[typeId] ?? [];
+    const mappedItems = CHECKLIST_ITEMS.filter((item) => mappedIds.includes(item.id));
+    const seen = new Set<string>();
+    return [...baseItems, ...mappedItems].filter((item) => {
+      if (seen.has(item.label)) return false;
+      seen.add(item.label);
+      return true;
+    });
   }, [selectedTypeIds, items]);
 
   // ── Handlers ─────────────────────────────────────────────
@@ -212,7 +222,7 @@ export default function SettingsPage() {
                 description={
                   selectedTypeIds.length === 0
                     ? 'Step 1에서 유형을 선택하면 추천 항목이 표시돼요'
-                    : `${recommendedItems.filter((r) => activeNamesSet.has(r.label)).length}/${recommendedItems.length}개 추천 항목이 체크되었어요 · 클릭하면 해제할 수 있어요`
+                    : `${recommendedItems.filter((r) => activeNamesSet.has(r.label)).length}개의 추천항목이 체크되었어요`
                 }
                 isFolded={folded.s2}
                 onToggleFold={() => setFolded((f) => ({ ...f, s2: !f.s2 }))}

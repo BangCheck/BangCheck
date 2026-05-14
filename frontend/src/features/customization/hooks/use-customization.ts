@@ -79,9 +79,14 @@ export const useCustomization = () => {
   }, [serverActiveSignature, items, setActiveItemNames]);
 
   // allItems: STEP3 전용 /items/all (disabled 포함) — toggleUserType의 disabledIds 계산에도 사용
+  // items와 동일하게 normalizeLabel 적용해야 activeItemNames(정규화)와 itemName 매칭 정합.
+  // 미적용 시 BE 원본('카페 / 공부 공간')과 store 라벨('카페/공부 공간') 불일치 → 활성 표시 누락
+  // + saveCurrentSettings의 disabledIds 계산에서 잘못 disabled로 포함되어 BE에 매번 저장되는 잔재 발생.
   const allItems = useMemo(() => {
     const seen = new Map<string, typeof rawAllItems[0]>();
-    for (const item of rawAllItems) {
+    for (const raw of rawAllItems) {
+      const normalized = normalizeLabel(raw.itemName);
+      const item = { ...raw, itemName: normalized };
       const existing = seen.get(item.itemName);
       if (!existing || item.id < existing.id) seen.set(item.itemName, item);
     }
@@ -183,8 +188,15 @@ export const useCustomization = () => {
       });
       await saveSettingsMutation.mutateAsync(disabledIds);
       setActiveItemNames(nextActiveNames);
+    } else if (typeId === 'FIRST_TIMER' || typeId === 'ESSENTIALS_ONLY') {
+      // FIRST_TIMER / ESSENTIALS_ONLY 잔재 청소:
+      // 이전 유형에서 disabled로 박힌 USER_TYPE 항목들이 user_checklist_settings에 남아있으면
+      // BE의 findFirstTimerItems / findEssentialsOnlyItems가 NOT IN (disabled) 절로 빼서
+      // 응답 항목 수가 기대값(44 / 15)보다 줄어듦. saveSettings([])로 disabled 전체 비움.
+      // BE가 itemType 분기로 응답 결정하므로 FE는 잔재만 청소.
+      await saveSettingsMutation.mutateAsync([]);
     }
-    // FIRST_TIMER / ESSENTIALS_ONLY: BE가 활성 항목을 결정 → P1 signature 동기화로 자동 정합
+    // 위 분기 후엔 P1 signature 동기화가 BE 응답 기준으로 activeItemNames 정합
   }, [items, allItems, selectedTypeIds, activeItemNames, selectTypeMutation, deselectTypeMutation, saveSettingsMutation, setSelectedTypeIds, setActiveItemNames]);
 
   // Option A: 토글은 로컬 state만 갱신. BE 저장은 "맞춤 설정 완료" 버튼에서 일괄 (saveCurrentSettings).
