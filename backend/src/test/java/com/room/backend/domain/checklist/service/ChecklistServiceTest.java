@@ -9,6 +9,7 @@ import com.room.backend.domain.checklist.repository.ChecklistItemRepository;
 import com.room.backend.domain.checklist.repository.ChecklistOptionRepository;
 import com.room.backend.domain.checklist.repository.UserChecklistSettingRepository;
 import com.room.backend.domain.checklist.repository.UserTypeSelectionRepository;
+import com.room.backend.global.common.exception.GeneralException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -17,7 +18,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -67,7 +67,6 @@ class ChecklistServiceTest {
                 .itemName("채광")
                 .category(ChecklistCategory.OPTION)
                 .itemType(ItemType.USER_TYPE)
-                .userType(UserType.NOISE_SENSITIVE)
                 .inputType(InputType.BOOLEAN)
                 .build();
 
@@ -113,7 +112,7 @@ class ChecklistServiceTest {
         UserChecklistSetting disabledSetting = UserChecklistSetting.of(userId, 1L, false);
         when(userTypeSelectionRepository.findByUserId(userId))
                 .thenReturn(List.of());
-        when(checklistItemRepository.findCustomizedItems(userId, List.of()))
+        when(checklistItemRepository.findDefaultAndCustomItems(userId))
                 .thenReturn(List.of(defaultItem));
         when(checklistOptionRepository.findByChecklistItemId(1L))
                 .thenReturn(List.of(option));
@@ -126,6 +125,31 @@ class ChecklistServiceTest {
         // Then
         assertEquals(1, items.size());
         assertFalse(items.get(0).getIsEnabled());
+    }
+
+    @Test
+    @DisplayName("getCustomizedItems - 첫 자취형은 전체 시스템 항목 조회")
+    void testGetCustomizedItemsFirstTimer() {
+        // Given
+        UserTypeSelection selection = UserTypeSelection.of(userId, UserType.FIRST_TIMER);
+        when(userTypeSelectionRepository.findByUserId(userId))
+                .thenReturn(List.of(selection));
+        when(checklistItemRepository.findFirstTimerItems(userId))
+                .thenReturn(List.of(defaultItem, userTypeItem));
+        when(checklistOptionRepository.findByChecklistItemId(1L))
+                .thenReturn(List.of(option));
+        when(checklistOptionRepository.findByChecklistItemId(2L))
+                .thenReturn(List.of());
+        when(userChecklistSettingRepository.findByUserIdAndIsEnabledFalse(userId))
+                .thenReturn(List.of());
+
+        // When
+        var items = checklistService.getCustomizedItems(userId);
+
+        // Then
+        assertEquals(2, items.size());
+        verify(checklistItemRepository, times(1)).findFirstTimerItems(userId);
+        verify(checklistItemRepository, never()).findCustomizedItems(eq(userId), any());
     }
 
     @Test
@@ -169,36 +193,6 @@ class ChecklistServiceTest {
     }
 
     @Test
-    @DisplayName("toggleItem - 기존 항목 토글")
-    void testToggleItemExisting() {
-        // Given
-        UserChecklistSetting setting = UserChecklistSetting.of(userId, 1L, true);
-        when(userChecklistSettingRepository.findByUserIdAndItemId(userId, 1L))
-                .thenReturn(Optional.of(setting));
-
-        // When
-        checklistService.toggleItem(userId, 1L);
-
-        // Then
-        assertFalse(setting.getIsEnabled());
-        verify(userChecklistSettingRepository, never()).save(any());
-    }
-
-    @Test
-    @DisplayName("toggleItem - 새 항목 OFF로 생성")
-    void testToggleItemNew() {
-        // Given
-        when(userChecklistSettingRepository.findByUserIdAndItemId(userId, 1L))
-                .thenReturn(Optional.empty());
-
-        // When
-        checklistService.toggleItem(userId, 1L);
-
-        // Then
-        verify(userChecklistSettingRepository, times(1)).save(any(UserChecklistSetting.class));
-    }
-
-    @Test
     @DisplayName("addCustomItem - 나만의 항목 추가")
     void testAddCustomItem() {
         // Given
@@ -239,7 +233,7 @@ class ChecklistServiceTest {
                 .thenReturn(List.of(customItem1, customItem2, customItem3));
 
         // When & Then
-        assertThrows(IllegalStateException.class, () ->
+        assertThrows(GeneralException.class, () ->
                 checklistService.addCustomItem(userId, "항목4")
         );
         verify(checklistItemRepository, never()).save(any());
@@ -282,7 +276,7 @@ class ChecklistServiceTest {
                 .thenReturn(Optional.of(customItem));
 
         // When & Then
-        assertThrows(IllegalArgumentException.class, () ->
+        assertThrows(GeneralException.class, () ->
                 checklistService.deleteCustomItem(userId, 10L)
         );
     }

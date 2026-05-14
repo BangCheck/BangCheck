@@ -22,7 +22,14 @@ public interface ChecklistItemRepository extends JpaRepository<ChecklistItem, Lo
             WHERE ci.isDeleted = false
             AND (
               ci.itemType = 'DEFAULT'
-              OR (ci.itemType = 'USER_TYPE' AND ci.userType IN :userTypes)
+              OR (
+                ci.itemType = 'USER_TYPE'
+                AND EXISTS (
+                  SELECT ciut.id FROM ChecklistItemUserType ciut
+                  WHERE ciut.checklistItemId = ci.id
+                  AND ciut.userType IN :userTypes
+                )
+              )
               OR (ci.itemType = 'CUSTOM' AND ci.ownerUserId = :userId)
             )
             AND ci.id NOT IN (
@@ -33,6 +40,37 @@ public interface ChecklistItemRepository extends JpaRepository<ChecklistItem, Lo
             """)
     List<ChecklistItem> findCustomizedItems(@Param("userId") Long userId,
                                              @Param("userTypes") List<UserType> userTypes);
+
+    @Query("""
+            SELECT ci FROM ChecklistItem ci
+            WHERE ci.isDeleted = false
+            AND (
+              ci.itemType = 'DEFAULT'
+              OR (ci.itemType = 'CUSTOM' AND ci.ownerUserId = :userId)
+            )
+            AND ci.id NOT IN (
+              SELECT cs.itemId FROM UserChecklistSetting cs
+              WHERE cs.userId = :userId AND cs.isEnabled = false
+            )
+            ORDER BY ci.displayOrder NULLS LAST, ci.id
+            """)
+    List<ChecklistItem> findDefaultAndCustomItems(@Param("userId") Long userId);
+
+    @Query("""
+            SELECT ci FROM ChecklistItem ci
+            WHERE ci.isDeleted = false
+            AND (
+              ci.itemType = 'DEFAULT'
+              OR ci.itemType = 'USER_TYPE'
+              OR (ci.itemType = 'CUSTOM' AND ci.ownerUserId = :userId)
+            )
+            AND ci.id NOT IN (
+              SELECT cs.itemId FROM UserChecklistSetting cs
+              WHERE cs.userId = :userId AND cs.isEnabled = false
+            )
+            ORDER BY ci.displayOrder NULLS LAST, ci.id
+            """)
+    List<ChecklistItem> findFirstTimerItems(@Param("userId") Long userId);
 
     @Query("""
             SELECT ci FROM ChecklistItem ci
