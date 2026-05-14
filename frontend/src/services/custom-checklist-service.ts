@@ -32,6 +32,13 @@ export const getAllItemsForSettings = async (): Promise<ChecklistItemResponse[]>
   return response.data;
 };
 
+// C-1.5. 현재 사용자 selectedTypes 조회 (#183 / feat/183-get-selected-user-types 머지됨)
+// V22 머지 후 ChecklistItemResponse.userType=null 응답에 대비한 selectedTypes 권위 소스.
+export const getSelectedUserTypes = async (): Promise<string[]> => {
+  const response = await api.get<string[]>('/api/checklist/types');
+  return response.data;
+};
+
 export const selectUserType = async (userType: string): Promise<void> => {
   console.log('[POST] /api/checklist/types/' + userType);
   await api.post(`/api/checklist/types/${userType}`);
