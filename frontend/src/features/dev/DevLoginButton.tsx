@@ -1,6 +1,4 @@
-'use client';
-
-import { useRouter } from 'next/navigation';
+import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/store/use-auth-store';
 import { ROUTES } from '@/lib/routes';
 import type { User } from '@/types';
@@ -24,7 +22,7 @@ const DEV_USER: User = {
 };
 
 export function DevLoginButton() {
-  const router = useRouter();
+  const navigate = useNavigate();
   const { setAuth } = useAuthStore();
 
   if (!import.meta.env.DEV) return null;
@@ -33,7 +31,7 @@ export function DevLoginButton() {
 
   const handleDevLogin = () => {
     setAuth(token, DEV_USER);
-    router.push(ROUTES.HOME);
+    navigate(ROUTES.HOME);
   };
 
   return (
