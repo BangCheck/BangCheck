@@ -36,8 +36,10 @@ export const initBuilding: BuildingInfoData = {
 export const initInterior: InteriorCheckData = {
   lighting: null, ventilation: null, floorNoise: null,
   waterPressure: null, soundProof: null, heating: null,
+  entrance: null,
   mold: null, pest: null, leak: null,
   wallpaper: null, drainSmell: null,
+  noise: null, humidity: null,
 };
 
 export const initSafety: SafetyLivingData = {

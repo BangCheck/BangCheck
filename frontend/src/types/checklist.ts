@@ -37,11 +37,14 @@ export interface InteriorCheckData {
   waterPressure: Rating;
   soundProof: Rating;
   heating: Rating;
+  entrance: Rating;
   mold: YesNo;
   pest: YesNo;
   leak: YesNo;
   wallpaper: YesNo;
   drainSmell: YesNo;
+  noise: YesNo;
+  humidity: YesNo;
 }
 
 export interface SafetyLivingData {

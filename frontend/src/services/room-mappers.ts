@@ -172,7 +172,9 @@ export function mapApiRoomToRoom(item: RoomListItem): Room {
 const INIT_INTERIOR: InteriorCheckData = {
   lighting: null, ventilation: null, floorNoise: null,
   waterPressure: null, soundProof: null, heating: null,
+  entrance: null,
   mold: null, pest: null, leak: null, wallpaper: null, drainSmell: null,
+  noise: null, humidity: null,
 };
 
 export function mapApiToForms(detail: RoomDetailApi): RoomFormState {
