@@ -17,6 +17,21 @@ export interface ChecklistGuide {
   variant: 'simple' | 'with-photos';
 }
 
+/** BE itemName(한글) → 가이드 매핑 (DynamicChecklistSections에서 사용) */
+export function getGuideByItemName(name: string): ChecklistGuide | undefined {
+  const trimmed = name.trim();
+  // 정규화: 공백/구두점 변형 흡수
+  const normalized = trimmed.replace(/\s+/g, '').replace(/[/·,]/g, '');
+  for (const guide of Object.values(CHECKLIST_GUIDES)) {
+    if (!guide) continue;
+    const guideName = guide.guideTitle.replace(/\s+/g, '').replace(/[/·,]/g, '').replace('확인가이드', '');
+    if (normalized === guideName || normalized.startsWith(guideName) || guideName.startsWith(normalized)) {
+      return guide;
+    }
+  }
+  return undefined;
+}
+
 export const CHECKLIST_GUIDES: Partial<Record<InteriorKey, ChecklistGuide>> = {
   // §4 내부상태 — 3-radio (좋음/보통/나쁨), variant: simple
   lighting: {
