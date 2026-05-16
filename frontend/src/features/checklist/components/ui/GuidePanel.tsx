@@ -1,8 +1,9 @@
+import { useEffect } from 'react';
 import { Icon } from '@iconify/react';
 import { cn } from '@/lib/utils';
 import type { ChecklistGuide } from '../../checklist-guides';
 
-// Figma node 587:45164 (Component 157) — "확인 가이드 보기" 고정 토글 버튼
+// Figma node 587:45164 (Component 157) — "확인 가이드 보기" 토글 버튼
 export function GuideToggleButton({
   expanded,
   onToggle,
@@ -18,50 +19,79 @@ export function GuideToggleButton({
       className="flex items-center gap-[10px] px-3 py-1.5 rounded-[6px] border border-[#bfbfbf] cursor-pointer hover:bg-bg-gray-soft transition-colors shrink-0"
     >
       <Icon icon="ix:user-manual" className="size-[18px] text-text-main" />
-      <span className="flex items-center gap-1">
-        <span className="text-[14px] font-medium text-text-main leading-[1.3]">
-          확인 가이드 보기
-        </span>
-        <Icon
-          icon="ic:round-navigate-next"
-          className={cn(
-            'size-6 text-text-main transition-transform',
-            expanded ? '-rotate-90' : 'rotate-90',
-          )}
-        />
+      <span className="text-[14px] font-medium text-text-main leading-[1.3] whitespace-nowrap">
+        확인 가이드 보기
       </span>
     </button>
   );
 }
 
-// Figma 587:43553(채광) 등 — 펼침 시 카드 내부 가이드 패널
-export function GuidePanel({ guide }: { guide: ChecklistGuide }) {
-  const textSize = guide.variant === 'with-photos' ? 'text-[14px]' : 'text-[12px]';
+// Figma 587:43553 등 — 모달 다이얼로그로 표시
+export function GuidePanel({ guide, onClose }: { guide: ChecklistGuide; onClose: () => void }) {
+  const textSize = guide.variant === 'with-photos' ? 'text-[14px]' : 'text-[13px]';
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
+    window.addEventListener('keydown', onKey);
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      window.removeEventListener('keydown', onKey);
+      document.body.style.overflow = prev;
+    };
+  }, [onClose]);
+
   return (
-    <div className="flex flex-col gap-[10px] mt-3 p-6 rounded-[6px] border border-[#e2e2e2] bg-white shadow-[0px_6px_8px_rgba(0,0,0,0.08)]">
-      <div className="flex flex-col gap-[15px] pb-6">
-        <p className="text-[16px] font-medium text-[#232527] leading-[1.3]">
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-label={guide.guideTitle}
+      className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-[rgba(0,0,0,0.5)]"
+      onClick={onClose}
+    >
+      <div
+        className="relative flex flex-col gap-3 max-h-[90vh] w-full max-w-[640px] overflow-y-auto p-6 rounded-[8px] bg-white shadow-[0px_10px_24px_rgba(0,0,0,0.15)]"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Close button */}
+        <button
+          type="button"
+          onClick={onClose}
+          aria-label="닫기"
+          className="absolute top-3 right-3 flex items-center justify-center size-9 rounded-full hover:bg-bg-gray-soft transition-colors cursor-pointer"
+        >
+          <Icon icon="ic:round-close" className="size-6 text-text-main" />
+        </button>
+
+        {/* Title */}
+        <p className="text-[18px] font-semibold text-[#232527] leading-[1.3] pr-10">
           {guide.guideTitle}
         </p>
-        {guide.guideItems.map((item, i) => (
-          <div key={i} className="flex items-center gap-1.5">
-            <Icon icon="lets-icons:check-fill" className="size-[18px] text-[#232527] shrink-0" />
-            <p className={cn('font-medium text-[#777] leading-[1.3]', textSize)}>{item}</p>
-          </div>
-        ))}
-      </div>
-      {guide.variant === 'with-photos' && (
-        <div className="flex gap-2.5">
-          {[1, 2].map((n) => (
-            <div
-              key={n}
-              className="relative flex items-center justify-center h-[268px] w-[400px] bg-[#d9d9d9] rounded-[6px] overflow-hidden"
-            >
-              <p className="text-[24px] font-medium text-white leading-[1.3] z-10">예시 사진</p>
+
+        {/* Items */}
+        <div className="flex flex-col gap-[15px] mt-2">
+          {guide.guideItems.map((item, i) => (
+            <div key={i} className="flex items-start gap-2">
+              <Icon icon="lets-icons:check-fill" className="size-[18px] text-[#232527] shrink-0 mt-0.5" />
+              <p className={cn('font-medium text-[#777] leading-[1.4]', textSize)}>{item}</p>
             </div>
           ))}
         </div>
-      )}
+
+        {/* Photos (문제확인만) */}
+        {guide.variant === 'with-photos' && (
+          <div className="flex flex-col sm:flex-row gap-2.5 mt-4">
+            {[1, 2].map((n) => (
+              <div
+                key={n}
+                className="relative flex items-center justify-center h-[180px] sm:h-[200px] flex-1 bg-[#d9d9d9] rounded-[6px] overflow-hidden"
+              >
+                <p className="text-[18px] font-medium text-white leading-[1.3]">예시 사진</p>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

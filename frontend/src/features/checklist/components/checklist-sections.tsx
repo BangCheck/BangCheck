@@ -7,7 +7,7 @@ import type { BuildingInfoData } from './02_building-info';
 import { BUILDING_TYPES, DIRECTIONS, OPTION_LIST } from './02_building-info';
 import type { InteriorCheckData } from './03_interior-check';
 
-/** 항목 카드 + (가이드가 있으면) 토글 + 펼침 패널 wrapper — static key 기반 */
+/** 항목 카드 + (가이드가 있으면) 토글 + 모달 wrapper — static key 기반 */
 function ItemWithGuide({
   itemKey,
   children,
@@ -19,7 +19,7 @@ function ItemWithGuide({
   return <ItemWithGuideRaw guide={guide} children={children} />;
 }
 
-/** 가이드 객체를 직접 받는 wrapper (BE-driven 경로용) */
+/** 가이드 객체를 직접 받는 wrapper (BE-driven 경로용) — 모달 다이얼로그 */
 function ItemWithGuideRaw({
   guide,
   children,
@@ -27,16 +27,16 @@ function ItemWithGuideRaw({
   guide?: ChecklistGuide;
   children: React.ReactNode;
 }) {
-  const [expanded, setExpanded] = useState(false);
+  const [open, setOpen] = useState(false);
   if (!guide) return <>{children}</>;
   return (
-    <div className="flex flex-col">
+    <>
       <div className="flex items-start justify-between gap-3">
         <div className="flex-1 min-w-0">{children}</div>
-        <GuideToggleButton expanded={expanded} onToggle={() => setExpanded((v) => !v)} />
+        <GuideToggleButton expanded={open} onToggle={() => setOpen(true)} />
       </div>
-      {expanded && <GuidePanel guide={guide} />}
-    </div>
+      {open && <GuidePanel guide={guide} onClose={() => setOpen(false)} />}
+    </>
   );
 }
 import type { SafetyLivingData } from './04_safety-living';
@@ -342,7 +342,7 @@ export function DynamicChecklistSections({
                       item={item}
                       value={answers[item.id] ?? null}
                       onChange={(v) => onChange(item.id, v)}
-                      hintOverride={guide?.hint}
+                      hintOverride={guide ? '' : undefined}
                     />
                   </ItemWithGuideRaw>
                 );

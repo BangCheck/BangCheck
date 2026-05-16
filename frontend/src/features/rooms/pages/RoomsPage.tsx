@@ -1,15 +1,12 @@
-import { useState, useRef, useEffect, useMemo } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/store/use-auth-store';
 import { useGuestRoomStore } from '@/store/use-guest-room-store';
-import { useCustomizationStore } from '@/store/use-customization-store';
 import { useRoomsList, useDeleteRoom } from '@/features/rooms/hooks/use-rooms-query';
 import { cn } from '@/lib/utils';
 import { ROUTES } from '@/lib/routes';
 import { GUEST_ROOM_LIMIT, ROOM_LIMIT, STORAGE_KEY_ONBOARDING } from '@/lib/constants';
-import { BASE_ITEM_LABELS } from '@/features/customization/constants';
 import RoomCard from '@/components/RoomCard';
-import { RoomBanner } from '@/features/rooms/components/RoomBanner';
 import {
   LoginRequiredModal,
   ComparisonDisabledModal,
@@ -209,15 +206,6 @@ export default function RoomsPage() {
   const rooms = isLoggedIn ? apiRooms : guestFiltered;
   const isGuestAtLimit = !isLoggedIn && guestRooms.length >= GUEST_ROOM_LIMIT;
 
-  // Banner 데이터 (활성/커스텀 항목 카운트)
-  const { activeItemNames } = useCustomizationStore();
-  const { activeCount, customCount } = useMemo(() => {
-    const baseSet = new Set(BASE_ITEM_LABELS);
-    return {
-      activeCount: activeItemNames.length,
-      customCount: activeItemNames.filter((n) => !baseSet.has(n)).length,
-    };
-  }, [activeItemNames]);
 
   // EmptyState 분기 — 필터 활성 상태(전체가 아닌 거래방식 또는 비-기본 정렬)이면 EmptyStateFiltered, 그 외 EmptyStateOnboarding
   const isFilterActive = transactionType !== '전체' || sortOption !== '보증금 낮은순';
@@ -427,13 +415,6 @@ export default function RoomsPage() {
           </div>
         </div>
       </div>
-
-      {/* Banner — 항상 노출 (D5), 활성 항목 ≥ 1일 때만 */}
-      {activeCount > 0 && (
-        <div className="max-w-screen-2xl mx-auto w-full sm:px-10 lg:px-20">
-          <RoomBanner activeCount={activeCount} customCount={customCount} />
-        </div>
-      )}
 
       {/* 방 카운터 (DESKTOP) + 메인 컨텐츠 */}
       <div className="flex-1 flex flex-col px-4 md:px-10 lg:px-20 pb-10 max-w-screen-2xl mx-auto w-full">
