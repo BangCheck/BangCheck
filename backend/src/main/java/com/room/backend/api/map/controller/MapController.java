@@ -16,8 +16,10 @@ import com.room.backend.api.map.dto.request.MapPointCreateRequestDTO;
 import com.room.backend.api.map.dto.response.MapPointResponseDTO;
 import com.room.backend.api.map.dto.response.MapRoomResponseDTO;
 import com.room.backend.api.map.service.MapService;
+import com.room.backend.api.room.service.RoomCheckResultService;
 import com.room.backend.domain.map.entity.MapPoint;
 import com.room.backend.domain.room.entity.Room;
+import com.room.backend.domain.map.entity.enums.MapSortType;
 import com.room.backend.domain.room.entity.enums.RentType;
 import com.room.backend.global.auth.util.SecurityUtil;
 import com.room.backend.global.common.response.ApiResponse;
@@ -37,36 +39,55 @@ import lombok.RequiredArgsConstructor;
 public class MapController {
 
     private final MapService mapService;
+    private final RoomCheckResultService roomCheckResultService;
 
     @GetMapping("/rooms")
     @Operation(summary = "지도용 매물 목록 조회", description = "지도에 표시할 내 방 목록을 반환합니다.")
-    public ResponseEntity<ApiResponse<List<MapRoomResponseDTO>>> getMapRooms(@RequestParam(required = false) RentType rentType, 
-    @RequestParam(required = false) Long pointId, @RequestParam(required = false) Integer maxDistance) {
+    public ResponseEntity<ApiResponse<List<MapRoomResponseDTO>>> getMapRooms(
+            @RequestParam(required = false) RentType rentType,
+            @RequestParam(required = false) Long pointId,
+            @RequestParam(required = false) Integer maxDistance,
+            @RequestParam(required = false) MapSortType sort) {
         Long userId = SecurityUtil.getCurrentUserId();
         List<Room> rooms = mapService.getRoomsForMap(userId, rentType);
 
+        List<MapRoomResponseDTO> result;
+
         if (pointId == null) {
-                return ResponseEntity.ok(ApiResponse.success(
-                rooms.stream().map(MapRoomResponseDTO::new).toList()
-                ));
+            result = rooms.stream()
+                    .map(room -> new MapRoomResponseDTO(room, roomCheckResultService.getRoomIssuesSummary(room.getId())))
+                    .collect(java.util.stream.Collectors.toList());
+        } else {
+            MapPoint point = mapService.getMapPointById(pointId, userId)
+                    .orElseThrow(() -> new GeneralException(MapErrorCode.MAP_POINT_NOT_FOUND));
+
+            result = rooms.stream()
+                    .filter(room -> room.getLat() != null && room.getLon() != null)
+                    .map(room -> {
+                        double distM = DistanceUtil.calculateDistanceM(
+                                point.getLat(), point.getLon(),
+                                room.getLat(), room.getLon());
+                        int walkMin = DistanceUtil.estimateWalkMinutes(distM);
+                        return new MapRoomResponseDTO(room, roomCheckResultService.getRoomIssuesSummary(room.getId()), (int) distM, walkMin);
+                    })
+                    .filter(dto -> maxDistance == null || dto.getDistanceM() <= maxDistance)
+                    .collect(java.util.stream.Collectors.toList());
         }
 
-        MapPoint point = mapService.getMapPointById(pointId, userId)
-                .orElseThrow(() -> new GeneralException(MapErrorCode.MAP_POINT_NOT_FOUND));
+        if (sort != null) {
+            result.sort(switch (sort) {
+                case DISTANCE_ASC -> java.util.Comparator.comparingInt(dto ->
+                        dto.getDistanceM() == null ? Integer.MAX_VALUE : dto.getDistanceM());
+                case DEPOSIT_ASC -> java.util.Comparator.comparingLong(dto ->
+                        dto.getDeposit() == null ? Long.MAX_VALUE : dto.getDeposit());
+                case RENT_ASC -> java.util.Comparator.comparingInt(dto ->
+                        dto.getRent() == null ? Integer.MAX_VALUE : dto.getRent());
+                case MANAGEMENT_FEE_ASC -> java.util.Comparator.comparingInt(dto ->
+                        dto.getManagementFee() == null ? Integer.MAX_VALUE : dto.getManagementFee());
+            });
+        }
 
-        return ResponseEntity.ok(ApiResponse.success(
-                rooms.stream()
-                .filter(room -> room.getLat() != null && room.getLon() != null)
-                .map(room -> {
-                        double distM = DistanceUtil.calculateDistanceM(
-                        point.getLat(), point.getLon(),
-                        room.getLat(), room.getLon());
-                        int walkMin = DistanceUtil.estimateWalkMinutes(distM);
-                        return new MapRoomResponseDTO(room, (int) distM, walkMin);
-                })
-                .filter(dto -> maxDistance == null || dto.getDistanceM() <= maxDistance)
-                .toList()
-        ));
+        return ResponseEntity.ok(ApiResponse.success(result));
     }
 
     @GetMapping("/points")
