@@ -342,7 +342,7 @@ export function DynamicChecklistSections({
                       item={item}
                       value={answers[item.id] ?? null}
                       onChange={(v) => onChange(item.id, v)}
-                      hintOverride={guide ? '' : undefined}
+                      hintOverride=""
                     />
                   </ItemWithGuideRaw>
                 );
