@@ -12,6 +12,7 @@ import MapPage from '@/features/map/MapPage';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import BottomNavigation from '@/components/BottomNavigation';
+import { DevLoginButton } from '@/features/dev/DevLoginButton';
 
 const Placeholder = ({ name }: { name: string }) => (
   <div className="flex flex-col items-center justify-center min-h-[60vh] gap-2 p-8">
@@ -33,24 +34,27 @@ const AppLayout = () => (
 );
 
 export const Router = () => (
-  <Routes>
-    {/* 헤더 없는 페이지 */}
-    <Route path="/" element={<LandingPage />} />
-    <Route path="/login-error" element={<LoginErrorPage />} />
-    <Route path="/auth/callback/:provider" element={<AuthCallbackPage />} />
+  <>
+    <Routes>
+      {/* 헤더 없는 페이지 */}
+      <Route path="/" element={<LandingPage />} />
+      <Route path="/login-error" element={<LoginErrorPage />} />
+      <Route path="/auth/callback/:provider" element={<AuthCallbackPage />} />
 
-    {/* 헤더 있는 페이지 */}
-    <Route element={<AppLayout />}>
-      <Route path="/login" element={<LoginPage />} />
-      <Route path="/checklist/new" element={<ChecklistNewPage />} />
-      <Route path="/checklist/:id" element={<ChecklistDetailPage />} />
-      <Route path="/rooms" element={<RoomsPage />} />
-      <Route path="/map" element={<MapPage />} />
-      <Route path="/report" element={<ReportPage />} />
-      <Route path="/custom" element={<SettingsPage />} />
-      <Route path="/settings" element={<Navigate to="/custom" replace />} />
-      <Route path="/my" element={<Placeholder name="마이" />} />
-      <Route path="*" element={<Placeholder name="404" />} />
-    </Route>
-  </Routes>
+      {/* 헤더 있는 페이지 */}
+      <Route element={<AppLayout />}>
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/checklist/new" element={<ChecklistNewPage />} />
+        <Route path="/checklist/:id" element={<ChecklistDetailPage />} />
+        <Route path="/rooms" element={<RoomsPage />} />
+        <Route path="/map" element={<MapPage />} />
+        <Route path="/report" element={<ReportPage />} />
+        <Route path="/custom" element={<SettingsPage />} />
+        <Route path="/settings" element={<Navigate to="/custom" replace />} />
+        <Route path="*" element={<Placeholder name="404" />} />
+      </Route>
+    </Routes>
+    {/* DEV 모드 한정 — import.meta.env.DEV에서만 렌더 */}
+    <DevLoginButton />
+  </>
 );

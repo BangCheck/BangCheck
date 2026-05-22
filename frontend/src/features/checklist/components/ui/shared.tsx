@@ -191,6 +191,8 @@ const OPTION_ICON: Record<string, string> = {
   '가깝다': 'uiw:smile', '멀다': 'bi:emoji-angry-fill',
   '밝음': 'uiw:smile', '어두움': 'bi:emoji-angry-fill',
   '약간': 'bi:emoji-neutral', '심함': 'bi:emoji-angry-fill',
+  '충분': 'uiw:smile', '적당': 'bi:emoji-neutral', '부족': 'bi:emoji-angry-fill',
+  '비상주': 'uiw:smile', '상주': 'bi:emoji-angry-fill',
 };
 const OPTION_ACTIVE: Record<string, { bg: string; border: string; icon: string }> = {
   '좋음':  { bg: 'bg-[#f8fefa]', border: 'border-[#22d455]', icon: 'text-[#22d455]' },
@@ -206,6 +208,11 @@ const OPTION_ACTIVE: Record<string, { bg: string; border: string; icon: string }
   '어두움':{ bg: 'bg-[#fffafa]', border: 'border-[#f15556]', icon: 'text-[#f15556]' },
   '약간':  { bg: 'bg-[#fffef5]', border: 'border-[#ffdf00]', icon: 'text-[#a07d00]' },
   '심함':  { bg: 'bg-[#fffafa]', border: 'border-[#f15556]', icon: 'text-[#f15556]' },
+  '충분':  { bg: 'bg-[#f8fefa]', border: 'border-[#22d455]', icon: 'text-[#22d455]' },
+  '적당':  { bg: 'bg-[#fffef5]', border: 'border-[#ffdf00]', icon: 'text-[#a07d00]' },
+  '부족':  { bg: 'bg-[#fffafa]', border: 'border-[#f15556]', icon: 'text-[#f15556]' },
+  '비상주':{ bg: 'bg-[#f8fefa]', border: 'border-[#22d455]', icon: 'text-[#22d455]' },
+  '상주':  { bg: 'bg-[#fffafa]', border: 'border-[#f15556]', icon: 'text-[#f15556]' },
 };
 const FALLBACK_ACTIVE = { bg: 'bg-slot-b-bg', border: 'border-brand-primary', icon: 'text-brand-primary' };
 
