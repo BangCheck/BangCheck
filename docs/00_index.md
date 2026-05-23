@@ -13,6 +13,7 @@
 | [03_erd.md](03_erd.md) | DB 엔티티 관계도 |
 | [04_api-spec.md](04_api-spec.md) | API 엔드포인트 목록 |
 | [05_deploy.md](05_deploy.md) | 배포 환경 및 환경변수 |
+| [07_qa.md](07_qa.md) | **QA 사이클 현황 (PM 뷰)** — Wave 1/2/3 상태, 즉시 결정 요청, SSoT 링크 |
 | [team-conventions.md](team-conventions.md) | 브랜치·커밋·코드 컨벤션 |
 | [기능명세서 (Google Drive)](https://docs.google.com/spreadsheets/d/1vTLuLzBPOPAkLDLsoAfBedFt_v6LjfMtN-aEotUKocI) | 화면별 기능 명세 v2.1.2 |
 
@@ -44,4 +45,4 @@
 
 ---
 
-_Last updated: 2026-04-29_
+_Last updated: 2026-05-23_
