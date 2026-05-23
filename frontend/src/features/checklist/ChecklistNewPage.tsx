@@ -9,6 +9,7 @@ import { GUEST_ROOM_LIMIT, ROOM_LIMIT } from '@/lib/constants';
 import { useChecklistState } from './hooks/use-checklist-state';
 import { useChecklistItems } from './hooks/use-checklist-items';
 import { useSectionScroll } from './hooks/use-section-scroll';
+import { deriveInteriorFromAnswers, deriveSafetyFromAnswers } from './mappers';
 import { ChecklistPageHeader } from './components/ui/ChecklistPageHeader';
 import { ChecklistTabNav } from './components/ui/ChecklistTabNav';
 import { ChecklistSubmitFooter } from './components/ui/ChecklistSubmitFooter';
@@ -30,7 +31,11 @@ export default function ChecklistNewPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const createRoom = useCreateRoom();
 
-  const { basic, building, interior, safety, custom, answers, patchBasic, patchBuilding, patchCustom, patchAnswer } = useChecklistState();
+  const {
+    basic, building, interior, safety, custom, answers,
+    setInterior, setSafety,
+    patchBasic, patchBuilding, patchCustom, patchAnswer,
+  } = useChecklistState();
   const { data: checklistItems = [] } = useChecklistItems();
   const { activeSection, sectionRefs, tabNavRef, scrollToSection } = useSectionScroll();
 
@@ -63,7 +68,12 @@ export default function ChecklistNewPage() {
       setSubmitError(`비로그인 상태에서는 방을 ${GUEST_ROOM_LIMIT}개까지만 등록할 수 있어요.`);
       return;
     }
-    const success = addGuestRoom({ basic, building, interior, safety, custom });
+    // 비로그인 흐름: dynamic answers를 레거시 interior/safety로 변환 후 저장.
+    const derivedInterior = deriveInteriorFromAnswers(checklistItems, answers, interior);
+    const derivedSafety = deriveSafetyFromAnswers(checklistItems, answers, safety);
+    setInterior(derivedInterior);
+    setSafety(derivedSafety);
+    const success = addGuestRoom({ basic, building, interior: derivedInterior, safety: derivedSafety, custom });
     if (!success) {
       setSubmitError(`비로그인 상태에서는 방을 ${GUEST_ROOM_LIMIT}개까지만 등록할 수 있어요.`);
       return;
