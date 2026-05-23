@@ -13,8 +13,8 @@ interface RoomCardProps {
 
 const ISSUE_LABELS: Record<string, string> = {
   mold: '곰팡이',
-  leak: '누수',
-  bug: '벌레',
+  leak: '누수흔적',
+  bug: '벌레흔적',
   condensation: '결로',
   drainSmell: '냄새',
 };
@@ -106,6 +106,7 @@ export default function RoomCard({
   return (
     <>
       <div
+        data-testid="room-card"
         role="button"
         tabIndex={0}
         onClick={() => onClick?.(id)}
@@ -162,7 +163,7 @@ export default function RoomCard({
         </div>
 
         {/* 5. 문제사항 — 단색 보더 칩 */}
-        <div className="flex flex-wrap items-center gap-2 min-h-[24px]">
+        <div data-testid="problem-tags" className="flex flex-wrap items-center gap-2 min-h-[24px]">
           {activeIssues.length === 0 ? (
             <span className="text-[12px] text-border-light font-medium">문제사항 없음</span>
           ) : (

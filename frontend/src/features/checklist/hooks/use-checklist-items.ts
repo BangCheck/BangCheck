@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useAuthStore } from '@/store/use-auth-store';
 import { getCustomizedItems } from '@/services/custom-checklist-service';
 import { QUERY_KEYS } from '@/lib/query-keys';
+import { GUEST_CHECKLIST_ITEMS } from '@/features/checklist/data/guest-items';
 import type { ChecklistItemResponse, ChecklistCategory } from '@/types';
 
 export const CHECKLIST_FORM_CATEGORIES: ChecklistCategory[] = [
@@ -28,9 +29,10 @@ export const CATEGORY_LABEL: Record<ChecklistCategory, string> = {
 export function useChecklistItems() {
   const { isLoggedIn } = useAuthStore();
   return useQuery({
-    queryKey: QUERY_KEYS.checklist.items,
-    queryFn: getCustomizedItems,
-    enabled: isLoggedIn,
+    queryKey: [...QUERY_KEYS.checklist.items, isLoggedIn ? 'auth' : 'guest'],
+    queryFn: isLoggedIn
+      ? getCustomizedItems
+      : async () => GUEST_CHECKLIST_ITEMS,
     staleTime: 1000 * 60 * 5,
     select: (items) =>
       items.filter(

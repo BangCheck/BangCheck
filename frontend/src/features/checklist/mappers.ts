@@ -1,4 +1,15 @@
-import type { ChecklistInput, Direction, ScoreLevel } from '@/types/checklist';
+import type {
+  ChecklistAnswers,
+  ChecklistInput,
+  ChecklistItemResponse,
+  Direction,
+  InteriorCheckData,
+  Rating,
+  SafetyLivingData,
+  ScoreLevel,
+  YesNo,
+} from '@/types/checklist';
+import { initInterior, initSafety } from './checklist-constants';
 
 const RENT_TYPE_MAP: Record<string, string> = {
   '전세': 'JEONSE',
@@ -67,6 +78,69 @@ const DIRECTION_REVERSE_MAP: Record<string, string> = {
 const SCORE_REVERSE_MAP: Record<number, string> = {
   3: '좋음', 2: '보통', 1: '나쁨',
 };
+
+// ── Dynamic answers → 레거시 interior/safety 형태 derive ──
+// 비로그인 흐름: ChecklistNewPage가 patchAnswer만 사용해 answers(itemId→value)에 저장.
+// addGuestRoom은 raw.interior.mold/leak/pest/drainSmell을 읽어 RoomCard chip 표시.
+// 따라서 save 직전에 itemName 기준으로 answers를 interior/safety 객체로 변환한다.
+
+// PROBLEM 카테고리(SINGLE_CHOICE: 없음/약간/심함) → YesNo
+const problemValueToYesNo = (v: string | null | undefined): YesNo => {
+  if (v === '없음') return '없음';
+  if (v === '약간' || v === '심함') return '있음';
+  return null;
+};
+
+const ratingValueToRating = (v: string | null | undefined): Rating => {
+  if (v === '좋음' || v === '보통' || v === '나쁨') return v;
+  return null;
+};
+
+const PROBLEM_NAME_TO_INTERIOR_KEY: Record<string, keyof InteriorCheckData> = {
+  '곰팡이': 'mold',
+  '누수 흔적': 'leak',
+  '벌레 흔적': 'pest',
+  '내/외부 소음': 'noise',
+  '하수구/곰팡이 냄새': 'drainSmell',
+  '습기 / 결로': 'humidity',
+};
+
+const INTERNAL_STATE_NAME_TO_INTERIOR_KEY: Record<string, keyof InteriorCheckData> = {
+  '채광': 'lighting',
+  '환기': 'ventilation',
+  '수압 및 배수': 'waterPressure',
+  '방음': 'soundProof',
+  '현관 / 문틈': 'entrance',
+};
+
+export function deriveInteriorFromAnswers(
+  items: ChecklistItemResponse[],
+  answers: ChecklistAnswers,
+  base: InteriorCheckData = initInterior,
+): InteriorCheckData {
+  const next: InteriorCheckData = { ...base };
+  for (const item of items) {
+    const value = answers[item.id] ?? null;
+    if (item.category === 'PROBLEM') {
+      const key = PROBLEM_NAME_TO_INTERIOR_KEY[item.itemName];
+      if (key) (next[key] as YesNo) = problemValueToYesNo(value);
+    } else if (item.category === 'INTERNAL_STATE') {
+      const key = INTERNAL_STATE_NAME_TO_INTERIOR_KEY[item.itemName];
+      if (key) (next[key] as Rating) = ratingValueToRating(value);
+    }
+  }
+  return next;
+}
+
+export function deriveSafetyFromAnswers(
+  _items: ChecklistItemResponse[],
+  _answers: ChecklistAnswers,
+  base: SafetyLivingData = initSafety,
+): SafetyLivingData {
+  // SAFETY/CONVENIENCE/ENVIRONMENT 카테고리는 score 계산에만 영향.
+  // chip 표시 경로는 interior로 충분하므로 현재는 base 유지 (후속 작업에서 매핑 확장).
+  return { ...base };
+}
 
 export const mapResponseToForm = (data: any): Partial<ChecklistInput> => ({
   name: data.name || '',

@@ -77,7 +77,7 @@ const rawToRoomFields = (raw: GuestRoomRaw) => ({
     mold: raw.interior.mold === '있음',
     leak: raw.interior.leak === '있음',
     bug: raw.interior.pest === '있음',
-    condensation: raw.interior.leak === '있음',
+    condensation: raw.interior.humidity === '있음',
     drainSmell: raw.interior.drainSmell === '있음',
   },
   memo: raw.custom.memo,
