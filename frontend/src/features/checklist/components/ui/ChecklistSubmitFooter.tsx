@@ -10,7 +10,10 @@ type Props = {
 
 export function ChecklistSubmitFooter({ label, disabled, isSubmitting, error, onClick }: Props) {
   return (
-    <div className="fixed bottom-0 left-0 right-0 md:sticky md:bottom-auto bg-white border-t border-border-light px-4 py-4 z-30">
+    <div
+      className="sticky bottom-0 left-0 right-0 bg-white border-t border-border-light px-4 pt-4 z-30"
+      style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}
+    >
       <div className="max-w-2xl md:max-w-3xl lg:max-w-4xl mx-auto flex flex-col gap-2">
         {error && (
           <p className="text-[12px] text-red-500 text-center">{error}</p>
