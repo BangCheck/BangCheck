@@ -61,11 +61,19 @@ export default function SettingsPage() {
   // ── Handlers ─────────────────────────────────────────────
   const getServerIdByLabel = (label: string) => allItems.find((item) => item.itemName === label)?.id;
 
-  const handleAddCustomItem = (e: React.FormEvent) => {
+  // UX-WEB-07: trim + dedupe + error 표시. 실패 시 입력값 보존 (재시도 편의).
+  const handleAddCustomItem = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (newCustomItem.trim()) {
-      addCustomItem(newCustomItem);
+    const trimmed = newCustomItem.trim();
+    if (!trimmed) return;
+    try {
+      setErrorMessage(null);
+      await addCustomItem(trimmed);
       setNewCustomItem('');
+    } catch (err) {
+      setErrorMessage(
+        err instanceof Error ? err.message : '항목 추가에 실패했어요. 잠시 후 다시 시도해주세요.',
+      );
     }
   };
 

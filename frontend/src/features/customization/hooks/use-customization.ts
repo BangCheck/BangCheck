@@ -242,10 +242,27 @@ export const useCustomization = () => {
     setActiveItemNames(Array.from(nextActiveSet));
   }, [activeItemNames, setActiveItemNames]);
 
-  const addCustomItem = useCallback((itemName: string) => {
-    addCustomMutation.mutate(itemName);
-    toggleItemName(itemName);
-  }, [addCustomMutation, toggleItemName]);
+  // UX-WEB-07: trim + dedupe + error 전파.
+  // 기존 버전은 raw input 전송 + 결과 미확인 → BE reject 시 사용자에 무피드백("미작동" 체감 원인).
+  const addCustomItem = useCallback(async (itemName: string) => {
+    const trimmed = itemName.trim();
+    if (!trimmed) {
+      throw new Error('항목명을 입력해주세요');
+    }
+    const duplicate = items.some(i => i.itemType === 'CUSTOM' && i.itemName === trimmed);
+    if (duplicate) {
+      throw new Error('이미 추가된 항목이에요');
+    }
+    try {
+      await addCustomMutation.mutateAsync(trimmed);
+    } catch {
+      // 네트워크/BE 에러는 친화 메시지로 일원화 (axios "Request failed..." 누출 차단)
+      throw new Error('항목 추가에 실패했어요. 잠시 후 다시 시도해주세요.');
+    }
+    if (!activeItemNames.includes(trimmed)) {
+      toggleItemName(trimmed);
+    }
+  }, [addCustomMutation, toggleItemName, items, activeItemNames]);
 
   const removeCustomItem = useCallback((customItemId: number, label: string) => {
     deleteCustomMutation.mutate(customItemId);
