@@ -4,6 +4,23 @@
 
 ---
 
+## 0. 작업 완료 — 검증 대기 (PM/QA 확인 필요)
+
+> 개발·배포는 마쳤고 PM/검증자가 라이브에서 동작 확인하면 시트의 `확인 여부`를 TRUE로 전환할 수 있는 항목들.
+
+| 코드 | 시트 | 화면 | 요지 | main SHA | 시트 행 |
+|---|---|---|---|---|---|
+| UX-WEB-01 | 05 웹UX | HOME | 카드 문제요소 chip (곰팡이·누수흔적·벌레흔적) 표시 | `adcea33` | [QA_웹UX.md](./QA_웹UX.md) |
+| UX-WEB-02 | 05 웹UX | HOME | 거래방식 필터 라벨 `거래방식 · 전체` | `e1e6499` | [QA_웹UX.md](./QA_웹UX.md) |
+| UX-WEB-04 | 05 웹UX | CHECK | 저장/수정완료 푸터 sticky + safe-area | `f0014ee` | [QA_웹UX.md](./QA_웹UX.md) |
+| UX-WEB-05 | 05 웹UX | COMPARE | 비교 방 선택 3번째 카드 disabled | (코드 무변경) | [QA_웹UX.md](./QA_웹UX.md) |
+| UX-WEB-07 | 05 웹UX | CUSTOM | 나만의 항목추가 trim/dedupe + 에러 메시지 | `6387808` | [QA_웹UX.md](./QA_웹UX.md) |
+| UX-MOBILE-02 | 06 모바일UX | CHECK | GNB 로그인 버튼 1줄 (whitespace-nowrap) | `4e46711` | [QA_모바일UX.md](./QA_모바일UX.md) |
+
+**총 6건 검증 대기** — 라이브 도메인(`https://bangcheck.site/`)에서 확인 후 시트 `[x]` → `확인 여부 TRUE` 갱신.
+
+---
+
 ## 1. 진행 현황 대시보드 (시트별)
 
 | 시트 | 전체 | Pass | Fail | 미실행 | 진행률 |
@@ -114,18 +131,7 @@
 
 ---
 
-## 7. PM 즉시 결정 요청
-
-1. **UX-WEB-01 분리 승인** — a) FE 매핑(완료) / b) BE issues 응답 분리 / c) 비로그인 UI E09 트랙
-2. **UX-WEB-02 라벨** — "거래방식 · 전체" 확정 (현재 적용됨)
-3. **UX-WEB-05 opacity** — 40% 유지 vs 시안 50%
-4. **UX-WEB-07 최상 승격** — 실측 결과 확인 후
-5. **UX-WEB-08 UX 시맨틱** — A 라벨 명확화 / B OFF=선택만
-6. **UX-WEB-03 / UX-MOBILE-05 SVG** — Designer 일정
-
----
-
-## 8. 시트 파일 링크
+## 7. 시트 파일 링크
 
 | 시트 | 파일 |
 |---|---|
