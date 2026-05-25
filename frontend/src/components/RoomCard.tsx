@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { cn, formatAmount } from '@/lib/utils';
+import { cn, formatRoomPrice } from '@/lib/utils';
 import type { Room } from '@/types';
 import { DeleteRoomModal } from '@/components/ui/Modals';
 
@@ -81,11 +81,9 @@ export default function RoomCard({
     return `${YYYY}.${MM}.${DD} ${HH}:${mm}`;
   };
 
-  // ISSUE-GUEST-X1: deposit 숫자 있으면 항상 formatAmount 통과 (price 문자열 fallback은 deposit 없는 케이스만)
+  // deposit 숫자 있으면 formatRoomPrice로 일관 포맷. 없으면 BE/legacy 문자열 price fallback.
   const formattedPrice = (typeof deposit === 'number' && deposit > 0)
-    ? (type === '전세'
-        ? `전세 ${formatAmount(deposit)}${managementFee ? `/${managementFee}만` : ''}`
-        : `${type} ${formatAmount(deposit)}/${formatAmount(rent)}/${managementFee || 0}만`)
+    ? formatRoomPrice(type, deposit, rent, managementFee)
     : (price ?? '');
 
   const activeIssues = issues
