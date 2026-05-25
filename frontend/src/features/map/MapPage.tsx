@@ -305,12 +305,15 @@ const MAP_ZOOM = 14;
 
 function loadNcpMaps(): Promise<void> {
   return new Promise((resolve, reject) => {
-    if (typeof window !== 'undefined' && window.naver?.maps?.Map) {
+    if (typeof window !== 'undefined' && window.naver?.maps?.Map && window.naver?.maps?.Service) {
       resolve();
       return;
     }
+    // geocoder 없는 기존 스크립트는 제거 후 재로드
     const existingScript = document.querySelector('script[data-ncp-map]');
-    if (existingScript) {
+    if (existingScript && !existingScript.getAttribute('src')?.includes('submodules=geocoder')) {
+      existingScript.remove();
+    } else if (existingScript) {
       existingScript.addEventListener('load', () => resolve());
       existingScript.addEventListener('error', () => reject(new Error('NCP Maps SDK 로드 실패')));
       return;
@@ -421,6 +424,11 @@ export default function MapPage() {
     if (!mapReady || !mapInstanceRef.current) return;
     markersRef.current.forEach((m) => m.setMap(null));
     markersRef.current = [];
+
+    if (!window.naver?.maps?.Service) {
+      console.warn('[Map] naver.maps.Service 미로드 — NCP 콘솔에서 Geocoding 서비스 활성화 필요');
+      return;
+    }
 
     roomsWithAddress.forEach((r) => {
       const address = (r as unknown as Record<string, unknown>)['address'] as string;
