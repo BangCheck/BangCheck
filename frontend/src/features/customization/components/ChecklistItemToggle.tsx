@@ -29,7 +29,7 @@ export const ChecklistItemToggle: React.FC<ChecklistItemToggleProps> = ({
       )}
     >
       {icon && (
-        <div className="flex items-center justify-center shrink-0 w-7 h-7 text-[18px]">
+        <div className="flex items-center justify-center shrink-0 w-7 h-7 text-[18px] text-brand-primary">
           {icon}
         </div>
       )}

@@ -260,7 +260,7 @@ export default function SettingsPage() {
                     </div>
                   ) : (
                     <div className="bg-white rounded-[6px] border border-border-light p-4 md:p-6 shadow-sm">
-                      <div className="grid grid-cols-1 lg:grid-cols-3 gap-2 lg:gap-3">
+                      <div className="grid grid-cols-2 lg:grid-cols-3 gap-2 lg:gap-3">
                         {recommendedItems.map((item) => (
                           <ChecklistItemToggle
                             key={item.id}
@@ -342,7 +342,7 @@ export default function SettingsPage() {
                               {BASE_ITEM_LABELS.filter((l) => activeNamesSet.has(l)).length}/{BASE_ITEM_LABELS.length}
                             </span>
                           </div>
-                          <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
+                          <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
                             {baseVisibleLabels.map((label) => {
                               const constItem = CHECKLIST_ITEMS.find((c) => c.label === label);
                               const icon = constItem ? (ItemIcons[constItem.id] || ItemIcons.default) : ItemIcons.default;
@@ -413,7 +413,7 @@ export default function SettingsPage() {
                               </button>
                               )}
                             </div>
-                            <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
+                            <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
                               {visibleCatItems.map((constItem) => {
                                 const icon = ItemIcons[constItem.id] || ItemIcons.default;
                                 const si = items.find((s) => s.itemName === constItem.label);
