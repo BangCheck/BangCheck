@@ -291,39 +291,57 @@ export default function SettingsPage() {
                     </button>
                   </div>
 
-                  {/* 기본 항목 — 토글 OFF여도 항상 표시 */}
-                  <div className="pt-4 border-t border-bg-gray">
-                    <div className="space-y-4">
-                      <div className="flex items-center gap-2">
-                        <h4 className="text-[14px] font-bold text-text-main">기본 항목</h4>
-                        <span className="text-[14px] font-bold text-text-mute">
-                          {BASE_ITEM_LABELS.filter((l) => activeNamesSet.has(l)).length}/{BASE_ITEM_LABELS.length}
-                        </span>
+                  {/* 기본 항목 — ON: 전체 / OFF: 선택된 항목만 */}
+                  {(() => {
+                    const baseVisibleLabels = isAllItemsVisible
+                      ? BASE_ITEM_LABELS
+                      : BASE_ITEM_LABELS.filter((l) => activeNamesSet.has(l));
+                    if (baseVisibleLabels.length === 0) return null;
+                    return (
+                      <div className="pt-4 border-t border-bg-gray">
+                        <div className="space-y-4">
+                          <div className="flex items-center gap-2">
+                            <h4 className="text-[14px] font-bold text-text-main">기본 항목</h4>
+                            <span className="text-[14px] font-bold text-text-mute">
+                              {BASE_ITEM_LABELS.filter((l) => activeNamesSet.has(l)).length}/{BASE_ITEM_LABELS.length}
+                            </span>
+                          </div>
+                          <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
+                            {baseVisibleLabels.map((label) => {
+                              const constItem = CHECKLIST_ITEMS.find((c) => c.label === label);
+                              const icon = constItem ? (ItemIcons[constItem.id] || ItemIcons.default) : ItemIcons.default;
+                              const si = items.find((s) => s.itemName === label);
+                              return (
+                                <ChecklistItemToggle
+                                  key={label}
+                                  label={label}
+                                  icon={icon}
+                                  isActive={activeNamesSet.has(label)}
+                                  onToggle={() => {
+                                    if (isPending) return;
+                                    if (si) toggleItem(Number(si.id), label);
+                                    else toggleItemLocally(label);
+                                  }}
+                                />
+                              );
+                            })}
+                          </div>
+                        </div>
                       </div>
-                      <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
-                        {BASE_ITEM_LABELS.map((label) => {
-                          const constItem = CHECKLIST_ITEMS.find((c) => c.label === label);
-                          const icon = constItem ? (ItemIcons[constItem.id] || ItemIcons.default) : ItemIcons.default;
-                          const si = items.find((s) => s.itemName === label);
-                          return (
-                            <ChecklistItemToggle
-                              key={label}
-                              label={label}
-                              icon={icon}
-                              isActive={activeNamesSet.has(label)}
-                              onToggle={() => {
-                                if (isPending) return;
-                                if (si) toggleItem(Number(si.id), label);
-                                else toggleItemLocally(label);
-                              }}
-                            />
-                          );
-                        })}
-                      </div>
-                    </div>
-                  </div>
+                    );
+                  })()}
 
-                  {isAllItemsVisible && (
+                  {(() => {
+                    const anyCategoryHasItems = CATEGORY_ORDER.some((cat) => {
+                      const catLabel = CATEGORY_LABEL[cat];
+                      const all = CHECKLIST_ITEMS
+                        .filter((i) => i.category === catLabel)
+                        .filter((i) => !BASE_ITEM_LABELS.includes(i.label));
+                      const visible = isAllItemsVisible ? all : all.filter((i) => activeNamesSet.has(i.label));
+                      return visible.length > 0;
+                    });
+                    if (!anyCategoryHasItems) return null;
+                    return (
                     <div className="pt-4 border-t border-bg-gray space-y-10">
                       {CATEGORY_ORDER.map((cat) => {
                         const catLabel = CATEGORY_LABEL[cat];
@@ -332,6 +350,10 @@ export default function SettingsPage() {
                           .filter((i) => i.category === catLabel)
                           .filter((i) => !BASE_ITEM_LABELS.includes(i.label));
                         if (catConstItems.length === 0) return null;
+                        const visibleCatItems = isAllItemsVisible
+                          ? catConstItems
+                          : catConstItems.filter((i) => activeNamesSet.has(i.label));
+                        if (visibleCatItems.length === 0) return null;
                         const activeCount = catConstItems.filter((i) => activeNamesSet.has(i.label)).length;
                         return (
                           <div key={cat} className="space-y-4">
@@ -340,6 +362,7 @@ export default function SettingsPage() {
                                 <h4 className="text-[14px] font-bold text-text-main">{catLabel}</h4>
                                 <span className="text-[14px] font-bold text-text-mute">{activeCount}/{catConstItems.length}</span>
                               </div>
+                              {isAllItemsVisible && (
                               <button
                                 className="text-[14px] font-medium text-text-main hover:text-brand-primary"
                                 onClick={() => {
@@ -352,9 +375,10 @@ export default function SettingsPage() {
                               >
                                 전체 선택
                               </button>
+                              )}
                             </div>
                             <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
-                              {catConstItems.map((constItem) => {
+                              {visibleCatItems.map((constItem) => {
                                 const icon = ItemIcons[constItem.id] || ItemIcons.default;
                                 const si = items.find((s) => s.itemName === constItem.label);
                                 return (
@@ -376,7 +400,8 @@ export default function SettingsPage() {
                         );
                       })}
                     </div>
-                  )}
+                    );
+                  })()}
 
                   {/* 나만의 항목 추가 */}
                   <div className="space-y-4 md:space-y-5">
