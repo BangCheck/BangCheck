@@ -8,6 +8,23 @@ import { ROUTES } from '@/lib/routes';
 import { GUEST_ROOM_LIMIT, ROOM_LIMIT } from '@/lib/constants';
 import { LoginRequiredModal } from '@/components/ui/Modals';
 
+// 기준점 타입 — 트랙 A가 참조할 수 있도록 export
+export interface LandmarkSelection {
+  name: string;
+  lat: number;
+  lng: number;
+}
+
+const LANDMARK_STORAGE_KEY = 'landmark-selection';
+
+const LANDMARK_PRESETS: LandmarkSelection[] = [
+  { name: '연세대학교', lat: 37.5651, lng: 126.9385 },
+  { name: '이화여자대학교', lat: 37.5620, lng: 126.9469 },
+  { name: '신촌역', lat: 37.5551, lng: 126.9368 },
+  { name: '이대역', lat: 37.5567, lng: 126.9462 },
+  { name: '서울역', lat: 37.5547, lng: 126.9707 },
+];
+
 const IconMapPin = () => (
   <svg width="82" height="82" viewBox="0 0 24 24" fill="none" stroke="#BFBFBF" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
     <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" />
@@ -224,10 +241,13 @@ export default function MapPage() {
   const { guestRooms } = useGuestRoomStore();
   const navigate = useNavigate();
 
-  const [searchValue, setSearchValue] = useState('연세대학교');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [sortOption, setSortOption] = useState('월세 (보증금 낮은순)');
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+
+  // 기준점 state — LocalStorage 영구 저장 (key: landmark-selection)
+  const [landmark, setLandmark] = useState<LandmarkSelection | null>(null);
+  const [showLandmarkInput, setShowLandmarkInput] = useState(false);
 
   const filterRef = useRef<HTMLDivElement>(null);
 
@@ -242,6 +262,18 @@ export default function MapPage() {
     return raw['address'] || raw['addressDetail'];
   });
 
+  // LocalStorage hydration
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem(LANDMARK_STORAGE_KEY);
+      if (stored) {
+        setLandmark(JSON.parse(stored) as LandmarkSelection);
+      }
+    } catch {
+      // ignore corrupt storage
+    }
+  }, []);
+
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
       if (filterRef.current && !filterRef.current.contains(e.target as Node)) {
@@ -252,6 +284,18 @@ export default function MapPage() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  const selectLandmark = (preset: LandmarkSelection) => {
+    setLandmark(preset);
+    localStorage.setItem(LANDMARK_STORAGE_KEY, JSON.stringify(preset));
+    setShowLandmarkInput(false);
+  };
+
+  const clearLandmark = () => {
+    setLandmark(null);
+    localStorage.removeItem(LANDMARK_STORAGE_KEY);
+    setShowLandmarkInput(false);
+  };
+
   const handleStartChecklist = () => {
     if (!isLoggedIn && isGuestAtLimit) {
       setIsLoginModalOpen(true);
@@ -261,7 +305,6 @@ export default function MapPage() {
   };
 
   const handleReset = () => {
-    setSearchValue('');
     setSortOption('거래방식 (정렬)');
   };
 
@@ -289,18 +332,65 @@ export default function MapPage() {
         </button>
       </div>
 
+      {/* 기준점 배너 — 기준점 선택 시 상단 sticky 표시 */}
+      {landmark && (
+        <div className="sticky top-0 z-40 bg-brand-primary/10 border-b border-brand-primary/20 px-[16px] lg:px-[40px] py-[10px] flex items-center gap-[12px]">
+          <IconSolarPin size={16} color="#0a607d" />
+          <span className="flex-1 text-[14px] font-semibold text-brand-primary leading-[1.3]">
+            기준점: {landmark.name}
+          </span>
+          <button
+            type="button"
+            onClick={() => setShowLandmarkInput(true)}
+            className="text-[13px] font-medium text-text-sub border border-border-mute rounded px-[10px] py-[4px] bg-white hover:border-brand-primary hover:text-brand-primary transition-colors cursor-pointer"
+          >
+            변경
+          </button>
+          <button
+            type="button"
+            onClick={clearLandmark}
+            className="text-[13px] font-medium text-text-sub border border-border-mute rounded px-[10px] py-[4px] bg-white hover:border-red-400 hover:text-red-500 transition-colors cursor-pointer"
+          >
+            초기화
+          </button>
+        </div>
+      )}
+
       {/* 필터 바 — Desktop: SearchFilter Applied + Sort + Reset + 비교 리포트 */}
       <div className="hidden lg:flex border border-border-light items-center justify-between px-[40px] py-[12px] w-full">
         <div className="flex gap-[10px] items-center">
-          <button
-            type="button"
-            className="bg-white border border-border-mute rounded-[6px] h-[36px] px-[12px] py-[6px] flex items-center gap-[10px] w-[217px] cursor-pointer hover:border-brand-primary transition-colors"
-          >
-            <span className={cn('flex-1 text-left text-[14px] font-medium leading-[1.3]', searchValue ? 'text-brand-primary' : 'text-text-caption')}>
-              {searchValue || '원하는 기준점을 입력해주세요'}
-            </span>
-            <IconSearch size={18} />
-          </button>
+          {/* 기준점 선택 버튼 / 빠른 선택 패널 */}
+          <div className="relative">
+            <button
+              type="button"
+              onClick={() => setShowLandmarkInput(!showLandmarkInput)}
+              className="bg-white border border-border-mute rounded-[6px] h-[36px] px-[12px] py-[6px] flex items-center gap-[10px] w-[217px] cursor-pointer hover:border-brand-primary transition-colors"
+            >
+              <span className={cn('flex-1 text-left text-[14px] font-medium leading-[1.3]', landmark ? 'text-brand-primary' : 'text-text-caption')}>
+                {landmark ? landmark.name : '원하는 기준점을 입력해주세요'}
+              </span>
+              <IconSearch size={18} />
+            </button>
+            {showLandmarkInput && (
+              <div className="absolute left-0 top-full mt-2 bg-white border border-border-light rounded-[6px] shadow-lg z-50 p-2 min-w-[217px]">
+                <p className="text-[11px] text-text-caption px-2 py-1 font-medium">빠른 선택</p>
+                {LANDMARK_PRESETS.map((preset) => (
+                  <button
+                    key={preset.name}
+                    type="button"
+                    onClick={() => selectLandmark(preset)}
+                    className={cn(
+                      'w-full text-left px-3 py-2 text-[14px] rounded flex items-center gap-[8px] hover:bg-bg-gray transition-colors cursor-pointer',
+                      landmark?.name === preset.name ? 'text-brand-primary font-semibold' : 'text-text-main'
+                    )}
+                  >
+                    <IconSolarPin size={14} color={landmark?.name === preset.name ? '#0a607d' : '#aaa'} />
+                    {preset.name}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
 
           <div className="relative" ref={filterRef}>
             <button
@@ -355,18 +445,37 @@ export default function MapPage() {
 
       {/* 모바일 검색 바 */}
       <div className="lg:hidden border-b border-border-light px-[16px] py-[12px]">
-        <div className="flex items-center h-[44px] bg-white border border-border-mute rounded-[6px] pl-[16px] pr-[4px]">
-          <input
-            type="text"
-            value={searchValue}
-            onChange={(e) => setSearchValue(e.target.value)}
-            placeholder="원하는 기준점을 입력해주세요."
-            className="flex-1 text-[15px] text-text-main placeholder:text-text-caption bg-transparent outline-none"
-          />
+        <div
+          className="flex items-center h-[44px] bg-white border border-border-mute rounded-[6px] pl-[16px] pr-[4px] cursor-pointer"
+          onClick={() => setShowLandmarkInput(!showLandmarkInput)}
+        >
+          <span className={cn('flex-1 text-[15px] bg-transparent outline-none select-none', landmark ? 'text-brand-primary font-medium' : 'text-text-caption')}>
+            {landmark ? landmark.name : '원하는 기준점을 입력해주세요.'}
+          </span>
           <button className="p-[10px] flex items-center justify-center cursor-pointer" type="button">
             <IconSearch size={20} />
           </button>
         </div>
+        {/* 모바일 빠른 선택 패널 */}
+        {showLandmarkInput && (
+          <div className="mt-2 bg-white border border-border-light rounded-[6px] shadow-lg p-2">
+            <p className="text-[11px] text-text-caption px-2 py-1 font-medium">빠른 선택</p>
+            {LANDMARK_PRESETS.map((preset) => (
+              <button
+                key={preset.name}
+                type="button"
+                onClick={() => selectLandmark(preset)}
+                className={cn(
+                  'w-full text-left px-3 py-2 text-[14px] rounded flex items-center gap-[8px] hover:bg-bg-gray transition-colors cursor-pointer',
+                  landmark?.name === preset.name ? 'text-brand-primary font-semibold' : 'text-text-main'
+                )}
+              >
+                <IconSolarPin size={14} color={landmark?.name === preset.name ? '#0a607d' : '#aaa'} />
+                {preset.name}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* 카운터 */}
