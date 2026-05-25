@@ -39,7 +39,7 @@ export default function Header() {
   const confirmLogout = () => {
     logout();
     setIsLogoutModalOpen(false);
-    navigate(ROUTES.LANDING, { replace: true });
+    navigate(ROUTES.HOME, { replace: true });
   };
 
   const userInitial = getInitial(user?.nickname, user?.email);
