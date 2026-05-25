@@ -46,11 +46,6 @@ const IconSolarPin = ({ size = 18, color = '#0a607d' }: { size?: number; color?:
   </svg>
 );
 
-const IconTrain = ({ size = 18, color = '#fff' }: { size?: number; color?: string }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill={color}>
-    <path d="M12 2c-4 0-8 .5-8 4v9.5C4 17.43 5.57 19 7.5 19L6 20.5v.5h12v-.5L16.5 19c1.93 0 3.5-1.57 3.5-3.5V6c0-3.5-3.58-4-8-4zM7.5 17c-.83 0-1.5-.67-1.5-1.5S6.67 14 7.5 14s1.5.67 1.5 1.5S8.33 17 7.5 17zm3.5-6H6V6h5v5zm5.5 6c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm1.5-6h-5V6h5v5z" />
-  </svg>
-);
 
 const IconReset = () => (
   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#232527" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -81,61 +76,6 @@ const IconMapTab = () => (
     <line x1="16" y1="6" x2="16" y2="22" />
   </svg>
 );
-
-// 핀 라벨 — 지도 위에 떠 있는 카드/지하철역 표시
-function PinLabel({
-  variant = 'room',
-  selected = false,
-  children,
-  style,
-}: {
-  variant?: 'room' | 'station' | 'landmark';
-  selected?: boolean;
-  children: React.ReactNode;
-  style?: React.CSSProperties;
-}) {
-  if (variant === 'station') {
-    return (
-      <div
-        className="absolute bg-[#232527] px-[16px] py-[10px] rounded-[4px] flex items-center gap-[10px] shadow-[0_8px_2px_rgba(0,0,0,0.29)] whitespace-nowrap"
-        style={style}
-      >
-        <IconTrain size={18} />
-        <span className="font-bold text-[14px] text-white leading-[1.3]">{children}</span>
-      </div>
-    );
-  }
-  if (variant === 'landmark') {
-    return (
-      <div
-        className="absolute bg-brand-primary px-[16px] py-[10px] rounded-[4px] flex items-center gap-[10px] shadow-[0_8px_2px_rgba(0,0,0,0.29)] whitespace-nowrap"
-        style={style}
-      >
-        <IconSolarPin size={18} color="#fff" />
-        <span className="font-bold text-[14px] text-white leading-[1.3]">{children}</span>
-      </div>
-    );
-  }
-  return (
-    <div
-      className={cn(
-        'absolute bg-white px-[16px] py-[10px] rounded-[4px] flex items-center gap-[10px] shadow-[0_8px_2px_rgba(0,0,0,0.29)] whitespace-nowrap',
-        selected && 'border-2 border-[#004cbd]'
-      )}
-      style={style}
-    >
-      <span
-        className={cn(
-          'inline-block w-[10px] h-[10px] rounded-full',
-          selected ? 'bg-[#004cbd]' : 'bg-text-main'
-        )}
-      />
-      <span className={cn('text-[14px] text-text-main leading-[1.3]', selected ? 'font-bold' : 'font-semibold')}>
-        {children}
-      </span>
-    </div>
-  );
-}
 
 // 룸 카드 (Compact + Landmark) — 데스크톱 그리드용
 function MapRoomCardCompact({
@@ -219,10 +159,72 @@ const DEMO_ROOMS = [
 
 const SORT_OPTIONS = ['거래방식 (정렬)', '월세 (보증금 낮은순)', '전세 (보증금 낮은순)', '단기임대 (보증금 낮은순)'];
 
+// NCP Maps SDK 타입 선언
+declare global {
+  interface Window {
+    naver: typeof naver;
+    navermap_authFailure?: () => void;
+  }
+}
+
+declare namespace naver.maps {
+  class Map {
+    constructor(element: HTMLElement | string, options?: MapOptions);
+    destroy(): void;
+  }
+  class Marker {
+    constructor(options: MarkerOptions);
+    setMap(map: Map | null): void;
+  }
+  class LatLng {
+    constructor(lat: number, lng: number);
+  }
+  interface MapOptions {
+    center?: LatLng;
+    zoom?: number;
+    mapTypeControl?: boolean;
+    scaleControl?: boolean;
+    logoControl?: boolean;
+    mapDataControl?: boolean;
+    zoomControl?: boolean;
+  }
+  interface MarkerOptions {
+    position: LatLng;
+    map?: Map;
+  }
+}
+
+const NCP_CLIENT_ID = import.meta.env.VITE_NCP_MAP_CLIENT_ID as string;
+const MAP_CENTER = { lat: 37.5792, lng: 126.9365 };
+const MAP_ZOOM = 14;
+
+function loadNcpMaps(): Promise<void> {
+  return new Promise((resolve, reject) => {
+    if (typeof window !== 'undefined' && window.naver?.maps?.Map) {
+      resolve();
+      return;
+    }
+    const existingScript = document.querySelector('script[data-ncp-map]');
+    if (existingScript) {
+      existingScript.addEventListener('load', () => resolve());
+      existingScript.addEventListener('error', () => reject(new Error('NCP Maps SDK 로드 실패')));
+      return;
+    }
+    const script = document.createElement('script');
+    script.src = `https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=${NCP_CLIENT_ID}`;
+    script.async = true;
+    script.dataset.ncpMap = 'true';
+    script.onload = () => resolve();
+    script.onerror = () => reject(new Error('NCP Maps SDK 로드 실패'));
+    document.head.appendChild(script);
+  });
+}
+
 export default function MapPage() {
   const { isLoggedIn } = useAuthStore();
   const { guestRooms } = useGuestRoomStore();
   const navigate = useNavigate();
+  const [mapError, setMapError] = useState<string | null>(null);
 
   const [searchValue, setSearchValue] = useState('연세대학교');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
@@ -230,6 +232,9 @@ export default function MapPage() {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
   const filterRef = useRef<HTMLDivElement>(null);
+  const mapContainerRef = useRef<HTMLDivElement>(null);
+  const mapInstanceRef = useRef<naver.maps.Map | null>(null);
+  const markersRef = useRef<naver.maps.Marker[]>([]);
 
   const { data: apiRoomsData } = useRoomsList();
   const apiRooms = apiRoomsData ?? [];
@@ -241,6 +246,66 @@ export default function MapPage() {
     const raw = r as unknown as Record<string, unknown>;
     return raw['address'] || raw['addressDetail'];
   });
+
+  const showEmpty = roomsWithAddress.length === 0;
+
+  // NCP 지도 초기화
+  useEffect(() => {
+    if (showEmpty) return;
+    let cancelled = false;
+
+    // 인증 실패 콜백 등록
+    window.navermap_authFailure = () => {
+      if (!cancelled) setMapError('NCP 지도 인증에 실패했습니다. 키를 확인해주세요.');
+    };
+
+    loadNcpMaps()
+      .then(() => {
+        if (cancelled || !mapContainerRef.current) return;
+        if (mapInstanceRef.current) return;
+        const map = new window.naver.maps.Map(mapContainerRef.current, {
+          center: new window.naver.maps.LatLng(MAP_CENTER.lat, MAP_CENTER.lng),
+          zoom: MAP_ZOOM,
+          mapTypeControl: false,
+          scaleControl: false,
+          logoControl: true,
+          mapDataControl: false,
+          zoomControl: true,
+        });
+        mapInstanceRef.current = map;
+      })
+      .catch((err: Error) => {
+        if (!cancelled) setMapError(err.message);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [showEmpty]);
+
+  // 실 마커 렌더링
+  useEffect(() => {
+    if (!mapInstanceRef.current) return;
+    // 기존 마커 제거
+    markersRef.current.forEach((m) => m.setMap(null));
+    markersRef.current = [];
+
+    const roomsWithCoords = rooms.filter((r) => {
+      const raw = r as unknown as Record<string, unknown>;
+      return typeof raw['latitude'] === 'number' && typeof raw['longitude'] === 'number';
+    });
+
+    roomsWithCoords.forEach((r) => {
+      const raw = r as unknown as Record<string, unknown>;
+      const lat = raw['latitude'] as number;
+      const lng = raw['longitude'] as number;
+      const marker = new window.naver.maps.Marker({
+        position: new window.naver.maps.LatLng(lat, lng),
+        map: mapInstanceRef.current!,
+      });
+      markersRef.current.push(marker);
+    });
+  }, [rooms, mapInstanceRef.current]);
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -267,7 +332,6 @@ export default function MapPage() {
 
   const roomLimit = isLoggedIn ? ROOM_LIMIT : GUEST_ROOM_LIMIT;
   const totalRooms = rooms.length;
-  const showEmpty = roomsWithAddress.length === 0;
 
   return (
     <main className="flex-1 flex flex-col bg-white">
@@ -394,61 +458,19 @@ export default function MapPage() {
         <MapEmptyState onStart={handleStartChecklist} />
       ) : (
         <>
-          {/* TODO(E11-S02): react-naver-maps 통합 — 현재는 placeholder + 오버레이 데모 */}
+          {/* NCP 지도 본체 */}
           <div className="relative w-full h-[661px] bg-bg-gray overflow-hidden">
-            {/* 지도 placeholder grid */}
-            <div
-              className="absolute inset-0 opacity-50"
-              style={{
-                backgroundImage:
-                  'linear-gradient(#e2e2e2 1px, transparent 1px), linear-gradient(90deg, #e2e2e2 1px, transparent 1px)',
-                backgroundSize: '40px 40px',
-              }}
-              aria-hidden
-            />
-            <p className="absolute top-4 left-1/2 -translate-x-1/2 text-text-caption text-[12px] bg-white/80 px-2 py-1 rounded">
-              지도 영역 (NCP Maps 연동 대기 — E11-S02)
-            </p>
-
-            {/* 오버레이 — Figma 노드 좌표 비율로 배치 (1440 폭 기준) */}
-            {/* 룸 핀 라벨 */}
-            <PinLabel selected style={{ left: '31.7%', top: '39.5%' }}>홍제동 (컨디션 별로, 위치 굳)</PinLabel>
-            <PinLabel style={{ left: '57.3%', top: '38.3%' }}>홍제동 (컨디션 별로, 위치 굳)</PinLabel>
-            <PinLabel style={{ left: '60.9%', top: '50.7%' }}>홍제동 (컨디션 별로, 위치 굳)</PinLabel>
-
-            {/* 지하철역 (다크) */}
-            <PinLabel variant="station" style={{ left: '20.4%', top: '54.9%' }}>신촌역</PinLabel>
-            <PinLabel variant="station" style={{ left: '28.9%', top: '52.5%' }}>이대역</PinLabel>
-            <PinLabel variant="station" style={{ left: '46.4%', top: '37.7%' }}>서대문역</PinLabel>
-            <PinLabel variant="station" style={{ left: '49.9%', top: '53.5%' }}>서울역</PinLabel>
-            <PinLabel variant="station" style={{ left: '77.4%', top: '45.6%' }}>종로5가역</PinLabel>
-            <PinLabel variant="station" style={{ left: '81.4%', top: '24.7%' }}>동대입구역</PinLabel>
-
-            {/* 랜드마크 (브랜드 파랑) */}
-            <PinLabel variant="landmark" style={{ left: '22.6%', top: '35.7%' }}>연세대학교</PinLabel>
-
-            {/* 줌 컨트롤 */}
-            <div className="absolute right-[10px] top-[10px] flex flex-col gap-[10px] w-[32px]">
-              <button
-                type="button"
-                aria-label="현재 위치"
-                className="bg-white border border-text-main rounded-[4px] h-[32px] flex items-center justify-center hover:bg-bg-gray transition-colors cursor-pointer"
-              >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#232527" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <circle cx="12" cy="12" r="3" />
-                  <path d="M12 2v3M12 19v3M2 12h3M19 12h3" />
-                </svg>
-              </button>
-              <div className="bg-white border border-text-main rounded-[4px] flex flex-col items-center justify-between p-[8px] h-[58px]">
-                <button type="button" aria-label="확대" className="cursor-pointer hover:opacity-70">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="#232527"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" /></svg>
-                </button>
-                <div className="w-[16px] h-px bg-border-light" />
-                <button type="button" aria-label="축소" className="cursor-pointer hover:opacity-70">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="#232527"><path d="M19 13H5v-2h14v2z" /></svg>
-                </button>
+            {mapError ? (
+              <div className="absolute inset-0 flex items-center justify-center">
+                <p className="text-text-caption text-[14px] bg-white/90 px-4 py-2 rounded shadow">{mapError}</p>
               </div>
-            </div>
+            ) : (
+              <div
+                ref={mapContainerRef}
+                className="absolute inset-0 w-full h-full"
+                aria-label="네이버 지도"
+              />
+            )}
           </div>
 
           {/* 카드 그리드 — Desktop 3-col / Tablet 2-col / Mobile 1-col */}
