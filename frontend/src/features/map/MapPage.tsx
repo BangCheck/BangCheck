@@ -23,11 +23,16 @@ const LANDMARK_PRESETS: LandmarkSelection[] = [
   { name: '이화여자대학교', lat: 37.5620, lng: 126.9469 },
   { name: '신촌역', lat: 37.5551, lng: 126.9368 },
   { name: '이대역', lat: 37.5567, lng: 126.9462 },
-  { name: '서대문역', lat: 37.5712, lng: 126.9622 },
+  { name: '서대문역', lat: 37.5647, lng: 126.9638 },
   { name: '서울역', lat: 37.5547, lng: 126.9707 },
   { name: '종로5가역', lat: 37.5700, lng: 126.9993 },
   { name: '동대입구역', lat: 37.5595, lng: 127.0062 },
 ];
+
+// P2-A: LANDMARK_PRESETS에서 역만 파생 — 중복 상수 제거
+const FIXED_STATIONS = LANDMARK_PRESETS.filter((p) =>
+  ['신촌역', '서대문역', '이대역', '서울역', '종로5가역', '동대입구역'].includes(p.name)
+);
 
 const IconMapPin = () => (
   <svg width="82" height="82" viewBox="0 0 24 24" fill="none" stroke="#BFBFBF" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
@@ -113,14 +118,28 @@ function formatCreatedAt(raw: string): string {
   }
 }
 
+// P1: XSS 방지 — InfoWindow HTML 보간 전 escape
+function escHtml(s: string): string {
+  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+// P2-C: fmtPrice 모듈 스코프로 이동
+function fmtPrice(v: number): string {
+  return v >= 10000
+    ? `${Math.floor(v / 10000)}억${v % 10000 ? ` ${v % 10000}만` : ''}`
+    : `${v.toLocaleString()}만`;
+}
+
 // 룸 카드 (Compact + 호버 확장) — 데스크톱 그리드용
 function MapRoomCardCompact({
   room,
-  landmarkDistance,
+  roomPos,
+  landmark,
   dotColor = '#004cbd',
 }: {
   room: Room;
-  landmarkDistance: string | null;
+  roomPos: { lat: number; lng: number } | null;
+  landmark: LandmarkSelection | null;
   dotColor?: string;
 }) {
   const navigate = useNavigate();
@@ -130,6 +149,17 @@ function MapRoomCardCompact({
     : 0;
 
   const tags = [room.buildingType, room.floor, room.direction].filter(Boolean) as string[];
+
+  const landmarkDist = landmark && roomPos
+    ? `${landmark.name} ${formatDist(distanceKm(landmark.lat, landmark.lng, roomPos.lat, roomPos.lng))}`
+    : null;
+
+  const stationDists = roomPos
+    ? FIXED_STATIONS.map((s) => ({
+        name: s.name,
+        dist: formatDist(distanceKm(s.lat, s.lng, roomPos.lat, roomPos.lng)),
+      }))
+    : [];
 
   return (
     <article
@@ -153,10 +183,26 @@ function MapRoomCardCompact({
               <p className="text-[12px] text-text-mute leading-[1.3] truncate">{room.address}</p>
             </div>
           </div>
-          {landmarkDistance && (
+
+          {/* 기준점 거리 */}
+          {landmarkDist && (
             <div className="flex gap-[4px] items-center">
               <IconSolarPin size={18} color="#0a607d" />
-              <p className="font-medium text-[12px] text-brand-primary leading-[1.3]">{landmarkDistance}</p>
+              <p className="font-medium text-[12px] text-brand-primary leading-[1.3]">{landmarkDist}</p>
+            </div>
+          )}
+
+          {/* 고정 역 거리 칩 */}
+          {stationDists.length > 0 && (
+            <div className="flex flex-wrap gap-[4px]">
+              {stationDists.map((s) => (
+                <span
+                  key={s.name}
+                  className="text-[11px] text-text-caption bg-bg-gray px-[6px] py-[2px] rounded-[4px] leading-[1.4]"
+                >
+                  {s.name} {s.dist}
+                </span>
+              ))}
             </div>
           )}
         </div>
@@ -229,6 +275,11 @@ function distanceKm(lat1: number, lng1: number, lat2: number, lng2: number): num
   return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
+function formatDist(km: number): string {
+  if (km < 1) return `${Math.round(km * 1000)}m`;
+  return `${km.toFixed(1)}km`;
+}
+
 const TRANSACTION_CHIPS = ['전체', '전세', '월세', '단기'] as const;
 type TransactionChip = (typeof TRANSACTION_CHIPS)[number];
 
@@ -263,15 +314,21 @@ declare namespace naver.maps {
     constructor(element: HTMLElement | string, options?: MapOptions);
     destroy(): void;
     getCenter(): LatLng;
+    setCenter(latlng: LatLng): void;
   }
   class Marker {
     constructor(options: MarkerOptions);
     setMap(map: Map | null): void;
+    setIcon(icon: { content: string; anchor?: { x: number; y: number } }): void;
   }
   class LatLng {
     constructor(lat: number, lng: number);
     lat(): number;
     lng(): number;
+  }
+  class Polyline {
+    constructor(options: PolylineOptions);
+    setMap(map: Map | null): void;
   }
   namespace Event {
     function addListener(target: Map | Marker, eventName: string, listener: () => void): void;
@@ -303,28 +360,31 @@ declare namespace naver.maps {
     map?: Map;
     icon?: { content: string; anchor?: { x: number; y: number } };
   }
+  interface PolylineOptions {
+    path: LatLng[];
+    strokeColor?: string;
+    strokeWeight?: number;
+    strokeOpacity?: number;
+    strokeStyle?: string;
+    map?: Map;
+  }
 }
 
 const NCP_CLIENT_ID = import.meta.env.VITE_NCP_MAP_CLIENT_ID as string;
 const MAP_CENTER = { lat: 37.5651, lng: 126.9385 };
 const SEODAEMUN_BOUNDS = { latMin: 37.548, latMax: 37.613, lngMin: 126.907, lngMax: 126.985 };
+const SEOUL_BOUNDS = { latMin: 37.41, latMax: 37.70, lngMin: 126.77, lngMax: 127.18 };
 const MAP_ZOOM = 14;
+
 
 function loadNcpMaps(): Promise<void> {
   return new Promise((resolve, reject) => {
-    if (typeof window !== 'undefined' && window.naver?.maps?.Map && window.naver?.maps?.Service) {
+    if (window.naver?.maps?.Map && window.naver?.maps?.Service) {
       resolve();
       return;
     }
-    // geocoder 없는 기존 스크립트는 제거 후 재로드
-    const existingScript = document.querySelector('script[data-ncp-map]');
-    if (existingScript && !existingScript.getAttribute('src')?.includes('submodules=geocoder')) {
-      existingScript.remove();
-    } else if (existingScript) {
-      existingScript.addEventListener('load', () => resolve());
-      existingScript.addEventListener('error', () => reject(new Error('NCP Maps SDK 로드 실패')));
-      return;
-    }
+    // Service 없으면 기존 스크립트 제거 후 geocoder 포함해 재로드
+    document.querySelector('script[data-ncp-map]')?.remove();
     const script = document.createElement('script');
     script.src = `https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=${NCP_CLIENT_ID}&submodules=geocoder`;
     script.async = true;
@@ -341,6 +401,7 @@ export default function MapPage() {
   const navigate = useNavigate();
   const [mapError, setMapError] = useState<string | null>(null);
   const [mapReady, setMapReady] = useState(false);
+  const [roomPositions, setRoomPositions] = useState<Record<string, { lat: number; lng: number }>>({});
 
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [transactionType, setTransactionType] = useState<TransactionChip>('전체');
@@ -356,6 +417,8 @@ export default function MapPage() {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<naver.maps.Map | null>(null);
   const markersRef = useRef<naver.maps.Marker[]>([]);
+  const stationMarkersRef = useRef<Record<string, naver.maps.Marker>>({});
+  const polylinesRef = useRef<naver.maps.Polyline[]>([]);
   const infoWindowRef = useRef<naver.maps.InfoWindow | null>(null);
 
   const { data: apiRoomsData } = useRoomsList();
@@ -364,10 +427,11 @@ export default function MapPage() {
 
   const isGuestAtLimit = !isLoggedIn && guestRooms.length >= GUEST_ROOM_LIMIT;
 
-  const roomsWithAddress = rooms.filter((r) => {
-    const raw = r as unknown as Record<string, unknown>;
-    return raw['address'] || raw['addressDetail'];
-  });
+  // P0-2: useMemo로 감싸 매 렌더마다 새 배열 생성 방지 + r.address 직접 접근
+  const roomsWithAddress = useMemo(
+    () => rooms.filter((r) => r.address),
+    [rooms]
+  );
 
   const showEmpty = roomsWithAddress.length === 0;
 
@@ -376,7 +440,19 @@ export default function MapPage() {
     try {
       const stored = localStorage.getItem(LANDMARK_STORAGE_KEY);
       if (stored) {
-        setLandmark(JSON.parse(stored) as LandmarkSelection);
+        // P2-B: LocalStorage 검증
+        const parsed = JSON.parse(stored) as unknown;
+        if (
+          parsed &&
+          typeof parsed === 'object' &&
+          'name' in parsed && typeof (parsed as { name: unknown }).name === 'string' &&
+          'lat' in parsed && typeof (parsed as { lat: unknown }).lat === 'number' &&
+          'lng' in parsed && typeof (parsed as { lng: unknown }).lng === 'number'
+        ) {
+          setLandmark(parsed as LandmarkSelection);
+        } else {
+          localStorage.removeItem(LANDMARK_STORAGE_KEY);
+        }
       }
     } catch {
       // ignore corrupt storage
@@ -412,20 +488,94 @@ export default function MapPage() {
           const center = map.getCenter();
           const lat = center.lat();
           const lng = center.lng();
+          // 서울 범위 이탈 시 clamp
+          const clampedLat = Math.min(Math.max(lat, SEOUL_BOUNDS.latMin), SEOUL_BOUNDS.latMax);
+          const clampedLng = Math.min(Math.max(lng, SEOUL_BOUNDS.lngMin), SEOUL_BOUNDS.lngMax);
+          if (clampedLat !== lat || clampedLng !== lng) {
+            map.setCenter(new window.naver.maps.LatLng(clampedLat, clampedLng));
+            return;
+          }
           const inside =
             lat >= SEODAEMUN_BOUNDS.latMin && lat <= SEODAEMUN_BOUNDS.latMax &&
             lng >= SEODAEMUN_BOUNDS.lngMin && lng <= SEODAEMUN_BOUNDS.lngMax;
           setOutOfService(!inside);
+        });
+        // 지도 배경 클릭 시 InfoWindow 닫기
+        window.naver.maps.Event.addListener(map, 'click', () => {
+          if (infoWindowRef.current) {
+            infoWindowRef.current.close();
+            infoWindowRef.current = null;
+          }
         });
       })
       .catch((err: Error) => {
         if (!cancelled) setMapError(err.message);
       });
 
+    // P2-D: unmount 시 지도 인스턴스 정리
     return () => {
       cancelled = true;
+      mapInstanceRef.current?.destroy();
+      mapInstanceRef.current = null;
     };
   }, [showEmpty]);
+
+  // 역/랜드마크 고정 마커 초기 배치
+  useEffect(() => {
+    if (!mapReady || !mapInstanceRef.current) return;
+    Object.values(stationMarkersRef.current).forEach((m) => m.setMap(null));
+    stationMarkersRef.current = {};
+
+    LANDMARK_PRESETS.forEach((s) => {
+      const isUniv = s.name.includes('대학교');
+      const content = isUniv
+        ? `<div style="background:#0a607d;color:#fff;padding:4px 10px;border-radius:12px;font-size:11px;font-weight:700;white-space:nowrap;box-shadow:0 2px 6px rgba(10,96,125,0.35)">${escHtml(s.name)}</div>`
+        : `<div style="background:#fff;color:#444;padding:3px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1.5px solid #aaa;white-space:nowrap;box-shadow:0 1px 4px rgba(0,0,0,0.12)">${escHtml(s.name)}</div>`;
+      const marker = new window.naver.maps.Marker({
+        position: new window.naver.maps.LatLng(s.lat, s.lng),
+        map: mapInstanceRef.current!,
+        icon: { content, anchor: { x: 0, y: 0 } },
+      });
+      stationMarkersRef.current[s.name] = marker;
+    });
+  }, [mapReady]);
+
+  // 기준점 선택 시 해당 마커 강조 (사각형 스타일 + 카드와 동일 색상)
+  useEffect(() => {
+    if (!mapReady) return;
+    LANDMARK_PRESETS.forEach((s) => {
+      const marker = stationMarkersRef.current[s.name];
+      if (!marker) return;
+      const isSelected = landmark?.name === s.name;
+      const content = isSelected
+        ? `<div style="background:#0a607d;color:#fff;padding:5px 12px;border-radius:4px;font-size:12px;font-weight:700;white-space:nowrap;box-shadow:0 3px 8px rgba(10,96,125,0.5);border:2px solid #fff">📍 ${escHtml(s.name)}</div>`
+        : `<div style="background:#fff;color:#555;padding:3px 8px;border-radius:4px;font-size:11px;font-weight:600;border:1.5px solid #bbb;white-space:nowrap;box-shadow:0 1px 4px rgba(0,0,0,0.12)">${escHtml(s.name)}</div>`;
+      marker.setIcon({ content, anchor: { x: 0, y: 0 } });
+    });
+  }, [landmark, mapReady]);
+
+  // 기준점 → 방 직선 경로 polyline (CORS로 Directions API 불가 → 직선 사용)
+  useEffect(() => {
+    polylinesRef.current.forEach((p) => p.setMap(null));
+    polylinesRef.current = [];
+    if (!landmark || !mapReady || !mapInstanceRef.current) return;
+
+    Object.values(roomPositions).forEach((pos) => {
+      if (!mapInstanceRef.current) return;
+      const polyline = new window.naver.maps.Polyline({
+        path: [
+          new window.naver.maps.LatLng(landmark.lat, landmark.lng),
+          new window.naver.maps.LatLng(pos.lat, pos.lng),
+        ],
+        strokeColor: '#0a607d',
+        strokeWeight: 2,
+        strokeOpacity: 0.5,
+        strokeStyle: 'shortdash',
+        map: mapInstanceRef.current,
+      });
+      polylinesRef.current.push(polyline);
+    });
+  }, [landmark, roomPositions, mapReady]);
 
   // 실 마커 렌더링 — 주소 geocoding 후 마커 배치
   useEffect(() => {
@@ -439,24 +589,26 @@ export default function MapPage() {
     }
 
     roomsWithAddress.forEach((r) => {
-      const raw = r as unknown as Record<string, unknown>;
-      const address = raw['address'] as string;
+      // P0-1: r.address 직접 접근 (as unknown as Record 패턴 제거)
+      const address = r.address;
       if (!address) return;
       window.naver.maps.Service.geocode({ query: address }, (status, response) => {
         if (status !== window.naver.maps.Service.Status.OK) return;
         const result = response.v2.addresses[0];
         if (!result || !mapInstanceRef.current) return;
 
-        const name = raw['name'] as string ?? '';
-        const type = raw['type'] as string ?? '';
-        const deposit = raw['deposit'] as number | null;
-        const rent = raw['rent'] as number | null;
+        const posLat = parseFloat(result.y);
+        const posLng = parseFloat(result.x);
+        setRoomPositions((prev) => ({ ...prev, [r.id]: { lat: posLat, lng: posLng } }));
+
+        // P0-1: 직접 접근
+        const name = r.name ?? '';
+        const type = r.type ?? '';
+        const deposit = r.deposit ?? null;
+        const rent = r.rent ?? null;
         const id = r.id;
 
-        const fmtPrice = (v: number) => v >= 10000
-          ? `${Math.floor(v / 10000)}억${v % 10000 ? ` ${v % 10000}만` : ''}`
-          : `${v.toLocaleString()}만`;
-
+        // P2-C: 모듈 스코프 fmtPrice 사용
         const priceLine = type === '전세'
           ? `전세 ${deposit ? fmtPrice(deposit) : '-'}`
           : type === '월세'
@@ -467,30 +619,36 @@ export default function MapPage() {
 
         const bubbleLabel = priceLine || name;
         const markerIcon = {
-          content: `<div style="background:#004cbd;color:#fff;padding:7px 14px;border-radius:20px;font-size:13px;font-weight:700;white-space:nowrap;box-shadow:0 3px 10px rgba(0,76,189,0.4);cursor:pointer;letter-spacing:-0.3px">${bubbleLabel}</div>`,
+          // P1: XSS 방지
+          content: `<div style="background:#004cbd;color:#fff;padding:7px 14px;border-radius:20px;font-size:13px;font-weight:700;white-space:nowrap;box-shadow:0 3px 10px rgba(0,76,189,0.4);cursor:pointer;letter-spacing:-0.3px">${escHtml(bubbleLabel)}</div>`,
           anchor: { x: 0, y: 0 },
         };
         const marker = new window.naver.maps.Marker({
-          position: new window.naver.maps.LatLng(parseFloat(result.y), parseFloat(result.x)),
+          position: new window.naver.maps.LatLng(posLat, posLng),
           map: mapInstanceRef.current,
           icon: markerIcon,
         });
         markersRef.current.push(marker);
 
+        // P1: XSS 방지 — name, address, priceLine escape 적용
         const content = `
           <div style="padding:12px 14px;min-width:180px;max-width:240px;font-family:inherit;cursor:default">
-            <p style="font-weight:700;font-size:14px;color:#111;margin:0 0 4px">${name}</p>
-            <p style="font-size:12px;color:#888;margin:0 0 6px;line-height:1.4">${address}</p>
-            ${priceLine ? `<p style="font-size:13px;color:#004cbd;font-weight:600;margin:0 0 10px">${priceLine}</p>` : ''}
+            <p style="font-weight:700;font-size:14px;color:#111;margin:0 0 4px">${escHtml(name)}</p>
+            <p style="font-size:12px;color:#888;margin:0 0 6px;line-height:1.4">${escHtml(address)}</p>
+            ${priceLine ? `<p style="font-size:13px;color:#004cbd;font-weight:600;margin:0 0 10px">${escHtml(priceLine)}</p>` : ''}
             <a href="/checklist/${id}" style="display:inline-block;background:#111;color:#fff;font-size:12px;font-weight:600;padding:5px 12px;border-radius:4px;text-decoration:none">자세히 보기</a>
           </div>`;
 
         const iw = new window.naver.maps.InfoWindow({ content, borderWidth: 0, backgroundColor: '#fff', anchorSize: { width: 10, height: 10 } });
 
+        // P1: InfoWindow 토글 버그 수정 — close 후 비교 버그 제거
         window.naver.maps.Event.addListener(marker, 'click', () => {
-          if (infoWindowRef.current?.getMap()) infoWindowRef.current.close();
-          if (infoWindowRef.current === iw) { infoWindowRef.current = null; return; }
-          iw.open(mapInstanceRef.current!, marker);
+          const prev = infoWindowRef.current;
+          if (prev) prev.close();
+          infoWindowRef.current = null;
+          if (prev === iw) return;
+          if (!mapInstanceRef.current) return;
+          iw.open(mapInstanceRef.current, marker);
           infoWindowRef.current = iw;
         });
       });
@@ -500,47 +658,33 @@ export default function MapPage() {
   // 거래방식 필터 → useMemo
   const filtered = useMemo(() => {
     if (transactionType === '전체') return roomsWithAddress;
-    return roomsWithAddress.filter((r) => {
-      const raw = r as unknown as Record<string, unknown>;
-      const roomTypeValue = (raw['type'] ?? raw['transactionType'] ?? '') as string;
-      return TYPE_TO_CHIP[roomTypeValue] === transactionType;
-    });
+    // P0-1: r.type 직접 접근
+    return roomsWithAddress.filter((r) => TYPE_TO_CHIP[r.type] === transactionType);
   }, [roomsWithAddress, transactionType]);
 
   // 정렬 → useMemo
   const sorted = useMemo(() => {
     const list = [...filtered];
     if (sortOption === '월세 (보증금 낮은순)') {
-      list.sort((a, b) => {
-        const ra = a as unknown as Record<string, unknown>;
-        const rb = b as unknown as Record<string, unknown>;
-        return ((ra['deposit'] as number) ?? 0) - ((rb['deposit'] as number) ?? 0);
-      });
+      // P0-1: a.deposit, b.deposit 직접 접근
+      list.sort((a, b) => (a.deposit ?? 0) - (b.deposit ?? 0));
     } else if (sortOption === '월세 (보증금 높은순)') {
+      list.sort((a, b) => (b.deposit ?? 0) - (a.deposit ?? 0));
+    } else if ((sortOption === '기준점 거리 가까운순' || sortOption === '기준점 거리 먼순') && landmark) {
+      // P0-3: roomPositions state 사용해 올바른 거리 계산 + 두 케이스 통합
       list.sort((a, b) => {
-        const ra = a as unknown as Record<string, unknown>;
-        const rb = b as unknown as Record<string, unknown>;
-        return ((rb['deposit'] as number) ?? 0) - ((ra['deposit'] as number) ?? 0);
-      });
-    } else if (sortOption === '기준점 거리 가까운순' && landmark) {
-      list.sort((a, b) => {
-        const ra = a as unknown as Record<string, unknown>;
-        const rb = b as unknown as Record<string, unknown>;
-        const da = distanceKm(landmark.lat, landmark.lng, (ra['lat'] as number) ?? 0, (ra['lng'] as number) ?? 0);
-        const db = distanceKm(landmark.lat, landmark.lng, (rb['lat'] as number) ?? 0, (rb['lng'] as number) ?? 0);
-        return da - db;
-      });
-    } else if (sortOption === '기준점 거리 먼순' && landmark) {
-      list.sort((a, b) => {
-        const ra = a as unknown as Record<string, unknown>;
-        const rb = b as unknown as Record<string, unknown>;
-        const da = distanceKm(landmark.lat, landmark.lng, (ra['lat'] as number) ?? 0, (ra['lng'] as number) ?? 0);
-        const db = distanceKm(landmark.lat, landmark.lng, (rb['lat'] as number) ?? 0, (rb['lng'] as number) ?? 0);
-        return db - da;
+        const posA = roomPositions[a.id];
+        const posB = roomPositions[b.id];
+        if (!posA && !posB) return 0;
+        if (!posA) return 1;
+        if (!posB) return -1;
+        const da = distanceKm(landmark.lat, landmark.lng, posA.lat, posA.lng);
+        const db = distanceKm(landmark.lat, landmark.lng, posB.lat, posB.lng);
+        return sortOption === '기준점 거리 가까운순' ? da - db : db - da;
       });
     }
     return list;
-  }, [filtered, sortOption, landmark]);
+  }, [filtered, sortOption, landmark, roomPositions]);
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -827,11 +971,12 @@ export default function MapPage() {
           {/* 카드 그리드 — Desktop 3-col / Tablet 2-col / Mobile 1-col */}
           <div className="border-t border-[#a0a0a0] px-[16px] lg:px-[40px] pt-[20px] lg:pt-[32px] pb-[20px] lg:pb-[32px]">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[16px]">
-              {(sorted as Room[]).map((r, idx) => (
+              {sorted.map((r, idx) => (
                 <MapRoomCardCompact
                   key={r.id}
                   room={r}
-                  landmarkDistance={null}
+                  roomPos={roomPositions[r.id] ?? null}
+                  landmark={landmark}
                   dotColor={idx % 2 === 0 ? '#004cbd' : '#461a2b'}
                 />
               ))}
