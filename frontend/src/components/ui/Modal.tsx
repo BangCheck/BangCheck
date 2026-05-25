@@ -87,16 +87,16 @@ export function ConfirmModal({
           )}
         </div>
 
-        <div className="flex gap-[12px] items-center w-full">
+        <div className="flex gap-[12px] items-stretch w-full">
           <button
             onClick={onLeftClick}
-            className="flex-1 py-[12px] px-[16px] bg-bg-gray text-text-main text-[16px] font-medium rounded-[4px] hover:bg-gray-200 transition-colors active:scale-[0.98] cursor-pointer"
+            className="flex flex-1 items-center justify-center py-[12px] px-[8px] bg-bg-gray text-text-main text-[14px] font-medium rounded-[4px] hover:bg-gray-200 transition-colors active:scale-[0.98] cursor-pointer text-center leading-[1.3]"
           >
             {leftButtonText}
           </button>
           <button
             onClick={onRightClick}
-            className="py-[12px] px-[16px] w-[175px] bg-brand-primary text-white text-[16px] font-medium rounded-[4px] hover:bg-brand-primary-dark transition-colors active:scale-[0.98] cursor-pointer"
+            className="flex flex-1 items-center justify-center py-[12px] px-[8px] bg-brand-primary text-white text-[14px] font-medium rounded-[4px] hover:bg-brand-primary-dark transition-colors active:scale-[0.98] cursor-pointer text-center leading-[1.3]"
           >
             {rightButtonText}
           </button>

@@ -15,6 +15,10 @@ export interface ChecklistGuide {
   guideItems: string[];
   /** 가이드 변형: simple(텍스트만) / with-photos(예시 사진 동반) */
   variant: 'simple' | 'with-photos';
+  /** 전체 너비 메인 가이드 사진 (annotated composite) */
+  mainPhoto?: string;
+  /** 예시 사진 2장 소스 (left-crop / right-crop으로 나눠서 표시) */
+  examplesPhoto?: string;
 }
 
 /** BE itemName(한글) → 가이드 매핑 (DynamicChecklistSections에서 사용) */
@@ -100,6 +104,8 @@ export const CHECKLIST_GUIDES: Partial<Record<InteriorKey, ChecklistGuide>> = {
     hint: '벽지 모서리, 욕실 천장, 창문 주변, 싱크대 하부 확인',
     guideTitle: '곰팡이 확인 가이드',
     variant: 'with-photos',
+    mainPhoto: '/images/guides/guide-mold-main.jpg',
+    examplesPhoto: '/images/guides/guide-mold-examples.jpg',
     guideItems: [
       '가구/가전 뒤편(특히 침대 머리맡 벽) 확인 요청',
       '욕실 실리콘/타일 사이 검은 점 형태 확인',
@@ -113,6 +119,8 @@ export const CHECKLIST_GUIDES: Partial<Record<InteriorKey, ChecklistGuide>> = {
     hint: '천장 얼룩, 창문 물기, 화장실 배관 연결부 확인',
     guideTitle: '누수 확인 가이드',
     variant: 'with-photos',
+    mainPhoto: '/images/guides/guide-leak-main.jpg',
+    examplesPhoto: '/images/guides/guide-leak-examples.jpg',
     guideItems: [
       '천장 얼룩/변색 부위 확인 (특히 욕실/주방 위층 배관 통과 지점)',
       '벽 하단 페인트 벗겨짐, 벽지 들뜸 확인',
@@ -126,6 +134,7 @@ export const CHECKLIST_GUIDES: Partial<Record<InteriorKey, ChecklistGuide>> = {
     hint: '트랩 확인, 싱크대 하부/창틀/몰딩 주변/배수구 확인',
     guideTitle: '벌레 흔적 확인 가이드',
     variant: 'with-photos',
+    examplesPhoto: '/images/guides/guide-pest-examples.jpg',
     guideItems: [
       '검은 점 형태의 배설물이 있는지 확인 (싱크대 하부, 서랍 모서리)',
       '조명 커버 안에 벌레 시체가 있는지 확인',
@@ -164,6 +173,8 @@ export const CHECKLIST_GUIDES: Partial<Record<InteriorKey, ChecklistGuide>> = {
     hint: '창문 주변, 벽 하단, 욕실 외벽 결로 흔적 확인',
     guideTitle: '습기/결로 확인 가이드',
     variant: 'with-photos',
+    mainPhoto: '/images/guides/guide-humidity-main.jpg',
+    examplesPhoto: '/images/guides/guide-humidity-examples.jpg',
     guideItems: [
       '창문 주변 물자국/얼룩 (결로 발생 흔적) 확인',
       '벽 하단 곰팡이/페인트 벗겨짐 확인',

@@ -16,10 +16,10 @@ export function GuideToggleButton({
       type="button"
       onClick={onToggle}
       aria-expanded={expanded}
-      className="flex items-center gap-[10px] px-3 py-1.5 rounded-[6px] border border-[#bfbfbf] cursor-pointer hover:bg-bg-gray-soft transition-colors shrink-0"
+      className="flex items-center gap-[6px] sm:gap-[10px] px-2 sm:px-3 py-1.5 rounded-[6px] border border-[#bfbfbf] cursor-pointer hover:bg-bg-gray-soft transition-colors shrink-0"
     >
       <Icon icon="ix:user-manual" className="size-[18px] text-text-main" />
-      <span className="text-[14px] font-medium text-text-main leading-[1.3] whitespace-nowrap">
+      <span className="hidden sm:inline text-[14px] font-medium text-text-main leading-[1.3] whitespace-nowrap">
         확인 가이드 보기
       </span>
     </button>
@@ -78,15 +78,30 @@ export function GuidePanel({ guide, onClose }: { guide: ChecklistGuide; onClose:
           ))}
         </div>
 
-        {/* Photos (문제확인만) */}
-        {guide.variant === 'with-photos' && (
-          <div className="flex flex-col sm:flex-row gap-2.5 mt-4">
-            {[1, 2].map((n) => (
+        {/* Main guide photo (annotated composite) */}
+        {guide.variant === 'with-photos' && guide.mainPhoto && (
+          <div className="w-full mt-4 rounded-[6px] overflow-hidden">
+            <img src={guide.mainPhoto} alt="가이드 사진" className="w-full h-auto object-cover" />
+          </div>
+        )}
+
+        {/* Example photos — examplesPhoto가 있을 때만 표시 */}
+        {guide.variant === 'with-photos' && guide.examplesPhoto && (
+          <div className="flex flex-col sm:flex-row gap-2.5 mt-3">
+            {(['left center', 'right center'] as const).map((pos, idx) => (
               <div
-                key={n}
+                key={idx}
                 className="relative flex items-center justify-center h-[180px] sm:h-[200px] flex-1 bg-[#d9d9d9] rounded-[6px] overflow-hidden"
               >
-                <p className="text-[18px] font-medium text-white leading-[1.3]">예시 사진</p>
+                <img
+                  src={guide.examplesPhoto}
+                  alt=""
+                  aria-hidden="true"
+                  className="absolute inset-0 w-full h-full object-cover"
+                  style={{ objectPosition: pos }}
+                />
+                <div className="absolute inset-0 bg-black/20" />
+                <p className="relative text-[18px] font-medium text-white leading-[1.3] drop-shadow-sm">예시 사진</p>
               </div>
             ))}
           </div>
