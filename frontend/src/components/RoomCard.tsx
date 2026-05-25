@@ -81,9 +81,12 @@ export default function RoomCard({
     return `${YYYY}.${MM}.${DD} ${HH}:${mm}`;
   };
 
-  const formattedPrice = price || (type === '전세'
-    ? `${formatAmount(deposit)}${managementFee ? `/${managementFee}만` : ''}`
-    : `${formatAmount(deposit)}/${formatAmount(rent)}/${managementFee || 0}만`);
+  // ISSUE-GUEST-X1: deposit 숫자 있으면 항상 formatAmount 통과 (price 문자열 fallback은 deposit 없는 케이스만)
+  const formattedPrice = (typeof deposit === 'number' && deposit > 0)
+    ? (type === '전세'
+        ? `전세 ${formatAmount(deposit)}${managementFee ? `/${managementFee}만` : ''}`
+        : `${type} ${formatAmount(deposit)}/${formatAmount(rent)}/${managementFee || 0}만`)
+    : (price ?? '');
 
   const activeIssues = issues
     ? Object.entries(issues)

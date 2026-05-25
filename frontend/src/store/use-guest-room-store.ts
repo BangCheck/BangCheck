@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import type { Room, RoomType, GuestRoomRaw } from '@/types/room';
 import { GUEST_ROOM_LIMIT } from '@/lib/constants';
+import { formatAmount } from '@/lib/utils';
 
 interface GuestRoomState {
   guestRooms: Room[];
@@ -20,10 +21,15 @@ const parseMoney = (val: string | undefined): number => {
 
 const formatPrice = (raw: GuestRoomRaw): string => {
   const t = raw.basic.transactionType ?? '월세';
-  const dep = raw.basic.deposit || '0';
-  const rent = raw.basic.monthlyRent || '0';
-  const mgmt = raw.basic.isMgmtUnknown ? '' : raw.basic.managementFee;
-  return `${t} ${dep}/${rent}${mgmt ? `/${mgmt}` : ''}`;
+  // ISSUE-GUEST-X1: 만원 단위 정수 → formatAmount 통과 (1억↑→"N억 M천", 1천만↑→"N천 M백", 그 외→"N,NNN만")
+  const dep = formatAmount(parseMoney(raw.basic.deposit));
+  if (t === '전세') {
+    const mgmt = raw.basic.isMgmtUnknown ? '' : raw.basic.managementFee;
+    return `${t} ${dep}${mgmt ? `/${mgmt}만` : ''}`;
+  }
+  const rent = formatAmount(parseMoney(raw.basic.monthlyRent));
+  const mgmt = raw.basic.isMgmtUnknown ? '' : (raw.basic.managementFee || '0');
+  return `${t} ${dep}/${rent}/${mgmt}만`;
 };
 
 const buildTags = (raw: GuestRoomRaw): string[] => {
