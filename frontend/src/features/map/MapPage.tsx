@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils';
 import { ROUTES } from '@/lib/routes';
 import { GUEST_ROOM_LIMIT, ROOM_LIMIT } from '@/lib/constants';
 import { LoginRequiredModal } from '@/components/ui/Modals';
+import type { Room } from '@/types/room';
 
 const IconMapPin = () => (
   <svg width="82" height="82" viewBox="0 0 24 24" fill="none" stroke="#BFBFBF" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round">
@@ -137,49 +138,97 @@ function PinLabel({
   );
 }
 
-// 룸 카드 (Compact + Landmark) — 데스크톱 그리드용
+function formatCreatedAt(raw: string): string {
+  try {
+    const d = new Date(raw);
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+    const hh = String(d.getHours()).padStart(2, '0');
+    const min = String(d.getMinutes()).padStart(2, '0');
+    return `${yyyy}.${mm}.${dd} ${hh}:${min}`;
+  } catch {
+    return raw;
+  }
+}
+
+// 룸 카드 (Compact + 호버 확장) — 데스크톱 그리드용
 function MapRoomCardCompact({
-  registeredAt,
-  title,
-  address,
+  room,
   landmarkDistance,
   dotColor = '#004cbd',
 }: {
-  registeredAt: string;
-  title: string;
-  address: string;
-  landmarkDistance: string;
+  room: Room;
+  landmarkDistance: string | null;
   dotColor?: string;
 }) {
+  const navigate = useNavigate();
+
+  const issueCount = room.issues
+    ? Object.values(room.issues).filter(Boolean).length
+    : 0;
+
+  const tags = [room.buildingType, room.floor, room.direction].filter(Boolean) as string[];
+
   return (
-    <article className="bg-white border border-border-light rounded-[6px] shadow-[0_6px_8px_rgba(0,0,0,0.04)] flex items-center justify-between p-[24px] w-full max-w-[378px]">
-      <div className="flex flex-col gap-[12px] items-start min-w-0">
-        <div className="flex items-center gap-[12px]">
-          <span className="w-[14px] h-[14px] rounded-full shrink-0" style={{ backgroundColor: dotColor }} />
-          <div className="flex gap-[4px] items-center text-[12px] text-text-mute leading-[1.3]">
-            <span>등록일시</span>
-            <span>{registeredAt}</span>
+    <article
+      onClick={() => navigate(ROUTES.CHECKLIST_DETAIL(room.id))}
+      className="group bg-white border border-border-light rounded-[6px] shadow-[0_6px_8px_rgba(0,0,0,0.04)] flex flex-col p-[24px] w-full max-w-[378px] cursor-pointer hover:border-brand-primary hover:shadow-[0_8px_16px_rgba(0,0,0,0.10)] transition-all duration-200"
+    >
+      {/* 기본 영역 */}
+      <div className="flex items-center justify-between">
+        <div className="flex flex-col gap-[12px] items-start min-w-0 flex-1">
+          <div className="flex items-center gap-[12px]">
+            <span className="w-[14px] h-[14px] rounded-full shrink-0" style={{ backgroundColor: dotColor }} />
+            <div className="flex gap-[4px] items-center text-[12px] text-text-mute leading-[1.3]">
+              <span>등록일시</span>
+              <span>{formatCreatedAt(room.createdAt)}</span>
+            </div>
           </div>
-        </div>
-        <div className="flex flex-col gap-[4px] items-start min-w-0">
-          <p className="font-semibold text-[18px] text-text-main leading-[1.3] truncate">{title}</p>
-          <div className="flex gap-[4px] items-center">
-            <IconSiPin size={16} color="#777" />
-            <p className="text-[12px] text-text-mute leading-[1.3] truncate">{address}</p>
+          <div className="flex flex-col gap-[4px] items-start min-w-0 w-full">
+            <p className="font-semibold text-[18px] text-text-main leading-[1.3] truncate w-full">{room.name}</p>
+            <div className="flex gap-[4px] items-center w-full">
+              <IconSiPin size={16} color="#777" />
+              <p className="text-[12px] text-text-mute leading-[1.3] truncate">{room.address}</p>
+            </div>
           </div>
+          {landmarkDistance && (
+            <div className="flex gap-[4px] items-center">
+              <IconSolarPin size={18} color="#0a607d" />
+              <p className="font-medium text-[12px] text-brand-primary leading-[1.3]">{landmarkDistance}</p>
+            </div>
+          )}
         </div>
-        <div className="flex gap-[4px] items-center">
-          <IconSolarPin size={18} color="#0a607d" />
-          <p className="font-medium text-[12px] text-brand-primary leading-[1.3]">{landmarkDistance}</p>
+        <div className="shrink-0 w-[36px] h-[36px] flex items-center justify-center">
+          <IconChevronRight />
         </div>
       </div>
-      <button
-        type="button"
-        aria-label="펼치기"
-        className="shrink-0 w-[36px] h-[36px] flex items-center justify-center cursor-pointer hover:bg-bg-gray rounded transition-colors"
-      >
-        <IconChevronRight />
-      </button>
+
+      {/* 호버 확장 영역 */}
+      <div className="overflow-hidden max-h-0 group-hover:max-h-[120px] transition-all duration-200 ease-in-out">
+        <div className="pt-[12px] mt-[12px] border-t border-border-light flex flex-col gap-[6px]">
+          {tags.length > 0 && (
+            <div className="flex flex-wrap gap-[6px]">
+              {tags.map((tag) => (
+                <span
+                  key={tag}
+                  className="bg-bg-gray text-text-sub text-[11px] font-medium px-[8px] py-[3px] rounded-[4px]"
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
+          )}
+          {issueCount > 0 && (
+            <p className="text-[12px] text-[#d9534f] font-medium leading-[1.3]">
+              문제요소 {issueCount}건
+            </p>
+          )}
+          {room.memo && (
+            <p className="text-[12px] text-text-caption leading-[1.3] truncate">{room.memo}</p>
+          )}
+        </div>
+      </div>
     </article>
   );
 }
@@ -206,16 +255,6 @@ function MapEmptyState({ onStart }: { onStart: () => void }) {
   );
 }
 
-// Figma 노드 587:31796 — 데스크톱 데모용 더미 데이터
-// TODO(E11-S02): roomsWithAddress + NCP geocoding 응답 → 실제 좌표/거리로 대체
-const DEMO_ROOMS = [
-  { id: '1', registeredAt: '2026.02.13 16:00', title: '홍제동 (컨디션 별로, 위치 굳)', address: '홍제동, 홍제2동, 서대문구, 서울특별시,03', landmarkDistance: '연세대학교에서 1.7km', dotColor: '#004cbd' },
-  { id: '2', registeredAt: '2026.02.13 16:00', title: '홍제동 (컨디션 별로, 위치 굳)', address: '홍제동, 홍제2동, 서대문구, 서울특별시,03', landmarkDistance: '연세대학교에서 1.7km', dotColor: '#461a2b' },
-  { id: '3', registeredAt: '2026.02.13 16:00', title: '홍제동 (컨디션 별로, 위치 굳)', address: '홍제동, 홍제2동, 서대문구, 서울특별시,03', landmarkDistance: '연세대학교에서 1.7km', dotColor: '#004cbd' },
-  { id: '4', registeredAt: '2026.02.13 16:00', title: '홍제동 (컨디션 별로, 위치 굳)', address: '홍제동, 홍제2동, 서대문구, 서울특별시,03', landmarkDistance: '연세대학교에서 1.7km', dotColor: '#461a2b' },
-  { id: '5', registeredAt: '2026.02.13 16:00', title: '홍제동 (컨디션 별로, 위치 굳)', address: '홍제동, 홍제2동, 서대문구, 서울특별시,03', landmarkDistance: '연세대학교에서 1.7km', dotColor: '#004cbd' },
-  { id: '6', registeredAt: '2026.02.13 16:00', title: '홍제동 (컨디션 별로, 위치 굳)', address: '홍제동, 홍제2동, 서대문구, 서울특별시,03', landmarkDistance: '연세대학교에서 1.7km', dotColor: '#461a2b' },
-];
 
 const SORT_OPTIONS = ['거래방식 (정렬)', '월세 (보증금 낮은순)', '전세 (보증금 낮은순)', '단기임대 (보증금 낮은순)'];
 
@@ -454,8 +493,13 @@ export default function MapPage() {
           {/* 카드 그리드 — Desktop 3-col / Tablet 2-col / Mobile 1-col */}
           <div className="border-t border-[#a0a0a0] px-[16px] lg:px-[40px] pt-[20px] lg:pt-[32px] pb-[20px] lg:pb-[32px]">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[16px]">
-              {DEMO_ROOMS.map((r) => (
-                <MapRoomCardCompact key={r.id} {...r} />
+              {(rooms as Room[]).map((r, idx) => (
+                <MapRoomCardCompact
+                  key={r.id}
+                  room={r}
+                  landmarkDistance={null}
+                  dotColor={idx % 2 === 0 ? '#004cbd' : '#461a2b'}
+                />
               ))}
             </div>
           </div>
