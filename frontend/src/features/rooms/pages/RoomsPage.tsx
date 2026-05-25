@@ -285,12 +285,12 @@ export default function RoomsPage() {
   // EmptyState 분기 — 필터 활성 상태(전체가 아닌 거래방식 또는 비-기본 정렬)이면 EmptyStateFiltered, 그 외 EmptyStateOnboarding
   const isFilterActive = transactionType !== '전체' || sortOption !== '보증금 낮은순';
 
-  // 로그인 상태 + 방 목록 없음 → 온보딩 모달 노출
+  // ISSUE-LOGIN-X2: 첫 로그인(onboarding flag 없음) 시 모달 1회 노출. 기존 rooms.length === 0 조건은 신규 기기/기존 사용자 케이스 누락 → flag 단독 판정으로 단순화.
   useEffect(() => {
-    if (isLoggedIn && isFetched && rooms.length === 0 && !localStorage.getItem(STORAGE_KEY_ONBOARDING)) {
+    if (isLoggedIn && !localStorage.getItem(STORAGE_KEY_ONBOARDING)) {
       setIsCustomModalOpen(true);
     }
-  }, [isLoggedIn, isFetched, rooms.length]);
+  }, [isLoggedIn]);
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
