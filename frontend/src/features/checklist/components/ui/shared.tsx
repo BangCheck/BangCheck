@@ -334,6 +334,8 @@ export function TextInput({
   type = 'text',
   suffix,
   disabled,
+  maxLength,
+  max,
 }: {
   value: string;
   onChange: (v: string) => void;
@@ -341,15 +343,24 @@ export function TextInput({
   type?: string;
   suffix?: string;
   disabled?: boolean;
+  maxLength?: number;
+  max?: number;
 }) {
   return (
     <div className="relative flex items-center">
       <input
         type={type}
         value={value}
-        onChange={(e) => onChange(e.target.value)}
+        onChange={(e) => {
+          if (max !== undefined && type === 'number') {
+            const num = Number(e.target.value);
+            if (num > max) { onChange(String(max)); return; }
+          }
+          onChange(e.target.value);
+        }}
         onKeyDown={type === 'number' ? (e) => { if (e.key === '-' || e.key === 'e' || e.key === '+') e.preventDefault(); } : undefined}
         min={type === 'number' ? 0 : undefined}
+        maxLength={maxLength}
         placeholder={placeholder}
         disabled={disabled}
         className={cn(

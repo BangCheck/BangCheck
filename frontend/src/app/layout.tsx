@@ -43,7 +43,7 @@ export default function RootLayout({
       <body className="min-h-full bg-white font-['Pretendard',sans-serif]">
         <ReactQueryProvider>
           <Header />
-          <main className="flex-1 flex flex-col pb-[80px] md:pb-0">
+          <main className="flex-1 flex flex-col pb-[80px] sm:pb-0">
             {children}
           </main>
           <BottomNavigation />

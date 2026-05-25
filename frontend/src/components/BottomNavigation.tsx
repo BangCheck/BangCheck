@@ -57,7 +57,7 @@ const BottomNavigation = () => {
   ];
 
   return (
-    <nav className="touch-device-only md:hidden sticky bottom-0 w-full h-[80px] bg-white border-t border-border-light px-2 flex items-center justify-around z-50 pb-safe">
+    <nav className="touch-device-only sm:hidden sticky bottom-0 w-full h-[80px] bg-white border-t border-border-light px-2 flex items-center justify-around z-50 pb-safe">
       {navItems.map((item, idx) => {
         const isActive = pathname === item.href;
 

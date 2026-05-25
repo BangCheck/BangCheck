@@ -19,11 +19,15 @@ export default function BasicInfo({ data, onChange }: Props) {
           {/* 매물정보 + 주소 */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <FieldLabel required>매물정보</FieldLabel>
+              <div className="flex items-center justify-between mb-2">
+                <FieldLabel required>매물정보</FieldLabel>
+                <span className="text-[12px] text-text-caption">{(data.name ?? '').length}/20</span>
+              </div>
               <TextInput
                 value={data.name}
                 onChange={(v) => onChange('name', v)}
                 placeholder="예 : 역삼역 원룸 3층"
+                maxLength={20}
               />
             </div>
             <div>
@@ -54,7 +58,7 @@ export default function BasicInfo({ data, onChange }: Props) {
           {/* 보증금 */}
           <div>
             <FieldLabel>보증금 (만원)</FieldLabel>
-            <TextInput value={data.deposit} onChange={(v) => onChange('deposit', v)} placeholder="예 : 1000" suffix="만원" type="number" />
+            <TextInput value={data.deposit} onChange={(v) => onChange('deposit', v)} placeholder="예 : 1000" suffix="만원" type="number" max={999999} />
           </div>
 
           {/* 월세 — 전세 선택 시 비노출 */}
@@ -72,7 +76,7 @@ export default function BasicInfo({ data, onChange }: Props) {
                   <span className="text-[13px] text-text-main">관리비 포함</span>
                 </label>
               </div>
-              <TextInput value={data.monthlyRent} onChange={(v) => onChange('monthlyRent', v)} placeholder="예 : 50" suffix="만원" type="number" />
+              <TextInput value={data.monthlyRent} onChange={(v) => onChange('monthlyRent', v)} placeholder="예 : 50" suffix="만원" type="number" max={9999} />
             </div>
           )}
 
@@ -90,7 +94,7 @@ export default function BasicInfo({ data, onChange }: Props) {
                 <span className="text-[13px] text-text-main">모름</span>
               </label>
             </div>
-            <TextInput value={data.managementFee} onChange={(v) => onChange('managementFee', v)} placeholder="예 : 5" suffix="만원" type="number" disabled={data.isMgmtUnknown} />
+            <TextInput value={data.managementFee} onChange={(v) => onChange('managementFee', v)} placeholder="예 : 5" suffix="만원" type="number" disabled={data.isMgmtUnknown} max={9999} />
           </div>
 
           {/* 융자 여부 */}
@@ -110,6 +114,7 @@ export default function BasicInfo({ data, onChange }: Props) {
                   placeholder="예 : 5000"
                   suffix="만원"
                   type="number"
+                  max={9999}
                 />
               </div>
             )}

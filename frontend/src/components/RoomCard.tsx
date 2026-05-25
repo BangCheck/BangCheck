@@ -143,12 +143,26 @@ export default function RoomCard({
           {name}
         </h3>
 
-        {/* 3. 주소 */}
+        {/* 3. 주소 + 수정 버튼 */}
         <div className="flex items-center gap-1 text-text-mute">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
             <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zM7 9c0-2.76 2.24-5 5-5s5 2.24 5 5c0 2.88-2.88 7.19-5 9.88C9.92 16.21 7 11.85 7 9z"/>
           </svg>
-          <span className="text-[12px] font-normal truncate">{address || "주소정보없음"}</span>
+          <span className="text-[12px] font-normal truncate flex-1">{address || "주소정보없음"}</span>
+          <button
+            type="button"
+            aria-label="방 수정"
+            onClick={(e) => {
+              e.stopPropagation();
+              onClick?.(id);
+            }}
+            className="ml-1 text-text-mute hover:text-brand-primary transition-colors cursor-pointer shrink-0"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+            </svg>
+          </button>
         </div>
 
         {/* 4. 정보 칩 */}

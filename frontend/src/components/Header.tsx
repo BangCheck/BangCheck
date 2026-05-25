@@ -4,7 +4,7 @@ import { LogoWithText } from './Logo';
 import { useAuthStore } from '@/store/use-auth-store';
 import { useGuestRoomStore } from '@/store/use-guest-room-store';
 import { useRoomsList } from '@/features/rooms/hooks/use-rooms-query';
-import { LogoutConfirmModal } from './ui/Modals';
+import { LogoutConfirmModal, LoginRequiredModal } from './ui/Modals';
 import { cn } from '@/lib/utils';
 import { ROUTES } from '@/lib/routes';
 import { GUEST_ROOM_LIMIT, ROOM_LIMIT } from '@/lib/constants';
@@ -22,6 +22,7 @@ export default function Header() {
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
+  const [isLoginRequiredModalOpen, setIsLoginRequiredModalOpen] = useState(false);
 
   const isLanding = pathname === ROUTES.LANDING;
   const isRoomsPage = pathname === ROUTES.HOME;
@@ -89,7 +90,7 @@ export default function Header() {
               </svg>
               <span className="text-[12px] font-semibold text-white whitespace-nowrap">체크리스트 시작하기</span>
             </button>
-          ) : (
+          ) : isLoggedIn ? (
             <Link
               to={ROUTES.CHECKLIST_NEW}
               className="hidden sm:flex h-8 px-3 sm:px-4 py-2 rounded-[4px] bg-brand-primary items-center gap-[6px] sm:gap-[10px] hover:bg-brand-primary-dark transition-colors"
@@ -100,6 +101,18 @@ export default function Header() {
               </svg>
               <span className="text-[12px] font-semibold text-white whitespace-nowrap">체크리스트 시작하기</span>
             </Link>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setIsLoginRequiredModalOpen(true)}
+              className="hidden sm:flex h-8 px-3 sm:px-4 py-2 rounded-[4px] bg-brand-primary items-center gap-[6px] sm:gap-[10px] hover:bg-brand-primary-dark transition-colors"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="12" y1="5" x2="12" y2="19" />
+                <line x1="5" y1="12" x2="19" y2="12" />
+              </svg>
+              <span className="text-[12px] font-semibold text-white whitespace-nowrap">체크리스트 시작하기</span>
+            </button>
           ))}
 
           {isLoggedIn ? (
@@ -138,6 +151,18 @@ export default function Header() {
         isOpen={isLogoutModalOpen}
         onClose={() => setIsLogoutModalOpen(false)}
         onLogout={confirmLogout}
+      />
+      <LoginRequiredModal
+        isOpen={isLoginRequiredModalOpen}
+        onClose={() => setIsLoginRequiredModalOpen(false)}
+        onContinueAsGuest={() => {
+          setIsLoginRequiredModalOpen(false);
+          navigate(ROUTES.CHECKLIST_NEW);
+        }}
+        onLogin={() => {
+          setIsLoginRequiredModalOpen(false);
+          navigate(`${ROUTES.LOGIN}?redirect=${ROUTES.CHECKLIST_NEW}`);
+        }}
       />
     </>
   );

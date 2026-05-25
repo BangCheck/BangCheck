@@ -14,13 +14,6 @@ import Footer from '@/components/Footer';
 import BottomNavigation from '@/components/BottomNavigation';
 import { DevLoginButton } from '@/features/dev/DevLoginButton';
 
-const Placeholder = ({ name }: { name: string }) => (
-  <div className="flex flex-col items-center justify-center min-h-[60vh] gap-2 p-8">
-    <h1 className="text-text-main text-2xl font-bold">[{name}]</h1>
-    <p className="text-text-caption text-sm">E09 placeholder — 페이지는 후속 스토리에서 마이그레이션됩니다.</p>
-  </div>
-);
-
 // 글로벌 헤더가 있는 레이아웃
 const AppLayout = () => (
   <div className="min-h-screen flex flex-col">
@@ -51,7 +44,7 @@ export const Router = () => (
         <Route path="/report" element={<ReportPage />} />
         <Route path="/custom" element={<SettingsPage />} />
         <Route path="/settings" element={<Navigate to="/custom" replace />} />
-        <Route path="*" element={<Placeholder name="404" />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Route>
     </Routes>
     {/* DEV 모드 한정 — import.meta.env.DEV에서만 렌더 */}
