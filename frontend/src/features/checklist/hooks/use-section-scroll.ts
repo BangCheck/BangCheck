@@ -44,12 +44,16 @@ export function useSectionScroll() {
     return () => obs.disconnect();
   }, []);
 
-  // 활성 탭이 바뀌면 탭 버튼을 스크롤로 보이게
+  // 활성 탭이 바뀌면 탭 버튼을 가로 스크롤로 보이게 (페이지 수직 스크롤 방지)
   useEffect(() => {
     const nav = tabNavRef.current;
     if (!nav) return;
     const activeBtn = nav.querySelector(`[data-tab="${activeSection}"]`) as HTMLElement | null;
-    activeBtn?.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+    if (!activeBtn) return;
+    const navRect = nav.getBoundingClientRect();
+    const btnRect = activeBtn.getBoundingClientRect();
+    const targetLeft = nav.scrollLeft + (btnRect.left - navRect.left) - (navRect.width - btnRect.width) / 2;
+    nav.scrollTo({ left: targetLeft, behavior: 'smooth' });
   }, [activeSection]);
 
   const scrollToSection = useCallback((id: SectionId) => {
