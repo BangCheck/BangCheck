@@ -23,7 +23,10 @@ const LANDMARK_PRESETS: LandmarkSelection[] = [
   { name: '이화여자대학교', lat: 37.5620, lng: 126.9469 },
   { name: '신촌역', lat: 37.5551, lng: 126.9368 },
   { name: '이대역', lat: 37.5567, lng: 126.9462 },
+  { name: '서대문역', lat: 37.5712, lng: 126.9622 },
   { name: '서울역', lat: 37.5547, lng: 126.9707 },
+  { name: '종로5가역', lat: 37.5700, lng: 126.9993 },
+  { name: '동대입구역', lat: 37.5595, lng: 127.0062 },
 ];
 
 const IconMapPin = () => (
@@ -259,6 +262,7 @@ declare namespace naver.maps {
   class Map {
     constructor(element: HTMLElement | string, options?: MapOptions);
     destroy(): void;
+    getCenter(): LatLng;
   }
   class Marker {
     constructor(options: MarkerOptions);
@@ -266,6 +270,11 @@ declare namespace naver.maps {
   }
   class LatLng {
     constructor(lat: number, lng: number);
+    lat(): number;
+    lng(): number;
+  }
+  namespace Event {
+    function addListener(target: Map, eventName: string, listener: () => void): void;
   }
   interface MapOptions {
     center?: LatLng;
@@ -283,7 +292,8 @@ declare namespace naver.maps {
 }
 
 const NCP_CLIENT_ID = import.meta.env.VITE_NCP_MAP_CLIENT_ID as string;
-const MAP_CENTER = { lat: 37.5792, lng: 126.9365 };
+const MAP_CENTER = { lat: 37.5651, lng: 126.9385 };
+const SEODAEMUN_BOUNDS = { latMin: 37.548, latMax: 37.613, lngMin: 126.907, lngMax: 126.985 };
 const MAP_ZOOM = 14;
 
 function loadNcpMaps(): Promise<void> {
@@ -318,6 +328,7 @@ export default function MapPage() {
   const [transactionType, setTransactionType] = useState<TransactionChip>('전체');
   const [sortOption, setSortOption] = useState<SortOption>(DEFAULT_SORT);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const [outOfService, setOutOfService] = useState(false);
 
   // 기준점 state — LocalStorage 영구 저장 (key: landmark-selection)
   const [landmark, setLandmark] = useState<LandmarkSelection | null>(null);
@@ -377,6 +388,15 @@ export default function MapPage() {
           zoomControl: true,
         });
         mapInstanceRef.current = map;
+        window.naver.maps.Event.addListener(map, 'idle', () => {
+          const center = map.getCenter();
+          const lat = center.lat();
+          const lng = center.lng();
+          const inside =
+            lat >= SEODAEMUN_BOUNDS.latMin && lat <= SEODAEMUN_BOUNDS.latMax &&
+            lng >= SEODAEMUN_BOUNDS.lngMin && lng <= SEODAEMUN_BOUNDS.lngMax;
+          setOutOfService(!inside);
+        });
       })
       .catch((err: Error) => {
         if (!cancelled) setMapError(err.message);
@@ -721,11 +741,18 @@ export default function MapPage() {
                 <p className="text-text-caption text-[14px] bg-white/90 px-4 py-2 rounded shadow">{mapError}</p>
               </div>
             ) : (
-              <div
-                ref={mapContainerRef}
-                className="absolute inset-0 w-full h-full"
-                aria-label="네이버 지도"
-              />
+              <>
+                <div
+                  ref={mapContainerRef}
+                  className="absolute inset-0 w-full h-full"
+                  aria-label="네이버 지도"
+                />
+                {outOfService && (
+                  <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-50 bg-black/75 text-white text-[14px] font-semibold px-[20px] py-[10px] rounded-[8px] shadow-lg pointer-events-none whitespace-nowrap">
+                    서비스 지역이 아닙니다
+                  </div>
+                )}
+              </>
             )}
           </div>
 
