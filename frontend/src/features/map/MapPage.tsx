@@ -95,59 +95,6 @@ const IconMapTab = () => (
   </svg>
 );
 
-// 핀 라벨 — 지도 위에 떠 있는 카드/지하철역 표시
-function PinLabel({
-  variant = 'room',
-  selected = false,
-  children,
-  style,
-}: {
-  variant?: 'room' | 'station' | 'landmark';
-  selected?: boolean;
-  children: React.ReactNode;
-  style?: React.CSSProperties;
-}) {
-  if (variant === 'station') {
-    return (
-      <div
-        className="absolute bg-[#232527] px-[16px] py-[10px] rounded-[4px] flex items-center gap-[10px] shadow-[0_8px_2px_rgba(0,0,0,0.29)] whitespace-nowrap"
-        style={style}
-      >
-        <span className="font-bold text-[14px] text-white leading-[1.3]">{children}</span>
-      </div>
-    );
-  }
-  if (variant === 'landmark') {
-    return (
-      <div
-        className="absolute bg-brand-primary px-[16px] py-[10px] rounded-[4px] flex items-center gap-[10px] shadow-[0_8px_2px_rgba(0,0,0,0.29)] whitespace-nowrap"
-        style={style}
-      >
-        <IconSolarPin size={18} color="#fff" />
-        <span className="font-bold text-[14px] text-white leading-[1.3]">{children}</span>
-      </div>
-    );
-  }
-  return (
-    <div
-      className={cn(
-        'absolute bg-white px-[16px] py-[10px] rounded-[4px] flex items-center gap-[10px] shadow-[0_8px_2px_rgba(0,0,0,0.29)] whitespace-nowrap',
-        selected && 'border-2 border-[#004cbd]'
-      )}
-      style={style}
-    >
-      <span
-        className={cn(
-          'inline-block w-[10px] h-[10px] rounded-full',
-          selected ? 'bg-[#004cbd]' : 'bg-text-main'
-        )}
-      />
-      <span className={cn('text-[14px] text-text-main leading-[1.3]', selected ? 'font-bold' : 'font-semibold')}>
-        {children}
-      </span>
-    </div>
-  );
-}
 
 function formatCreatedAt(raw: string): string {
   try {
