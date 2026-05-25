@@ -274,7 +274,13 @@ declare namespace naver.maps {
     lng(): number;
   }
   namespace Event {
-    function addListener(target: Map, eventName: string, listener: () => void): void;
+    function addListener(target: Map | Marker, eventName: string, listener: () => void): void;
+  }
+  class InfoWindow {
+    constructor(options: { content: string; borderWidth?: number; backgroundColor?: string; borderColor?: string; anchorSize?: { width: number; height: number } });
+    open(map: Map, anchor: Marker | LatLng): void;
+    close(): void;
+    getMap(): Map | null;
   }
   namespace Service {
     enum Status { ERROR = 'ERROR', OK = 'OK' }
@@ -349,6 +355,7 @@ export default function MapPage() {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<naver.maps.Map | null>(null);
   const markersRef = useRef<naver.maps.Marker[]>([]);
+  const infoWindowRef = useRef<naver.maps.InfoWindow | null>(null);
 
   const { data: apiRoomsData } = useRoomsList();
   const apiRooms = apiRoomsData ?? [];
@@ -431,7 +438,8 @@ export default function MapPage() {
     }
 
     roomsWithAddress.forEach((r) => {
-      const address = (r as unknown as Record<string, unknown>)['address'] as string;
+      const raw = r as unknown as Record<string, unknown>;
+      const address = raw['address'] as string;
       if (!address) return;
       window.naver.maps.Service.geocode({ query: address }, (status, response) => {
         if (status !== window.naver.maps.Service.Status.OK) return;
@@ -442,6 +450,41 @@ export default function MapPage() {
           map: mapInstanceRef.current,
         });
         markersRef.current.push(marker);
+
+        const name = raw['name'] as string ?? '';
+        const type = raw['type'] as string ?? '';
+        const deposit = raw['deposit'] as number | null;
+        const rent = raw['rent'] as number | null;
+        const id = r.id;
+
+        const fmtPrice = (v: number) => v >= 10000
+          ? `${Math.floor(v / 10000)}억${v % 10000 ? ` ${v % 10000}만` : ''}`
+          : `${v.toLocaleString()}만`;
+
+        const priceLine = type === '전세'
+          ? `전세 ${deposit ? fmtPrice(deposit) : '-'}`
+          : type === '월세'
+          ? `월세 ${deposit ? fmtPrice(deposit) : '-'} / ${rent ? `${rent}만` : '-'}`
+          : type === '단기임대'
+          ? `단기 ${deposit ? fmtPrice(deposit) : '-'} / ${rent ? `${rent}만` : '-'}`
+          : '';
+
+        const content = `
+          <div style="padding:12px 14px;min-width:180px;max-width:240px;font-family:inherit;cursor:default">
+            <p style="font-weight:700;font-size:14px;color:#111;margin:0 0 4px">${name}</p>
+            <p style="font-size:12px;color:#888;margin:0 0 6px;line-height:1.4">${address}</p>
+            ${priceLine ? `<p style="font-size:13px;color:#004cbd;font-weight:600;margin:0 0 10px">${priceLine}</p>` : ''}
+            <a href="/checklist/${id}" style="display:inline-block;background:#111;color:#fff;font-size:12px;font-weight:600;padding:5px 12px;border-radius:4px;text-decoration:none">자세히 보기</a>
+          </div>`;
+
+        const iw = new window.naver.maps.InfoWindow({ content, borderWidth: 0, backgroundColor: '#fff', anchorSize: { width: 10, height: 10 } });
+
+        window.naver.maps.Event.addListener(marker, 'click', () => {
+          if (infoWindowRef.current?.getMap()) infoWindowRef.current.close();
+          if (infoWindowRef.current === iw) { infoWindowRef.current = null; return; }
+          iw.open(mapInstanceRef.current!, marker);
+          infoWindowRef.current = iw;
+        });
       });
     });
   }, [roomsWithAddress, mapReady]);
