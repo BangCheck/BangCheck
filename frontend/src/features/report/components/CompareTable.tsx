@@ -73,9 +73,9 @@ function CheckCell({ value }: { value: boolean | null | undefined }) {
 // ─── Table primitives ────────────────────────────────────────────
 
 const LABEL_CLS =
-  'w-[102px] shrink-0 flex items-center px-2 py-2 bg-[rgba(0,0,0,0.02)] border-r border-[rgba(0,0,0,0.06)] text-sm text-text-main leading-8';
+  'w-[80px] md:w-[102px] shrink-0 flex items-center px-2 py-2 bg-[rgba(0,0,0,0.02)] border-r border-[rgba(0,0,0,0.06)] text-sm text-text-main leading-8';
 
-const CELL_CLS = 'flex-1 min-w-[120px] flex items-center px-2 py-2 text-sm text-text-main leading-8';
+const CELL_CLS = 'flex-1 min-w-[90px] md:min-w-[120px] flex items-center px-2 py-2 text-sm text-text-main leading-8';
 
 function TableRow({ label, values }: { label: string; values: ReactNode[] }) {
   return (
@@ -120,7 +120,7 @@ function SectionCard({
         <h2 className="text-base font-bold text-text-main">{s.label}</h2>
       </div>
       <div className="overflow-x-auto rounded-lg border border-[rgba(0,0,0,0.06)] bg-white shadow-sm">
-        <div className="min-w-[560px]">{children}</div>
+        <div className="min-w-[400px] md:min-w-[560px]">{children}</div>
       </div>
     </section>
   );
