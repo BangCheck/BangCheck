@@ -30,8 +30,9 @@ export function SectionTabNav({ activeSections }: Props) {
   const scrollTo = (id: ReportSectionId) => {
     const el = document.getElementById(`section-${id}`);
     if (!el) return;
-    // sticky 헤더(56px) + 서브헤더(~64px) + 섹션탭(45px) + 여백(16px)
-    const OFFSET = 56 + 64 + 45 + 16;
+    // sticky 헤더(56px 모바일/64px 데스크톱) + 서브헤더(52px 모바일/56px 데스크톱) + 섹션탭(45px) + 여백(8px)
+    const isMd = window.innerWidth >= 768;
+    const OFFSET = (isMd ? 64 + 56 : 56 + 52) + 45 + 8;
     const top = el.getBoundingClientRect().top + window.scrollY - OFFSET;
     window.scrollTo({ top, behavior: 'smooth' });
     setActiveTab(id);
@@ -40,7 +41,7 @@ export function SectionTabNav({ activeSections }: Props) {
   const visible = REPORT_SECTIONS.filter((s) => activeSections.includes(s.id));
 
   return (
-    <nav className="bg-white border-b border-border-light sticky top-[109px] z-20">
+    <nav className="bg-white border-b border-border-light sticky top-[108px] md:top-[120px] z-20">
       <div className="max-w-[1200px] mx-auto px-4 md:px-10 overflow-x-auto scrollbar-none max-w-full">
         <div className="flex flex-wrap gap-y-1 md:flex-nowrap md:min-w-max">
           {visible.map((s) => {

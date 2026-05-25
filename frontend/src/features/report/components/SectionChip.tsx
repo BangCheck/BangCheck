@@ -10,11 +10,14 @@ type Props = {
 };
 
 export function SectionChip({ section, label, selected, disabled = false, onToggle }: Props) {
-  const tone = disabled
-    ? 'border-border-light text-text-caption bg-bg-gray cursor-not-allowed'
-    : selected
-      ? 'border-brand-primary text-brand-primary bg-white cursor-pointer'
-      : 'border-border-mute text-text-mute bg-white cursor-pointer hover:border-text-mute';
+  const tone =
+    disabled && selected
+      ? 'border-brand-primary text-brand-primary bg-white opacity-60 cursor-not-allowed'
+      : disabled
+        ? 'border-border-light text-text-caption bg-bg-gray cursor-not-allowed'
+        : selected
+          ? 'border-brand-primary text-brand-primary bg-white cursor-pointer'
+          : 'border-border-mute text-text-mute bg-white cursor-pointer hover:border-text-mute';
 
   return (
     <button

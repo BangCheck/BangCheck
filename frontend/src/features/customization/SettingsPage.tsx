@@ -29,6 +29,7 @@ export default function SettingsPage() {
     toggleUserType,
     toggleItem,
     selectAllItems,
+    deselectAllItems,
     saveCurrentSettings,
     enableItems,
     toggleItemLocally,
@@ -292,6 +293,9 @@ export default function SettingsPage() {
                   setIsAllItemsVisible(true);
                   selectAllItems();
                 }}
+                onDeselectAll={() => {
+                  deselectAllItems();
+                }}
                 isFolded={folded.s3}
                 onToggleFold={() => setFolded((f) => ({ ...f, s3: !f.s3 }))}
               />
@@ -324,11 +328,10 @@ export default function SettingsPage() {
                     </button>
                   </div>
 
-                  {/* 기본 항목 — ON: 전체 / OFF: 선택된 항목만 */}
+                  {/* 기본 항목 — 전체 체크리스트 보기 OFF 시에만 표시, ON 시 숨김 */}
                   {(() => {
-                    const baseVisibleLabels = isAllItemsVisible
-                      ? BASE_ITEM_LABELS
-                      : BASE_ITEM_LABELS.filter((l) => activeNamesSet.has(l));
+                    if (isAllItemsVisible) return null;
+                    const baseVisibleLabels = BASE_ITEM_LABELS.filter((l) => activeNamesSet.has(l));
                     if (baseVisibleLabels.length === 0) return null;
                     return (
                       <div className="pt-4 border-t border-bg-gray">

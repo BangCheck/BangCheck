@@ -77,7 +77,7 @@ export function ConfigCard({
           </div>
           <SelectAllToggle checked={allRoomsSelected} onChange={toggleAllRooms} className="shrink-0" />
         </header>
-        <div className="grid grid-cols-1 gap-2.5 md:grid-cols-2 lg:grid-cols-2">
+        <div className="grid grid-cols-1 gap-2.5 md:grid-cols-2 lg:grid-cols-2 justify-items-center">
           {rooms.map((room, idx) => {
             const isSelected = selectedRoomIds.includes(room.id);
             const disabled = isLockedSelection || (!isSelected && !canSelectMore);
@@ -98,13 +98,13 @@ export function ConfigCard({
       {/* 섹션 2: 표시할 섹션 */}
       <section className="border-b border-border-light py-6">
         <header className="mb-4 flex items-start justify-between gap-4">
-          <div className="space-y-1">
+          <div className="space-y-1 flex-1 min-w-0">
             <h3 className="text-base font-semibold leading-[1.3] text-text-main">표시할 섹션</h3>
             <p className="text-sm leading-[1.3] text-text-sub">
               선택되지 않은 섹션은 화면과 PDF에 모두 표시되지 않아요. (최소 1개)
             </p>
           </div>
-          <SelectAllToggle checked={allSectionsSelected} onChange={toggleAllSections} />
+          <SelectAllToggle checked={allSectionsSelected} onChange={toggleAllSections} className="shrink-0" />
         </header>
         <div className="flex flex-wrap gap-2">
           {REPORT_SECTIONS.map((s) => (

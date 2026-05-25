@@ -371,6 +371,13 @@ declare namespace naver.maps {
 }
 
 const NCP_CLIENT_ID = import.meta.env.VITE_NCP_MAP_CLIENT_ID as string;
+
+function stationMarkerContent(name: string, selected: boolean): string {
+  if (selected) {
+    return `<div style="background:#0a607d;color:#fff;padding:5px 12px;border-radius:4px;font-size:12px;font-weight:700;white-space:nowrap;box-shadow:0 3px 10px rgba(10,96,125,0.55);cursor:pointer;border:2px solid #fff">📍 ${escHtml(name)}</div>`;
+  }
+  return `<div style="background:#fff;color:#0a607d;padding:4px 10px;border-radius:4px;font-size:11px;font-weight:700;white-space:nowrap;border:2px solid #0a607d;box-shadow:0 2px 6px rgba(10,96,125,0.2);cursor:pointer;display:flex;align-items:center;gap:5px"><span style="width:7px;height:7px;border-radius:50%;background:#0a607d;display:inline-block;flex-shrink:0"></span>${escHtml(name)}</div>`;
+}
 const MAP_CENTER = { lat: 37.5651, lng: 126.9385 };
 const SEODAEMUN_BOUNDS = { latMin: 37.548, latMax: 37.613, lngMin: 126.907, lngMax: 126.985 };
 const SEOUL_BOUNDS = { latMin: 37.41, latMax: 37.70, lngMin: 126.77, lngMax: 127.18 };
@@ -520,37 +527,32 @@ export default function MapPage() {
     };
   }, [showEmpty]);
 
-  // 역/랜드마크 고정 마커 초기 배치
+  // 역/랜드마크 고정 마커 초기 배치 + 클릭으로 기준점 설정
   useEffect(() => {
     if (!mapReady || !mapInstanceRef.current) return;
     Object.values(stationMarkersRef.current).forEach((m) => m.setMap(null));
     stationMarkersRef.current = {};
 
     LANDMARK_PRESETS.forEach((s) => {
-      const isUniv = s.name.includes('대학교');
-      const content = isUniv
-        ? `<div style="background:#0a607d;color:#fff;padding:4px 10px;border-radius:12px;font-size:11px;font-weight:700;white-space:nowrap;box-shadow:0 2px 6px rgba(10,96,125,0.35)">${escHtml(s.name)}</div>`
-        : `<div style="background:#fff;color:#444;padding:3px 8px;border-radius:10px;font-size:11px;font-weight:600;border:1.5px solid #aaa;white-space:nowrap;box-shadow:0 1px 4px rgba(0,0,0,0.12)">${escHtml(s.name)}</div>`;
+      const content = stationMarkerContent(s.name, false);
       const marker = new window.naver.maps.Marker({
         position: new window.naver.maps.LatLng(s.lat, s.lng),
         map: mapInstanceRef.current!,
         icon: { content, anchor: { x: 0, y: 0 } },
       });
+      window.naver.maps.Event.addListener(marker, 'click', () => selectLandmark(s));
       stationMarkersRef.current[s.name] = marker;
     });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mapReady]);
 
-  // 기준점 선택 시 해당 마커 강조 (사각형 스타일 + 카드와 동일 색상)
+  // 기준점 선택 시 해당 마커 강조
   useEffect(() => {
     if (!mapReady) return;
     LANDMARK_PRESETS.forEach((s) => {
       const marker = stationMarkersRef.current[s.name];
       if (!marker) return;
-      const isSelected = landmark?.name === s.name;
-      const content = isSelected
-        ? `<div style="background:#0a607d;color:#fff;padding:5px 12px;border-radius:4px;font-size:12px;font-weight:700;white-space:nowrap;box-shadow:0 3px 8px rgba(10,96,125,0.5);border:2px solid #fff">📍 ${escHtml(s.name)}</div>`
-        : `<div style="background:#fff;color:#555;padding:3px 8px;border-radius:4px;font-size:11px;font-weight:600;border:1.5px solid #bbb;white-space:nowrap;box-shadow:0 1px 4px rgba(0,0,0,0.12)">${escHtml(s.name)}</div>`;
-      marker.setIcon({ content, anchor: { x: 0, y: 0 } });
+      marker.setIcon({ content: stationMarkerContent(s.name, landmark?.name === s.name), anchor: { x: 0, y: 0 } });
     });
   }, [landmark, mapReady]);
 

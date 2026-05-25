@@ -85,12 +85,18 @@ export const useCustomization = () => {
     [items],
   );
   const serverTypeSignature = useMemo(() => [...serverSelectedTypes].sort().join('|'), [serverSelectedTypes]);
+  // null   = 아직 한 번도 sync 안 됨 (최초 진입 또는 save 후 재sync 허용)
+  // 'FORCE' = saveCurrentSettings 후 다음 응답으로 반드시 재sync 필요
+  // 그 외   = 이미 sync됨 → 사용자 변경 중 서버 refetch로 덮어쓰기 방지
   const lastSyncedActiveRef = useRef<string | null>(null);
   const lastSyncedTypeRef = useRef<string | null>(null);
 
   useEffect(() => {
     if (items.length === 0) return;
     if (lastSyncedActiveRef.current === serverActiveSignature) return;
+    // 최초 sync 또는 save 후 재sync 시에만 서버값을 store에 반영.
+    // 이미 sync된 상태에서 사용자가 변경 중인 경우 서버 refetch로 덮어쓰지 않음.
+    if (lastSyncedActiveRef.current !== null && lastSyncedActiveRef.current !== 'FORCE') return;
     const serverActiveNames = items.filter((i) => i.isEnabled).map((i) => i.itemName);
     setActiveItemNames(serverActiveNames);
     lastSyncedActiveRef.current = serverActiveSignature;
@@ -98,6 +104,9 @@ export const useCustomization = () => {
 
   useEffect(() => {
     if (lastSyncedTypeRef.current === serverTypeSignature) return;
+    // 최초 sync 또는 save 후 재sync 시에만 서버값을 store에 반영.
+    // 이미 sync된 상태에서 사용자가 변경 중인 경우 서버 refetch로 덮어쓰지 않음.
+    if (lastSyncedTypeRef.current !== null && lastSyncedTypeRef.current !== 'FORCE') return;
     setSelectedTypeIds(serverSelectedTypes);
     lastSyncedTypeRef.current = serverTypeSignature;
   }, [serverTypeSignature, serverSelectedTypes, setSelectedTypeIds]);
@@ -156,6 +165,11 @@ export const useCustomization = () => {
     const constLabels = CHECKLIST_ITEMS.map((i) => i.label);
     const customNames = customItems.map((c) => c.itemName);
     setActiveItemNames(Array.from(new Set([...constLabels, ...customNames])));
+  }, [customItems, setActiveItemNames]);
+
+  const deselectAllItems = useCallback(() => {
+    const customNames = customItems.map((c) => c.itemName);
+    setActiveItemNames(customNames);
   }, [customItems, setActiveItemNames]);
 
   const enableItems = useCallback((labels: string[]) => {
@@ -218,9 +232,9 @@ export const useCustomization = () => {
       // 5) Reset pending + refetch all
       setPendingCustomAdds([]);
       setPendingCustomDeleteIds([]);
-      // baseline sync ref 무효화 → 다음 useEffect에서 서버값 재반영
-      lastSyncedActiveRef.current = null;
-      lastSyncedTypeRef.current = null;
+      // baseline sync ref를 FORCE로 → 다음 서버 응답 수신 시 store 재반영 허용
+      lastSyncedActiveRef.current = 'FORCE';
+      lastSyncedTypeRef.current = 'FORCE';
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: QUERY_KEYS.customization.settings }),
         queryClient.invalidateQueries({ queryKey: QUERY_KEYS.customization.allItems }),
@@ -266,6 +280,7 @@ export const useCustomization = () => {
     deselectAllTypes,
     toggleItem,
     selectAllItems,
+    deselectAllItems,
     saveCurrentSettings,
     enableItems,
     toggleItemLocally,
