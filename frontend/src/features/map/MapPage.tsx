@@ -276,6 +276,13 @@ declare namespace naver.maps {
   namespace Event {
     function addListener(target: Map, eventName: string, listener: () => void): void;
   }
+  namespace Service {
+    enum Status { ERROR = 'ERROR', OK = 'OK' }
+    interface GeocodeResponse {
+      v2: { addresses: Array<{ x: string; y: string }> };
+    }
+    function geocode(options: { query: string }, callback: (status: Status, response: GeocodeResponse) => void): void;
+  }
   interface MapOptions {
     center?: LatLng;
     zoom?: number;
@@ -309,7 +316,7 @@ function loadNcpMaps(): Promise<void> {
       return;
     }
     const script = document.createElement('script');
-    script.src = `https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=${NCP_CLIENT_ID}`;
+    script.src = `https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=${NCP_CLIENT_ID}&submodules=geocoder`;
     script.async = true;
     script.dataset.ncpMap = 'true';
     script.onload = () => resolve();
@@ -323,6 +330,7 @@ export default function MapPage() {
   const { guestRooms } = useGuestRoomStore();
   const navigate = useNavigate();
   const [mapError, setMapError] = useState<string | null>(null);
+  const [mapReady, setMapReady] = useState(false);
 
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [transactionType, setTransactionType] = useState<TransactionChip>('전체');
@@ -388,6 +396,7 @@ export default function MapPage() {
           zoomControl: true,
         });
         mapInstanceRef.current = map;
+        setMapReady(true);
         window.naver.maps.Event.addListener(map, 'idle', () => {
           const center = map.getCenter();
           const lat = center.lat();
@@ -407,29 +416,27 @@ export default function MapPage() {
     };
   }, [showEmpty]);
 
-  // 실 마커 렌더링
+  // 실 마커 렌더링 — 주소 geocoding 후 마커 배치
   useEffect(() => {
-    if (!mapInstanceRef.current) return;
-    // 기존 마커 제거
+    if (!mapReady || !mapInstanceRef.current) return;
     markersRef.current.forEach((m) => m.setMap(null));
     markersRef.current = [];
 
-    const roomsWithCoords = rooms.filter((r) => {
-      const raw = r as unknown as Record<string, unknown>;
-      return typeof raw['latitude'] === 'number' && typeof raw['longitude'] === 'number';
-    });
-
-    roomsWithCoords.forEach((r) => {
-      const raw = r as unknown as Record<string, unknown>;
-      const lat = raw['latitude'] as number;
-      const lng = raw['longitude'] as number;
-      const marker = new window.naver.maps.Marker({
-        position: new window.naver.maps.LatLng(lat, lng),
-        map: mapInstanceRef.current!,
+    roomsWithAddress.forEach((r) => {
+      const address = (r as unknown as Record<string, unknown>)['address'] as string;
+      if (!address) return;
+      window.naver.maps.Service.geocode({ query: address }, (status, response) => {
+        if (status !== window.naver.maps.Service.Status.OK) return;
+        const result = response.v2.addresses[0];
+        if (!result || !mapInstanceRef.current) return;
+        const marker = new window.naver.maps.Marker({
+          position: new window.naver.maps.LatLng(parseFloat(result.y), parseFloat(result.x)),
+          map: mapInstanceRef.current,
+        });
+        markersRef.current.push(marker);
       });
-      markersRef.current.push(marker);
     });
-  }, [rooms, mapInstanceRef.current]);
+  }, [roomsWithAddress, mapReady]);
 
   // 거래방식 필터 → useMemo
   const filtered = useMemo(() => {
