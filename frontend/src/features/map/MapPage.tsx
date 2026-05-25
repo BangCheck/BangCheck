@@ -301,6 +301,7 @@ declare namespace naver.maps {
   interface MarkerOptions {
     position: LatLng;
     map?: Map;
+    icon?: { content: string; anchor?: { x: number; y: number } };
   }
 }
 
@@ -445,11 +446,6 @@ export default function MapPage() {
         if (status !== window.naver.maps.Service.Status.OK) return;
         const result = response.v2.addresses[0];
         if (!result || !mapInstanceRef.current) return;
-        const marker = new window.naver.maps.Marker({
-          position: new window.naver.maps.LatLng(parseFloat(result.y), parseFloat(result.x)),
-          map: mapInstanceRef.current,
-        });
-        markersRef.current.push(marker);
 
         const name = raw['name'] as string ?? '';
         const type = raw['type'] as string ?? '';
@@ -468,6 +464,18 @@ export default function MapPage() {
           : type === '단기임대'
           ? `단기 ${deposit ? fmtPrice(deposit) : '-'} / ${rent ? `${rent}만` : '-'}`
           : '';
+
+        const bubbleLabel = priceLine || name;
+        const markerIcon = {
+          content: `<div style="background:#004cbd;color:#fff;padding:7px 14px;border-radius:20px;font-size:13px;font-weight:700;white-space:nowrap;box-shadow:0 3px 10px rgba(0,76,189,0.4);cursor:pointer;letter-spacing:-0.3px">${bubbleLabel}</div>`,
+          anchor: { x: 0, y: 0 },
+        };
+        const marker = new window.naver.maps.Marker({
+          position: new window.naver.maps.LatLng(parseFloat(result.y), parseFloat(result.x)),
+          map: mapInstanceRef.current,
+          icon: markerIcon,
+        });
+        markersRef.current.push(marker);
 
         const content = `
           <div style="padding:12px 14px;min-width:180px;max-width:240px;font-family:inherit;cursor:default">
@@ -793,7 +801,8 @@ export default function MapPage() {
       ) : (
         <>
           {/* NCP 지도 본체 */}
-          <div className="relative w-full h-[661px] bg-bg-gray overflow-hidden">
+          <div className="px-[16px] lg:px-[40px] py-[16px]">
+          <div className="relative w-full h-[500px] bg-bg-gray overflow-hidden rounded-[10px]">
             {mapError ? (
               <div className="absolute inset-0 flex items-center justify-center">
                 <p className="text-text-caption text-[14px] bg-white/90 px-4 py-2 rounded shadow">{mapError}</p>
@@ -812,6 +821,7 @@ export default function MapPage() {
                 )}
               </>
             )}
+          </div>
           </div>
 
           {/* 카드 그리드 — Desktop 3-col / Tablet 2-col / Mobile 1-col */}
