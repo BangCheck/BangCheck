@@ -12,6 +12,8 @@ import {
   ComparisonDisabledModal,
   CustomChecklistModal,
 } from '@/components/ui/Modals';
+import { RoomBanner } from '@/features/rooms/components/RoomBanner';
+import { useChecklistItems } from '@/features/checklist/hooks/use-checklist-items';
 
 // ─── Skeleton ────────────────────────────────────────────────────────────────
 
@@ -249,6 +251,9 @@ export default function RoomsPage() {
   const { isLoggedIn } = useAuthStore();
   const { guestRooms, deleteGuestRoom } = useGuestRoomStore();
   const navigate = useNavigate();
+  const { data: checklistItems = [] } = useChecklistItems();
+  const baseActiveCount = checklistItems.filter((i) => i.itemType !== 'CUSTOM').length;
+  const customActiveCount = checklistItems.filter((i) => i.itemType === 'CUSTOM').length;
 
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isComparisonModalOpen, setIsComparisonModalOpen] = useState(false);
@@ -480,6 +485,9 @@ export default function RoomsPage() {
         <p className="hidden sm:block text-fluid-lg font-semibold text-text-caption py-5">
           등록된 방 {rooms.length}개/{isLoggedIn ? ROOM_LIMIT : GUEST_ROOM_LIMIT}개
         </p>
+        {isLoggedIn && (
+          <RoomBanner activeCount={baseActiveCount} customCount={customActiveCount} />
+        )}
         {showEmpty ? (
           isFilterActive ? (
             <EmptyStateFiltered />
