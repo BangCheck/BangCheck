@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/store/use-auth-store';
 import { useGuestRoomStore } from '@/store/use-guest-room-store';
@@ -163,18 +163,39 @@ function MapEmptyState({ onStart }: { onStart: () => void }) {
   );
 }
 
-// Figma 노드 587:31796 — 데스크톱 데모용 더미 데이터
-// TODO(E11-S02): roomsWithAddress + NCP geocoding 응답 → 실제 좌표/거리로 대체
-const DEMO_ROOMS = [
-  { id: '1', registeredAt: '2026.02.13 16:00', title: '홍제동 (컨디션 별로, 위치 굳)', address: '홍제동, 홍제2동, 서대문구, 서울특별시,03', landmarkDistance: '연세대학교에서 1.7km', dotColor: '#004cbd' },
-  { id: '2', registeredAt: '2026.02.13 16:00', title: '홍제동 (컨디션 별로, 위치 굳)', address: '홍제동, 홍제2동, 서대문구, 서울특별시,03', landmarkDistance: '연세대학교에서 1.7km', dotColor: '#461a2b' },
-  { id: '3', registeredAt: '2026.02.13 16:00', title: '홍제동 (컨디션 별로, 위치 굳)', address: '홍제동, 홍제2동, 서대문구, 서울특별시,03', landmarkDistance: '연세대학교에서 1.7km', dotColor: '#004cbd' },
-  { id: '4', registeredAt: '2026.02.13 16:00', title: '홍제동 (컨디션 별로, 위치 굳)', address: '홍제동, 홍제2동, 서대문구, 서울특별시,03', landmarkDistance: '연세대학교에서 1.7km', dotColor: '#461a2b' },
-  { id: '5', registeredAt: '2026.02.13 16:00', title: '홍제동 (컨디션 별로, 위치 굳)', address: '홍제동, 홍제2동, 서대문구, 서울특별시,03', landmarkDistance: '연세대학교에서 1.7km', dotColor: '#004cbd' },
-  { id: '6', registeredAt: '2026.02.13 16:00', title: '홍제동 (컨디션 별로, 위치 굳)', address: '홍제동, 홍제2동, 서대문구, 서울특별시,03', landmarkDistance: '연세대학교에서 1.7km', dotColor: '#461a2b' },
-];
+// Haversine 거리 계산 (km)
+function distanceKm(lat1: number, lng1: number, lat2: number, lng2: number): number {
+  const R = 6371;
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLng = ((lng2 - lng1) * Math.PI) / 180;
+  const a =
+    Math.sin(dLat / 2) ** 2 +
+    Math.cos((lat1 * Math.PI) / 180) *
+      Math.cos((lat2 * Math.PI) / 180) *
+      Math.sin(dLng / 2) ** 2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+}
 
-const SORT_OPTIONS = ['거래방식 (정렬)', '월세 (보증금 낮은순)', '전세 (보증금 낮은순)', '단기임대 (보증금 낮은순)'];
+const TRANSACTION_CHIPS = ['전체', '전세', '월세', '단기'] as const;
+type TransactionChip = (typeof TRANSACTION_CHIPS)[number];
+
+// RoomType → chip 매핑
+const TYPE_TO_CHIP: Record<string, TransactionChip> = {
+  '전세': '전세',
+  '월세': '월세',
+  '단기임대': '단기',
+};
+
+const SORT_OPTIONS = [
+  '거래방식 (정렬)',
+  '월세 (보증금 낮은순)',
+  '월세 (보증금 높은순)',
+  '기준점 거리 가까운순',
+  '기준점 거리 먼순',
+] as const;
+type SortOption = (typeof SORT_OPTIONS)[number];
+
+const DEFAULT_SORT: SortOption = '거래방식 (정렬)';
 
 // NCP Maps SDK 타입 선언
 declare global {
@@ -244,7 +265,8 @@ export default function MapPage() {
   const [mapError, setMapError] = useState<string | null>(null);
 
   const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [sortOption, setSortOption] = useState('월세 (보증금 낮은순)');
+  const [transactionType, setTransactionType] = useState<TransactionChip>('전체');
+  const [sortOption, setSortOption] = useState<SortOption>(DEFAULT_SORT);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
   // 기준점 state — LocalStorage 영구 저장 (key: landmark-selection)
@@ -339,6 +361,51 @@ export default function MapPage() {
     });
   }, [rooms, mapInstanceRef.current]);
 
+  // 거래방식 필터 → useMemo
+  const filtered = useMemo(() => {
+    if (transactionType === '전체') return roomsWithAddress;
+    return roomsWithAddress.filter((r) => {
+      const raw = r as unknown as Record<string, unknown>;
+      const roomTypeValue = (raw['type'] ?? raw['transactionType'] ?? '') as string;
+      return TYPE_TO_CHIP[roomTypeValue] === transactionType;
+    });
+  }, [roomsWithAddress, transactionType]);
+
+  // 정렬 → useMemo
+  const sorted = useMemo(() => {
+    const list = [...filtered];
+    if (sortOption === '월세 (보증금 낮은순)') {
+      list.sort((a, b) => {
+        const ra = a as unknown as Record<string, unknown>;
+        const rb = b as unknown as Record<string, unknown>;
+        return ((ra['deposit'] as number) ?? 0) - ((rb['deposit'] as number) ?? 0);
+      });
+    } else if (sortOption === '월세 (보증금 높은순)') {
+      list.sort((a, b) => {
+        const ra = a as unknown as Record<string, unknown>;
+        const rb = b as unknown as Record<string, unknown>;
+        return ((rb['deposit'] as number) ?? 0) - ((ra['deposit'] as number) ?? 0);
+      });
+    } else if (sortOption === '기준점 거리 가까운순' && landmark) {
+      list.sort((a, b) => {
+        const ra = a as unknown as Record<string, unknown>;
+        const rb = b as unknown as Record<string, unknown>;
+        const da = distanceKm(landmark.lat, landmark.lng, (ra['lat'] as number) ?? 0, (ra['lng'] as number) ?? 0);
+        const db = distanceKm(landmark.lat, landmark.lng, (rb['lat'] as number) ?? 0, (rb['lng'] as number) ?? 0);
+        return da - db;
+      });
+    } else if (sortOption === '기준점 거리 먼순' && landmark) {
+      list.sort((a, b) => {
+        const ra = a as unknown as Record<string, unknown>;
+        const rb = b as unknown as Record<string, unknown>;
+        const da = distanceKm(landmark.lat, landmark.lng, (ra['lat'] as number) ?? 0, (ra['lng'] as number) ?? 0);
+        const db = distanceKm(landmark.lat, landmark.lng, (rb['lat'] as number) ?? 0, (rb['lng'] as number) ?? 0);
+        return db - da;
+      });
+    }
+    return list;
+  }, [filtered, sortOption, landmark]);
+
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
       if (filterRef.current && !filterRef.current.contains(e.target as Node)) {
@@ -370,11 +437,13 @@ export default function MapPage() {
   };
 
   const handleReset = () => {
-    setSortOption('거래방식 (정렬)');
+    setTransactionType('전체');
+    setSortOption(DEFAULT_SORT);
   };
 
   const roomLimit = isLoggedIn ? ROOM_LIMIT : GUEST_ROOM_LIMIT;
   const totalRooms = rooms.length;
+  const isDistanceSortDisabled = !landmark;
 
   return (
     <main className="flex-1 flex flex-col bg-white">
@@ -420,9 +489,28 @@ export default function MapPage() {
         </div>
       )}
 
-      {/* 필터 바 — Desktop: SearchFilter Applied + Sort + Reset + 비교 리포트 */}
+      {/* 필터 바 — Desktop: 거래방식 칩 + 기준점 검색 + Sort + Reset + 비교 리포트 */}
       <div className="hidden lg:flex border border-border-light items-center justify-between px-[40px] py-[12px] w-full">
-        <div className="flex gap-[10px] items-center">
+        <div className="flex gap-[10px] items-center flex-wrap">
+          {/* 거래방식 칩 — SCR-MAP-FILTER-001 */}
+          <div className="flex gap-[6px] items-center">
+            {TRANSACTION_CHIPS.map((chip) => (
+              <button
+                key={chip}
+                type="button"
+                onClick={() => setTransactionType(chip)}
+                className={cn(
+                  'h-[36px] px-[14px] rounded-[18px] text-[14px] font-semibold transition-colors cursor-pointer whitespace-nowrap',
+                  transactionType === chip
+                    ? 'bg-brand-primary text-white'
+                    : 'bg-white border border-border-mute text-text-sub hover:border-brand-primary'
+                )}
+              >
+                {chip}
+              </button>
+            ))}
+          </div>
+
           {/* 기준점 선택 버튼 / 빠른 선택 패널 */}
           <div className="relative">
             <button
@@ -456,6 +544,7 @@ export default function MapPage() {
             )}
           </div>
 
+          {/* 정렬 드롭다운 — SCR-MAP-FILTER-002 */}
           <div className="relative" ref={filterRef}>
             <button
               type="button"
@@ -468,24 +557,32 @@ export default function MapPage() {
               </span>
             </button>
             {isFilterOpen && (
-              <div className="absolute left-0 top-full mt-2 bg-white border border-border-light rounded-[6px] shadow-lg z-50 p-2 min-w-[200px]">
-                {SORT_OPTIONS.map((opt) => (
-                  <button
-                    key={opt}
-                    type="button"
-                    onClick={() => { setSortOption(opt); setIsFilterOpen(false); }}
-                    className={cn(
-                      'w-full text-left px-3 py-2 text-[14px] rounded hover:bg-bg-gray transition-colors cursor-pointer',
-                      sortOption === opt ? 'text-brand-primary font-semibold' : 'text-text-main'
-                    )}
-                  >
-                    {opt}
-                  </button>
-                ))}
+              <div className="absolute left-0 top-full mt-2 bg-white border border-border-light rounded-[6px] shadow-lg z-50 p-2 min-w-[210px]">
+                {SORT_OPTIONS.map((opt) => {
+                  const isDistanceOpt = opt === '기준점 거리 가까운순' || opt === '기준점 거리 먼순';
+                  const disabled = isDistanceOpt && isDistanceSortDisabled;
+                  return (
+                    <button
+                      key={opt}
+                      type="button"
+                      disabled={disabled}
+                      onClick={() => { setSortOption(opt); setIsFilterOpen(false); }}
+                      className={cn(
+                        'w-full text-left px-3 py-2 text-[14px] rounded transition-colors cursor-pointer',
+                        sortOption === opt ? 'text-brand-primary font-semibold' : 'text-text-main',
+                        disabled ? 'opacity-40 cursor-not-allowed' : 'hover:bg-bg-gray'
+                      )}
+                    >
+                      {opt}
+                      {disabled && <span className="ml-1 text-[11px] text-text-caption">(기준점 필요)</span>}
+                    </button>
+                  );
+                })}
               </div>
             )}
           </div>
 
+          {/* 초기화 — SCR-MAP-FILTER-003 */}
           <button
             type="button"
             onClick={handleReset}
@@ -585,9 +682,18 @@ export default function MapPage() {
           {/* 카드 그리드 — Desktop 3-col / Tablet 2-col / Mobile 1-col */}
           <div className="border-t border-[#a0a0a0] px-[16px] lg:px-[40px] pt-[20px] lg:pt-[32px] pb-[20px] lg:pb-[32px]">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[16px]">
-              {DEMO_ROOMS.map((r) => (
-                <MapRoomCardCompact key={r.id} {...r} />
-              ))}
+              {sorted.map((r) => {
+                const raw = r as unknown as Record<string, unknown>;
+                return (
+                  <MapRoomCardCompact
+                    key={r.id}
+                    registeredAt={(raw['registeredAt'] as string) ?? ''}
+                    title={(raw['title'] as string) ?? (raw['name'] as string) ?? ''}
+                    address={r.address ?? ''}
+                    landmarkDistance={(raw['landmarkDistance'] as string) ?? ''}
+                  />
+                );
+              })}
             </div>
           </div>
         </>
