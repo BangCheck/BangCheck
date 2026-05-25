@@ -17,7 +17,7 @@
 | UX-WEB-07 | 05 웹UX | CUSTOM | 나만의 항목추가 trim/dedupe + 에러 메시지 | `6387808` | [QA_웹UX.md](./QA_웹UX.md) |
 | UX-MOBILE-02 | 06 모바일UX | CHECK | GNB 로그인 버튼 1줄 (whitespace-nowrap) | `4e46711` | [QA_모바일UX.md](./QA_모바일UX.md) |
 
-**총 6건 검증 대기** — 라이브 도메인(`https://bangcheck.site/`)에서 확인 후 시트 `[x]` → `확인 여부 TRUE` 갱신.
+**총 6건 검증 대기** — 라이브 도메인(`https://bangcheck.site/`)에서 확인 후 시트 `✅` → `확인 여부 TRUE` 갱신.
 
 ---
 
@@ -53,11 +53,11 @@
 
 ## 3. 5/10 출시 차단 조건 (5건)
 
-- [ ] **우선순위 [최상] 시나리오 100% Pass** (현재 18/36 = 50%, 미실행 12 + Fail 6)
-- [ ] **Fail 0건** (현재 29건 — 발견 즉시 수정 후 Pass 전환)
-- [ ] **비로그인 핵심 흐름 100% Pass** (시트 01 진행률 56%)
-- [ ] **로그인 핵심 흐름 100% Pass** (시트 02 진행률 25%)
-- [ ] **모바일 반응형 Pass** (시트 06 UX 모바일 — Wave 1 진행 중)
+- ⬜ **우선순위 [최상] 시나리오 100% Pass** (현재 18/36 = 50%, 미실행 12 + Fail 6)
+- ⬜ **Fail 0건** (현재 29건 — 발견 즉시 수정 후 Pass 전환)
+- ⬜ **비로그인 핵심 흐름 100% Pass** (시트 01 진행률 56%)
+- ⬜ **로그인 핵심 흐름 100% Pass** (시트 02 진행률 25%)
+- ⬜ **모바일 반응형 Pass** (시트 06 UX 모바일 — Wave 1 진행 중)
 
 ---
 
@@ -119,15 +119,15 @@
 
 ### 직전 배포 검증 체크리스트
 
-- [x] `.env.production` = `https://api.bangcheck.site`
-- [x] 번들에 `localhost:8080` / `15.164.102.241` 미박힘
-- [x] CloudFront Invalidation `/*` 발급
-- [ ] 라이브 도메인 200 (`https://bangcheck.site/`) — 1~3분 후 확인
-- [ ] UX-MOBILE-02 모바일 로그인 버튼 1줄
-- [ ] UX-WEB-01 비로그인 체크리스트 카드 chip 표시
-- [ ] UX-WEB-02 거래방식 필터 "전체" 라벨
-- [ ] UX-WEB-04 저장 푸터 sticky
-- [ ] UX-WEB-05 비교 3번째 카드 disabled
+- ✅ `.env.production` = `https://api.bangcheck.site`
+- ✅ 번들에 `localhost:8080` / `15.164.102.241` 미박힘
+- ✅ CloudFront Invalidation `/*` 발급
+- ⬜ 라이브 도메인 200 (`https://bangcheck.site/`) — 1~3분 후 확인
+- ⬜ UX-MOBILE-02 모바일 로그인 버튼 1줄
+- ⬜ UX-WEB-01 비로그인 체크리스트 카드 chip 표시
+- ⬜ UX-WEB-02 거래방식 필터 "전체" 라벨
+- ⬜ UX-WEB-04 저장 푸터 sticky
+- ⬜ UX-WEB-05 비교 3번째 카드 disabled
 
 ---
 
