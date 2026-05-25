@@ -487,7 +487,7 @@ export default function MapPage() {
           scaleControl: false,
           logoControl: true,
           mapDataControl: false,
-          zoomControl: true,
+          zoomControl: false,
         });
         mapInstanceRef.current = map;
         setMapReady(true);

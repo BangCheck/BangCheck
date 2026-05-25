@@ -14,7 +14,7 @@ export function ChecklistTabNav({ tabNavRef, activeSection, onScrollTo, filter }
   return (
     <nav
       ref={tabNavRef as RefObject<HTMLElement>}
-      className="sticky top-28 md:top-32 z-30 bg-white border-b border-border-light px-4 py-2 flex gap-2 overflow-x-auto no-scrollbar"
+      className="z-30 bg-white border-b border-border-light px-4 py-2 flex gap-2 overflow-x-auto no-scrollbar"
     >
       {tabs.map(({ id, label }) => (
         <button

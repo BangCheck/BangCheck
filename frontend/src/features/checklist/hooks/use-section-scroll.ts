@@ -2,10 +2,11 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import { SECTION_TABS } from '../checklist-constants';
 import type { SectionId } from '../checklist-constants';
 
-const HEADER_OFFSET = 168; // 글로벌헤더(56px) + 페이지헤더(56px) + 탭바(48px) + 여백(8px)
+const HEADER_OFFSET = 120; // 글로벌헤더(56px) + 페이지헤더(56px) + 여백(8px)
 
 export function useSectionScroll() {
   const [activeSection, setActiveSection] = useState<SectionId>('basic');
+  const isScrollingRef = useRef(false);
 
   const sectionRefs = useRef<Record<SectionId, HTMLElement | null>>({
     basic: null, building: null, options: null, interior: null, problems: null,
@@ -19,6 +20,7 @@ export function useSectionScroll() {
 
     const obs = new IntersectionObserver(
       (entries) => {
+        if (isScrollingRef.current) return;
         entries.forEach((entry) => {
           const sid = entry.target.getAttribute('data-section-id');
           if (sid) visibilityMap[sid] = entry.intersectionRatio;
@@ -53,8 +55,11 @@ export function useSectionScroll() {
   const scrollToSection = useCallback((id: SectionId) => {
     const el = sectionRefs.current[id];
     if (!el) return;
+    setActiveSection(id);
+    isScrollingRef.current = true;
     const top = el.getBoundingClientRect().top + window.scrollY - HEADER_OFFSET;
     window.scrollTo({ top, behavior: 'smooth' });
+    setTimeout(() => { isScrollingRef.current = false; }, 1000);
   }, []);
 
   return { activeSection, sectionRefs, tabNavRef, scrollToSection };

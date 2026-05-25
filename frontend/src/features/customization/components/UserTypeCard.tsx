@@ -53,10 +53,10 @@ export const UserTypeCard: React.FC<UserTypeCardProps> = ({
         {IconComponent && <IconComponent />}
       </div>
       <div className="space-y-1 text-left">
-        <h3 className="text-fluid-base font-semibold leading-tight text-text-main whitespace-nowrap">
+        <h3 className="text-fluid-base font-semibold leading-tight text-text-main">
           {label}
         </h3>
-        <p className="text-[11px] lg:text-[12px] font-normal leading-[1.3] text-text-mute whitespace-nowrap">
+        <p className="text-[11px] lg:text-[12px] font-normal leading-[1.3] text-text-mute">
           {description}
         </p>
       </div>
