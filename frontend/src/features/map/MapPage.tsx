@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils';
 import { ROUTES } from '@/lib/routes';
 import { GUEST_ROOM_LIMIT, ROOM_LIMIT } from '@/lib/constants';
 import { LoginRequiredModal } from '@/components/ui/Modals';
+import type { Room } from '@/types/room';
 
 // 기준점 타입 — 트랙 A가 참조할 수 있도록 export
 export interface LandmarkSelection {
@@ -94,49 +95,151 @@ const IconMapTab = () => (
   </svg>
 );
 
-// 룸 카드 (Compact + Landmark) — 데스크톱 그리드용
+// 핀 라벨 — 지도 위에 떠 있는 카드/지하철역 표시
+function PinLabel({
+  variant = 'room',
+  selected = false,
+  children,
+  style,
+}: {
+  variant?: 'room' | 'station' | 'landmark';
+  selected?: boolean;
+  children: React.ReactNode;
+  style?: React.CSSProperties;
+}) {
+  if (variant === 'station') {
+    return (
+      <div
+        className="absolute bg-[#232527] px-[16px] py-[10px] rounded-[4px] flex items-center gap-[10px] shadow-[0_8px_2px_rgba(0,0,0,0.29)] whitespace-nowrap"
+        style={style}
+      >
+        <span className="font-bold text-[14px] text-white leading-[1.3]">{children}</span>
+      </div>
+    );
+  }
+  if (variant === 'landmark') {
+    return (
+      <div
+        className="absolute bg-brand-primary px-[16px] py-[10px] rounded-[4px] flex items-center gap-[10px] shadow-[0_8px_2px_rgba(0,0,0,0.29)] whitespace-nowrap"
+        style={style}
+      >
+        <IconSolarPin size={18} color="#fff" />
+        <span className="font-bold text-[14px] text-white leading-[1.3]">{children}</span>
+      </div>
+    );
+  }
+  return (
+    <div
+      className={cn(
+        'absolute bg-white px-[16px] py-[10px] rounded-[4px] flex items-center gap-[10px] shadow-[0_8px_2px_rgba(0,0,0,0.29)] whitespace-nowrap',
+        selected && 'border-2 border-[#004cbd]'
+      )}
+      style={style}
+    >
+      <span
+        className={cn(
+          'inline-block w-[10px] h-[10px] rounded-full',
+          selected ? 'bg-[#004cbd]' : 'bg-text-main'
+        )}
+      />
+      <span className={cn('text-[14px] text-text-main leading-[1.3]', selected ? 'font-bold' : 'font-semibold')}>
+        {children}
+      </span>
+    </div>
+  );
+}
+
+function formatCreatedAt(raw: string): string {
+  try {
+    const d = new Date(raw);
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, '0');
+    const dd = String(d.getDate()).padStart(2, '0');
+    const hh = String(d.getHours()).padStart(2, '0');
+    const min = String(d.getMinutes()).padStart(2, '0');
+    return `${yyyy}.${mm}.${dd} ${hh}:${min}`;
+  } catch {
+    return raw;
+  }
+}
+
+// 룸 카드 (Compact + 호버 확장) — 데스크톱 그리드용
 function MapRoomCardCompact({
-  registeredAt,
-  title,
-  address,
+  room,
   landmarkDistance,
   dotColor = '#004cbd',
 }: {
-  registeredAt: string;
-  title: string;
-  address: string;
-  landmarkDistance: string;
+  room: Room;
+  landmarkDistance: string | null;
   dotColor?: string;
 }) {
+  const navigate = useNavigate();
+
+  const issueCount = room.issues
+    ? Object.values(room.issues).filter(Boolean).length
+    : 0;
+
+  const tags = [room.buildingType, room.floor, room.direction].filter(Boolean) as string[];
+
   return (
-    <article className="bg-white border border-border-light rounded-[6px] shadow-[0_6px_8px_rgba(0,0,0,0.04)] flex items-center justify-between p-[24px] w-full max-w-[378px]">
-      <div className="flex flex-col gap-[12px] items-start min-w-0">
-        <div className="flex items-center gap-[12px]">
-          <span className="w-[14px] h-[14px] rounded-full shrink-0" style={{ backgroundColor: dotColor }} />
-          <div className="flex gap-[4px] items-center text-[12px] text-text-mute leading-[1.3]">
-            <span>등록일시</span>
-            <span>{registeredAt}</span>
+    <article
+      onClick={() => navigate(ROUTES.CHECKLIST_DETAIL(room.id))}
+      className="group bg-white border border-border-light rounded-[6px] shadow-[0_6px_8px_rgba(0,0,0,0.04)] flex flex-col p-[24px] w-full max-w-[378px] cursor-pointer hover:border-brand-primary hover:shadow-[0_8px_16px_rgba(0,0,0,0.10)] transition-all duration-200"
+    >
+      {/* 기본 영역 */}
+      <div className="flex items-center justify-between">
+        <div className="flex flex-col gap-[12px] items-start min-w-0 flex-1">
+          <div className="flex items-center gap-[12px]">
+            <span className="w-[14px] h-[14px] rounded-full shrink-0" style={{ backgroundColor: dotColor }} />
+            <div className="flex gap-[4px] items-center text-[12px] text-text-mute leading-[1.3]">
+              <span>등록일시</span>
+              <span>{formatCreatedAt(room.createdAt)}</span>
+            </div>
           </div>
-        </div>
-        <div className="flex flex-col gap-[4px] items-start min-w-0">
-          <p className="font-semibold text-[18px] text-text-main leading-[1.3] truncate">{title}</p>
-          <div className="flex gap-[4px] items-center">
-            <IconSiPin size={16} color="#777" />
-            <p className="text-[12px] text-text-mute leading-[1.3] truncate">{address}</p>
+          <div className="flex flex-col gap-[4px] items-start min-w-0 w-full">
+            <p className="font-semibold text-[18px] text-text-main leading-[1.3] truncate w-full">{room.name}</p>
+            <div className="flex gap-[4px] items-center w-full">
+              <IconSiPin size={16} color="#777" />
+              <p className="text-[12px] text-text-mute leading-[1.3] truncate">{room.address}</p>
+            </div>
           </div>
+          {landmarkDistance && (
+            <div className="flex gap-[4px] items-center">
+              <IconSolarPin size={18} color="#0a607d" />
+              <p className="font-medium text-[12px] text-brand-primary leading-[1.3]">{landmarkDistance}</p>
+            </div>
+          )}
         </div>
-        <div className="flex gap-[4px] items-center">
-          <IconSolarPin size={18} color="#0a607d" />
-          <p className="font-medium text-[12px] text-brand-primary leading-[1.3]">{landmarkDistance}</p>
+        <div className="shrink-0 w-[36px] h-[36px] flex items-center justify-center">
+          <IconChevronRight />
         </div>
       </div>
-      <button
-        type="button"
-        aria-label="펼치기"
-        className="shrink-0 w-[36px] h-[36px] flex items-center justify-center cursor-pointer hover:bg-bg-gray rounded transition-colors"
-      >
-        <IconChevronRight />
-      </button>
+
+      {/* 호버 확장 영역 */}
+      <div className="overflow-hidden max-h-0 group-hover:max-h-[120px] transition-all duration-200 ease-in-out">
+        <div className="pt-[12px] mt-[12px] border-t border-border-light flex flex-col gap-[6px]">
+          {tags.length > 0 && (
+            <div className="flex flex-wrap gap-[6px]">
+              {tags.map((tag) => (
+                <span
+                  key={tag}
+                  className="bg-bg-gray text-text-sub text-[11px] font-medium px-[8px] py-[3px] rounded-[4px]"
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
+          )}
+          {issueCount > 0 && (
+            <p className="text-[12px] text-[#d9534f] font-medium leading-[1.3]">
+              문제요소 {issueCount}건
+            </p>
+          )}
+          {room.memo && (
+            <p className="text-[12px] text-text-caption leading-[1.3] truncate">{room.memo}</p>
+          )}
+        </div>
+      </div>
     </article>
   );
 }
@@ -682,18 +785,14 @@ export default function MapPage() {
           {/* 카드 그리드 — Desktop 3-col / Tablet 2-col / Mobile 1-col */}
           <div className="border-t border-[#a0a0a0] px-[16px] lg:px-[40px] pt-[20px] lg:pt-[32px] pb-[20px] lg:pb-[32px]">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[16px]">
-              {sorted.map((r) => {
-                const raw = r as unknown as Record<string, unknown>;
-                return (
-                  <MapRoomCardCompact
-                    key={r.id}
-                    registeredAt={(raw['registeredAt'] as string) ?? ''}
-                    title={(raw['title'] as string) ?? (raw['name'] as string) ?? ''}
-                    address={r.address ?? ''}
-                    landmarkDistance={(raw['landmarkDistance'] as string) ?? ''}
-                  />
-                );
-              })}
+              {(sorted as Room[]).map((r, idx) => (
+                <MapRoomCardCompact
+                  key={r.id}
+                  room={r}
+                  landmarkDistance={null}
+                  dotColor={idx % 2 === 0 ? '#004cbd' : '#461a2b'}
+                />
+              ))}
             </div>
           </div>
         </>
