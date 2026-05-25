@@ -69,13 +69,13 @@ export function ConfigCard({
       {/* 섹션 1: 비교할 방 선택 */}
       <section className="border-b border-border-light pb-6">
         <header className="mb-4 flex items-start justify-between gap-4">
-          <div className="space-y-1">
+          <div className="space-y-1 flex-1 min-w-0">
             <h3 className="text-base font-semibold leading-[1.3] text-text-main">비교할 방 선택</h3>
             <p className="text-sm leading-[1.3] text-text-sub">
               최소 2개는 선택되어야 해요. 선택 해제 시 해당 방은 비교 대상에서 제외됩니다.
             </p>
           </div>
-          <SelectAllToggle checked={allRoomsSelected} onChange={toggleAllRooms} />
+          <SelectAllToggle checked={allRoomsSelected} onChange={toggleAllRooms} className="shrink-0" />
         </header>
         <div className="grid grid-cols-1 gap-2.5 md:grid-cols-2 lg:grid-cols-2">
           {rooms.map((room, idx) => {

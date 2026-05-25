@@ -118,7 +118,7 @@ export default function ReportPage() {
     <div className="flex-1 bg-bg-footer min-h-screen">
       {/* ── 서브 헤더 ── */}
       <div className="bg-white border-b border-border-light sticky top-14 md:top-16 z-30">
-        <div className="max-w-screen-xl mx-auto px-4 md:px-10 py-4 flex items-center gap-4">
+        <div className="max-w-screen-xl mx-auto px-4 md:px-10 py-3 md:py-4 flex items-center gap-2 md:gap-4">
           <button
             type="button"
             onClick={() => navigate(ROUTES.HOME)}
@@ -129,27 +129,27 @@ export default function ReportPage() {
           </button>
           <h1 className="text-fluid-4xl font-bold text-text-main">비교 리포트</h1>
           <FilterToggle open={isConfigOpen} onToggle={() => setIsConfigOpen((v) => !v)} />
-          <span className="text-fluid-md text-text-mute">
+          <span className="hidden sm:inline text-fluid-md text-text-mute">
             {selectedRooms.length}개 방 · {activeSections.length}개 섹션
           </span>
-          <div className="ml-auto flex items-center gap-3">
+          <div className="ml-auto flex items-center gap-2">
             <button
               type="button"
               aria-label="공유"
-              className="inline-flex h-8 items-center gap-2.5 rounded-[4px] border border-border-light px-4 py-2 text-xs font-semibold text-text-main hover:bg-bg-gray"
+              className="inline-flex h-8 items-center gap-1 sm:gap-2.5 rounded-[4px] border border-border-light px-2 sm:px-4 py-2 text-xs font-semibold text-text-main hover:bg-bg-gray"
             >
               <Icon icon="material-symbols:share-outline" width={16} height={16} />
-              <span>공유</span>
+              <span className="hidden sm:inline">공유</span>
             </button>
             {/* TODO(E06-S06): html2canvas + jsPDF 교체 예정 */}
             <button
               type="button"
               aria-label="PDF 다운로드"
               onClick={() => isLoggedIn ? window.print() : setPdfLoginModalOpen(true)}
-              className="inline-flex h-8 items-center gap-2.5 rounded-[4px] border border-border-light px-4 py-2 text-xs font-semibold text-text-main hover:bg-bg-gray"
+              className="inline-flex h-8 items-center gap-1 sm:gap-2.5 rounded-[4px] border border-border-light px-2 sm:px-4 py-2 text-xs font-semibold text-text-main hover:bg-bg-gray"
             >
               <Icon icon="material-symbols:download-rounded" width={16} height={16} />
-              <span>PDF 다운로드</span>
+              <span className="hidden sm:inline">PDF 다운로드</span>
             </button>
           </div>
         </div>

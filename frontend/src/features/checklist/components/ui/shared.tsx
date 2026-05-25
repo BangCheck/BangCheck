@@ -128,19 +128,19 @@ export function RatingCards({
               type="button"
               onClick={() => onChange(active ? null : val)}
               className={cn(
-                'flex items-center gap-2 lg:gap-3 p-3 lg:p-4 rounded-[6px] transition-all cursor-pointer shadow-[0px_6px_8px_rgba(0,0,0,0.04)]',
+                'flex items-center gap-1 sm:gap-2 lg:gap-3 p-2 sm:p-3 lg:p-4 rounded-[6px] transition-all cursor-pointer shadow-[0px_6px_8px_rgba(0,0,0,0.04)]',
                 active
                   ? `${cfg.activeBg} border-2 ${cfg.activeBorder}`
                   : 'bg-white border border-border-light hover:border-border-mute',
               )}
             >
-              <span className="flex items-center justify-center size-9 shrink-0">
+              <span className="flex items-center justify-center size-6 sm:size-9 shrink-0">
                 <Icon
                   icon={cfg.icon}
-                  className={cn('size-6', active ? cfg.activeIcon : 'text-text-caption')}
+                  className={cn('size-5 sm:size-6', active ? cfg.activeIcon : 'text-text-caption')}
                 />
               </span>
-              <span className="text-fluid-base font-semibold text-text-main whitespace-nowrap">
+              <span className="text-[12px] sm:text-fluid-base font-semibold text-text-main whitespace-nowrap">
                 {val}
               </span>
             </button>
@@ -282,16 +282,16 @@ export function DynamicOptionCards({
               type="button"
               onClick={() => onChange(active ? null : opt)}
               className={cn(
-                'flex items-center gap-2 lg:gap-3 p-3 lg:p-4 rounded-[6px] transition-all cursor-pointer shadow-[0px_6px_8px_rgba(0,0,0,0.04)]',
+                'flex items-center gap-1 sm:gap-2 lg:gap-3 p-2 sm:p-3 lg:p-4 rounded-[6px] transition-all cursor-pointer shadow-[0px_6px_8px_rgba(0,0,0,0.04)]',
                 active
                   ? `${cfg.bg} border-2 ${cfg.border}`
                   : 'bg-white border border-border-light hover:border-border-mute',
               )}
             >
-              <span className="flex items-center justify-center size-9 shrink-0">
-                <Icon icon={icon} className={cn('size-6', active ? cfg.icon : 'text-text-caption')} />
+              <span className="flex items-center justify-center size-6 sm:size-9 shrink-0">
+                <Icon icon={icon} className={cn('size-5 sm:size-6', active ? cfg.icon : 'text-text-caption')} />
               </span>
-              <span className="text-fluid-base font-semibold text-text-main whitespace-nowrap">{opt}</span>
+              <span className="text-[12px] sm:text-fluid-base font-semibold text-text-main whitespace-nowrap">{opt}</span>
             </button>
           );
         })}
