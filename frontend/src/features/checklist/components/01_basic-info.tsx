@@ -1,4 +1,5 @@
 import { SelectCard, EmojiCard, SectionHeader, FieldLabel, TextInput } from './ui/shared';
+import AddressSearchInput from './ui/AddressSearchInput';
 import type { BasicInfoData } from '@/types';
 
 export type { BasicInfoData };
@@ -27,7 +28,7 @@ export default function BasicInfo({ data, onChange }: Props) {
             </div>
             <div>
               <FieldLabel>주소 (지도 표시용)</FieldLabel>
-              <TextInput
+              <AddressSearchInput
                 value={data.address}
                 onChange={(v) => onChange('address', v)}
                 placeholder="예 : 가천대학교, 신촌역.."

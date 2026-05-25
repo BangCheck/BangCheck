@@ -3,7 +3,7 @@
 > Source: `raw-csv/04-issues-login.csv` | [← Dashboard](./Dashboard.md)
 > 본 표는 CSV에서 핵심 컬럼만 추출. 전체 정보는 원본 CSV 참조. 업데이트 컬럼은 작업자 수기 체크용.
 
-총 25건 | 상태 분포: 확인 TRUE 13 / FALSE 12
+총 25건 | 상태 분포: 확인 TRUE 18 / FALSE 7
 
 | 화면명 | 필드 | ISSUE 요지 | 확인 여부 | 업데이트 |
 |---|---|---|---|---|

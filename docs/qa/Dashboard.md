@@ -1,6 +1,6 @@
 # QA Dashboard — 방체크 MVP QA v2.1.2
 
-> **사이클**: QA v2.1.2 (Google Sheet → CSV 6종) | **출시 목표**: 5/10 → D+8 phased GO 검토 | **마지막 갱신**: 2026-05-23
+> **사이클**: QA v2.1.2 (Google Sheet → CSV 6종) | **출시 목표**: 5/10 → D+8 phased GO 검토 | **마지막 갱신**: 2026-05-26
 
 ---
 
@@ -15,9 +15,13 @@
 | UX-WEB-04 | 05 웹UX | CHECK | 저장/수정완료 푸터 sticky + safe-area | `f0014ee` | [QA_웹UX.md](./QA_웹UX.md) |
 | UX-WEB-05 | 05 웹UX | COMPARE | 비교 방 선택 3번째 카드 disabled | (코드 무변경) | [QA_웹UX.md](./QA_웹UX.md) |
 | UX-WEB-07 | 05 웹UX | CUSTOM | 나만의 항목추가 trim/dedupe + 에러 메시지 | `6387808` | [QA_웹UX.md](./QA_웹UX.md) |
+| UX-WEB-08 | 05 웹UX | CUSTOM | 전체 체크리스트 보기 토글 작동 (OFF=선택만 표시) | `ff73266` | [QA_웹UX.md](./QA_웹UX.md) |
 | UX-MOBILE-02 | 06 모바일UX | CHECK | GNB 로그인 버튼 1줄 (whitespace-nowrap) | `4e46711` | [QA_모바일UX.md](./QA_모바일UX.md) |
+| CUST-01 | 04 로그인이슈 | CUSTOM | 맞춤 설정 완료 버튼 BE 일괄 저장 + 이탈 가드 | `9909493` | [QA_로그인_이슈.md](./QA_로그인_이슈.md) |
+| CUST-02 | 04 로그인이슈 | CUSTOM | STEP1 첫자취형 44개 매핑 / STEP2 카운트 / STEP3 기본항목 토글 | `70f4a5e` | [QA_로그인_이슈.md](./QA_로그인_이슈.md) |
+| CUST-03 | 04 로그인이슈 | CUSTOM | 모바일 정합 — 배너/유형카드 가로 레이아웃 | `cb13531` | [QA_로그인_이슈.md](./QA_로그인_이슈.md) |
 
-**총 6건 검증 대기** — 라이브 도메인(`https://bangcheck.site/`)에서 확인 후 시트 `✅` → `확인 여부 TRUE` 갱신.
+**총 10건 검증 대기** — 라이브 도메인(`https://bangcheck.site/`)에서 확인 후 시트 `✅` → `확인 여부 TRUE` 갱신.
 
 ---
 
@@ -34,8 +38,8 @@
 
 | 시트 | 본 사이클 등재 | 상태 | 본체 파일 |
 |---|---:|---|---|
-| 03 비로그인 이슈 | (Wave 2) | TBD | [QA_비로그인_이슈.md](./QA_비로그인_이슈.md) |
-| 04 로그인 이슈 | (Wave 2) | TBD | [QA_로그인_이슈.md](./QA_로그인_이슈.md) |
+| 03 비로그인 이슈 | (Wave 2) | Wave 2 진행 중 (TRUE 33/49) | [QA_비로그인_이슈.md](./QA_비로그인_이슈.md) |
+| 04 로그인 이슈 | (Wave 2) | Wave 2 진행 중 (TRUE 18/25) | [QA_로그인_이슈.md](./QA_로그인_이슈.md) |
 | **05 UX 웹** | **8** | **Wave 1 진행 중** | [QA_웹UX.md](./QA_웹UX.md) |
 | **06 UX 모바일** | **2** | **Wave 1 진행 중** | [QA_모바일UX.md](./QA_모바일UX.md) |
 
@@ -76,13 +80,13 @@
 
 > 본 Wave는 시트 5·6의 사용성 이슈 10건만 다룸. 시나리오 Fail 29건 해소는 Wave 3에서.
 
-**진행 카운터** (2026-05-23 밤 배포 후)
+**진행 카운터** (2026-05-26 기준)
 
 | open | reproduce | verify | diagnosed | in-progress | blocked-spec | review | closed |
 |---:|---:|---:|---:|---:|---:|---:|---:|
-| 0 | 2 | 0 | 0 | 0 | 2 | **5** | 0 |
+| 0 | 0 | 0 | 0 | 0 | 2 | **7** | 0 |
 
-### review (검증자 사이클) — 5건
+### review (검증자 사이클) — 7건
 
 | 코드 | 시트 | 화면 | priority | main SHA | 검증자 |
 |---|---|---|---|---|---|
@@ -90,15 +94,9 @@
 | UX-WEB-02 | 05 | HOME | 높음 | `e1e6499` | YE |
 | UX-WEB-04 | 05 | CHECK | 높음 | `f0014ee` | DG |
 | UX-WEB-05 | 05 | COMPARE | 높음 | (변경 0) | DG |
+| UX-WEB-07 | 05 | CUSTOM | 높음 | `6387808` | — |
+| UX-WEB-08 | 05 | CUSTOM | 높음 | `ff73266` | — |
 | UX-MOBILE-02 | 06 | CHECK | **최상** | `4e46711` | JY |
-
-### 잔여 — 3건
-
-| 코드 | 시트 | 화면 | priority | 상태 | 차단 |
-|---|---|---|---|---|---|
-| UX-WEB-07 | 05 | CUSTOM | 높음 (최상 승격 검토) | reproduce-needed | 실측 재현 |
-| UX-WEB-08 | 05 | CUSTOM | 높음 | reproduce-needed | UX 시맨틱 PM 결정 |
-| UX-MOBILE-01 | 06 | HOME | **최상** | verify-needed | PR #191 시각 회귀 |
 
 ### blocked-spec — 2건
 
@@ -144,4 +142,4 @@
 
 ---
 
-_Last updated: 2026-05-23_
+_Last updated: 2026-05-26_
