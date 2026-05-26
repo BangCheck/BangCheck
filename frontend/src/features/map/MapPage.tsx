@@ -3,11 +3,13 @@ import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/store/use-auth-store';
 import { useGuestRoomStore } from '@/store/use-guest-room-store';
 import { useRoomsList } from '@/features/rooms/hooks/use-rooms-query';
+import { useWalkingDirections, formatWalkingDistance, formatWalkingDuration } from './hooks/use-directions-query';
 import { cn } from '@/lib/utils';
 import { ROUTES } from '@/lib/routes';
 import { GUEST_ROOM_LIMIT, ROOM_LIMIT } from '@/lib/constants';
 import { LoginRequiredModal } from '@/components/ui/Modals';
 import type { Room } from '@/types/room';
+import type { WalkingDirectionsParams } from '@/types/directions';
 
 // 기준점 타입 — 트랙 A가 참조할 수 있도록 export
 export interface LandmarkSelection {
@@ -419,6 +421,7 @@ export default function MapPage() {
   // 기준점 state — LocalStorage 영구 저장 (key: landmark-selection)
   const [landmark, setLandmark] = useState<LandmarkSelection | null>(null);
   const [showLandmarkInput, setShowLandmarkInput] = useState(false);
+  const [selectedRoomForRoute, setSelectedRoomForRoute] = useState<Room | null>(null);
 
   const filterRef = useRef<HTMLDivElement>(null);
   const mapContainerRef = useRef<HTMLDivElement>(null);
@@ -427,6 +430,16 @@ export default function MapPage() {
   const stationMarkersRef = useRef<Record<string, naver.maps.Marker>>({});
   const polylinesRef = useRef<naver.maps.Polyline[]>([]);
   const infoWindowRef = useRef<naver.maps.InfoWindow | null>(null);
+
+  // 도보 경로 파라미터 — 기준점 + 선택된 방 좌표가 모두 있을 때만 활성화
+  const directionsParams = useMemo((): WalkingDirectionsParams | null => {
+    if (!landmark || !selectedRoomForRoute) return null;
+    const pos = roomPositions[selectedRoomForRoute.id];
+    if (!pos) return null;
+    return { startLat: landmark.lat, startLng: landmark.lng, goalLat: pos.lat, goalLng: pos.lng };
+  }, [landmark, selectedRoomForRoute, roomPositions]);
+
+  const { data: directionsData } = useWalkingDirections(directionsParams);
 
   const { data: apiRoomsData } = useRoomsList();
   const apiRooms = apiRoomsData ?? [];
@@ -687,6 +700,27 @@ export default function MapPage() {
     }
     return list;
   }, [filtered, sortOption, landmark, roomPositions]);
+
+  // 도보 경로 Polyline — directionsData.path 변경 시 기존 선 제거 후 재그림
+  const directionsPolylineRef = useRef<naver.maps.Polyline | null>(null);
+  useEffect(() => {
+    if (!mapInstanceRef.current) return;
+    if (directionsPolylineRef.current) {
+      directionsPolylineRef.current.setMap(null);
+      directionsPolylineRef.current = null;
+    }
+    const path = directionsData?.data?.path;
+    if (!path || path.length < 2) return;
+    const latLngs = path.map(([lng, lat]) => new window.naver.maps.LatLng(lat, lng));
+    directionsPolylineRef.current = new window.naver.maps.Polyline({
+      map: mapInstanceRef.current,
+      path: latLngs,
+      strokeColor: '#0A607D',
+      strokeOpacity: 0.9,
+      strokeWeight: 4,
+      strokeStyle: 'solid',
+    });
+  }, [directionsData]);
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -973,15 +1007,36 @@ export default function MapPage() {
           {/* 카드 그리드 — Desktop 3-col / Tablet 2-col / Mobile 1-col */}
           <div className="border-t border-[#a0a0a0] px-[16px] lg:px-[40px] pt-[20px] lg:pt-[32px] pb-[20px] lg:pb-[32px]">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[16px]">
-              {sorted.map((r, idx) => (
-                <MapRoomCardCompact
-                  key={r.id}
-                  room={r}
-                  roomPos={roomPositions[r.id] ?? null}
-                  landmark={landmark}
-                  dotColor={idx % 2 === 0 ? '#004cbd' : '#461a2b'}
-                />
-              ))}
+              {sorted.map((r, idx) => {
+                const isSelected = selectedRoomForRoute?.id === r.id;
+                const result = isSelected ? directionsData?.data : null;
+                return (
+                  <div key={r.id} className="relative">
+                    <MapRoomCardCompact
+                      room={r}
+                      roomPos={roomPositions[r.id] ?? null}
+                      landmark={landmark}
+                      dotColor={idx % 2 === 0 ? '#004cbd' : '#461a2b'}
+                    />
+                    {landmark && (
+                      <button
+                        type="button"
+                        onClick={() => setSelectedRoomForRoute(isSelected ? null : r)}
+                        className={cn(
+                          'absolute top-[12px] right-[48px] text-[11px] font-semibold px-[8px] py-[3px] rounded-[4px] border transition-colors cursor-pointer',
+                          isSelected
+                            ? 'bg-brand-primary text-white border-brand-primary'
+                            : 'bg-white text-text-sub border-border-mute hover:border-brand-primary hover:text-brand-primary'
+                        )}
+                      >
+                        {isSelected && result
+                          ? `${formatWalkingDuration(result.duration)} · ${formatWalkingDistance(result.distance)}`
+                          : isSelected ? '경로 숨기기' : '도보 경로'}
+                      </button>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           </div>
         </>

@@ -14,4 +14,8 @@ export const QUERY_KEYS = {
     allItems: ['customization', 'allItems'] as const,
     types: ['customization', 'types'] as const,
   },
+  directions: {
+    walking: (startLat: number, startLng: number, goalLat: number, goalLng: number) =>
+      ['directions', 'walking', startLat, startLng, goalLat, goalLng] as const,
+  },
 } as const;
