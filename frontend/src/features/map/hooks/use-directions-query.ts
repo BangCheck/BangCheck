@@ -20,8 +20,8 @@ export function formatWalkingDistance(distanceMeters: number): string {
   return `${(distanceMeters / 1000).toFixed(1)}km`;
 }
 
-export function formatWalkingDuration(durationMs: number): string {
-  const minutes = Math.round(durationMs / 1000 / 60);
+export function formatWalkingDuration(durationSec: number): string {
+  const minutes = Math.max(1, Math.round(durationSec / 60));
   if (minutes < 60) return `도보 ${minutes}분`;
   const hours = Math.floor(minutes / 60);
   const remainMinutes = minutes % 60;

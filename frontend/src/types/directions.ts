@@ -1,6 +1,6 @@
 export interface WalkingDirectionsResult {
   distance: number;  // meters
-  duration: number;  // milliseconds
+  duration: number;  // seconds (BE TMAP 응답 그대로 — 보행자 totalTime 초 단위)
   path: [number, number][];  // [[lng, lat], ...]
 }
 

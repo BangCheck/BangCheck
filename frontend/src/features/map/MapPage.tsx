@@ -56,12 +56,6 @@ const IconChevronDown = () => (
   </svg>
 );
 
-const IconChevronRight = () => (
-  <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#232527" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="m9 18 6-6-6-6" />
-  </svg>
-);
-
 const IconSiPin = ({ size = 16, color = '#777' }: { size?: number; color?: string }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill={color}>
     <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5z" />
@@ -138,11 +132,17 @@ function MapRoomCardCompact({
   roomPos,
   landmark,
   dotColor = '#004cbd',
+  isSelected = false,
+  walkingLabel = null,
+  onCardClick,
 }: {
   room: Room;
   roomPos: { lat: number; lng: number } | null;
   landmark: LandmarkSelection | null;
   dotColor?: string;
+  isSelected?: boolean;
+  walkingLabel?: string | null;
+  onCardClick?: () => void;
 }) {
   const navigate = useNavigate();
 
@@ -165,8 +165,11 @@ function MapRoomCardCompact({
 
   return (
     <article
-      onClick={() => navigate(ROUTES.CHECKLIST_DETAIL(room.id))}
-      className="group bg-white border border-border-light rounded-[6px] shadow-[0_6px_8px_rgba(0,0,0,0.04)] flex flex-col p-[24px] w-full max-w-[378px] cursor-pointer hover:border-brand-primary hover:shadow-[0_8px_16px_rgba(0,0,0,0.10)] transition-all duration-200"
+      onClick={onCardClick}
+      className={cn(
+        'group bg-white border rounded-[6px] shadow-[0_6px_8px_rgba(0,0,0,0.04)] flex flex-col p-[24px] w-full max-w-[378px] cursor-pointer hover:shadow-[0_8px_16px_rgba(0,0,0,0.10)] transition-all duration-200',
+        isSelected ? 'border-brand-primary ring-1 ring-brand-primary' : 'border-border-light hover:border-brand-primary'
+      )}
     >
       {/* 기본 영역 */}
       <div className="flex items-center justify-between">
@@ -208,8 +211,23 @@ function MapRoomCardCompact({
             </div>
           )}
         </div>
-        <div className="shrink-0 w-[36px] h-[36px] flex items-center justify-center">
-          <IconChevronRight />
+        <div className="shrink-0 flex flex-col items-end gap-[6px]">
+          {isSelected && walkingLabel && (
+            <span className="text-[12px] font-semibold text-brand-primary whitespace-nowrap">
+              {walkingLabel}
+            </span>
+          )}
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              navigate(ROUTES.CHECKLIST_DETAIL(room.id));
+            }}
+            className="text-[11px] font-medium px-[8px] py-[4px] rounded-[4px] border border-border-mute text-text-sub bg-white hover:border-brand-primary hover:text-brand-primary transition-colors cursor-pointer whitespace-nowrap"
+            aria-label={`${room.name} 자세히 보기`}
+          >
+            자세히 보기
+          </button>
         </div>
       </div>
 
@@ -1010,31 +1028,20 @@ export default function MapPage() {
               {sorted.map((r, idx) => {
                 const isSelected = selectedRoomForRoute?.id === r.id;
                 const result = isSelected ? directionsData?.data : null;
+                const walkingLabel = result
+                  ? `${formatWalkingDuration(result.duration)} · ${formatWalkingDistance(result.distance)}`
+                  : isSelected && landmark ? '경로 불러오는 중…' : null;
                 return (
-                  <div key={r.id} className="relative">
-                    <MapRoomCardCompact
-                      room={r}
-                      roomPos={roomPositions[r.id] ?? null}
-                      landmark={landmark}
-                      dotColor={idx % 2 === 0 ? '#004cbd' : '#461a2b'}
-                    />
-                    {landmark && (
-                      <button
-                        type="button"
-                        onClick={() => setSelectedRoomForRoute(isSelected ? null : r)}
-                        className={cn(
-                          'absolute top-[12px] right-[48px] text-[11px] font-semibold px-[8px] py-[3px] rounded-[4px] border transition-colors cursor-pointer',
-                          isSelected
-                            ? 'bg-brand-primary text-white border-brand-primary'
-                            : 'bg-white text-text-sub border-border-mute hover:border-brand-primary hover:text-brand-primary'
-                        )}
-                      >
-                        {isSelected && result
-                          ? `${formatWalkingDuration(result.duration)} · ${formatWalkingDistance(result.distance)}`
-                          : isSelected ? '경로 숨기기' : '도보 경로'}
-                      </button>
-                    )}
-                  </div>
+                  <MapRoomCardCompact
+                    key={r.id}
+                    room={r}
+                    roomPos={roomPositions[r.id] ?? null}
+                    landmark={landmark}
+                    dotColor={idx % 2 === 0 ? '#004cbd' : '#461a2b'}
+                    isSelected={isSelected}
+                    walkingLabel={walkingLabel}
+                    onCardClick={() => setSelectedRoomForRoute(isSelected ? null : r)}
+                  />
                 );
               })}
             </div>
