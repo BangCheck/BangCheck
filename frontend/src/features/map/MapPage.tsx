@@ -167,39 +167,42 @@ function MapRoomCardCompact({
     <article
       onClick={onCardClick}
       className={cn(
-        'group bg-white border rounded-[6px] shadow-[0_6px_8px_rgba(0,0,0,0.04)] flex flex-col p-[24px] w-full max-w-[378px] cursor-pointer hover:shadow-[0_8px_16px_rgba(0,0,0,0.10)] transition-all duration-200',
+        'group bg-white border rounded-[6px] shadow-[0_6px_8px_rgba(0,0,0,0.04)] flex flex-col p-[12px] md:p-[24px] w-full md:max-w-[378px] cursor-pointer hover:shadow-[0_8px_16px_rgba(0,0,0,0.10)] transition-all duration-200',
         isSelected ? 'border-brand-primary ring-1 ring-brand-primary' : 'border-border-light hover:border-brand-primary'
       )}
     >
       {/* 기본 영역 */}
-      <div className="flex items-center justify-between">
-        <div className="flex flex-col gap-[12px] items-start min-w-0 flex-1">
-          <div className="flex items-center gap-[12px]">
+      <div className="flex items-center justify-between gap-[8px]">
+        <div className="flex flex-col gap-[4px] md:gap-[12px] items-start min-w-0 flex-1">
+          <div className="hidden md:flex items-center gap-[12px]">
             <span className="w-[14px] h-[14px] rounded-full shrink-0" style={{ backgroundColor: dotColor }} />
             <div className="flex gap-[4px] items-center text-[12px] text-text-mute leading-[1.3]">
               <span>등록일시</span>
               <span>{formatCreatedAt(room.createdAt)}</span>
             </div>
           </div>
-          <div className="flex flex-col gap-[4px] items-start min-w-0 w-full">
-            <p className="font-semibold text-[18px] text-text-main leading-[1.3] truncate w-full">{room.name}</p>
+          <div className="flex flex-col gap-[2px] md:gap-[4px] items-start min-w-0 w-full">
+            <div className="flex items-center gap-[6px] w-full">
+              <span className="md:hidden w-[10px] h-[10px] rounded-full shrink-0" style={{ backgroundColor: dotColor }} />
+              <p className="font-semibold text-[14px] md:text-[18px] text-text-main leading-[1.3] truncate w-full">{room.name}</p>
+            </div>
             <div className="flex gap-[4px] items-center w-full">
-              <IconSiPin size={16} color="#777" />
-              <p className="text-[12px] text-text-mute leading-[1.3] truncate">{room.address}</p>
+              <IconSiPin size={14} color="#777" />
+              <p className="text-[11px] md:text-[12px] text-text-mute leading-[1.3] truncate">{room.address}</p>
             </div>
           </div>
 
           {/* 기준점 거리 */}
           {landmarkDist && (
             <div className="flex gap-[4px] items-center">
-              <IconSolarPin size={18} color="#0a607d" />
-              <p className="font-medium text-[12px] text-brand-primary leading-[1.3]">{landmarkDist}</p>
+              <IconSolarPin size={16} color="#0a607d" />
+              <p className="font-medium text-[11px] md:text-[12px] text-brand-primary leading-[1.3]">{landmarkDist}</p>
             </div>
           )}
 
-          {/* 고정 역 거리 칩 */}
+          {/* 고정 역 거리 칩 — Desktop만 */}
           {stationDists.length > 0 && (
-            <div className="flex flex-wrap gap-[4px]">
+            <div className="hidden md:flex flex-wrap gap-[4px]">
               {stationDists.map((s) => (
                 <span
                   key={s.name}
@@ -211,9 +214,9 @@ function MapRoomCardCompact({
             </div>
           )}
         </div>
-        <div className="shrink-0 flex flex-col items-end gap-[6px]">
+        <div className="shrink-0 flex flex-col items-end gap-[4px] md:gap-[6px]">
           {isSelected && walkingLabel && (
-            <span className="text-[12px] font-semibold text-brand-primary whitespace-nowrap">
+            <span className="text-[10px] md:text-[12px] font-semibold text-brand-primary whitespace-nowrap">
               {walkingLabel}
             </span>
           )}
@@ -223,10 +226,10 @@ function MapRoomCardCompact({
               e.stopPropagation();
               navigate(ROUTES.CHECKLIST_DETAIL(room.id));
             }}
-            className="text-[11px] font-medium px-[8px] py-[4px] rounded-[4px] border border-border-mute text-text-sub bg-white hover:border-brand-primary hover:text-brand-primary transition-colors cursor-pointer whitespace-nowrap"
+            className="text-[10px] md:text-[11px] font-medium px-[6px] py-[2px] md:px-[8px] md:py-[4px] rounded-[4px] border border-border-mute text-text-sub bg-white hover:border-brand-primary hover:text-brand-primary transition-colors cursor-pointer whitespace-nowrap"
             aria-label={`${room.name} 자세히 보기`}
           >
-            자세히 보기
+            자세히<span className="hidden md:inline"> 보기</span>
           </button>
         </div>
       </div>
