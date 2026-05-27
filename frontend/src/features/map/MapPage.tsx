@@ -998,6 +998,31 @@ export default function MapPage() {
         <MapEmptyState onStart={handleStartChecklist} />
       ) : (
         <>
+          {/* 카드 그리드 — Desktop 3-col / Tablet 2-col / Mobile 1-col */}
+          <div className="border-b border-[#a0a0a0] px-[16px] lg:px-[40px] pt-[20px] lg:pt-[32px] pb-[20px] lg:pb-[32px]">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[16px]">
+              {sorted.map((r, idx) => {
+                const isSelected = selectedRoomForRoute?.id === r.id;
+                const result = isSelected ? directionsData?.data : null;
+                const walkingLabel = result
+                  ? `${formatWalkingDuration(result.duration)} · ${formatWalkingDistance(result.distance)}`
+                  : isSelected && landmark ? '경로 불러오는 중…' : null;
+                return (
+                  <MapRoomCardCompact
+                    key={r.id}
+                    room={r}
+                    roomPos={roomPositions[r.id] ?? null}
+                    landmark={landmark}
+                    dotColor={idx % 2 === 0 ? '#004cbd' : '#461a2b'}
+                    isSelected={isSelected}
+                    walkingLabel={walkingLabel}
+                    onCardClick={() => setSelectedRoomForRoute(isSelected ? null : r)}
+                  />
+                );
+              })}
+            </div>
+          </div>
+
           {/* NCP 지도 본체 */}
           <div className="px-[16px] lg:px-[40px] py-[16px]">
           <div className="relative w-full h-[500px] bg-bg-gray overflow-hidden rounded-[10px]">
@@ -1020,31 +1045,6 @@ export default function MapPage() {
               </>
             )}
           </div>
-          </div>
-
-          {/* 카드 그리드 — Desktop 3-col / Tablet 2-col / Mobile 1-col */}
-          <div className="border-t border-[#a0a0a0] px-[16px] lg:px-[40px] pt-[20px] lg:pt-[32px] pb-[20px] lg:pb-[32px]">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[16px]">
-              {sorted.map((r, idx) => {
-                const isSelected = selectedRoomForRoute?.id === r.id;
-                const result = isSelected ? directionsData?.data : null;
-                const walkingLabel = result
-                  ? `${formatWalkingDuration(result.duration)} · ${formatWalkingDistance(result.distance)}`
-                  : isSelected && landmark ? '경로 불러오는 중…' : null;
-                return (
-                  <MapRoomCardCompact
-                    key={r.id}
-                    room={r}
-                    roomPos={roomPositions[r.id] ?? null}
-                    landmark={landmark}
-                    dotColor={idx % 2 === 0 ? '#004cbd' : '#461a2b'}
-                    isSelected={isSelected}
-                    walkingLabel={walkingLabel}
-                    onCardClick={() => setSelectedRoomForRoute(isSelected ? null : r)}
-                  />
-                );
-              })}
-            </div>
           </div>
         </>
       )}
