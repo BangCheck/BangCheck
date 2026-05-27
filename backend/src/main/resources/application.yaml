@@ -48,6 +48,10 @@ naver:
     client-secret: ${NAVER_GEOCODING_CLIENT_SECRET}
     url: https://naveropenapi.apigw.ntruss.com/map-geocode/v2/geocode
 
+tmap:
+  api:
+    app-key: ${TMAP_APP_KEY}
+
 juso:
   api:
     confirm-key: ${JUSO_CONFIRM_KEY}
