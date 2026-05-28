@@ -5,6 +5,8 @@ import com.room.backend.domain.checklist.entity.ChecklistItem;
 import com.room.backend.domain.checklist.entity.ChecklistOption;
 import com.room.backend.domain.checklist.entity.UserChecklistSetting;
 import com.room.backend.domain.checklist.entity.UserTypeSelection;
+import com.room.backend.domain.checklist.entity.enums.ChecklistCategory;
+import com.room.backend.domain.checklist.entity.enums.InputType;
 import com.room.backend.domain.checklist.entity.enums.ItemType;
 import com.room.backend.domain.checklist.entity.enums.UserType;
 import com.room.backend.domain.checklist.repository.ChecklistItemRepository;
@@ -155,9 +157,9 @@ public class ChecklistService {
 
         ChecklistItem customItem = ChecklistItem.builder()
                 .itemName(itemName)
-                .category(null)
+                .category(ChecklistCategory.CONVENIENCE)
                 .itemType(ItemType.CUSTOM)
-                .inputType(null)
+                .inputType(InputType.BOOLEAN)
                 .ownerUserId(userId)
                 .build();
 
