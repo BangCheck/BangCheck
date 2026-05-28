@@ -57,8 +57,8 @@ public class SecurityConfig {
                                                 appPathProperties.getApiDocsPath() + "/**", "/webjars/**")
                                 .permitAll()
 
-                                // Guest — 비로그인도 허용할 엔드포인트 (추후 추가)
-                                // .requestMatchers(HttpMethod.GET, "/api/v1/rooms/**").permitAll()
+                                // Guest — 비로그인도 허용할 엔드포인트
+                                .requestMatchers(HttpMethod.GET, "/api/v1/address/search").permitAll()
 
                                 // Authenticated — 반드시 로그인 필요
                                 .requestMatchers(appPathProperties.getAuthBasePath()
