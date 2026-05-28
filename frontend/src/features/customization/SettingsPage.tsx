@@ -328,9 +328,9 @@ export default function SettingsPage() {
                     </button>
                   </div>
 
-                  {/* 기본 항목 — 전체 체크리스트 보기 OFF 시에만 표시, ON 시 숨김 */}
+                  {/* 항목 영역 — 전체 체크리스트 보기 ON 시에만 노출 */}
                   {(() => {
-                    if (isAllItemsVisible) return null;
+                    if (!isAllItemsVisible) return null;
                     const baseVisibleLabels = BASE_ITEM_LABELS.filter((l) => activeNamesSet.has(l));
                     if (baseVisibleLabels.length === 0) return null;
                     return (
@@ -368,6 +368,7 @@ export default function SettingsPage() {
                   })()}
 
                   {(() => {
+                    if (!isAllItemsVisible) return null;
                     const anyCategoryHasItems = CATEGORY_ORDER.some((cat) => {
                       const catLabel = CATEGORY_LABEL[cat];
                       const all = CHECKLIST_ITEMS

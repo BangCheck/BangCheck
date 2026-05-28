@@ -3,31 +3,31 @@ import type { ChecklistCategory } from '@/types/checklist';
 export const USER_TYPES = [
   {
     id: 'BUG_AVOIDER',
-    label: '벌레 민감형',
+    label: '벌레회피형',
     description: '벌레/위생 관련 집중',
     icon: 'bug',
   },
   {
     id: 'NOISE_SENSITIVE',
-    label: '조용한 곳 선호',
+    label: '소음민감형',
     description: '소음/방음 집중',
     icon: 'mute',
   },
   {
     id: 'CLEAN_FREAK',
-    label: '채광 중요형',
+    label: '쾌적환경형',
     description: '햇빛/환기/곰팡이',
     icon: 'sun',
   },
   {
     id: 'PERFORMANCE_TYPE',
-    label: '밤길 걱정형',
+    label: '생활성능형',
     description: '보안/조명 집중 점검',
     icon: 'moon',
   },
   {
     id: 'FIRST_TIMER',
-    label: '첫 자취',
+    label: '첫자취형',
     description: '처음이라 다 확인!',
     icon: 'house',
   },
