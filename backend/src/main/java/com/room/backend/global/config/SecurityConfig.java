@@ -59,6 +59,7 @@ public class SecurityConfig {
 
                                 // Guest — 비로그인도 허용할 엔드포인트
                                 .requestMatchers(HttpMethod.GET, "/api/v1/address/search").permitAll()
+                                .requestMatchers(HttpMethod.GET, "/api/v1/directions/walking").permitAll()
 
                                 // Authenticated — 반드시 로그인 필요
                                 .requestMatchers(appPathProperties.getAuthBasePath()
