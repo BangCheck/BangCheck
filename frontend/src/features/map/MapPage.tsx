@@ -167,7 +167,7 @@ function MapRoomCardCompact({
     <article
       onClick={onCardClick}
       className={cn(
-        'group bg-white border rounded-[6px] shadow-[0_6px_8px_rgba(0,0,0,0.04)] flex flex-col p-[12px] md:p-[24px] w-full md:max-w-[378px] cursor-pointer hover:shadow-[0_8px_16px_rgba(0,0,0,0.10)] transition-all duration-200',
+        'group bg-white border rounded-[6px] shadow-[0_6px_8px_rgba(0,0,0,0.04)] flex flex-col p-[12px] md:p-[24px] w-full md:max-w-[378px] md:justify-self-start cursor-pointer hover:shadow-[0_8px_16px_rgba(0,0,0,0.10)] transition-all duration-200',
         isSelected ? 'border-brand-primary ring-1 ring-brand-primary' : 'border-border-light hover:border-brand-primary'
       )}
     >
@@ -372,6 +372,8 @@ declare namespace naver.maps {
   interface MapOptions {
     center?: LatLng;
     zoom?: number;
+    minZoom?: number;
+    maxZoom?: number;
     mapTypeControl?: boolean;
     scaleControl?: boolean;
     logoControl?: boolean;
@@ -517,6 +519,7 @@ export default function MapPage() {
         const map = new window.naver.maps.Map(mapContainerRef.current, {
           center: new window.naver.maps.LatLng(MAP_CENTER.lat, MAP_CENTER.lng),
           zoom: MAP_ZOOM,
+          minZoom: MAP_ZOOM,
           mapTypeControl: false,
           scaleControl: false,
           logoControl: true,
