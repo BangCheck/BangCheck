@@ -32,7 +32,7 @@ export function useChecklistItems() {
     queryKey: [...QUERY_KEYS.checklist.items, isLoggedIn ? 'auth' : 'guest'],
     queryFn: isLoggedIn
       ? getCustomizedItems
-      : async () => GUEST_CHECKLIST_ITEMS,
+      : async () => GUEST_CHECKLIST_ITEMS.filter((i) => i.itemType === 'DEFAULT'),
     staleTime: 1000 * 60 * 5,
     select: (items) =>
       items.filter(
