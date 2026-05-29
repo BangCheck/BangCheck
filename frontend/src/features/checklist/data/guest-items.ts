@@ -33,8 +33,8 @@ const mk = (
 });
 
 const YES_NO = ['있음', '없음'];
-const BOOL = ['없음', '있음']; // V20 BOOLEAN 보완: 없음(1), 있음(2)
-const RATING = ['나쁨', '보통', '좋음'];
+const BOOL = ['있음', '없음']; // 왼쪽=positive 규칙: 있음(green) 우선
+const RATING = ['좋음', '보통', '나쁨'];
 const PROBLEM_LEVEL = ['없음', '약간', '심함'];
 
 export const GUEST_CHECKLIST_ITEMS: ChecklistItemResponse[] = [
@@ -83,11 +83,11 @@ export const GUEST_CHECKLIST_ITEMS: ChecklistItemResponse[] = [
     '모든 창문의 잠금장치 정상 작동 여부 확인'),
   mk(23, 'CCTV 설치 여부', 'SAFETY', 'USER_TYPE', 'BOOLEAN', 3, BOOL,
     '건물 내외부 CCTV 설치 위치 및 작동 여부 확인'),
-  mk(24, '야간 조명', 'SAFETY', 'USER_TYPE', 'SINGLE_CHOICE', 4, ['어두움', '보통', '밝음'],
+  mk(24, '야간 조명', 'SAFETY', 'USER_TYPE', 'SINGLE_CHOICE', 4, ['밝음', '보통', '어두움'],
     '저녁/밤 시간대 방문 시 골목 및 건물 주변 조명 밝기 확인'),
-  mk(25, '경찰서 근처', 'SAFETY', 'USER_TYPE', 'SINGLE_CHOICE', 5, ['멀다', '보통', '가깝다'],
+  mk(25, '경찰서 근처', 'SAFETY', 'USER_TYPE', 'SINGLE_CHOICE', 5, ['가깝다', '보통', '멀다'],
     '지도 앱으로 가장 가까운 경찰서/지구대 거리 확인'),
-  mk(26, '밤길 안전도', 'SAFETY', 'USER_TYPE', 'SINGLE_CHOICE', 6, ['불안', '보통', '안전'],
+  mk(26, '밤길 안전도', 'SAFETY', 'USER_TYPE', 'SINGLE_CHOICE', 6, ['안전', '보통', '불안'],
     '저녁 시간 직접 거주지까지 걸어보며 안전성 확인'),
   mk(27, '접근성', 'SAFETY', 'USER_TYPE', 'SINGLE_CHOICE', 7, ['큰길 근처', '보통', '깊은 골목'],
     '큰길에서 집까지 진입 경로 확인'),
@@ -103,27 +103,27 @@ export const GUEST_CHECKLIST_ITEMS: ChecklistItemResponse[] = [
     '건물 주차장 또는 주변 거치 공간 확인'),
   mk(32, '병원 / 약국', 'CONVENIENCE', 'USER_TYPE', 'BOOLEAN', 4, BOOL,
     '도보 또는 대중교통 5~10분 내 병원/약국 위치 확인'),
-  mk(33, '콘센트 수', 'CONVENIENCE', 'USER_TYPE', 'SINGLE_CHOICE', 5, ['부족', '보통', '충분'],
+  mk(33, '콘센트 수', 'CONVENIENCE', 'USER_TYPE', 'SINGLE_CHOICE', 5, ['충분', '보통', '부족'],
     '각 방의 콘센트 위치 및 개수 직접 확인'),
-  mk(34, '집주인 거주 여부', 'CONVENIENCE', 'USER_TYPE', 'SINGLE_CHOICE', 6, ['상주', '비상주'],
+  mk(34, '집주인 거주 여부', 'CONVENIENCE', 'USER_TYPE', 'SINGLE_CHOICE', 6, ['비상주', '상주'],
     '집주인이 같은 건물 또는 인근 거주 여부 확인'),
-  mk(35, '택배 보관 환경', 'CONVENIENCE', 'USER_TYPE', 'SINGLE_CHOICE', 7, ['없음', '공용 보관'],
+  mk(35, '택배 보관 환경', 'CONVENIENCE', 'USER_TYPE', 'SINGLE_CHOICE', 7, ['공용 보관', '없음'],
     '공동 택배함 또는 무인 택배 보관 시스템 유무 확인'),
   mk(36, '세탁 건조 공간', 'CONVENIENCE', 'USER_TYPE', 'BOOLEAN', 8, BOOL,
     '실내 건조 공간 또는 베란다 유무 확인'),
 
   // ── ENVIRONMENT (37-44) ──
-  mk(37, '편의점 / 마트', 'ENVIRONMENT', 'DEFAULT', 'SINGLE_CHOICE', 1, ['멀다', '보통', '가깝다'],
+  mk(37, '편의점 / 마트', 'ENVIRONMENT', 'DEFAULT', 'SINGLE_CHOICE', 1, ['가깝다', '보통', '멀다'],
     '도보 5~10분 내 편의점/마트 위치 확인'),
-  mk(38, '대중교통 접근성', 'ENVIRONMENT', 'DEFAULT', 'SINGLE_CHOICE', 2, ['멀다', '보통', '가깝다'],
+  mk(38, '대중교통 접근성', 'ENVIRONMENT', 'DEFAULT', 'SINGLE_CHOICE', 2, ['가깝다', '보통', '멀다'],
     '도보 10분 내 지하철역/버스정류장 위치 확인'),
-  mk(39, '야간 상권 인접도', 'ENVIRONMENT', 'USER_TYPE', 'SINGLE_CHOICE', 3, ['멀다', '보통', '가깝다'],
+  mk(39, '야간 상권 인접도', 'ENVIRONMENT', 'USER_TYPE', 'SINGLE_CHOICE', 3, ['가깝다', '보통', '멀다'],
     '인근 술집/유흥가 밀집도 확인 (소음/안전 영향)'),
-  mk(40, '녹지/산 인접도', 'ENVIRONMENT', 'USER_TYPE', 'SINGLE_CHOICE', 4, ['멀다', '보통', '가깝다'],
+  mk(40, '녹지/산 인접도', 'ENVIRONMENT', 'USER_TYPE', 'SINGLE_CHOICE', 4, ['가깝다', '보통', '멀다'],
     '도보 거리 내 공원/산책로 위치 확인'),
-  mk(41, '음식점 밀집도', 'ENVIRONMENT', 'USER_TYPE', 'SINGLE_CHOICE', 5, ['없음', '보통', '많음'],
+  mk(41, '음식점 밀집도', 'ENVIRONMENT', 'USER_TYPE', 'SINGLE_CHOICE', 5, ['많음', '보통', '없음'],
     '도보 거리 내 식당/배달 가능 매장 수 확인'),
-  mk(42, '유동인구', 'ENVIRONMENT', 'USER_TYPE', 'SINGLE_CHOICE', 6, ['없음', '보통', '많음'],
+  mk(42, '유동인구', 'ENVIRONMENT', 'USER_TYPE', 'SINGLE_CHOICE', 6, ['많음', '보통', '없음'],
     '평일/주말, 낮/밤 시간대별 거리 활기 정도 확인'),
   mk(43, '공사장 여부', 'ENVIRONMENT', 'USER_TYPE', 'SINGLE_CHOICE', 7, ['없음', '모름', '있음'],
     '인근 공사장 유무 확인 (소음/먼지/진동 영향)'),

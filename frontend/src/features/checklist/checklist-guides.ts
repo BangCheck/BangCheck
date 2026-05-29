@@ -19,16 +19,19 @@ export interface ChecklistGuide {
   mainPhoto?: string;
   /** 예시 사진 2장 소스 (left-crop / right-crop으로 나눠서 표시) */
   examplesPhoto?: string;
+  /** examplesPhoto에 이미 2장이 합쳐있을 때 — 분할 없이 단일 타일로 노출 */
+  singleExample?: boolean;
 }
 
 /** BE itemName(한글) → 가이드 매핑 (DynamicChecklistSections에서 사용) */
 export function getGuideByItemName(name: string): ChecklistGuide | undefined {
   const trimmed = name.trim();
   // 정규화: 공백/구두점 변형 흡수
-  const normalized = trimmed.replace(/\s+/g, '').replace(/[/·,]/g, '');
+  const normalize = (s: string) => s.replace(/\s+/g, '').replace(/[/·,]/g, '').replace(/(및|와|또는|혹은)/g, '');
+  const normalized = normalize(trimmed);
   for (const guide of Object.values(CHECKLIST_GUIDES)) {
     if (!guide) continue;
-    const guideName = guide.guideTitle.replace(/\s+/g, '').replace(/[/·,]/g, '').replace('확인가이드', '');
+    const guideName = normalize(guide.guideTitle).replace('확인가이드', '');
     if (normalized === guideName || normalized.startsWith(guideName) || guideName.startsWith(normalized)) {
       return guide;
     }
@@ -106,6 +109,7 @@ export const CHECKLIST_GUIDES: Partial<Record<InteriorKey, ChecklistGuide>> = {
     variant: 'with-photos',
     mainPhoto: '/images/guides/guide-mold-main.jpg',
     examplesPhoto: '/images/guides/guide-mold-examples.jpg',
+    singleExample: true,
     guideItems: [
       '가구/가전 뒤편(특히 침대 머리맡 벽) 확인 요청',
       '욕실 실리콘/타일 사이 검은 점 형태 확인',
@@ -121,6 +125,7 @@ export const CHECKLIST_GUIDES: Partial<Record<InteriorKey, ChecklistGuide>> = {
     variant: 'with-photos',
     mainPhoto: '/images/guides/guide-leak-main.jpg',
     examplesPhoto: '/images/guides/guide-leak-examples.jpg',
+    singleExample: true,
     guideItems: [
       '천장 얼룩/변색 부위 확인 (특히 욕실/주방 위층 배관 통과 지점)',
       '벽 하단 페인트 벗겨짐, 벽지 들뜸 확인',
@@ -135,6 +140,7 @@ export const CHECKLIST_GUIDES: Partial<Record<InteriorKey, ChecklistGuide>> = {
     guideTitle: '벌레 흔적 확인 가이드',
     variant: 'with-photos',
     examplesPhoto: '/images/guides/guide-pest-examples.jpg',
+    singleExample: true,
     guideItems: [
       '검은 점 형태의 배설물이 있는지 확인 (싱크대 하부, 서랍 모서리)',
       '조명 커버 안에 벌레 시체가 있는지 확인',
@@ -175,6 +181,7 @@ export const CHECKLIST_GUIDES: Partial<Record<InteriorKey, ChecklistGuide>> = {
     variant: 'with-photos',
     mainPhoto: '/images/guides/guide-humidity-main.jpg',
     examplesPhoto: '/images/guides/guide-humidity-examples.jpg',
+    singleExample: true,
     guideItems: [
       '창문 주변 물자국/얼룩 (결로 발생 흔적) 확인',
       '벽 하단 곰팡이/페인트 벗겨짐 확인',

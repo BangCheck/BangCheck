@@ -67,8 +67,13 @@ export default function SettingsPage() {
     if (typeId === 'ESSENTIALS_ONLY') {
       return CHECKLIST_ITEMS.filter((c) => BASE_ITEM_LABELS.includes(c.label));
     }
+    // 스펙: STEP2 = BASE 15 + 유형 추천 (중복 제거, BASE 우선 정렬)
+    const baseItems = CHECKLIST_ITEMS.filter((c) => BASE_ITEM_LABELS.includes(c.label));
     const mappedIds = TYPE_ITEM_MAP[typeId] ?? [];
-    return CHECKLIST_ITEMS.filter((item) => mappedIds.includes(item.id));
+    const typeOnlyItems = CHECKLIST_ITEMS.filter(
+      (item) => mappedIds.includes(item.id) && !BASE_ITEM_LABELS.includes(item.label),
+    );
+    return [...baseItems, ...typeOnlyItems];
   }, [selectedTypeIds]);
 
   // ── Handlers ─────────────────────────────────────────────
@@ -509,7 +514,7 @@ export default function SettingsPage() {
 
       {/* 저장 CTA — 로그인 상태에서만 노출 */}
       {isLoggedIn && (
-        <div className="fixed bottom-[80px] md:bottom-0 left-0 right-0 bg-bg-footer border-t border-border-light px-4 md:px-12 lg:px-24 py-6 z-40">
+        <div className="fixed bottom-[80px] md:bottom-0 left-0 right-0 bg-bg-footer border-t border-border-light px-4 md:px-12 lg:px-24 py-6 z-[60] pb-[calc(1.5rem+env(safe-area-inset-bottom))] md:pb-6">
           <div className="max-w-screen-xl mx-auto flex flex-col items-center gap-3">
             <div className="flex items-center justify-between w-full">
               <span className="text-fluid-lg font-medium text-text-mute">총 선택된 항목</span>

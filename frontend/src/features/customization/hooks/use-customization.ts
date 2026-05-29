@@ -126,7 +126,9 @@ export const useCustomization = () => {
     if (typeId === 'FIRST_TIMER') return CHECKLIST_ITEMS.map((c) => c.label);
     if (typeId === 'ESSENTIALS_ONLY') return BASE_ITEM_LABELS.slice();
     const mappedIds = TYPE_ITEM_MAP[typeId] ?? [];
-    return CHECKLIST_ITEMS.filter((item) => mappedIds.includes(item.id)).map((i) => i.label);
+    const typeLabels = CHECKLIST_ITEMS.filter((item) => mappedIds.includes(item.id)).map((i) => i.label);
+    // 스펙: 유형 선택 시 BASE 15 + 유형 추천 모두 active 처리
+    return Array.from(new Set([...BASE_ITEM_LABELS, ...typeLabels]));
   }, []);
 
   // ── 핸들러: 모두 로컬 store만 갱신 (BE 호출 없음) ──

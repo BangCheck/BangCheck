@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { SelectCard, EmojiCard, SectionHeader, FieldLabel, TextInput, RatingCards, YesNoCards, DynamicOptionCards } from './ui/shared';
-import { GuideToggleButton, GuidePanel } from './ui/GuidePanel';
+import { GuideToggleButton, GuidePanel, InlineGuidePanel } from './ui/GuidePanel';
 import { CHECKLIST_GUIDES, getGuideByItemName } from '../checklist-guides';
 import type { ChecklistGuide } from '../checklist-guides';
 import type { BuildingInfoData } from './02_building-info';
@@ -19,7 +19,7 @@ function ItemWithGuide({
   return <ItemWithGuideRaw guide={guide} children={children} />;
 }
 
-/** 가이드 객체를 직접 받는 wrapper (BE-driven 경로용) — 모달 다이얼로그 */
+/** 가이드 객체를 직접 받는 wrapper (static InteriorCheck 경로용) — 인라인 패널 */
 function ItemWithGuideRaw({
   guide,
   children,
@@ -30,13 +30,13 @@ function ItemWithGuideRaw({
   const [open, setOpen] = useState(false);
   if (!guide) return <>{children}</>;
   return (
-    <>
+    <div>
       <div className="flex items-start justify-between gap-3">
         <div className="flex-1 min-w-0">{children}</div>
-        <GuideToggleButton expanded={open} onToggle={() => setOpen(true)} />
+        <GuideToggleButton expanded={open} onToggle={() => setOpen((o) => !o)} />
       </div>
       {open && <GuidePanel guide={guide} onClose={() => setOpen(false)} />}
-    </>
+    </div>
   );
 }
 import type { SafetyLivingData } from './04_safety-living';
@@ -289,6 +289,15 @@ const FORM_CATEGORY_ORDER: ChecklistCategory[] = [
 
 const POSITIVE_IS_있음_CATEGORIES: ChecklistCategory[] = ['SAFETY', 'CONVENIENCE'];
 
+// BE seed가 왼쪽=negative로 깔려있어 FE에서 강제 reverse. BE V24 마이그레이션 후 비우면 됨.
+const REVERSE_BE_OPTIONS: Set<string> = new Set([
+  '채광', '환기', '수압 및 배수', '방음', '창문 / 망충망', '현관 / 문틈',
+  '야간 조명', '경찰서 근처', '밤길 안전도',
+  '콘센트 수', '집주인 거주 여부', '택배 보관 환경',
+  '편의점 / 마트', '대중교통 접근성', '야간 상권 인접도',
+  '녹지/산 인접도', '음식점 밀집도', '유동인구',
+]);
+
 function DynamicItem({
   item,
   value,
@@ -300,7 +309,16 @@ function DynamicItem({
   onChange: (v: string | null) => void;
   hintOverride?: string;
 }) {
-  const beOptions = item.options.map((o) => o.optionValue);
+  const [guideOpen, setGuideOpen] = useState(false);
+  const guide = getGuideByItemName(item.itemName);
+  useEffect(() => {
+    if (!guideOpen) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setGuideOpen(false); };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [guideOpen]);
+  const rawBeOptions = item.options.map((o) => o.optionValue);
+  const beOptions = REVERSE_BE_OPTIONS.has(item.itemName) ? [...rawBeOptions].reverse() : rawBeOptions;
   const isBooleanFallback = beOptions.length === 0 && item.inputType === 'BOOLEAN';
   const isPositiveFirst = item.inputType === 'BOOLEAN' && POSITIVE_IS_있음_CATEGORIES.includes(item.category);
   const options = isBooleanFallback
@@ -309,14 +327,33 @@ function DynamicItem({
       ? ['있음', '없음']
       : beOptions;
   const positiveValue = isPositiveFirst ? '있음' : undefined;
+  const shortHint = (item.description ?? '').split(/\r?\n/)[0]?.trim() || undefined;
   return (
     <DynamicOptionCards
       label={item.itemName}
-      hint={hintOverride ?? item.description ?? undefined}
+      hint={hintOverride ?? shortHint}
       options={options}
       value={value}
       onChange={onChange}
       positiveValue={positiveValue}
+      topRight={
+        guide ? (
+          <div className="relative">
+            <GuideToggleButton expanded={guideOpen} onToggle={() => setGuideOpen((o) => !o)} />
+            {guideOpen && (
+              <>
+                <div className="fixed inset-0 z-40 bg-black/50 sm:bg-transparent" onClick={() => setGuideOpen(false)} />
+                <div className="fixed inset-x-0 bottom-0 max-h-[85vh] z-50 overflow-y-auto overscroll-contain sm:hidden">
+                  <InlineGuidePanel guide={guide} onClose={() => setGuideOpen(false)} />
+                </div>
+                <div className="hidden sm:block absolute top-full right-0 mt-2 w-[860px] max-w-[90vw] z-50">
+                  <InlineGuidePanel guide={guide} />
+                </div>
+              </>
+            )}
+          </div>
+        ) : undefined
+      }
     />
   );
 }
@@ -343,19 +380,14 @@ export function DynamicChecklistSections({
           <section key={cat} ref={sectionRefs[cat]}>
             <SectionHeader title={CATEGORY_LABEL[cat]} />
             <div className="flex flex-col gap-5">
-              {catItems.map((item) => {
-                const guide = getGuideByItemName(item.itemName);
-                return (
-                  <ItemWithGuideRaw key={item.id} guide={guide}>
-                    <DynamicItem
-                      item={item}
-                      value={answers[item.id] ?? null}
-                      onChange={(v) => onChange(item.id, v)}
-                      hintOverride=""
-                    />
-                  </ItemWithGuideRaw>
-                );
-              })}
+              {catItems.map((item) => (
+                <DynamicItem
+                  key={item.id}
+                  item={item}
+                  value={answers[item.id] ?? null}
+                  onChange={(v) => onChange(item.id, v)}
+                />
+              ))}
             </div>
           </section>
         );

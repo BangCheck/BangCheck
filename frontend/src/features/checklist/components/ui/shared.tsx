@@ -247,6 +247,7 @@ export function DynamicOptionCards({
   value,
   onChange,
   positiveValue,
+  topRight,
 }: {
   label: string;
   hint?: string;
@@ -254,13 +255,17 @@ export function DynamicOptionCards({
   value: string | null;
   onChange: (v: string | null) => void;
   positiveValue?: string;
+  topRight?: React.ReactNode;
 }) {
   const cols = options.length === 2 ? 'grid-cols-2' : 'grid-cols-3';
   const amenity = positiveValue == null && isAmenityOptions(options);
   return (
     <div className="flex flex-col gap-3">
       <div>
-        <p className="text-[14px] font-semibold text-text-main">{label}</p>
+        <div className="flex items-center justify-between gap-3">
+          <p className="text-[14px] font-semibold text-text-main">{label}</p>
+          {topRight && <div className="shrink-0">{topRight}</div>}
+        </div>
         {hint && <p className="text-[12px] text-text-caption mt-0.5">{hint}</p>}
       </div>
       <div className={cn('grid gap-3', cols)}>

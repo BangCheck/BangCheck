@@ -135,6 +135,7 @@ function MapRoomCardCompact({
   isSelected = false,
   walkingLabel = null,
   onCardClick,
+  onLocateClick,
 }: {
   room: Room;
   roomPos: { lat: number; lng: number } | null;
@@ -143,6 +144,7 @@ function MapRoomCardCompact({
   isSelected?: boolean;
   walkingLabel?: string | null;
   onCardClick?: () => void;
+  onLocateClick?: () => void;
 }) {
   const navigate = useNavigate();
 
@@ -220,17 +222,33 @@ function MapRoomCardCompact({
               {walkingLabel}
             </span>
           )}
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              navigate(ROUTES.CHECKLIST_DETAIL(room.id));
-            }}
-            className="text-[10px] md:text-[11px] font-medium px-[6px] py-[2px] md:px-[8px] md:py-[4px] rounded-[4px] border border-border-mute text-text-sub bg-white hover:border-brand-primary hover:text-brand-primary transition-colors cursor-pointer whitespace-nowrap"
-            aria-label={`${room.name} 자세히 보기`}
-          >
-            자세히<span className="hidden md:inline"> 보기</span>
-          </button>
+          <div className="flex items-center gap-[4px] md:gap-[6px]">
+            {onLocateClick && roomPos && (
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onLocateClick();
+                }}
+                className="p-[4px] md:p-[5px] rounded-[4px] border border-border-mute bg-white hover:border-brand-primary hover:bg-brand-primary/5 transition-colors cursor-pointer"
+                aria-label={`${room.name} 지도에서 위치 보기`}
+                title="지도에서 위치 보기"
+              >
+                <IconSolarPin size={14} color="#0a607d" />
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                navigate(ROUTES.CHECKLIST_DETAIL(room.id));
+              }}
+              className="text-[10px] md:text-[11px] font-medium px-[6px] py-[2px] md:px-[8px] md:py-[4px] rounded-[4px] border border-border-mute text-text-sub bg-white hover:border-brand-primary hover:text-brand-primary transition-colors cursor-pointer whitespace-nowrap"
+              aria-label={`${room.name} 자세히 보기`}
+            >
+              자세히<span className="hidden md:inline"> 보기</span>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -1023,6 +1041,12 @@ export default function MapPage() {
                     isSelected={isSelected}
                     walkingLabel={walkingLabel}
                     onCardClick={() => setSelectedRoomForRoute(isSelected ? null : r)}
+                    onLocateClick={() => {
+                      const pos = roomPositions[r.id];
+                      if (!pos || !mapInstanceRef.current) return;
+                      mapInstanceRef.current.setCenter(new window.naver.maps.LatLng(pos.lat, pos.lng));
+                      mapContainerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }}
                   />
                 );
               })}
