@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { cn } from '@/lib/utils';
+import { useOnClickOutside } from '@/hooks/use-on-click-outside';
 import { searchAddress, type AddressResult } from '@/services/address-service';
 
 interface Props {
@@ -54,15 +55,7 @@ export default function AddressSearchInput({ value, onChange, placeholder }: Pro
   };
 
   // 외부 클릭 시 드롭다운 닫기
-  useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
-        setOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handler);
-    return () => document.removeEventListener('mousedown', handler);
-  }, []);
+  useOnClickOutside(containerRef, () => setOpen(false));
 
   return (
     <div ref={containerRef} className="relative">

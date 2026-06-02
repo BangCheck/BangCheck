@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/store/use-auth-store';
 import { useGuestRoomStore } from '@/store/use-guest-room-store';
 import { useRoomsList } from '@/features/rooms/hooks/use-rooms-query';
-import { cn } from '@/lib/utils';
+import { cn, formatAmount, formatDateTime } from '@/lib/utils';
+import { useOnClickOutside } from '@/hooks/use-on-click-outside';
 import { ROUTES } from '@/lib/routes';
 import { GUEST_ROOM_LIMIT, ROOM_LIMIT } from '@/lib/constants';
 import { LoginRequiredModal } from '@/components/ui/Modals';
@@ -104,30 +105,9 @@ const IconMapTab = () => (
 );
 
 
-function formatCreatedAt(raw: string): string {
-  try {
-    const d = new Date(raw);
-    const yyyy = d.getFullYear();
-    const mm = String(d.getMonth() + 1).padStart(2, '0');
-    const dd = String(d.getDate()).padStart(2, '0');
-    const hh = String(d.getHours()).padStart(2, '0');
-    const min = String(d.getMinutes()).padStart(2, '0');
-    return `${yyyy}.${mm}.${dd} ${hh}:${min}`;
-  } catch {
-    return raw;
-  }
-}
-
 // P1: XSS 방지 — InfoWindow HTML 보간 전 escape
 function escHtml(s: string): string {
   return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-}
-
-// P2-C: fmtPrice 모듈 스코프로 이동
-function fmtPrice(v: number): string {
-  return v >= 10000
-    ? `${Math.floor(v / 10000)}억${v % 10000 ? ` ${v % 10000}만` : ''}`
-    : `${v.toLocaleString()}만`;
 }
 
 // 룸 카드 (Compact + 호버 확장) — 데스크톱 그리드용
@@ -173,7 +153,7 @@ function MapRoomCardCompact({
             <span className="w-[14px] h-[14px] rounded-full shrink-0" style={{ backgroundColor: dotColor }} />
             <div className="flex gap-[4px] items-center text-[12px] text-text-mute leading-[1.3]">
               <span>등록일시</span>
-              <span>{formatCreatedAt(room.createdAt)}</span>
+              <span>{formatDateTime(room.createdAt)}</span>
             </div>
           </div>
           <div className="flex flex-col gap-[4px] items-start min-w-0 w-full">
@@ -610,13 +590,13 @@ export default function MapPage() {
         const rent = r.rent ?? null;
         const id = r.id;
 
-        // P2-C: 모듈 스코프 fmtPrice 사용
+        // 가격 표기는 공유 formatAmount로 통일 (카드/리스트와 동일 포맷)
         const priceLine = type === '전세'
-          ? `전세 ${deposit ? fmtPrice(deposit) : '-'}`
+          ? `전세 ${deposit ? formatAmount(deposit) : '-'}`
           : type === '월세'
-          ? `월세 ${deposit ? fmtPrice(deposit) : '-'} / ${rent ? `${rent}만` : '-'}`
+          ? `월세 ${deposit ? formatAmount(deposit) : '-'} / ${rent ? `${rent}만` : '-'}`
           : type === '단기임대'
-          ? `단기 ${deposit ? fmtPrice(deposit) : '-'} / ${rent ? `${rent}만` : '-'}`
+          ? `단기 ${deposit ? formatAmount(deposit) : '-'} / ${rent ? `${rent}만` : '-'}`
           : '';
 
         const bubbleLabel = priceLine || name;
@@ -688,15 +668,7 @@ export default function MapPage() {
     return list;
   }, [filtered, sortOption, landmark, roomPositions]);
 
-  useEffect(() => {
-    function handleClickOutside(e: MouseEvent) {
-      if (filterRef.current && !filterRef.current.contains(e.target as Node)) {
-        setIsFilterOpen(false);
-      }
-    }
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+  useOnClickOutside(filterRef, () => setIsFilterOpen(false));
 
   const selectLandmark = (preset: LandmarkSelection) => {
     setLandmark(preset);

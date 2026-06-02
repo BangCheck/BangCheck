@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { cn, formatRoomPrice } from '@/lib/utils';
+import { cn, formatRoomPrice, formatDateTime } from '@/lib/utils';
 import type { Room } from '@/types';
 import { DeleteRoomModal } from '@/components/ui/Modals';
 
@@ -70,16 +70,6 @@ export default function RoomCard({
 }: RoomCardProps) {
   const { id, name, address, type, deposit, rent, managementFee, price, issues, memo, createdAt, buildingType, floor, direction } = room;
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-
-  const formatDateTime = (dateStr: string) => {
-    const date = new Date(dateStr);
-    const YYYY = date.getFullYear();
-    const MM = String(date.getMonth() + 1).padStart(2, '0');
-    const DD = String(date.getDate()).padStart(2, '0');
-    const HH = String(date.getHours()).padStart(2, '0');
-    const mm = String(date.getMinutes()).padStart(2, '0');
-    return `${YYYY}.${MM}.${DD} ${HH}:${mm}`;
-  };
 
   // deposit 숫자 있으면 formatRoomPrice로 일관 포맷. 없으면 BE/legacy 문자열 price fallback.
   const formattedPrice = (typeof deposit === 'number' && deposit > 0)
