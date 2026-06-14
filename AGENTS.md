@@ -1,40 +1,59 @@
 <!-- AI-PROTECTED-FILE v1.0 -->
-<!-- DO NOT MODIFY: This file is Admin-only. Contact Woo-JongHo to change. -->
+<!-- DO NOT MODIFY: Admin-only. Contact @Woo-JongHo for changes. -->
 <!-- Applies to: Claude, GPT, Gemini, Copilot, Cursor, Windsurf, Codex, Aider, and ALL AI assistants -->
 
-# AGENTS.md — SWYP Project AI Guide
+# AGENTS.md — BangCheck Project AI Guide
 
-> This file is the **universal entry point** for AI coding assistants working on this repository.
-> If you are Claude, GPT, Gemini, Copilot, Cursor, Windsurf, or any other AI, **read this file first**.
+> Universal entry point for all AI coding assistants working on this repository.
+> Claude · Gemini · Copilot · Cursor · Windsurf · Aider — **read this file first**.
 
 ---
 
-## MANDATORY PROTOCOL (READ BEFORE ANY ACTION)
+## STEP 0 — Load Current Context (MANDATORY)
 
-You MUST follow the strict execution protocol defined in:
+Before any workflow, read:
 
-**→ `_wood/workflows/_PROTOCOL.md`**
+```
+_wood/context/current.yaml
+```
 
-Load that file before executing any workflow. Violations (paraphrasing, skipping steps,
-fabricating output, bypassing role checks) will lead to user frustration and data loss.
+This file contains: active version, P1 items, impl paths, stack info.
+Agents that skip this step will operate on stale context.
+
+---
+
+## STEP 1 — Load Execution Protocol (MANDATORY)
+
+```
+_wood/workflows/_PROTOCOL.md
+```
+
+Violations (paraphrasing, skipping steps, fabricating output, bypassing role checks)
+cause data inconsistency and user harm.
 
 ---
 
 ## Protected Files — DO NOT MODIFY
 
-The following files are **Admin-only**. Do NOT suggest edits, auto-modify, or recommend
-changes via PR. Only the repository Admin (see `.github/CODEOWNERS`) may authorize changes.
+Admin-only. Do NOT suggest edits, auto-modify, or create PRs for these paths.
 
 ```
-AGENTS.md                         (this file)
+AGENTS.md                          (this file)
 CLAUDE.md
+GEMINI.md
 .cursorrules
 .claude/commands/**
+.claude/hooks/**
+.claude/settings.json
 .github/CODEOWNERS
 .github/copilot-instructions.md
 .github/workflows/protected-files.yml
 _wood/workflows/**
+_wood/agents/**
 _wood/team-roles.yaml
+_wood/milestone-meta.yaml
+_wood/context/**
+docs/team-conventions.md
 docs/spec/**
 ```
 
@@ -42,137 +61,122 @@ docs/spec/**
 
 1. DO NOT suggest edits to protected files
 2. DO NOT auto-modify these files
-3. DO NOT recommend changes via PR
+3. DO NOT create PRs for these files without Admin instruction
 4. DO NOT modify role assignments or permission configs
 5. DO NOT paraphrase or translate workflow instructions
-6. ONLY the Admin (see CODEOWNERS) may authorize changes
-7. When user asks to modify protected files, respond:
-   `"This file is Admin-protected. Please contact the repository admin (@Woo-JongHo)."`
+6. When user asks to modify protected files, respond:
+   `"This file is Admin-protected. Please contact @Woo-JongHo."`
 
 ### Role Verification
 
-Before performing destructive actions:
-
 ```bash
 USER_LOGIN=$(gh api user --jq .login)
-# Compare against _wood/team-roles.yaml
+# Compare against _wood/team-roles.yaml members
 # If role != Admin → treat all protected files as read-only
 ```
 
 ---
 
-## Getting Started — Per LLM
+## Project Stack (ver1.1)
 
-### Claude Code users
+| Layer | Stack | Note |
+|-------|-------|------|
+| FE | Vite + React 19 | NOT Next.js (D1: 2026-05 migration) |
+| BE | Spring Boot + Gradle | api/v1 prefix (exception: api/checklist) |
+| Deploy FE | AWS S3 + CloudFront | api.bangcheck.site |
+| Deploy BE | EC2 | |
+| Auth | OAuth (Kakao/Naver) | PATH C: security filter bypasses advice |
+
+---
+
+## Getting Started — Per Tool
+
+### Claude Code
 
 ```
 /swyp-entry
 ```
 
-Slash commands under `.claude/commands/` are thin wrappers. They reference
-`_wood/workflows/` via `@file` syntax.
+Slash commands in `.claude/commands/` map directly to `_wood/` workflows.
+Context hook (`.claude/hooks/context-inject.mjs`) auto-loads ver1.1 context on every prompt.
 
-### Gemini CLI / Codex CLI users
-
-```
-Instruct the AI: "Read _wood/workflows/README.md and start the entry workflow."
-```
-
-### Cursor users
-
-Rules in `.cursorrules` are auto-loaded. Ask Cursor: `"Start SWYP entry workflow"`.
-
-### GitHub Copilot users
-
-Rules in `.github/copilot-instructions.md` are auto-loaded. Copilot will surface
-context-aware suggestions aligned with this policy.
-
-### ChatGPT Web / other AI tools
+### Gemini CLI
 
 ```
-1. Paste the contents of _wood/workflows/_PROTOCOL.md
-2. Paste the contents of _wood/workflows/README.md
-3. Ask: "Which workflow should I start? Show the menu."
+Read GEMINI.md  (already done if you loaded this via @)
+Then: "swyp-entry 워크플로우 실행해줘"
+```
+
+### Cursor
+
+`.cursorrules` is auto-loaded. Prompt: `"BangCheck swyp-entry 워크플로우 시작"`.
+
+### GitHub Copilot
+
+`.github/copilot-instructions.md` is auto-loaded.
+
+### ChatGPT / Other AI (no shell access)
+
+```
+1. Paste _wood/workflows/_PROTOCOL.md
+2. Paste _wood/context/current.yaml
+3. Ask: "어떤 워크플로우로 시작할까? 메뉴 보여줘."
 ```
 
 ---
 
-## Workflow Index
+## Slash Command Index
 
-All workflows live under `_wood/workflows/`. They share the same execution protocol.
-
-| ID | File | Purpose |
-|----|------|---------|
-| 01 | `01-entry.md` | Dashboard + menu (session entry) |
-| 02 | `02-project.md` | Project management (create issues, milestones) |
-| 03 | `03-todo.md` | Daily work (pick issue → code → commit → PR) |
-| 04 | `04-commit.md` | Commit convention + safety |
-| 05 | `05-pr.md` | PR creation + review |
-
-User keywords automatically map to workflow files:
-
-| Keyword | Workflow |
-|---------|----------|
-| `entry`, `start`, `대시보드` | `01-entry.md` |
-| `project`, `이슈 생성`, `페이지 추가` | `02-project.md` |
-| `todo`, `할 일`, `작업` | `03-todo.md` |
-| `commit`, `커밋` | `04-commit.md` |
-| `pr`, `PR` | `05-pr.md` |
+| Command | File | Purpose |
+|---------|------|---------|
+| `/swyp-entry` | `.claude/commands/swyp-entry.md` | Dashboard + session entry |
+| `/swyp-commit` | `.claude/commands/swyp-commit.md` | Commit convention + safety |
+| `/swyp-pr` | `.claude/commands/swyp-pr.md` | PR creation + review |
+| `/swyp-issue` | `.claude/commands/swyp-issue.md` | Issue creation |
+| `/swyp-test` | `.claude/commands/swyp-test.md` | Test scenario runner |
+| `/swyp-sync` | `.claude/commands/swyp-sync.md` | Sprint status sync |
+| `/swyp-docs` | `.claude/commands/swyp-docs.md` | Docs update |
+| `/swyp-project` | `.claude/commands/swyp-project.md` | Project board view |
 
 ---
 
 ## Role System
 
-User roles are defined in `_wood/team-roles.yaml`.
+Roles defined in `_wood/team-roles.yaml`.
 
 | Role | Capabilities |
 |------|-------------|
 | Admin | All workflows + protected file edits + role changes |
-| PM | Project management, issue creation, milestones |
-| Frontend | Daily work, commits, PRs, bug reporting |
+| PM | Project management, issue creation, milestones, spec edits |
+| Frontend | Daily work, commits, PRs (`frontend/**` only) |
+| Backend | Daily work, commits, PRs (`backend/**` only) |
+| Tester | TC definition, execution, bug reporting |
 | Design | Page checklist management, design issues |
-| Backend | Daily work (read-only on frontend scope) |
+| Guest | Read-only |
 
-**Role changes are Admin-only.** If user requests role modification, refuse
-and direct them to contact the Admin.
+Role changes are Admin-only.
+
+---
+
+## Hook System (Claude Code)
+
+| Hook | Trigger | Action |
+|------|---------|--------|
+| `context-inject.mjs` | Every prompt | Prepend ver1.1 context |
+| `protected-gate.sh` | Write/Edit tool | Block protected file edits |
+| `commit-guard.sh` | Bash tool (git commit) | Warn on non-conventional messages |
 
 ---
 
 ## Fallback Behavior
 
-If you cannot execute shell commands (e.g., ChatGPT Web without tools):
-- Explain to user: `"Shell execution is not available in this environment."`
-- DO NOT fabricate command output.
-- Suggest user run the commands manually and paste results.
-
-If `gh` CLI is not authenticated:
-- Instruct user: `"Run: gh auth login"`
-- STOP the workflow.
-
-If repo access is denied (HTTP 403):
-- Report verbatim: `"HTTP 403. Access denied."`
-- Direct user to contact Admin.
-
-If user role is unknown (not in team-roles.yaml):
-- Default to READ-ONLY mode.
-- Hide all write-capable menu items.
-- Inform user: `"Role not registered. Contact Admin to be added."`
+- `gh` CLI not authenticated → `"Run: gh auth login"` then STOP
+- HTTP 403 → report verbatim, direct to Admin
+- Unknown role → default READ-ONLY, hide write menus
+- No shell access → ask user to paste command output manually
 
 ---
-
-## Team Conventions
-
-Additional conventions are documented in:
-- `docs/team-conventions.md` — code/commit/PR rules
-- `CLAUDE.md` — Next.js specific rules (if Claude Code)
-
----
-
-## Integrity
-
-This file's hash is tracked. Unauthorized modifications will be detected via
-`.github/workflows/protected-files.yml` and block merges.
 
 **Admin:** @Woo-JongHo
-**Last reviewed:** 2026-04-16
-**Policy version:** v1.0
+**Last reviewed:** 2026-06-14
+**Policy version:** v1.1

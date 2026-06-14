@@ -1,0 +1,47 @@
+# BangCheck — Current Version Context
+# Read by: all _wood agents, collect-brief.mjs, .claude/hooks/context-inject.mjs
+# Update: Admin only, on version bump or P1 change
+
+version: ver1.1
+started: 2026-06-14
+focus: 사용성 개선 + API 핸들링 단위테스트
+
+repo: SWYP-Backend/BangCheck
+
+stack:
+  fe: Vite + React 19        # NOT Next.js (D1 결정: 2026-05)
+  be: Spring Boot + Gradle
+  api_prefix: api/v1
+  exception: api/checklist   # v1 prefix 없음 — 단위테스트 주의
+  deploy:
+    fe: AWS S3 + CloudFront  # api.bangcheck.site (D2 결정: 2026-05)
+    be: EC2
+
+docs:
+  kickoff: docs/kickoff-note-ver1.1.md
+  dev_note: docs/개발자노트-ver1.1.md
+  arch_note: docs/arch-note-wood-woo.md
+  impl_root: docs/impl/ver1.1/
+  impl:
+    pm: docs/impl/ver1.1/pm.md
+    fe: docs/impl/ver1.1/fe.md
+    be: docs/impl/ver1.1/be.md
+    qa: docs/impl/ver1.1/qa.md
+  scenario_bank: docs/qa/scenarios-be-api-handling-bank.md
+
+p1:
+  - IDOR-RPT-13    # 타인 리포트 조회 — 하지명
+  - IDOR-RPT-14    # 타인 리포트 수정 — 하지명
+  - IDOR-ROOM-27   # 타인 방 조회 — 하지명
+  - IDOR-ROOM-31   # 타인 방 수정/삭제 — 하지명
+  - silent-500-juso       # AddressSearchService 미래핑 — 이민우
+  - silent-500-geocoding  # GeocodingService 미래핑 — 이민우
+
+error_paths:
+  PATH_A: GeneralException → advice → flat ApiResponse
+  PATH_B: framework (400/405/409/500) → advice
+  PATH_C: security filter → AUTH_401 (advice bypass)
+
+blockers:
+  - gh read:project scope (board#2 수집 차단)
+  - Discord bot token (일일 알람 미발송)

@@ -22,8 +22,11 @@ The following paths are Admin-only. Cursor MUST NOT suggest edits:
   .github/workflows/protected-files.yml
   _wood/workflows/**
   _wood/agents/**
+  _wood/context/**
   _wood/team-roles.yaml
   _wood/milestone-meta.yaml
+  .claude/hooks/**
+  .claude/settings.json
   docs/team-conventions.md
 
 PM-editable (Admin + PM):
