@@ -1,0 +1,10 @@
+{
+  "pkg": "frontend",
+  "globalName": "BangCheck",
+  "projectId": "11ccd2d5-08f3-47c3-adbd-5f67434f3b8b",
+  "shape": "package",
+  "srcDir": "src/components/ui",
+  "tsconfig": "tsconfig.json",
+  "cssEntry": ".design-sync/.cache/ds_compiled.css",
+  "runtimeFontPrefixes": ["Pretendard", "Phudu"]
+}
