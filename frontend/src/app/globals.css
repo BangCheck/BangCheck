@@ -1,6 +1,10 @@
 @import "tailwindcss";
 
 @theme {
+  /* Font families — body(Pretendard) + wordmark header(Phudu). 로드: index.html */
+  --font-sans: "Pretendard", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-wordmark: "Phudu", "Pretendard", sans-serif;
+
   --color-brand-primary: #0a607d;
   --color-brand-primary-dark: #084e6d;
   --color-text-main: #232527;
