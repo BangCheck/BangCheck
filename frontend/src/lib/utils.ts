@@ -15,8 +15,14 @@ export function formatAmount(val: number): string {
   if (val <= 0) return '0';
   if (val >= 10000) {
     const uk = Math.floor(val / 10000);
-    const chun = Math.floor((val % 10000) / 1000);
-    return chun === 0 ? `${uk}억` : `${uk}억 ${chun}천`;
+    const rem = val % 10000;
+    const chun = Math.floor(rem / 1000);
+    const baek = Math.floor((rem % 1000) / 100);
+    // 억 구간도 천 구간과 동일 granularity(백까지) 유지 — 10999를 "1억"으로 절삭하지 않는다.
+    let s = `${uk}억`;
+    if (chun) s += ` ${chun}천`;
+    if (baek) s += ` ${baek}백`;
+    return s;
   }
   if (val >= 1000) {
     const chun = Math.floor(val / 1000);

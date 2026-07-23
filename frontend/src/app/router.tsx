@@ -1,4 +1,5 @@
 import { Routes, Route, Outlet, Navigate } from 'react-router-dom';
+import { ROUTES } from '@/lib/routes';
 import LandingPage from '@/features/landing/LandingPage';
 import LoginPage from '@/features/login/LoginPage';
 import AuthCallbackPage from '@/features/auth/AuthCallbackPage';
@@ -45,7 +46,7 @@ export const Router = () => (
         <Route path="/report" element={<ReportPage />} />
         <Route path="/custom" element={<SettingsPage />} />
         <Route path="/settings" element={<Navigate to="/custom" replace />} />
-        <Route path="/my" element={<MyPage />} />
+        <Route path={ROUTES.MY} element={<MyPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Route>
     </Routes>

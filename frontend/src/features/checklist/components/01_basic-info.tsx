@@ -1,6 +1,6 @@
 import { SelectCard, EmojiCard, SectionHeader, FieldLabel, TextInput } from './ui/shared';
 import AddressSearchInput from './ui/AddressSearchInput';
-import { TRANSACTION_TYPES } from '@/features/rooms/constants';
+import { ROOM_TYPES } from '@/lib/constants';
 import type { BasicInfoData } from '@/types';
 
 export type { BasicInfoData };
@@ -45,7 +45,7 @@ export default function BasicInfo({ data, onChange }: Props) {
           <div>
             <FieldLabel>거래 유형</FieldLabel>
             <div className="grid grid-cols-3 gap-3">
-              {TRANSACTION_TYPES.map((t) => (
+              {ROOM_TYPES.map((t) => (
                 <SelectCard
                   key={t}
                   label={t}

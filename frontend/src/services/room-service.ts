@@ -1,5 +1,5 @@
 import { api } from '@/lib/api';
-import type { Room, RoomDetail, RoomListItem, BasicInfoData, BuildingInfoData, InteriorCheckData, CustomMemoData, RoomFormState, ChecklistAnswers } from '@/types';
+import type { Room, RoomDetail, RoomListItem, BasicInfoData, BuildingInfoData, InteriorCheckData, CustomMemoData, RoomFormState, ChecklistAnswers, SortOption } from '@/types';
 import {
   mapApiRoomToRoom,
   mapApiToForms,
@@ -15,7 +15,7 @@ export type { RoomFormState };
 export const getRooms = async (rentType?: string, sort?: string): Promise<Room[]> => {
   const params: Record<string, string> = {};
   if (rentType && rentType !== '전체') params.rentType = RENT_TYPE_TO_API[rentType] ?? rentType;
-  if (sort) params.sort = SORT_TO_API[sort] ?? sort;
+  if (sort) params.sort = SORT_TO_API[sort as SortOption] ?? sort;
   const response = await api.get<{ success: boolean; data: RoomListItem[] }>('/api/v1/rooms', { params });
   return response.data.data.map(mapApiRoomToRoom);
 };

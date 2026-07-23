@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Navigate } from 'react-router-dom';
 import { Icon } from '@iconify/react';
 import { useAuthStore } from '@/store/use-auth-store';
 import { ROUTES } from '@/lib/routes';
@@ -14,7 +14,12 @@ import { ROUTES } from '@/lib/routes';
  */
 export default function MyPage() {
   const navigate = useNavigate();
-  const { user, logout } = useAuthStore();
+  const { user, logout, isLoggedIn } = useAuthStore();
+
+  // 마이페이지는 로그인 사용자 전용(유일 액션이 로그아웃). 게스트 진입 시 로그인으로 유도.
+  if (!isLoggedIn) {
+    return <Navigate to={`${ROUTES.LOGIN}?redirect=${ROUTES.MY}`} replace />;
+  }
 
   // 아바타 이니셜: nickname 우선, 없으면 email 첫 글자, 그래도 없으면 '?' 폴백.
   // Figma의 "김"은 placeholder — User 타입에는 nickname/email만 존재(name 필드 없음).

@@ -590,13 +590,13 @@ export default function MapPage() {
         const rent = r.rent ?? null;
         const id = r.id;
 
-        // 가격 표기는 공유 formatAmount로 통일 (카드/리스트와 동일 포맷)
+        // 보증금·월세 모두 공유 formatAmount로 통일 (formatRoomPrice 카드 경로와 동일 규칙)
         const priceLine = type === '전세'
           ? `전세 ${deposit ? formatAmount(deposit) : '-'}`
           : type === '월세'
-          ? `월세 ${deposit ? formatAmount(deposit) : '-'} / ${rent ? `${rent}만` : '-'}`
+          ? `월세 ${deposit ? formatAmount(deposit) : '-'} / ${rent ? formatAmount(rent) : '-'}`
           : type === '단기임대'
-          ? `단기 ${deposit ? formatAmount(deposit) : '-'} / ${rent ? `${rent}만` : '-'}`
+          ? `단기 ${deposit ? formatAmount(deposit) : '-'} / ${rent ? formatAmount(rent) : '-'}`
           : '';
 
         const bubbleLabel = priceLine || name;

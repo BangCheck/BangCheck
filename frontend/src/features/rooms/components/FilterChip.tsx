@@ -18,6 +18,8 @@ export function FilterChip({
 }) {
   return (
     <button
+      type="button"
+      aria-pressed={selected}
       onClick={onClick}
       className={cn(
         'rounded-lg font-medium transition-all cursor-pointer whitespace-nowrap',

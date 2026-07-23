@@ -1,4 +1,4 @@
-import type { Room, RoomListItem, BasicInfoData, BuildingInfoData, InteriorCheckData, CustomMemoData, RoomFormState, ChecklistAnswers, ChecklistCategory } from '@/types';
+import type { Room, RoomListItem, BasicInfoData, BuildingInfoData, InteriorCheckData, CustomMemoData, RoomFormState, ChecklistAnswers, ChecklistCategory, SortOption, RoomSort } from '@/types';
 
 // ── FE → API enum maps ────────────────────────────────────────
 
@@ -36,7 +36,8 @@ const API_TO_DIRECTION: Record<string, string> = {
   SOUTH: '남향', EAST: '동향', WEST: '서향', NORTH: '북향',
 };
 
-const SORT_TO_API: Record<string, string> = {
+// Record<SortOption, RoomSort> — SORT_OPTIONS 라벨이 늘면 여기 누락을 컴파일러가 잡는다.
+const SORT_TO_API: Record<SortOption, RoomSort> = {
   '보증금 낮은순': 'DEPOSIT_ASC',
   '월세 낮은순': 'RENT_ASC',
   '관리비 낮은순': 'MANAGEMENT_FEE_ASC',

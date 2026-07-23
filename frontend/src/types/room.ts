@@ -1,6 +1,11 @@
 // 하위호환 타입 (RoomCard, use-guest-room-store 등 기존 코드용)
 export type RoomType = '전세' | '월세' | '단기임대';
 
+// rooms 리스트 정렬 — FE 라벨과 API enum. SORT_TO_API(services/room-mappers)가
+// Record<SortOption, RoomSort>로 묶어 라벨 추가 시 매핑 누락을 컴파일러가 잡게 한다.
+export type SortOption = '보증금 낮은순' | '월세 낮은순' | '관리비 낮은순';
+export type RoomSort = 'DEPOSIT_ASC' | 'RENT_ASC' | 'MANAGEMENT_FEE_ASC';
+
 // BE /api/v1/rooms 목록 응답 DTO
 export interface RoomListItem {
   id: number;

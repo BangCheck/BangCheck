@@ -16,6 +16,7 @@ import {
 import { RoomBanner } from '@/features/rooms/components/RoomBanner';
 import { FilterChip } from '@/features/rooms/components/FilterChip';
 import { TRANSACTION_FILTERS, SORT_OPTIONS, DEFAULT_SORT } from '@/features/rooms/constants';
+import type { SortOption } from '@/types';
 import { useChecklistItems } from '@/features/checklist/hooks/use-checklist-items';
 
 // ─── Skeleton ────────────────────────────────────────────────────────────────
@@ -134,8 +135,8 @@ function SortDropdown({
   onReset,
   onClose,
 }: {
-  value: string;
-  onChange: (v: string) => void;
+  value: SortOption;
+  onChange: (v: SortOption) => void;
   onReset: () => void;
   onClose: () => void;
 }) {
@@ -172,8 +173,8 @@ function UnifiedFilterDropdown({
 }: {
   transactionType: string;
   onTransactionChange: (v: string) => void;
-  sortOption: string;
-  onSortChange: (v: string) => void;
+  sortOption: SortOption;
+  onSortChange: (v: SortOption) => void;
   onReset: () => void;
   onClose: () => void;
 }) {
@@ -241,7 +242,7 @@ export default function RoomsPage() {
   const [isCustomModalOpen, setIsCustomModalOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<'transaction' | 'sort' | null>(null);
   const [transactionType, setTransactionType] = useState('전체');
-  const [sortOption, setSortOption] = useState<string>(DEFAULT_SORT);
+  const [sortOption, setSortOption] = useState<SortOption>(DEFAULT_SORT);
 
   const dropdownRef = useRef<HTMLDivElement>(null);
   const dropdownRefMobile = useRef<HTMLDivElement>(null);
