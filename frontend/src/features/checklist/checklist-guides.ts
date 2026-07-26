@@ -1,6 +1,6 @@
 // SSoT — 내부상태/문제확인 항목별 hint + 가이드 패널 텍스트
 // Figma 소스: 587:42437 (ChecklistNew 페이지), v0.2 인벤토리 참조
-// 위치: _woo/projects/08_SWYP/04_docs/pages/checklist-new/components.md
+// 위치: _woo/projects/08_BangCheck/04_docs/pages/checklist-new/components.md
 
 import type { InteriorCheckData } from '@/types';
 

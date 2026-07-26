@@ -1,4 +1,4 @@
-# Story Template — 08_SWYP
+# Story Template — 08_BangCheck
 
 > Copy this file, rename to `e{ep}-s{st}-{name}.md`, fill in each section.
 > Decomposition is **developer's choice** — merge or split sections freely.

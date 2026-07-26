@@ -159,7 +159,7 @@ All non-code documents in this repo MUST be written in **English**. This is a **
 
 ### Rules
 
-- The source of truth is managed in Korean at `00_bmad` (`_woo/projects/08_SWYP/`); documents are translated to English when copied to this repo.
+- The source of truth is managed in Korean at `00_bmad` (`_woo/projects/08_BangCheck/`); documents are translated to English when copied to this repo.
 - Identifiers (filenames, slugs, command IDs, branch names) always use English/ASCII.
 - `_wood/` agents and workflows must be fully English — Korean inline comments or labels are prohibited.
 

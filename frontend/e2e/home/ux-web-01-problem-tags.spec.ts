@@ -3,7 +3,7 @@ import { clearStorage, seedGuestRoom } from '../helpers/storage';
 
 /**
  * TC-P0-01 [UX-WEB-01] 문제요소 태그 렌더 [covers: NL-HM-09]
- * Issue: _woo/projects/08_SWYP/07_test/qa-v2.1.2/wave1/wave1-UX-WEB-01-home-problem-tags.md
+ * Issue: _woo/projects/08_BangCheck/07_test/qa-v2.1.2/wave1/wave1-UX-WEB-01-home-problem-tags.md
  *
  * 데이터 경로: guest-room-storage (zustand persist) → Room.issues 객체 → RoomCard chip.
  * 라벨: mold→곰팡이, leak→누수흔적, bug→벌레흔적, condensation→결로, drainSmell→냄새.
