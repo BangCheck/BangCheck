@@ -4,6 +4,7 @@ import { useAuthStore } from '@/store/use-auth-store';
 import { useGuestRoomStore } from '@/store/use-guest-room-store';
 import { useRoomsList, useDeleteRoom } from '@/features/rooms/hooks/use-rooms-query';
 import { cn } from '@/lib/utils';
+import { useOnClickOutside } from '@/hooks/use-on-click-outside';
 import { ROUTES } from '@/lib/routes';
 import { GUEST_ROOM_LIMIT, ROOM_LIMIT, STORAGE_KEY_ONBOARDING } from '@/lib/constants';
 import RoomCard from '@/components/RoomCard';
@@ -13,6 +14,9 @@ import {
   CustomChecklistModal,
 } from '@/components/ui/Modals';
 import { RoomBanner } from '@/features/rooms/components/RoomBanner';
+import { FilterChip } from '@/features/rooms/components/FilterChip';
+import { TRANSACTION_FILTERS, SORT_OPTIONS, DEFAULT_SORT } from '@/features/rooms/constants';
+import type { SortOption } from '@/types';
 import { useChecklistItems } from '@/features/checklist/hooks/use-checklist-items';
 
 // ─── Skeleton ────────────────────────────────────────────────────────────────
@@ -112,19 +116,13 @@ function TransactionDropdown({
     <div className="absolute top-full left-0 mt-2 w-max bg-white border border-border-light rounded-[12px] shadow-xl z-50 p-5 animate-in fade-in zoom-in-95 duration-150">
       <h4 className="text-[14px] font-bold text-text-main mb-4">거래방식</h4>
       <div className="flex gap-2">
-        {['전체', '전세', '월세', '단기임대'].map((type) => (
-          <button
+        {TRANSACTION_FILTERS.map((type) => (
+          <FilterChip
             key={type}
+            label={type}
+            selected={value === type}
             onClick={() => { onChange(type); onClose(); }}
-            className={cn(
-              'px-4 py-2 rounded-lg text-[13px] font-medium transition-all cursor-pointer whitespace-nowrap',
-              value === type
-                ? 'border border-brand-primary text-brand-primary bg-white'
-                : 'bg-bg-gray text-text-caption border border-transparent'
-            )}
-          >
-            {type}
-          </button>
+          />
         ))}
       </div>
     </div>
@@ -137,8 +135,8 @@ function SortDropdown({
   onReset,
   onClose,
 }: {
-  value: string;
-  onChange: (v: string) => void;
+  value: SortOption;
+  onChange: (v: SortOption) => void;
   onReset: () => void;
   onClose: () => void;
 }) {
@@ -151,19 +149,13 @@ function SortDropdown({
         </button>
       </div>
       <div className="flex flex-wrap gap-2">
-        {['보증금 낮은순', '월세 낮은순', '관리비 낮은순'].map((opt) => (
-          <button
+        {SORT_OPTIONS.map((opt) => (
+          <FilterChip
             key={opt}
+            label={opt}
+            selected={value === opt}
             onClick={() => { onChange(opt); onClose(); }}
-            className={cn(
-              'px-4 py-2 rounded-lg text-[13px] font-medium transition-all cursor-pointer whitespace-nowrap',
-              value === opt
-                ? 'border border-brand-primary text-brand-primary bg-white'
-                : 'bg-bg-gray text-text-caption border border-transparent'
-            )}
-          >
-            {opt}
-          </button>
+          />
         ))}
       </div>
     </div>
@@ -181,8 +173,8 @@ function UnifiedFilterDropdown({
 }: {
   transactionType: string;
   onTransactionChange: (v: string) => void;
-  sortOption: string;
-  onSortChange: (v: string) => void;
+  sortOption: SortOption;
+  onSortChange: (v: SortOption) => void;
   onReset: () => void;
   onClose: () => void;
 }) {
@@ -198,19 +190,14 @@ function UnifiedFilterDropdown({
       <div className="mb-4">
         <p className="text-[12px] font-semibold text-text-sub mb-2">거래방식</p>
         <div className="flex flex-wrap gap-1.5">
-          {['전체', '전세', '월세', '단기임대'].map((type) => (
-            <button
+          {TRANSACTION_FILTERS.map((type) => (
+            <FilterChip
               key={type}
+              label={type}
+              size="sm"
+              selected={transactionType === type}
               onClick={() => onTransactionChange(type)}
-              className={cn(
-                'px-3 py-1.5 rounded-lg text-[12px] font-medium transition-all cursor-pointer whitespace-nowrap',
-                transactionType === type
-                  ? 'border border-brand-primary text-brand-primary bg-white'
-                  : 'bg-bg-gray text-text-caption border border-transparent'
-              )}
-            >
-              {type}
-            </button>
+            />
           ))}
         </div>
       </div>
@@ -218,19 +205,14 @@ function UnifiedFilterDropdown({
       <div className="mb-4">
         <p className="text-[12px] font-semibold text-text-sub mb-2">정렬</p>
         <div className="flex flex-wrap gap-1.5">
-          {['보증금 낮은순', '월세 낮은순', '관리비 낮은순'].map((opt) => (
-            <button
+          {SORT_OPTIONS.map((opt) => (
+            <FilterChip
               key={opt}
+              label={opt}
+              size="sm"
+              selected={sortOption === opt}
               onClick={() => onSortChange(opt)}
-              className={cn(
-                'px-3 py-1.5 rounded-lg text-[12px] font-medium transition-all cursor-pointer whitespace-nowrap',
-                sortOption === opt
-                  ? 'border border-brand-primary text-brand-primary bg-white'
-                  : 'bg-bg-gray text-text-caption border border-transparent'
-              )}
-            >
-              {opt}
-            </button>
+            />
           ))}
         </div>
       </div>
@@ -260,7 +242,7 @@ export default function RoomsPage() {
   const [isCustomModalOpen, setIsCustomModalOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<'transaction' | 'sort' | null>(null);
   const [transactionType, setTransactionType] = useState('전체');
-  const [sortOption, setSortOption] = useState('보증금 낮은순');
+  const [sortOption, setSortOption] = useState<SortOption>(DEFAULT_SORT);
 
   const dropdownRef = useRef<HTMLDivElement>(null);
   const dropdownRefMobile = useRef<HTMLDivElement>(null);
@@ -277,7 +259,7 @@ export default function RoomsPage() {
     if (transactionType !== '전체') {
       list = list.filter((r) => r.type === transactionType);
     }
-    if (sortOption === '보증금 낮은순') list.sort((a, b) => (a.deposit ?? 0) - (b.deposit ?? 0));
+    if (sortOption === DEFAULT_SORT) list.sort((a, b) => (a.deposit ?? 0) - (b.deposit ?? 0));
     else if (sortOption === '월세 낮은순') list.sort((a, b) => (a.rent ?? 0) - (b.rent ?? 0));
     else if (sortOption === '관리비 낮은순') list.sort((a, b) => (a.managementFee ?? 0) - (b.managementFee ?? 0));
     return list;
@@ -288,7 +270,7 @@ export default function RoomsPage() {
 
 
   // EmptyState 분기 — 필터 활성 상태(전체가 아닌 거래방식 또는 비-기본 정렬)이면 EmptyStateFiltered, 그 외 EmptyStateOnboarding
-  const isFilterActive = transactionType !== '전체' || sortOption !== '보증금 낮은순';
+  const isFilterActive = transactionType !== '전체' || sortOption !== DEFAULT_SORT;
 
   // ISSUE-LOGIN-X2: 첫 로그인(onboarding flag 없음) 시 모달 1회 노출. 기존 rooms.length === 0 조건은 신규 기기/기존 사용자 케이스 누락 → flag 단독 판정으로 단순화.
   useEffect(() => {
@@ -297,18 +279,7 @@ export default function RoomsPage() {
     }
   }, [isLoggedIn]);
 
-  useEffect(() => {
-    function handleClickOutside(e: MouseEvent) {
-      const target = e.target as Node;
-      const insideDesktop = dropdownRef.current?.contains(target);
-      const insideMobile = dropdownRefMobile.current?.contains(target);
-      if (!insideDesktop && !insideMobile) {
-        setActiveDropdown(null);
-      }
-    }
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+  useOnClickOutside([dropdownRef, dropdownRefMobile], () => setActiveDropdown(null));
 
   const handleStartChecklist = () => {
     if (!isLoggedIn) {
@@ -394,7 +365,7 @@ export default function RoomsPage() {
               onClick={() => setActiveDropdown(activeDropdown === 'sort' ? null : 'sort')}
               className={cn(
                 'border rounded-[6px] px-3 py-1.5 text-fluid-md font-medium flex items-center gap-1.5 transition-all cursor-pointer bg-white whitespace-nowrap',
-                activeDropdown === 'sort' || sortOption !== '보증금 낮은순'
+                activeDropdown === 'sort' || sortOption !== DEFAULT_SORT
                   ? 'border-brand-primary text-brand-primary'
                   : 'border-border-mute text-text-sub'
               )}
@@ -419,7 +390,7 @@ export default function RoomsPage() {
               <SortDropdown
                 value={sortOption}
                 onChange={setSortOption}
-                onReset={() => setSortOption('보증금 낮은순')}
+                onReset={() => setSortOption(DEFAULT_SORT)}
                 onClose={() => setActiveDropdown(null)}
               />
             )}
@@ -452,7 +423,7 @@ export default function RoomsPage() {
               onClick={() => setActiveDropdown(activeDropdown === 'transaction' ? null : 'transaction')}
               className={cn(
                 'border rounded-[6px] pl-3 pr-2 py-1.5 text-[14px] font-medium flex items-center gap-1 transition-all cursor-pointer bg-white whitespace-nowrap',
-                activeDropdown === 'transaction' || transactionType !== '전체' || sortOption !== '보증금 낮은순'
+                activeDropdown === 'transaction' || transactionType !== '전체' || sortOption !== DEFAULT_SORT
                   ? 'border-brand-primary text-brand-primary'
                   : 'border-border-mute text-text-sub'
               )}
@@ -471,7 +442,7 @@ export default function RoomsPage() {
                 onSortChange={setSortOption}
                 onReset={() => {
                   setTransactionType('전체');
-                  setSortOption('보증금 낮은순');
+                  setSortOption(DEFAULT_SORT);
                 }}
                 onClose={() => setActiveDropdown(null)}
               />

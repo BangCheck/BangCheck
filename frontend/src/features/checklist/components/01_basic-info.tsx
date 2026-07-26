@@ -1,5 +1,6 @@
 import { SelectCard, EmojiCard, SectionHeader, FieldLabel, TextInput } from './ui/shared';
 import AddressSearchInput from './ui/AddressSearchInput';
+import { ROOM_TYPES } from '@/lib/constants';
 import type { BasicInfoData } from '@/types';
 
 export type { BasicInfoData };
@@ -44,7 +45,7 @@ export default function BasicInfo({ data, onChange }: Props) {
           <div>
             <FieldLabel>거래 유형</FieldLabel>
             <div className="grid grid-cols-3 gap-3">
-              {(['전세', '월세', '단기임대'] as const).map((t) => (
+              {ROOM_TYPES.map((t) => (
                 <SelectCard
                   key={t}
                   label={t}

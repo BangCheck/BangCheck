@@ -15,8 +15,14 @@ export function formatAmount(val: number): string {
   if (val <= 0) return '0';
   if (val >= 10000) {
     const uk = Math.floor(val / 10000);
-    const chun = Math.floor((val % 10000) / 1000);
-    return chun === 0 ? `${uk}억` : `${uk}억 ${chun}천`;
+    const rem = val % 10000;
+    const chun = Math.floor(rem / 1000);
+    const baek = Math.floor((rem % 1000) / 100);
+    // 억 구간도 천 구간과 동일 granularity(백까지) 유지 — 10999를 "1억"으로 절삭하지 않는다.
+    let s = `${uk}억`;
+    if (chun) s += ` ${chun}천`;
+    if (baek) s += ` ${baek}백`;
+    return s;
   }
   if (val >= 1000) {
     const chun = Math.floor(val / 1000);
@@ -24,6 +30,21 @@ export function formatAmount(val: number): string {
     return baek === 0 ? `${chun}천` : `${chun}천 ${baek}백`;
   }
   return `${val.toLocaleString()}만`;
+}
+
+/** 생성일시 포맷터 — "YYYY.MM.DD HH:mm".
+ *  RoomCard·MapPage 공통(기존 각자 보유한 동일 로직을 통합).
+ *  파싱 불가한 입력은 원문 그대로 반환.
+ */
+export function formatDateTime(dateStr: string): string {
+  const date = new Date(dateStr);
+  if (Number.isNaN(date.getTime())) return dateStr;
+  const YYYY = date.getFullYear();
+  const MM = String(date.getMonth() + 1).padStart(2, '0');
+  const DD = String(date.getDate()).padStart(2, '0');
+  const HH = String(date.getHours()).padStart(2, '0');
+  const mm = String(date.getMinutes()).padStart(2, '0');
+  return `${YYYY}.${MM}.${DD} ${HH}:${mm}`;
 }
 
 /** RoomCard·guest store 공통 포맷터 — 거래방식별 표기.
