@@ -29,6 +29,8 @@ export default function HeroSection() {
 
           <Link
             to={ROUTES.HOME}
+            data-atlas-node="landing-login-cta"
+            data-atlas-label="체크리스트 시작하기"
             className="flex items-center gap-[10px] bg-brand-primary text-white font-semibold md:font-bold text-fluid-lg tracking-[-0.5px] px-[16px] md:px-[10px] py-[10px] md:py-[16px] rounded-[4px] md:rounded-[8px] w-[293px] md:w-[210px] justify-center hover:bg-brand-primary-dark transition-colors"
           >
             체크리스트 시작하기
