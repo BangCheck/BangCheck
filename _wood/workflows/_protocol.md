@@ -18,7 +18,7 @@ Run them exactly as written in workflow files.
 
 ```
 ❌ Wrong: "Let me check the issues..."  (then make up output)
-✅ Right: Execute `gh issue list --repo SWYP-Backend/project --state open --limit 10`
+✅ Right: Execute `gh issue list --repo BangCheck/BangCheck --state open --limit 10`
          Display actual stdout.
 ```
 
@@ -80,7 +80,7 @@ gh auth status || { echo "Not authenticated. Run: gh auth login"; exit 1; }
 
 # 2. Repo verification
 REPO=$(git remote get-url origin | sed -E 's|.*github.com[:/]([^/]+/[^/.]+).*|\1|')
-[ "$REPO" = "SWYP-Backend/project" ] || { echo "Wrong repo: $REPO"; exit 1; }
+[ "$REPO" = "BangCheck/BangCheck" ] || { echo "Wrong repo: $REPO"; exit 1; }
 
 # 3. User identification
 USER_LOGIN=$(gh api user --jq .login)
@@ -102,7 +102,7 @@ Workflow files contain bash blocks. Execute them verbatim:
 
 ````markdown
 ```bash
-gh issue list --repo SWYP-Backend/project --state open
+gh issue list --repo BangCheck/BangCheck --state open
 ```
 ````
 
@@ -213,7 +213,7 @@ When executing a workflow, show progress clearly:
 [Workflow: 01-entry.md]
 [Step 1/6] Pre-flight check... ✓
 [Step 2/6] Fetching milestones... 
-  $ gh api repos/SWYP-Backend/project/milestones
+  $ gh api repos/BangCheck/BangCheck/milestones
   → 2 milestones found
 [Step 3/6] Fetching user issues...
   ...
@@ -269,5 +269,5 @@ If role != Admin → REFUSE with message from "Refusal Patterns" section.
 ---
 
 **Policy version:** v1.0
-**Last reviewed:** 2026-04-16
+**Last reviewed:** 2026-07-29
 **Admin:** @Woo-JongHo
