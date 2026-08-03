@@ -1,6 +1,5 @@
 package com.room.backend.domain.room.entity;
 
-import com.room.backend.api.room.dto.request.RoomUpdateRequestDTO;
 import com.room.backend.domain.room.entity.enums.BuildingType;
 import com.room.backend.domain.room.entity.enums.Direction;
 import com.room.backend.domain.room.entity.enums.MaintenanceStatus;
@@ -46,7 +45,6 @@ public class Room extends BaseEntity {
     @Column(name = "rent_type", length = 20)
     private RentType rentType;
 
-    @Column
     private Long deposit;
 
     @Column(name = "monthly_rent")
@@ -78,10 +76,8 @@ public class Room extends BaseEntity {
     private Boolean isMoveInDateNegotiable;
 
     @Enumerated(EnumType.STRING)
-    @Column
     private BuildingType buildingType;
 
-    @Column
     private Integer floor;
 
     @Column(name = "has_elevator")
@@ -179,31 +175,39 @@ public class Room extends BaseEntity {
         return room;
     }
 
-    public void update(RoomUpdateRequestDTO request, BigDecimal lat, BigDecimal lon) {
-        this.name = request.getName();
-        if (request.getAddress() != null) {
-            this.address = request.getAddress();
+    /** 수정 가능한 값을 하나의 불변 명령으로 묶어 부분 인자 누락과 순서 오류를 막는다. */
+    public void update(UpdateValues values, BigDecimal lat, BigDecimal lon) {
+        this.name = values.name();
+        if (values.address() != null) {
+            this.address = values.address();
             this.lat = lat;
             this.lon = lon;
         }
-        this.rentType = request.getRentType();
-        this.deposit = request.getDeposit();
-        this.monthlyRent = request.getRent();
-        this.isManagementFeeUnknown = request.getIsManagementFeeUnknown() != null ? request.getIsManagementFeeUnknown() : false;
-        this.maintenanceFee = request.getManagementFee();
+        this.rentType = values.rentType();
+        this.deposit = values.deposit();
+        this.monthlyRent = values.rent();
+        this.isManagementFeeUnknown = values.managementFeeUnknown() != null ? values.managementFeeUnknown() : false;
+        this.maintenanceFee = values.managementFee();
         this.maintenanceStatus = this.isManagementFeeUnknown ? MaintenanceStatus.UNKNOWN :
                 (this.maintenanceFee != null ? MaintenanceStatus.INCLUDED : MaintenanceStatus.NONE);
-        this.hasLoan = request.getHasLoan();
-        this.loanAmount = request.getLoanAmount();
-        this.canRegisterAddress = request.getCanRegisterAddress();
-        this.availableFrom = request.getMoveInDate();
-        this.isMoveInDateNegotiable = request.getIsMoveInDateNegotiable();
-        this.buildingType = request.getBuildingType();
-        this.floor = request.getFloor();
-        this.hasElevator = request.getHasElevator();
-        this.hasParking = request.getHasParking();
-        this.specialFloor = request.getSpecialFloor();
-        this.direction = request.getDirection();
-        this.memo = request.getMemo();
+        this.hasLoan = values.hasLoan();
+        this.loanAmount = values.loanAmount();
+        this.canRegisterAddress = values.canRegisterAddress();
+        this.availableFrom = values.moveInDate();
+        this.isMoveInDateNegotiable = values.moveInDateNegotiable();
+        this.buildingType = values.buildingType();
+        this.floor = values.floor();
+        this.hasElevator = values.hasElevator();
+        this.hasParking = values.hasParking();
+        this.specialFloor = values.specialFloor();
+        this.direction = values.direction();
+        this.memo = values.memo();
     }
+
+    public record UpdateValues(
+            String name, String address, RentType rentType, Long deposit, Integer rent,
+            Boolean managementFeeUnknown, Integer managementFee, Boolean hasLoan, Long loanAmount,
+            Boolean canRegisterAddress, LocalDate moveInDate, Boolean moveInDateNegotiable,
+            BuildingType buildingType, Integer floor, Boolean hasElevator, Boolean hasParking,
+            SpecialFloor specialFloor, Direction direction, String memo) { }
 }

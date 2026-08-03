@@ -1,0 +1,84 @@
+# Atlas registry 스키마 — 축 1(사용자 가치)의 필드 계약
+#
+# 이 파일이 없으면 두 번째 feature를 쓰는 순간 형식이 갈라진다.
+# resolver(tools/resolve.mjs)가 이 정의를 읽어 registry를 검사한다.
+#
+# 경계: 이 디렉터리 전체가 별도 project-atlas 저장소로 이동할 대상이다.
+#       BangCheck에는 project.yaml과 registry만 남는다.
+
+version: 0.1
+
+authorityClass:
+  # AD-1: 모든 값은 셋 중 하나의 권위 등급을 가진다
+  AUTHORED: 사람이 쓴 값. 근거 문서가 있어야 한다
+  DERIVED:  코드·산출물에서 기계적으로 파생. commit 또는 collectedAt 필수
+  SEED:     아직 검증되지 않은 임시값. LIVE·VERIFIED로 표시할 수 없다
+
+idPattern:
+  capability: '^CAP-[A-Z0-9-]+$'
+  feature:    '^FT-[A-Z0-9-]+$'
+  operation:  '^OP-[A-Z0-9-]+$'
+  defect:     '^BC-[A-Z]+-[0-9]{2}$'
+
+entities:
+
+  feature:
+    file: 'registry/FT-*.yaml'
+    required: [capabilityId, capabilityTitle, featureId, title, status, owner, owns, implementedBy]
+    fields:
+      featureId:      { type: id, idType: feature, unique: true }
+      capabilityId:   { type: id, idType: capability }
+      status:         { type: enum, values: [PLANNED, REFACTOR_IN_PROGRESS, SWITCHED_OVER, LIVE] }
+      owns:           { type: list, of: operation, minItems: 1 }
+      uses:           { type: list, of: operationRef, minItems: 0 }
+      knownDefects:   { type: list, of: idRef, idType: defect }
+      implementedBy:  { type: object, of: implementation }
+      tests:          { type: list, of: filePath }
+
+  operation:
+    # owns 항목의 형태. 한 operation의 주인은 정확히 하나의 feature다.
+    required: [operationId, route, safety]
+    fields:
+      operationId: { type: id, idType: operation, unique: true }
+      route:       { type: route, verifyAgainst: routeOracle }
+      auth:        { type: enum, values: [PUBLIC, JWT, GUEST] }
+      safety:      { type: object, of: safety }
+
+  safety:
+    # RPA의 Unit 안전 스키마를 웹 operation에 대응시킨 것
+    required: [sideEffect, rerunSafe, abortOnFail]
+    fields:
+      sideEffect:  { type: enum, values: [READ, WRITE, EXTERNAL] }
+      writes:      { type: list, of: string }
+      rerunSafe:   { type: boolean }
+      abortOnFail: { type: enum, values: [FULL_ROLLBACK, PARTIAL, NONE] }
+
+  operationRef:
+    # uses 항목. 남의 operation을 빌려 쓴다는 선언이며 소유를 주장하지 않는다.
+    required: [operationId, route]
+
+  implementation:
+    # 축 1과 축 2가 만나는 유일한 지점
+    required: [slice, switchedOver]
+    fields:
+      slice:         { type: dirPath }
+      useCase:       { type: filePath, relativeTo: slice }
+      legacyPath:    { type: filePathWithSymbol }
+      frontendEntry: { type: filePathWithSymbol }
+      switchedOver:  { type: boolean }
+
+  defect:
+    file: 'registry/defects.yaml'
+    required: [id, severity, title, detail, evidence, disposition]
+    fields:
+      id:          { type: id, idType: defect, unique: true }
+      severity:    { type: enum, values: [P1, P2, P3] }
+      evidence:    { type: object, of: evidence }
+      disposition: { type: enum, values: [UNDECIDED, FIX_PLANNED, RECORD_ONLY, NEEDS_PRODUCT_DECISION, FIX_WHEN_SLICE_MIGRATED] }
+
+  evidence:
+    required: [path]
+    fields:
+      path:   { type: filePath, mustExist: true }
+      symbol: { type: symbol, mustAppearInFile: true }
+      line:   { type: integer }

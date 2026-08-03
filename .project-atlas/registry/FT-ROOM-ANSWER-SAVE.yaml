@@ -1,0 +1,19 @@
+capabilityId: CAP-ROOM-INSPECT
+capabilityTitle: 방 하나의 계약 조건과 체크 결과를 확인한다
+featureId: FT-ROOM-ANSWER-SAVE
+title: 기존 방 체크리스트 답변 저장
+status: SWITCHED_OVER
+owner: "@Woo-JongHo"
+owns:
+  - operationId: OP-ROOM-ANSWER-SAVE
+    route: "POST /api/v1/rooms/{id}/check-results"
+    auth: JWT
+    safety: { sideEffect: WRITE, writes: [room_check_results, room_check_selected_options], rerunSafe: false, abortOnFail: FULL_ROLLBACK }
+uses: []
+implementedBy:
+  slice: backend/src/main/java/com/room/backend/feature/roomanswersave
+  useCase: application/SaveRoomAnswers.java
+  legacyPath: backend/src/main/java/com/room/backend/api/room/controller/RoomController.java#saveCheckResults
+  switchedOver: true
+knownDefects: [BC-SEC-01, BC-REG-02, BC-REG-03]
+switchoverReadiness: { controllerSwitched: true, legacyMethodRemoved: true }

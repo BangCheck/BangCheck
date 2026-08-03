@@ -1,0 +1,19 @@
+capabilityId: CAP-ROOM-MANAGE
+capabilityTitle: 저장한 방을 수정하고 관리한다
+featureId: FT-ROOM-UPDATE
+title: 방과 체크리스트 수정
+status: SWITCHED_OVER
+owner: "@Woo-JongHo"
+owns:
+  - operationId: OP-ROOM-UPDATE
+    route: "PUT /api/v1/rooms/{id}"
+    auth: JWT
+    safety: { sideEffect: WRITE, writes: [rooms, room_check_results, room_check_selected_options], rerunSafe: true, abortOnFail: FULL_ROLLBACK }
+uses: []
+implementedBy:
+  slice: backend/src/main/java/com/room/backend/feature/roomupdate
+  useCase: application/UpdateRoomWithAnswers.java
+  legacyPath: backend/src/main/java/com/room/backend/api/room/controller/RoomController.java#updateRoom
+  switchedOver: true
+knownDefects: [BC-REG-02, BC-REG-03, BC-REG-04]
+switchoverReadiness: { controllerSwitched: true, legacyMethodRemoved: true }

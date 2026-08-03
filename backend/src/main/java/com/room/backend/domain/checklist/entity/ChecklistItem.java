@@ -22,7 +22,7 @@ public class ChecklistItem extends BaseEntity {
     private String itemName;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = true, length = 50)
+    @Column(length = 50)
     private ChecklistCategory category;
 
     @Enumerated(EnumType.STRING)
@@ -30,13 +30,12 @@ public class ChecklistItem extends BaseEntity {
     private ItemType itemType;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = true, length = 30)
+    @Column(length = 30)
     private InputType inputType;
 
     @Column(length = 600)
     private String description;
 
-    @Column
     private Integer displayOrder;
 
     @Column(name = "owner_user_id")

@@ -1,0 +1,55 @@
+# 축 1 — 사용자 가치 계층 (CAPABILITY → FEATURE → OPERATION)
+#
+# 이 파일은 이관(refactor) 산물이 아니라 현행 코드의 관측 결과다.
+# status/switchedOver가 그 사실을 말한다 — 아직 feature slice로 옮기지 않았고,
+# 코드는 여전히 api/auth 패키지에 있다.
+# 관측만 하고 동작은 고치지 않는다. 발견한 결함은 defects.yaml로 간다.
+
+capabilityId: CAP-AUTH-SESSION
+capabilityTitle: 나를 식별하고 로그인 상태를 유지한다
+
+featureId: FT-AUTH-OAUTH-LOGIN
+title: 소셜 계정으로 로그인
+status: PLANNED
+# git author 'jiye' → team-roles.yaml의 dlwldP(Lee Ji-Ye, Backend).
+# 커밋 이메일이 로컬 호스트명이라 확증이 아니라 추정이다.
+owner: "@dlwldP"
+
+owns:
+  - operationId: OP-AUTH-OAUTH-AUTHORIZE
+    route: "GET /api/v1/auth/oauth2/{provider}"
+    auth: PUBLIC          # SecurityConfig: authBasePath + authOauthBasePath + "/**" permitAll
+    safety:
+      sideEffect: READ
+      # state는 서명된 JWT로 즉석 생성되며 서버에 저장되지 않는다 (OAuthStateService.generateState).
+      # 그래서 이 operation은 아무 테이블도 건드리지 않는다.
+      writes: []
+      rerunSafe: true       # 호출할 때마다 새 state가 나올 뿐 남는 것이 없다
+      abortOnFail: NONE
+
+  - operationId: OP-AUTH-OAUTH-CALLBACK
+    route: "GET /api/v1/auth/oauth2/{provider}/callback"
+    auth: PUBLIC
+    safety:
+      # schema의 sideEffect는 단일 enum이라 "외부 호출 + 쓰기"를 함께 말할 수 없다.
+      # 재시도 판단을 지배하는 쪽이 외부 호출(코드 1회용)이므로 EXTERNAL로 적고
+      # 실제 쓰기 대상은 writes에 남긴다. 형식 한계는 batch 1 기록으로 남긴다.
+      sideEffect: EXTERNAL
+      writes: [users, refresh_tokens]
+      rerunSafe: false      # provider의 authorization code는 1회용. 두 번째 교환은 실패한다
+      abortOnFail: FULL_ROLLBACK  # AuthService.handleOAuthCallback이 @Transactional
+
+# 이 기능이 쓰지만 소유하지 않는 외부 표면
+# (provider 토큰·userinfo 엔드포인트는 제품 route가 아니라 registry에 operation으로 두지 않는다)
+
+implementedBy:
+  # 아직 vertical slice로 이관하지 않았다. 지금 이 기능의 코드가 사는 곳을 가리킨다.
+  slice: backend/src/main/java/com/room/backend/api/auth
+  useCase: service/AuthService.java
+  legacyPath: backend/src/main/java/com/room/backend/api/auth/controller/AuthController.java#callback
+  switchedOver: false
+
+knownDefects:
+  - BC-AUTH-01
+
+tests: []   # 2026-08-03 기준 이 기능을 덮는 test 없음

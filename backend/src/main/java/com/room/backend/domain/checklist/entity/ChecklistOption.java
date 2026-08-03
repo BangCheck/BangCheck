@@ -20,6 +20,5 @@ public class ChecklistOption {
     @Column(nullable = false, length = 100)
     private String optionValue;
 
-    @Column
     private Integer displayOrder;
 }

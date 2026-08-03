@@ -1,0 +1,22 @@
+# Project Atlas — BangCheck marker
+#
+# 이 파일은 Atlas가 이 저장소를 읽기 위한 최소 메타데이터다.
+# Atlas 코드·타입·의존성은 여기에 들어오지 않는다. 방향은 단방향이다 — Atlas가 이 저장소를 읽는다.
+#
+# 정본(registry, resolver, UI)은 별도 project-atlas 저장소가 소유한다.
+# 추출 시점: Story 1.3 완료 후.
+
+projectId: bangcheck
+repo: BangCheck/BangCheck
+defaultBranch: main
+workingBranch: v0.2.0
+
+# Atlas resolver가 참조하는 경로 규약
+sources:
+  backendRoot: backend/src/main/java
+  frontendRoot: frontend/src
+  migrationRoot: backend/src/main/resources/db/migration
+  # 제품 관측치 정답지 — route 목록의 기계적 근거
+  routeOracle: backend/src/test/resources/atlas-baseline/routes.txt
+
+registryRoot: .project-atlas/registry

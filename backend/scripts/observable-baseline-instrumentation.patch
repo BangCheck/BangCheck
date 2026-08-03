@@ -1,0 +1,389 @@
+diff --git a/backend/build.gradle b/backend/build.gradle
+index d1d20d6..c87e4c2 100644
+--- a/backend/build.gradle
++++ b/backend/build.gradle
+@@ -7,12 +7,32 @@ plugins {
+ group = 'com.Login'
+ version = '0.0.1-SNAPSHOT'
+ 
++ext['testcontainers.version'] = '2.0.5'
++
++springBoot {
++    mainClass = 'com.room.backend.BackendApplication'
++}
++
+ java {
+     toolchain {
+         languageVersion = JavaLanguageVersion.of(17)
+     }
+ }
+ 
++sourceSets {
++    atlasBaselineTest {
++        java.srcDir 'src/atlasBaselineTest/java'
++        resources.srcDir 'src/atlasBaselineTest/resources'
++        compileClasspath += sourceSets.main.output
++        runtimeClasspath += output + compileClasspath
++    }
++}
++
++configurations {
++    atlasBaselineTestImplementation.extendsFrom testImplementation
++    atlasBaselineTestRuntimeOnly.extendsFrom testRuntimeOnly
++}
++
+ repositories {
+     mavenCentral()
+ }
+@@ -37,6 +57,9 @@ dependencies {
+     implementation 'org.flywaydb:flyway-mysql'
+ 
+     testImplementation 'org.springframework.boot:spring-boot-starter-test'
++    atlasBaselineTestImplementation enforcedPlatform('org.testcontainers:testcontainers-bom:2.0.5')
++    atlasBaselineTestImplementation 'org.testcontainers:testcontainers-junit-jupiter'
++    atlasBaselineTestImplementation 'org.testcontainers:testcontainers-mysql'
+     implementation 'me.paulschwarz:spring-dotenv:4.0.0'
+ }
+ 
+@@ -55,3 +78,148 @@ bootJar {
+ jar {
+     enabled = false
+ }
++
++def atlasBaselineDirectory = layout.projectDirectory.dir('src/test/resources/atlas-baseline')
++def atlasInformationReportDirectory = layout.buildDirectory.dir('reports/atlas-baseline-info')
++
++def normalizedBaselineContent = { List<String> records ->
++    records.findAll { it != null && !it.isBlank() }.unique().toSorted().join('\n') + '\n'
++}
++
++def verifyBaseline = { String fileName, List<String> records ->
++    def baselineFile = atlasBaselineDirectory.file(fileName).asFile
++    def normalized = normalizedBaselineContent(records)
++
++    if (!baselineFile.isFile()) {
++        throw new GradleException("Missing Atlas baseline: ${baselineFile}. Capture a candidate and review it before compare.")
++    }
++
++    def expected = baselineFile.getText('UTF-8').replace('\r\n', '\n')
++    if (expected != normalized) {
++        throw new GradleException("Atlas product oracle drift: ${fileName}. Capture never updates the approved baseline.")
++    }
++}
++
++def requiredCandidateDirectory = {
++    if (!providers.gradleProperty('atlasBaselineCandidateDir').isPresent()) {
++        throw new GradleException('atlasBaselineCandidateDir is required for capture.')
++    }
++    file(providers.gradleProperty('atlasBaselineCandidateDir').get())
++}
++
++def writeCandidate = { String relativePath, List<String> records ->
++    def candidateFile = new File(requiredCandidateDirectory(), relativePath)
++    candidateFile.parentFile.mkdirs()
++    candidateFile.setText(normalizedBaselineContent(records), 'UTF-8')
++    logger.lifecycle("Captured Atlas candidate: ${candidateFile}")
++}
++
++tasks.register('atlasRuntimeDependencyReport') {
++    group = 'verification'
++    description = 'Writes normalized production runtime dependencies as informational evidence.'
++
++    doLast {
++        def coordinates = configurations.runtimeClasspath.resolvedConfiguration.resolvedArtifacts.collect {
++            def id = it.moduleVersion.id
++            "${id.group}:${id.name}:${id.version}"
++        }.unique()
++        def reportFile = atlasInformationReportDirectory.get().file('runtime-dependencies.txt').asFile
++        reportFile.parentFile.mkdirs()
++        reportFile.setText(normalizedBaselineContent(coordinates), 'UTF-8')
++    }
++}
++
++tasks.register('atlasRuntimeDependencyCapture') {
++    group = 'baseline capture'
++    description = 'Captures runtime dependencies as informational candidate evidence; it is not a verification task.'
++
++    doLast {
++        def coordinates = configurations.runtimeClasspath.resolvedConfiguration.resolvedArtifacts.collect {
++            def id = it.moduleVersion.id
++            "${id.group}:${id.name}:${id.version}"
++        }.unique()
++        writeCandidate('info/runtime-dependencies.txt', coordinates)
++    }
++}
++
++tasks.register('atlasBootEntryCompare') {
++    group = 'verification'
++    description = 'Compares the executable jar Start-Class product oracle.'
++    dependsOn tasks.named('bootJar')
++
++    doLast {
++        def executableJar = tasks.named('bootJar').get().archiveFile.get().asFile
++        def jarFile = new java.util.jar.JarFile(executableJar)
++        try {
++            def attributes = jarFile.manifest.mainAttributes
++            verifyBaseline('start-class.txt', ["start-class=${attributes.getValue('Start-Class')}"])
++        } finally {
++            jarFile.close()
++        }
++    }
++}
++
++tasks.register('atlasBootEntryCapture') {
++    group = 'baseline capture'
++    description = 'Captures Start-Class and boot loader candidate evidence; it is not a verification task.'
++    dependsOn tasks.named('bootJar')
++
++    doLast {
++        def executableJar = tasks.named('bootJar').get().archiveFile.get().asFile
++        def jarFile = new java.util.jar.JarFile(executableJar)
++        try {
++            def attributes = jarFile.manifest.mainAttributes
++            writeCandidate('oracle/start-class.txt', [
++                    "start-class=${attributes.getValue('Start-Class')}"
++            ])
++            writeCandidate('info/boot-loader.txt', [
++                    "main-class=${attributes.getValue('Main-Class')}"
++            ])
++        } finally {
++            jarFile.close()
++        }
++    }
++}
++
++tasks.register('atlasBaselineTest', Test) {
++    group = 'verification'
++    description = 'Runs the MySQL-backed context, route and Flyway product oracle comparison.'
++    testClassesDirs = sourceSets.atlasBaselineTest.output.classesDirs
++    classpath = sourceSets.atlasBaselineTest.runtimeClasspath
++    useJUnitPlatform()
++    systemProperty 'atlas.baseline.mode', 'compare'
++    systemProperty 'atlas.baseline.directory', atlasBaselineDirectory.asFile.absolutePath
++    systemProperty 'atlas.baseline.info-directory', atlasInformationReportDirectory.get().asFile.absolutePath
++    shouldRunAfter tasks.named('test')
++}
++
++tasks.register('atlasBaselineCaptureTest', Test) {
++    group = 'baseline capture'
++    description = 'Captures MySQL-backed candidate evidence; it never updates approved baselines.'
++    testClassesDirs = sourceSets.atlasBaselineTest.output.classesDirs
++    classpath = sourceSets.atlasBaselineTest.runtimeClasspath
++    useJUnitPlatform()
++    systemProperty 'atlas.baseline.mode', 'capture'
++    doFirst {
++        systemProperty 'atlas.baseline.directory',
++                new File(requiredCandidateDirectory(), 'oracle').absolutePath
++        systemProperty 'atlas.baseline.info-directory',
++                new File(requiredCandidateDirectory(), 'info').absolutePath
++    }
++}
++
++tasks.register('atlasBaselineCompare') {
++    group = 'verification'
++    description = 'Runs all blocking product oracle comparisons and writes informational reports.'
++    dependsOn tasks.named('atlasBaselineTest')
++    dependsOn tasks.named('atlasBootEntryCompare')
++    dependsOn tasks.named('atlasRuntimeDependencyReport')
++}
++
++tasks.register('atlasBaselineCapture') {
++    group = 'baseline capture'
++    description = 'Creates candidate evidence only. Review and promote it separately before compare.'
++    dependsOn tasks.named('atlasBaselineCaptureTest')
++    dependsOn tasks.named('atlasBootEntryCapture')
++    dependsOn tasks.named('atlasRuntimeDependencyCapture')
++}
+diff --git a/backend/src/atlasBaselineTest/java/com/room/backend/baseline/BaselineSnapshot.java b/backend/src/atlasBaselineTest/java/com/room/backend/baseline/BaselineSnapshot.java
+new file mode 100644
+index 0000000..cb4fd01
+--- /dev/null
++++ b/backend/src/atlasBaselineTest/java/com/room/backend/baseline/BaselineSnapshot.java
+@@ -0,0 +1,79 @@
++package com.room.backend.baseline;
++
++import java.io.IOException;
++import java.nio.charset.StandardCharsets;
++import java.nio.file.Files;
++import java.nio.file.Path;
++import java.util.Collection;
++import java.util.List;
++
++import static org.junit.jupiter.api.Assertions.assertEquals;
++import static org.junit.jupiter.api.Assertions.fail;
++
++final class BaselineSnapshot {
++
++    private static final String MODE = System.getProperty("atlas.baseline.mode", "compare");
++    private static final Path ORACLE_DIRECTORY =
++            Path.of(requiredProperty("atlas.baseline.directory"));
++    private static final Path INFORMATION_DIRECTORY =
++            Path.of(requiredProperty("atlas.baseline.info-directory"));
++
++    private BaselineSnapshot() {
++    }
++
++    static void oracle(String fileName, Collection<String> records) {
++        String actual = normalized(records);
++        Path target = ORACLE_DIRECTORY.resolve(fileName);
++
++        if ("capture".equals(MODE)) {
++            write(target, actual);
++            return;
++        }
++        if (!"compare".equals(MODE)) {
++            throw new IllegalStateException("Unsupported Atlas baseline mode: " + MODE);
++        }
++
++        try {
++            if (Files.notExists(target)) {
++                fail("Missing approved Atlas product oracle: " + target);
++            }
++            String expected = Files.readString(target, StandardCharsets.UTF_8)
++                    .replace("\r\n", "\n");
++            assertEquals(expected, actual,
++                    "Atlas product oracle drift in " + fileName
++                            + ". Capture never updates the approved baseline.");
++        } catch (IOException exception) {
++            throw new IllegalStateException("Cannot read Atlas product oracle: " + target, exception);
++        }
++    }
++
++    static void information(String fileName, Collection<String> records) {
++        write(INFORMATION_DIRECTORY.resolve(fileName), normalized(records));
++    }
++
++    private static String normalized(Collection<String> records) {
++        List<String> normalized = records.stream()
++                .filter(record -> record != null && !record.isBlank())
++                .distinct()
++                .sorted()
++                .toList();
++        return String.join("\n", normalized) + "\n";
++    }
++
++    private static void write(Path target, String content) {
++        try {
++            Files.createDirectories(target.getParent());
++            Files.writeString(target, content, StandardCharsets.UTF_8);
++        } catch (IOException exception) {
++            throw new IllegalStateException("Cannot write Atlas baseline evidence: " + target, exception);
++        }
++    }
++
++    private static String requiredProperty(String name) {
++        String value = System.getProperty(name);
++        if (value == null || value.isBlank()) {
++            throw new IllegalStateException("Missing required system property: " + name);
++        }
++        return value;
++    }
++}
+diff --git a/backend/src/atlasBaselineTest/java/com/room/backend/baseline/BackendContextBaselineTest.java b/backend/src/atlasBaselineTest/java/com/room/backend/baseline/BackendContextBaselineTest.java
+new file mode 100644
+index 0000000..b911a86
+--- /dev/null
++++ b/backend/src/atlasBaselineTest/java/com/room/backend/baseline/BackendContextBaselineTest.java
+@@ -0,0 +1,102 @@
++package com.room.backend.baseline;
++
++import org.flywaydb.core.Flyway;
++import org.flywaydb.core.api.MigrationInfo;
++import org.junit.jupiter.api.Test;
++import org.springframework.beans.factory.annotation.Autowired;
++import org.springframework.boot.test.context.SpringBootTest;
++import org.springframework.context.ApplicationContext;
++import org.springframework.test.context.DynamicPropertyRegistry;
++import org.springframework.test.context.DynamicPropertySource;
++import org.springframework.web.bind.annotation.RequestMethod;
++import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
++import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
++import org.testcontainers.junit.jupiter.Container;
++import org.testcontainers.junit.jupiter.Testcontainers;
++import org.testcontainers.mysql.MySQLContainer;
++
++import java.util.Arrays;
++import java.util.Collection;
++import java.util.List;
++import java.util.Set;
++import java.util.stream.Stream;
++
++@Testcontainers
++@SpringBootTest(properties = {
++        "spring.jpa.show-sql=false",
++        "spring.main.banner-mode=off",
++        "jwt.secret-key=atlas-baseline-secret-key-at-least-thirty-two-bytes-long",
++        "jwt.access-token-expiration=3600000",
++        "jwt.refresh-token-expiration=1209600000",
++        "oauth.naver.client-id=atlas",
++        "oauth.naver.client-secret=atlas",
++        "oauth.naver.redirect-uri=http://localhost/atlas/naver",
++        "oauth.google.client-id=atlas",
++        "oauth.google.client-secret=atlas",
++        "oauth.google.redirect-uri=http://localhost/atlas/google",
++        "naver.geocoding.client-id=atlas",
++        "naver.geocoding.client-secret=atlas",
++        "tmap.api.app-key=atlas",
++        "juso.api.confirm-key=atlas"
++})
++class BackendContextBaselineTest {
++
++    @Container
++    static final MySQLContainer MYSQL = new MySQLContainer("mysql:8.0")
++            .withDatabaseName("room")
++            .withUsername("room")
++            .withPassword("room")
++            .withReuse(false);
++
++    @DynamicPropertySource
++    static void configureDatabase(DynamicPropertyRegistry registry) {
++        registry.add("spring.datasource.url", MYSQL::getJdbcUrl);
++        registry.add("spring.datasource.username", MYSQL::getUsername);
++        registry.add("spring.datasource.password", MYSQL::getPassword);
++    }
++
++    @Autowired
++    ApplicationContext applicationContext;
++
++    @Autowired
++    RequestMappingHandlerMapping requestMappingHandlerMapping;
++
++    @Autowired
++    Flyway flyway;
++
++    @Test
++    void comparesProductOraclesAndWritesInformationEvidence() {
++        BaselineSnapshot.oracle("routes.txt", routeRecords());
++        BaselineSnapshot.oracle("flyway-checksums.txt", migrationRecords());
++        BaselineSnapshot.information("bean-names.txt",
++                Arrays.asList(applicationContext.getBeanDefinitionNames()));
++    }
++
++    private List<String> routeRecords() {
++        return requestMappingHandlerMapping.getHandlerMethods().keySet().stream()
++                .flatMap(this::routeRecords)
++                .toList();
++    }
++
++    private Stream<String> routeRecords(RequestMappingInfo mappingInfo) {
++        Set<RequestMethod> methods = mappingInfo.getMethodsCondition().getMethods();
++        Collection<String> methodNames = methods.isEmpty()
++                ? List.of("*")
++                : methods.stream().map(Enum::name).toList();
++
++        return mappingInfo.getPatternValues().stream()
++                .flatMap(pattern -> methodNames.stream().map(method -> method + " " + pattern));
++    }
++
++    private List<String> migrationRecords() {
++        return Arrays.stream(flyway.info().applied())
++                .map(this::migrationRecord)
++                .toList();
++    }
++
++    private String migrationRecord(MigrationInfo migration) {
++        String version = migration.getVersion() == null ? "repeatable" : migration.getVersion().getVersion();
++        String checksum = migration.getChecksum() == null ? "none" : migration.getChecksum().toString();
++        return version + "|" + migration.getDescription() + "|" + checksum;
++    }
++}
