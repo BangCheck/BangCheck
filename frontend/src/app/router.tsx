@@ -28,7 +28,7 @@ const ProjectAtlasPage = import.meta.env.DEV
   : null;
 
 const AtlasLoading = () => (
-  <div className="min-h-screen bg-[#071012] text-[#7de2cb] grid place-items-center font-mono text-xs tracking-[0.2em]">
+  <div className="min-h-screen bg-white text-[#616161] grid place-items-center font-mono text-xs tracking-[0.2em]">
     PROJECT ATLAS / LOADING
   </div>
 );

@@ -9,7 +9,7 @@ import './research.css';
 const CANVAS_WIDTH = 1480;
 const CANVAS_HEIGHT = 900;
 const FLOW_COLUMNS = [219, 561, 903, 1245];
-type MapTheme = 'circuit' | 'blueprint' | 'terminal' | 'amber';
+type MapTheme = 'vscode-light' | 'vscode-dark' | 'circuit' | 'blueprint' | 'terminal' | 'amber';
 
 const MAP_THEMES: Array<{
   id: MapTheme;
@@ -18,6 +18,8 @@ const MAP_THEMES: Array<{
   background: string;
   accent: string;
 }> = [
+  { id: 'vscode-light', label: 'LIGHT', description: 'VS Code Light+', background: '#ffffff', accent: '#005fb8' },
+  { id: 'vscode-dark', label: 'DARK', description: 'VS Code Dark+', background: '#1e1e1e', accent: '#3794ff' },
   { id: 'circuit', label: 'CIRCUIT', description: '청록 회로', background: '#071012', accent: '#58c3ad' },
   { id: 'blueprint', label: 'BLUEPRINT', description: '청색 설계도', background: '#061426', accent: '#48bfff' },
   { id: 'terminal', label: 'TERMINAL', description: '인광 터미널', background: '#050906', accent: '#63f58b' },
@@ -28,7 +30,7 @@ function getInitialTheme(): MapTheme {
   const savedTheme = window.localStorage.getItem('bangcheck-project-map-theme');
   return MAP_THEMES.some((theme) => theme.id === savedTheme)
     ? savedTheme as MapTheme
-    : 'circuit';
+    : 'vscode-light';
 }
 
 const statusFilters: Array<{ value: 'all' | ResearchNodeStatus; label: string }> = [

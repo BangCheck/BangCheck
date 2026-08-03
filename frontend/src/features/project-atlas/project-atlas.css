@@ -103,6 +103,48 @@
   --map-info: #6c8fd5;
 }
 
+.project-map-theme-vscode-light {
+  --map-bg: #ffffff;
+  --map-top: #f8f8f8;
+  --map-side: #f3f3f3;
+  --map-panel: #ffffff;
+  --map-panel-raised: #f3f3f3;
+  --map-border: #e5e5e5;
+  --map-border-strong: #c8c8c8;
+  --map-accent: #005fb8;
+  --map-accent-soft: #cce4f7;
+  --map-text: #1f1f1f;
+  --map-muted: #616161;
+  --map-grid-major: rgba(31, 31, 31, 0.07);
+  --map-grid-minor: rgba(31, 31, 31, 0.025);
+  --map-secondary: #af00db;
+  --map-live: #16825d;
+  --map-warning: #bf8803;
+  --map-danger: #e51400;
+  --map-info: #0067c0;
+}
+
+.project-map-theme-vscode-dark {
+  --map-bg: #1e1e1e;
+  --map-top: #323233;
+  --map-side: #252526;
+  --map-panel: #252526;
+  --map-panel-raised: #2d2d30;
+  --map-border: #3c3c3c;
+  --map-border-strong: #6f6f6f;
+  --map-accent: #3794ff;
+  --map-accent-soft: #0e639c;
+  --map-text: #d4d4d4;
+  --map-muted: #858585;
+  --map-grid-major: rgba(212, 212, 212, 0.08);
+  --map-grid-minor: rgba(212, 212, 212, 0.03);
+  --map-secondary: #c586c0;
+  --map-live: #89d185;
+  --map-warning: #cca700;
+  --map-danger: #f14c4c;
+  --map-info: #75beff;
+}
+
 .atlas-topbar {
   position: relative;
   z-index: 30;
@@ -1309,4 +1351,599 @@
   .atlas-lane-bus i {
     animation: none;
   }
+}
+
+/* ==========================================================================
+   페이지 캔버스 — 왼쪽에 페이지 전체(스크롤 없음), 오른쪽에 카드.
+   카드는 Front/Back을 나누지 않는다. 색은 전부 --map-* 토큰을 쓴다.
+   ========================================================================== */
+
+.atlas-canvas {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 380px;
+  gap: 14px;
+  padding: 14px 18px;
+  align-items: start;
+}
+
+.atlas-page-panel {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  border: 1px solid var(--map-border);
+  border-radius: 3px;
+  background: var(--map-panel);
+}
+
+.atlas-page-head,
+.atlas-page-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 13px;
+  font-family: var(--atlas-mono);
+  font-size: 8px;
+  letter-spacing: 0.08em;
+  color: var(--map-muted);
+}
+
+.atlas-page-head { border-bottom: 1px solid var(--map-border); }
+.atlas-page-foot { border-top: 1px solid var(--map-border); }
+
+.atlas-page-head span { display: block; }
+.atlas-page-head strong {
+  display: block;
+  margin-top: 3px;
+  color: var(--map-text);
+  font-size: 11px;
+  letter-spacing: 0;
+}
+
+.atlas-page-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.atlas-page-meta button {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border: 1px solid var(--map-border);
+  border-radius: 3px;
+  background: var(--map-panel-raised);
+  color: var(--map-muted);
+  cursor: pointer;
+}
+
+.atlas-page-meta button:hover { color: var(--map-accent); border-color: var(--map-accent); }
+
+/* 무대 — 여기 안에 축소된 페이지가 통째로 들어간다 */
+.atlas-page-stage {
+  position: relative;
+  /* FIT일 때는 전체가 들어가므로 넘칠 일이 없다. 확대하면 여기서 스크롤한다. */
+  overflow: auto;
+  display: flex;
+  justify-content: center;
+  /* 페이지 전체가 스크롤 없이 들어가야 하므로 FIT 배율은 높이가 지배한다.
+     랜딩이 1280폭 기준 4000px대라 무대를 짧게 잡으면 읽을 수 없을 만큼 작아진다. */
+  height: clamp(720px, calc(100vh - 210px), 1320px);
+  background: var(--map-bg);
+  background-image:
+    linear-gradient(var(--map-grid-minor) 1px, transparent 1px),
+    linear-gradient(90deg, var(--map-grid-minor) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+/* 배율이 반영된 크기를 가진 래퍼. transform은 레이아웃 크기를 안 바꾸므로
+   확대했을 때 스크롤 영역을 만드는 것은 이 요소다. */
+.atlas-page-canvas {
+  position: relative;
+  flex: none;
+  margin: auto;
+}
+
+.atlas-page-scaler {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: top left;
+}
+
+/* ---- 배율 컨트롤 -------------------------------------------------------- */
+
+.atlas-zoom {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 2px;
+  border: 1px solid var(--map-border);
+  border-radius: 3px;
+  background: var(--map-panel-raised);
+}
+
+.atlas-zoom button {
+  display: grid;
+  place-items: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 5px;
+  border: 0;
+  border-radius: 2px;
+  background: transparent;
+  color: var(--map-muted);
+  font-family: var(--atlas-mono);
+  font-size: 8px;
+  letter-spacing: 0.08em;
+  cursor: pointer;
+}
+
+.atlas-zoom button:hover:not(:disabled) {
+  background: var(--map-panel);
+  color: var(--map-accent);
+}
+
+.atlas-zoom button:disabled { opacity: 0.35; cursor: not-allowed; }
+
+.atlas-zoom button.is-active {
+  background: var(--map-accent);
+  color: #fff;
+}
+
+.atlas-zoom > span {
+  min-width: 38px;
+  text-align: center;
+  font-family: var(--atlas-mono);
+  font-size: 9px;
+  color: var(--map-text);
+}
+
+.atlas-page-scaler iframe {
+  display: block;
+  border: 0;
+  background: #fff;
+  /* 미리보기는 보는 것이지 조작하는 것이 아니다. 이걸 열어두면 iframe이 별도 문서라
+     휠·클릭을 삼켜서 무대의 배율 조절과 영역 선택이 커서 위치에 따라 먹었다 안 먹었다 한다. */
+  pointer-events: none;
+}
+
+.atlas-page-waiting {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  gap: 8px;
+  color: var(--map-muted);
+  font-family: var(--atlas-mono);
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  pointer-events: none;
+}
+
+/* 카드가 가리키는 화면 영역 */
+.atlas-region {
+  position: absolute;
+  /* 평소에도 옅게 보인다 — 영역이 있다는 사실 자체가 정보다 */
+  border: 1px dashed color-mix(in srgb, var(--map-accent) 45%, transparent);
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+}
+
+.atlas-region span {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: top left;
+  padding: 2px 5px;
+  background: var(--map-accent);
+  color: #fff;
+  font-family: var(--atlas-mono);
+  font-size: 9px;
+  opacity: 0;
+}
+
+.atlas-region.is-active {
+  border-color: var(--map-accent);
+  background: color-mix(in srgb, var(--map-accent) 12%, transparent);
+}
+
+.atlas-region.is-active span { opacity: 1; }
+
+.atlas-region.is-selected {
+  border-width: 2px;
+  background: color-mix(in srgb, var(--map-accent) 18%, transparent);
+}
+
+/* ---- 카드 레일 ---------------------------------------------------------- */
+
+.atlas-card-rail {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+}
+
+.atlas-card-rail-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 0 2px;
+  font-family: var(--atlas-mono);
+  font-size: 8px;
+  letter-spacing: 0.12em;
+  color: var(--map-muted);
+}
+
+.atlas-card-rail-head strong { color: var(--map-text); font-size: 13px; }
+
+.atlas-card-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.atlas-card {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 12px 13px;
+  border: 1px solid var(--map-border);
+  border-radius: 3px;
+  background: var(--map-panel);
+  color: var(--map-text);
+  text-align: left;
+  cursor: pointer;
+}
+
+.atlas-card:hover { border-color: var(--map-border-strong); }
+
+.atlas-card.is-selected {
+  border-color: var(--map-accent);
+  box-shadow: inset 2px 0 0 var(--map-accent);
+}
+
+.atlas-card-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-family: var(--atlas-mono);
+  font-size: 8px;
+  color: var(--map-muted);
+}
+
+.atlas-card-top em {
+  padding: 2px 5px;
+  border-radius: 2px;
+  background: var(--map-panel-raised);
+  font-style: normal;
+}
+
+.atlas-card-top em[data-state='LIVE'] { color: var(--map-live); }
+.atlas-card-top em[data-state='BOUND'] { color: var(--map-accent); }
+.atlas-card-top em[data-state='MOCK'],
+.atlas-card-top em[data-state='PLANNED'] { color: var(--map-warning); }
+
+.atlas-card-title { font-size: 12px; }
+
+.atlas-card-headline {
+  color: var(--map-muted);
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+.atlas-card-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 3px;
+  font-family: var(--atlas-mono);
+  font-size: 7px;
+  color: var(--map-muted);
+}
+
+.atlas-card-facts > span {
+  padding: 2px 5px;
+  border: 1px solid var(--map-border);
+  border-radius: 2px;
+}
+
+.atlas-card-facts > span.is-bound {
+  border-color: var(--map-accent);
+  color: var(--map-accent);
+}
+
+/* ---- 상세 4절 ----------------------------------------------------------- */
+
+.atlas-detail {
+  margin: 0 18px 14px;
+  border: 1px solid var(--map-border);
+  border-radius: 3px;
+  background: var(--map-panel);
+}
+
+.atlas-detail-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 13px 16px;
+  border-bottom: 1px solid var(--map-border);
+}
+
+.atlas-detail-head span {
+  font-family: var(--atlas-mono);
+  font-size: 8px;
+  letter-spacing: 0.12em;
+  color: var(--map-muted);
+}
+
+.atlas-detail-head h2 { margin: 4px 0 0; font-size: 15px; color: var(--map-text); }
+
+.atlas-detail-head button {
+  border: 0;
+  background: transparent;
+  color: var(--map-muted);
+  cursor: pointer;
+}
+
+.atlas-detail-head button:hover { color: var(--map-danger); }
+
+.atlas-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1px;
+  background: var(--map-border);
+}
+
+.atlas-detail-block {
+  padding: 14px 16px 16px;
+  background: var(--map-panel);
+}
+
+.atlas-detail-block h3 {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin: 0 0 10px;
+  font-size: 11px;
+  color: var(--map-text);
+}
+
+.atlas-detail-block h3 span {
+  padding: 2px 5px;
+  border-radius: 2px;
+  background: var(--map-accent);
+  color: #fff;
+  font-family: var(--atlas-mono);
+  font-size: 8px;
+}
+
+.atlas-detail-block p {
+  margin: 0 0 7px;
+  color: var(--map-text);
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+.atlas-detail-block p.is-muted { color: var(--map-muted); }
+
+.atlas-detail-sources {
+  margin: 10px 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.atlas-detail-sources > div { display: flex; gap: 7px; align-items: baseline; }
+
+.atlas-detail-sources dt {
+  flex: none;
+  padding: 1px 5px;
+  border: 1px solid var(--map-border);
+  border-radius: 2px;
+  font-family: var(--atlas-mono);
+  font-size: 7px;
+  color: var(--map-muted);
+}
+
+.atlas-detail-sources dd {
+  margin: 0;
+  font-family: var(--atlas-mono);
+  font-size: 9px;
+  color: var(--map-muted);
+  word-break: break-all;
+}
+
+.atlas-detail-steps {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.atlas-detail-steps li { display: flex; gap: 8px; }
+
+.atlas-detail-steps em {
+  flex: none;
+  width: 44px;
+  padding: 2px 0;
+  border-radius: 2px;
+  background: var(--map-panel-raised);
+  color: var(--map-muted);
+  font-family: var(--atlas-mono);
+  font-size: 8px;
+  font-style: normal;
+  text-align: center;
+}
+
+.atlas-detail-steps em[data-actor='USER'] { color: var(--map-accent); }
+.atlas-detail-steps em[data-actor='BACK'] { color: var(--map-live); }
+
+.atlas-detail-steps p { margin: 0; font-size: 11px; }
+
+.atlas-detail-steps code {
+  display: block;
+  margin-top: 3px;
+  font-family: var(--atlas-mono);
+  font-size: 8px;
+  color: var(--map-muted);
+  word-break: break-all;
+}
+
+.atlas-api-rule {
+  padding: 10px 0;
+  border-top: 1px solid var(--map-border);
+}
+
+.atlas-api-rule:first-of-type { border-top: 0; padding-top: 0; }
+
+.atlas-api-line { display: flex; align-items: center; gap: 7px; margin-bottom: 5px; }
+
+.atlas-api-line strong {
+  padding: 2px 6px;
+  border-radius: 2px;
+  background: var(--map-accent);
+  color: #fff;
+  font-family: var(--atlas-mono);
+  font-size: 8px;
+}
+
+.atlas-api-line code {
+  font-family: var(--atlas-mono);
+  font-size: 9px;
+  color: var(--map-text);
+  word-break: break-all;
+}
+
+.atlas-api-rule dl { margin: 8px 0 0; display: flex; flex-direction: column; gap: 6px; }
+.atlas-api-rule dl > div { display: grid; grid-template-columns: 78px minmax(0, 1fr); gap: 8px; }
+
+.atlas-api-rule dt {
+  font-family: var(--atlas-mono);
+  font-size: 8px;
+  color: var(--map-muted);
+}
+
+.atlas-api-rule dd { margin: 0; font-size: 10px; color: var(--map-text); }
+.atlas-api-rule dd span { display: block; margin-bottom: 2px; }
+.atlas-api-rule dd b { color: var(--map-accent); font-weight: 600; }
+
+.atlas-detail-links {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.atlas-detail-links li { display: flex; flex-direction: column; gap: 3px; }
+
+.atlas-relation {
+  align-self: flex-start;
+  padding: 2px 6px;
+  border: 1px solid var(--map-border);
+  border-radius: 2px;
+  font-family: var(--atlas-mono);
+  font-size: 7px;
+  color: var(--map-muted);
+}
+
+.atlas-relation[data-relation='INCONSISTENT_WITH'] {
+  border-color: var(--map-danger);
+  color: var(--map-danger);
+}
+
+.atlas-detail-links button {
+  align-self: flex-start;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: var(--map-accent);
+  font: inherit;
+  font-size: 11px;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.atlas-detail-links strong { font-size: 11px; color: var(--map-text); }
+.atlas-detail-links p { margin: 0; font-size: 10px; color: var(--map-muted); }
+
+.atlas-detail-defects {
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid var(--map-border);
+  font-family: var(--atlas-mono);
+  font-size: 9px;
+  color: var(--map-danger);
+}
+
+@media (max-width: 1280px) {
+  .atlas-canvas { grid-template-columns: minmax(0, 1fr); }
+  .atlas-card-rail { flex-direction: column; }
+}
+
+/* ---- 화면 상태 탭 -------------------------------------------------------
+   한 화면이 조건에 따라 다르게 보이는 경우(로그인 전/후 등)를 실제로 띄운다.
+   스크린샷이 아니라 그 상태로 렌더한 제품 페이지다. */
+
+.atlas-state-bar {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 9px 13px;
+  border-bottom: 1px solid var(--map-border);
+  background: var(--map-panel-raised);
+}
+
+.atlas-state-tabs {
+  display: inline-flex;
+  flex: none;
+  gap: 2px;
+  padding: 2px;
+  border: 1px solid var(--map-border);
+  border-radius: 3px;
+  background: var(--map-panel);
+}
+
+.atlas-state-tabs button {
+  padding: 4px 10px;
+  border: 0;
+  border-radius: 2px;
+  background: transparent;
+  color: var(--map-muted);
+  font-size: 10px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.atlas-state-tabs button:hover { color: var(--map-accent); }
+
+.atlas-state-tabs button.is-active {
+  background: var(--map-accent);
+  color: #fff;
+}
+
+.atlas-state-note {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.atlas-state-note p {
+  margin: 0;
+  color: var(--map-text);
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+/* 확인하지 못한 전제. 초록불처럼 보이지 않게 경고색으로 둔다 */
+.atlas-state-note p.is-caveat {
+  color: var(--map-warning);
 }
