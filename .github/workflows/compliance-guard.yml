@@ -5,7 +5,7 @@
 #   Detect PRs that bypass SWYP conventions (commit format,
 #   branch naming, PR template, issue linkage, labels).
 #
-# Rules live in: _wood/workflows/_COMPLIANCE-SPEC.yaml
+# Rules live in: _wood/workflows/_compliance-spec.yaml
 # Severity:     error → fail check / warning → comment only
 #
 # Companion workflow:
@@ -76,102 +76,21 @@ jobs:
             const errors = [];
             const warnings = [];
 
-            // ────── Rule 1: Branch naming ──────
-            const branchPattern = /^(feat|fix|refactor|docs|chore|design)\/\d+-[a-z0-9-]+$/;
-            if (!branchPattern.test(pr.head.ref)) {
-              errors.push({
-                rule: 'branch_naming',
-                message: `브랜치명 '${pr.head.ref}' 이 컨벤션 위반`,
-                expected: '{type}/{issue-number}-{slug}',
-                examples: ['feat/5-login-form', 'fix/12-naver-auth-error'],
-                fix: 'git branch -m {correct-name} && git push --force-with-lease',
-              });
-            }
-
-            // ────── Rule 2: Issue linkage ──────
-            const closePattern = /(closes|fixes|resolves)\s+#\d+/i;
-            if (!closePattern.test(pr.body || '')) {
-              errors.push({
-                rule: 'issue_linkage',
-                message: 'PR body에 `closes #N` 누락',
-                fix: 'PR description 편집 → body에 `closes #{이슈번호}` 추가',
-              });
-            }
-
-            // ────── Rule 3: Commit message ──────
-            const { data: commits } = await github.rest.pulls.listCommits({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              pull_number: prNumber,
-            });
-            const commitTypePattern = /^(feat|fix|docs|refactor|chore|design|comment|remove):\s+.+/;
-            const badCommits = commits.filter(c => {
-              const firstLine = c.commit.message.split('\n')[0];
-              return !commitTypePattern.test(firstLine) && !firstLine.startsWith('Merge ');
-            });
-            if (badCommits.length > 0) {
+            // ────── Rule 1: Atlas scope ──────
+            // 이 PR이 어느 화면을 건드리는지 본문에 밝힌다.
+            // Atlas 상세 캔버스의 pageId 또는 route를 그대로 쓴다.
+            // 화면과 무관한 변경이면 `Atlas: 없음`이라고 적으면 된다 —
+            // 빈 칸과 "해당 없음"을 구별하기 위해서다.
+            const atlasScopePattern = /(^|\n)\s*Atlas:\s*\S+/i;
+            if (!atlasScopePattern.test(pr.body || '')) {
               warnings.push({
-                rule: 'commit_type',
-                message: `${badCommits.length}개 커밋이 컨벤션 위반`,
-                details: badCommits.map(c => `  - ${c.sha.substring(0,7)}: ${c.commit.message.split('\n')[0]}`).join('\n'),
-                fix: 'git rebase -i로 메시지 수정',
+                rule: 'atlas_scope',
+                message: 'PR body에 `Atlas:` 줄이 없다 — 어느 화면을 건드리는지 알 수 없다',
+                fix: 'PR description에 `Atlas: landing` 또는 `Atlas: /custom` 추가 (해당 없으면 `Atlas: 없음`)',
               });
             }
 
-            // ────── Rule 4: PR template ──────
-            const requiredSections = [/^##\s+What/m, /^##\s+Why/m, /^##\s+Test/m];
-            const missingSections = requiredSections
-              .filter(re => !re.test(pr.body || ''))
-              .map(re => re.source.replace('^##\\s+', '## ').replace('/m', ''));
-            if (missingSections.length > 0) {
-              warnings.push({
-                rule: 'pr_template',
-                message: `PR 템플릿 섹션 누락: ${missingSections.join(', ')}`,
-                fix: 'docs: _wood/workflows/05-pr.md 의 Step 4 템플릿 참조',
-              });
-            }
-
-            // ────── Rule 5: Issue labels ──────
-            const issueRefMatch = (pr.body || '').match(/(closes|fixes|resolves)\s+#(\d+)/i);
-            if (issueRefMatch) {
-              const issueNum = issueRefMatch[2];
-              try {
-                const { data: issue } = await github.rest.issues.get({
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  issue_number: parseInt(issueNum, 10),
-                });
-                const labels = issue.labels.map(l => typeof l === 'string' ? l : l.name);
-                const hasType = labels.some(l => l.startsWith('유형:'));
-                const hasPriority = labels.some(l => l.startsWith('순위:'));
-                const hasStatus = labels.some(l => l.startsWith('상태:'));
-                const missing = [];
-                if (!hasType) missing.push('유형:*');
-                if (!hasPriority) missing.push('순위:*');
-                if (!hasStatus) missing.push('상태:*');
-                if (missing.length > 0) {
-                  warnings.push({
-                    rule: 'issue_labels',
-                    message: `연결된 이슈 #${issueNum} 라벨 누락: ${missing.join(', ')}`,
-                    fix: `gh issue edit ${issueNum} --add-label "..."`,
-                  });
-                }
-              } catch (e) {
-                // issue not found etc. — skip
-              }
-            }
-
-            // ────── Rule 6: PR size ──────
-            const changedLines = (pr.additions || 0) + (pr.deletions || 0);
-            if (changedLines > 800) {
-              warnings.push({
-                rule: 'pr_size',
-                message: `PR 변경 라인 ${changedLines} (권장 <800)`,
-                fix: 'PR을 작은 단위로 분할',
-              });
-            }
-
-            // ────── Rule 7: Forbidden files ──────
+            // ────── Rule 2: Forbidden files ──────
             const { data: files } = await github.rest.pulls.listFiles({
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -247,7 +166,7 @@ jobs:
 
             body += `\n---\n`;
             body += `참고: [_CODING-GUIDE.md](../blob/main/_wood/workflows/_CODING-GUIDE.md) · `;
-            body += `[_COMPLIANCE-SPEC.yaml](../blob/main/_wood/workflows/_COMPLIANCE-SPEC.yaml)\n`;
+            body += `[_compliance-spec.yaml](../blob/main/_wood/workflows/_compliance-spec.yaml)\n`;
             body += `이 코멘트는 compliance-guard Action이 자동 생성했습니다.`;
 
             // Find existing comment to update

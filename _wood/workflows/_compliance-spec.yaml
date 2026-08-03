@@ -6,9 +6,16 @@
 # ============================================================
 #
 # Purpose:
-#   Centralized definition of SWYP compliance rules.
-#   Used by:
-#     - GitHub Actions (.github/workflows/compliance-guard.yml)
+#   Declaration of the compliance rules this repository enforces.
+#
+# WARNING — this file does not enforce anything by itself.
+#   The actual judgement lives in inline regexes inside
+#   .github/workflows/compliance-guard.yml. This file only declares them.
+#   The two drifted before (2026-08-04): this file said the rules lived here
+#   while the workflow held its own copy, so editing this file changed nothing.
+#   Change both together, or the declaration becomes a lie.
+#
+#   Also read by:
 #     - PM audit workflow (_wood/agents/pm/workflows/05-audit.md)
 #     - Human reference (_wood/workflows/_CODING-GUIDE.md)
 #
@@ -19,8 +26,8 @@
 # ============================================================
 
 policy:
-  version: "1.0"
-  last_reviewed: "2026-04-16"
+  version: "2.0"
+  last_reviewed: "2026-08-04"
   admin_login: "Woo-JongHo"
 
 # ============================================================
@@ -50,124 +57,29 @@ severity_levels:
 rules:
 
   # ─────────────────────────────────────────────
-  # Branch naming
+  # Atlas scope — 이 PR이 어느 화면을 건드리는가
   # ─────────────────────────────────────────────
 
-  branch_naming:
-    severity: error
+  atlas_scope:
+    severity: warning
     enabled: true
-    pattern: '^(feat|fix|refactor|docs|chore|design)/[0-9]+-[a-z0-9-]+$'
-    description: "Branch name must follow {type}/{issue-number}-{slug} format"
+    pattern: '(^|\n)\s*Atlas:\s*\S+'
+    location: "pr_body"
+    description: |
+      PR 본문에 `Atlas:` 줄이 있어야 한다. 값은 Atlas 상세 캔버스의
+      pageId 또는 route를 그대로 쓴다.
+      화면과 무관한 변경이면 `Atlas: 없음`이라고 적는다 —
+      빈 칸과 "해당 없음"은 구별되어야 한다.
     examples_good:
-      - feat/5-login-form
-      - fix/12-naver-auth-error
-      - refactor/18-api-retry
-    examples_bad:
-      - fix-login
-      - feature/login
-      - my-branch
+      - "Atlas: landing"
+      - "Atlas: /custom"
+      - "Atlas: 없음"
     fix_guide: |
-      git branch -m {correct-name}
-      git push --force-with-lease origin {correct-name}
-      # Delete the old incorrectly named branch
-      git push origin --delete {old-name}
+      PR description에 한 줄 추가:
+      Atlas: {pageId 또는 route}
 
   # ─────────────────────────────────────────────
-  # Issue linkage
-  # ─────────────────────────────────────────────
-
-  issue_linkage:
-    severity: error
-    enabled: true
-    pattern: '(closes|fixes|resolves)\s+#[0-9]+'
-    description: "PR body must include `closes #N` / `fixes #N` / `resolves #N`"
-    fix_guide: |
-      Edit PR → add `closes #{issue-number}` to the body
-
-  # ─────────────────────────────────────────────
-  # Commit message convention
-  # ─────────────────────────────────────────────
-
-  commit_type:
-    severity: warning
-    enabled: true
-    pattern: '^(feat|fix|docs|refactor|chore|design|comment|remove):\s+.+'
-    description: "Each commit message first line must follow `{type}: {summary}` format"
-    types_allowed:
-      - feat
-      - fix
-      - docs
-      - refactor
-      - chore
-      - design
-      - comment
-      - remove
-    fix_guide: |
-      git commit --amend  # Fix the last commit (before push)
-      # If already pushed:
-      git rebase -i {commit_hash}  # Edit the message
-      git push --force-with-lease
-
-  commit_issue_ref:
-    severity: warning
-    enabled: true
-    pattern: '#[0-9]+'
-    description: "Commit body must include an issue number (`#N` format)"
-    location: "body"
-
-  # ─────────────────────────────────────────────
-  # PR body template
-  # ─────────────────────────────────────────────
-
-  pr_template:
-    severity: warning
-    enabled: true
-    required_sections:
-      - "^##\\s+What"
-      - "^##\\s+Why"
-      - "^##\\s+Test"
-    description: "PR body must contain What/Why/Test sections"
-    fix_guide: |
-      Edit PR description → refer to docs template
-      docs: _wood/workflows/05-pr.md
-
-  # ─────────────────────────────────────────────
-  # Linked issue labels
-  # ─────────────────────────────────────────────
-
-  issue_labels:
-    severity: warning
-    enabled: true
-    required_label_prefixes:
-      - "유형:"
-      - "순위:"
-      - "상태:"
-    description: "Linked issues must have all type/priority/status labels assigned"
-    fix_guide: |
-      Add labels on the issue page:
-      gh issue edit {n} --add-label "유형:작업,순위:높음,상태:진행중"
-
-  # ─────────────────────────────────────────────
-  # PR size
-  # ─────────────────────────────────────────────
-
-  pr_size:
-    severity: warning
-    enabled: true
-    thresholds:
-      caution: 400
-      exceed: 800
-    description: "PR changed lines should be ≤400 recommended, warning if >800"
-    exceptions:
-      # Exclude auto-generated files like filename renames
-      - pattern: "package-lock.json"
-      - pattern: "*.generated.*"
-    fix_guide: |
-      Split the PR into smaller units and submit each as a separate PR
-      Reference: _wood/workflows/_CODING-GUIDE.md § PR Convention
-
-  # ─────────────────────────────────────────────
-  # Forbidden paths
+  # Forbidden paths — 되돌릴 수 없는 사고를 막는다
   # ─────────────────────────────────────────────
 
   forbidden_files:
@@ -198,6 +110,37 @@ rules:
     enabled: true
     description: "When protected files are modified, .github/workflows/protected-files.yml handles it separately"
     delegate_to: ".github/workflows/protected-files.yml"
+
+# ============================================================
+# 걷어낸 규칙 (2026-08-04)
+# ============================================================
+#
+# 아래는 형식을 강제하던 규칙들이다. 판단은 리뷰가 하고,
+# 자동 검사는 되돌릴 수 없는 것만 막는다는 방침으로 제거했다.
+#
+#   branch_naming      브랜치명에 이슈번호 강제
+#   issue_linkage      모든 PR에 closes #N 요구
+#   commit_type        커밋 메시지 conventional 접두 요구
+#   commit_issue_ref   커밋 본문에 #N 요구
+#   pr_template        What/Why/Test 섹션 요구
+#   issue_labels       연결 이슈의 라벨 3종 요구
+#   pr_size            변경 800줄 상한
+#
+# 되살릴 조건: 이 규칙들이 없어서 실제로 사고가 났을 때.
+# 그 전까지는 없는 게 기본값이다.
+
+removed_rules:
+  removed_at: "2026-08-04"
+  removed_by: "Woo-JongHo"
+  reason: "형식 강제가 과했다. 자동 검사는 되돌릴 수 없는 것만 막는다"
+  names:
+    - branch_naming
+    - issue_linkage
+    - commit_type
+    - commit_issue_ref
+    - pr_template
+    - issue_labels
+    - pr_size
 
 # ============================================================
 # Exemptions
