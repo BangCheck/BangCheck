@@ -11,6 +11,18 @@ import type { ResearchArtifactKind } from '@/types/research';
 import '@/features/research/research.css';
 import './project-dashboard.css';
 
+// 테마 정본은 research.css / project-atlas.css의 .project-map-theme-* 블록이다.
+// 이 페이지는 선택 UI 없이 다른 Atlas 페이지가 저장한 값을 따라간다.
+const THEME_IDS = ['vscode-light', 'vscode-dark', 'circuit', 'blueprint', 'terminal', 'amber'] as const;
+type DashboardTheme = (typeof THEME_IDS)[number];
+
+function getInitialTheme(): DashboardTheme {
+  const savedTheme = window.localStorage.getItem('bangcheck-project-map-theme');
+  return THEME_IDS.some((id) => id === savedTheme)
+    ? savedTheme as DashboardTheme
+    : 'vscode-light';
+}
+
 const P1_ITEMS = [
   { id: 'IDOR-RPT-13', label: '타인 리포트 조회', owner: '하지명', area: 'REPORT' },
   { id: 'IDOR-RPT-14', label: '타인 리포트 수정', owner: '하지명', area: 'REPORT' },
@@ -92,6 +104,7 @@ function WorkspaceSidebar() {
 }
 
 export default function ProjectDashboardPage() {
+  const theme = getInitialTheme();
   const coverage = (Object.keys(ARTIFACT_META) as ResearchArtifactKind[]).map((kind) => {
     const artifacts = RESEARCH_NODES.flatMap((node) => node.artifacts).filter((item) => item.kind === kind);
     const ready = artifacts.filter((item) => item.status === 'ready').length;
@@ -104,7 +117,7 @@ export default function ProjectDashboardPage() {
   });
 
   return (
-    <main className="research-shell dashboard-shell">
+    <main className={`research-shell dashboard-shell project-map-theme-${theme}`}>
       <header className="research-topbar">
         <WorkspaceBrand />
         <div className="research-topbar-title">

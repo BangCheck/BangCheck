@@ -144,7 +144,11 @@ function FeatureRowDesktop({ feature }: { feature: Feature }) {
 
 export default function FeaturesSection() {
   return (
-    <SectionWrapper className="bg-white px-6 py-[70px] md:px-[190px] md:py-[140px]">
+    <SectionWrapper
+      atlasNode="landing-features"
+      atlasLabel="기능 소개 · 게스트 분기"
+      className="bg-white px-6 py-[70px] md:px-[190px] md:py-[140px]"
+    >
       <div className="flex flex-col gap-[50px] md:gap-[100px] items-start max-w-[962px]">
         <div className="flex flex-col gap-[40px] md:gap-[60px] items-start tracking-[-0.5px]">
           <p className="font-bold text-fluid-xl text-brand-primary leading-[1.7]">

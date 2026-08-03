@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/store/use-auth-store';
+import { useAtlasPreview } from '@/lib/use-atlas-preview';
 import { cn } from '@/lib/utils';
 import { Spinner } from '@/components/ui/Spinner';
 import { USER_TYPES, CHECKLIST_ITEMS, TYPE_ITEM_MAP, CATEGORY_LABEL, CATEGORY_ORDER, BASE_ITEM_LABELS } from '@/features/customization/constants';
@@ -13,7 +14,14 @@ import { BannerLoggedOut } from '@/features/customization/components/BannerLogge
 import { ROUTES } from '@/lib/routes';
 
 export default function SettingsPage() {
-  const { isLoggedIn } = useAuthStore();
+  const { isLoggedIn: authLoggedIn } = useAuthStore();
+  // Atlas 상세 캔버스가 이 페이지를 띄우면 섹션 좌표를 부모로 보고한다
+  const atlasPreview = useAtlasPreview(ROUTES.SETTINGS);
+  // 평소엔 로그인해야만 보이는 화면(STEP 조작 가능 상태, 하단 저장 바)을
+  // Atlas에서 확인할 수 있게 미리보기에서만 상태를 덮어쓴다. 운영 동작은 그대로다.
+  const isLoggedIn = atlasPreview.isPreview && atlasPreview.state === 'member'
+    ? true
+    : authLoggedIn;
   const navigate = useNavigate();
 
   const {
@@ -205,7 +213,7 @@ export default function SettingsPage() {
             aria-hidden={!isLoggedIn || undefined}
           >
             {/* ── STEP 1 — 사용자 유형 ── */}
-            <section>
+            <section data-atlas-node="custom-step1" data-atlas-label="STEP 1 사용자 유형">
               <SectionHeader
                 number={1}
                 title="나는 이런 유형이에요"
@@ -233,7 +241,7 @@ export default function SettingsPage() {
             </section>
 
             {/* ── STEP 2 — 맞춤 체크리스트 ── */}
-            <section>
+            <section data-atlas-node="custom-step2" data-atlas-label="STEP 2 맞춤 체크리스트">
               <SectionHeader
                 number={2}
                 title="맞춤 체크리스트"
@@ -288,7 +296,7 @@ export default function SettingsPage() {
             </section>
 
             {/* ── STEP 3 — 추가로 확인할 항목 ── */}
-            <section>
+            <section data-atlas-node="custom-step3" data-atlas-label="STEP 3 추가 항목">
               <SectionHeader
                 number={3}
                 title="추가로 확인할 항목"
@@ -514,7 +522,11 @@ export default function SettingsPage() {
 
       {/* 저장 CTA — 로그인 상태에서만 노출 */}
       {isLoggedIn && (
-        <div className="fixed bottom-[80px] md:bottom-0 left-0 right-0 bg-bg-footer border-t border-border-light px-4 md:px-12 lg:px-24 py-6 z-[60] pb-[calc(1.5rem+env(safe-area-inset-bottom))] md:pb-6">
+        <div
+          data-atlas-node="custom-save"
+          data-atlas-label="저장 · 일괄 반영"
+          className="fixed bottom-[80px] md:bottom-0 left-0 right-0 bg-bg-footer border-t border-border-light px-4 md:px-12 lg:px-24 py-6 z-[60] pb-[calc(1.5rem+env(safe-area-inset-bottom))] md:pb-6"
+        >
           <div className="max-w-screen-xl mx-auto flex flex-col items-center gap-3">
             <div className="flex items-center justify-between w-full">
               <span className="text-fluid-lg font-medium text-text-mute">총 선택된 항목</span>

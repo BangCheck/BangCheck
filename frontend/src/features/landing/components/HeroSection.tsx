@@ -4,7 +4,11 @@ import { ChevronRight } from '@/components/ui/ChevronRight';
 
 export default function HeroSection() {
   return (
-    <section className="relative w-full h-[413px] md:h-[600px] flex items-center justify-center overflow-hidden">
+    <section
+      data-atlas-node="landing-hero"
+      data-atlas-label="히어로 · 체크리스트 시작"
+      className="relative w-full h-[413px] md:h-[600px] flex items-center justify-center overflow-hidden"
+    >
       <div className="absolute inset-0">
         <img
           src="/images/landing/hero-bg.jpg"
