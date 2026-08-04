@@ -1944,6 +1944,71 @@
   color: var(--map-muted);
 }
 
+/* ── 위험도 색 복구 ─────────────────────────────────────────────────────
+   바로 위 테마 규칙들이 border-color·background·color를 한꺼번에 덮어서
+   6개 테마 전부에서 P1과 P3가 같은 muted 색이 됐다. 위험도 구분은 이 화면이
+   존재하는 이유라 덮인 채로 둘 수 없다.
+
+   !important를 쓰지 않고 명시도로 이긴다 — 덮는 규칙이 (0,2,1)이므로
+   severity 클래스를 하나 더 얹어 (0,3,1)로 만들고 뒤에 둔다.
+   색은 하드코딩하지 않고 각 테마가 이미 가진 팔레트를 쓴다.
+   그래야 여섯 배경 위에서 대비가 유지된다.
+
+   2026-08-05 실측(6테마 × P1/P2/P3 computed style): 전 테마에서 세 등급이
+   서로 다른 색이고 대비는 4.41~18.78이다. 한 곳만 AA(4.5)에 못 미친다 —
+   vscode-light의 P1이 4.41인데, 원인은 배경이 아니라 그 테마의
+   --map-missing(#e51400)이 흰 배경에서 갖는 한계다. 배경 혼합을 11%까지
+   낮춰도 값이 그대로였다. 배지에서만 색을 어둡게 하면 다크 네 테마가
+   반대로 나빠지므로, 팔레트를 손볼 때 함께 정리한다. */
+.project-map-shell .brief-defects article[data-severity="P1"] {
+  border-left-color: var(--map-missing);
+}
+.project-map-shell .brief-defects article[data-severity="P2"] {
+  border-left-color: var(--map-working);
+}
+.project-map-shell .brief-defects article[data-severity="P3"] {
+  border-left-color: var(--map-status-planned);
+}
+
+.project-map-shell .brief-severity.is-P1 {
+  background: color-mix(in srgb, var(--map-missing) 18%, var(--map-bg));
+  color: var(--map-missing);
+}
+.project-map-shell .brief-severity.is-P2 {
+  background: color-mix(in srgb, var(--map-working) 18%, var(--map-bg));
+  color: var(--map-working);
+}
+.project-map-shell .brief-severity.is-P3 {
+  background: color-mix(in srgb, var(--map-status-planned) 18%, var(--map-bg));
+  color: var(--map-status-planned);
+}
+
+.project-map-shell .feature-layer.is-defect,
+.project-map-shell .feature-chip.is-danger {
+  border-color: color-mix(in srgb, var(--map-missing) 45%, var(--map-border));
+  background: color-mix(in srgb, var(--map-missing) 12%, var(--map-bg));
+  color: var(--map-missing);
+}
+
+.project-map-shell .feature-chip.is-warn {
+  border-color: color-mix(in srgb, var(--map-working) 40%, var(--map-border));
+  color: var(--map-working);
+}
+
+.project-map-shell .research-rollup span.is-danger {
+  border-color: color-mix(in srgb, var(--map-missing) 45%, var(--map-border));
+  background: color-mix(in srgb, var(--map-missing) 10%, var(--map-panel-raised));
+}
+.project-map-shell .research-rollup span.is-danger strong {
+  color: var(--map-missing);
+}
+.project-map-shell .research-rollup span.is-warn {
+  border-color: color-mix(in srgb, var(--map-working) 40%, var(--map-border));
+}
+.project-map-shell .research-rollup span.is-warn strong {
+  color: var(--map-working);
+}
+
 .project-map-shell .brief-section-title span,
 .project-map-shell .feature-row-ops span,
 .project-map-shell .brief-decisions p,
