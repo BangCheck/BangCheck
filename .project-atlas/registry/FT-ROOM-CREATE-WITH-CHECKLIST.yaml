@@ -12,7 +12,7 @@ capabilityTitle: 방을 비교해서 고른다
 featureId: FT-ROOM-CREATE-WITH-CHECKLIST
 title: 방 + 체크리스트 등록
 status: PLANNED
-owner: "@Woo-JongHo"
+owner: "@minwoo-l"
 
 # 이 기능이 주인인 operation
 owns:

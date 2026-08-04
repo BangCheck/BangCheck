@@ -11,7 +11,7 @@ capabilityTitle: 방을 비교해서 고른다
 featureId: FT-REPORT-COMPARE
 title: 선택한 방들을 카테고리별로 비교
 status: PLANNED
-owner: "@Woo-JongHo"
+owner: "@hajimeong"
 
 owns:
   - operationId: OP-REPORT-COMPARE

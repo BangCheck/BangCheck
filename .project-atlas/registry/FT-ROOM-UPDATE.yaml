@@ -3,7 +3,7 @@ capabilityTitle: 저장한 방을 수정하고 관리한다
 featureId: FT-ROOM-UPDATE
 title: 방과 체크리스트 수정
 status: PLANNED
-owner: "@Woo-JongHo"
+owner: "@minwoo-l"
 owns:
   - operationId: OP-ROOM-UPDATE
     route: "PUT /api/v1/rooms/{id}"

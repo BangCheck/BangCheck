@@ -8,7 +8,7 @@ capabilityTitle: 방을 비교해서 고른다
 featureId: FT-ROOM-LIST
 title: 내 방 목록 조회
 status: PLANNED
-owner: "@Woo-JongHo"
+owner: "@minwoo-l"
 
 owns:
   - operationId: OP-ROOM-LIST

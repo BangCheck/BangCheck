@@ -3,7 +3,7 @@ capabilityTitle: 저장한 방을 수정하고 관리한다
 featureId: FT-ROOM-CREATE
 title: 체크리스트 없는 기본 방 등록
 status: PLANNED
-owner: "@Woo-JongHo"
+owner: "@minwoo-l"
 owns:
   - operationId: OP-ROOM-CREATE
     route: "POST /api/v1/rooms"

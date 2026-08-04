@@ -9,7 +9,7 @@ capabilityTitle: 내가 볼 체크리스트를 내 상황에 맞춘다
 featureId: FT-CHECKLIST-CATALOG
 title: 체크리스트 항목 카탈로그 조회
 status: PLANNED
-owner: "@Woo-JongHo"
+owner: "@std-yong"
 
 owns:
   - operationId: OP-CHECKLIST-ITEMS-CUSTOMIZED

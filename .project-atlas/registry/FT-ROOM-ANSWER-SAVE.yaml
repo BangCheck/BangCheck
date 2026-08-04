@@ -3,7 +3,7 @@ capabilityTitle: 방 하나의 계약 조건과 체크 결과를 확인한다
 featureId: FT-ROOM-ANSWER-SAVE
 title: 기존 방 체크리스트 답변 저장
 status: PLANNED
-owner: "@Woo-JongHo"
+owner: "@minwoo-l"
 owns:
   - operationId: OP-ROOM-ANSWER-SAVE
     route: "POST /api/v1/rooms/{id}/check-results"

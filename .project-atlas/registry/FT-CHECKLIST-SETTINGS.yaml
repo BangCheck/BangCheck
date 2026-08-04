@@ -9,7 +9,7 @@ capabilityTitle: 내가 볼 체크리스트를 내 상황에 맞춘다
 featureId: FT-CHECKLIST-SETTINGS
 title: 사용자 유형 선택과 항목 표시 설정
 status: PLANNED
-owner: "@Woo-JongHo"
+owner: "@std-yong"
 
 owns:
   - operationId: OP-CHECKLIST-TYPES-LIST

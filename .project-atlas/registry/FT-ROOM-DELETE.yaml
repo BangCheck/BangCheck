@@ -3,7 +3,7 @@ capabilityTitle: 저장한 방을 수정하고 관리한다
 featureId: FT-ROOM-DELETE
 title: 내 방 삭제
 status: PLANNED
-owner: "@Woo-JongHo"
+owner: "@minwoo-l"
 owns:
   - operationId: OP-ROOM-DELETE
     route: "DELETE /api/v1/rooms/{id}"

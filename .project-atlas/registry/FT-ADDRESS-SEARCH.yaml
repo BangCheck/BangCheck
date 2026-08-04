@@ -10,7 +10,7 @@ capabilityTitle: 방을 비교해서 고른다
 featureId: FT-ADDRESS-SEARCH
 title: 주소 검색
 status: PLANNED
-owner: "@Woo-JongHo"
+owner: "@minwoo-l"
 
 owns:
   - operationId: OP-ADDRESS-SEARCH
