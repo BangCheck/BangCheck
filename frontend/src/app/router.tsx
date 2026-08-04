@@ -20,9 +20,6 @@ import { DevLoginButton } from '@/features/dev/DevLoginButton';
 const ProjectMapPage = import.meta.env.DEV
   ? lazy(() => import('@/features/research/ResearchPage'))
   : null;
-const ProjectDashboardPage = import.meta.env.DEV
-  ? lazy(() => import('@/features/project-dashboard/ProjectDashboardPage'))
-  : null;
 const ProjectAtlasPage = import.meta.env.DEV
   ? lazy(() => import('@/features/project-atlas/ProjectAtlasPage'))
   : null;
@@ -52,15 +49,11 @@ export const Router = () => (
       <Route path="/" element={<LandingPage />} />
       <Route path="/login-error" element={<LoginErrorPage />} />
       <Route path="/auth/callback/:provider" element={<AuthCallbackPage />} />
-      {import.meta.env.DEV && ProjectMapPage && ProjectDashboardPage && ProjectAtlasPage && (
+      {import.meta.env.DEV && ProjectMapPage && ProjectAtlasPage && (
         <>
           <Route
             path={ROUTES.PROJECT_MAP}
             element={<Suspense fallback={<AtlasLoading />}><ProjectMapPage /></Suspense>}
-          />
-          <Route
-            path={ROUTES.PROJECT_DASHBOARD}
-            element={<Suspense fallback={<AtlasLoading />}><ProjectDashboardPage /></Suspense>}
           />
           <Route
             path={ROUTES.PROJECT_PAGE_PATTERN}

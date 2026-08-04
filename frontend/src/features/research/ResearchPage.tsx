@@ -197,46 +197,6 @@ export default function ProjectMapPage() {
 
       <div className="research-workspace">
         <aside className="research-sidebar">
-          <div className="research-project-card">
-            <div className="research-project-icon">
-              <Icon icon="solar:home-2-bold-duotone" width={24} />
-            </div>
-            <div>
-              <strong>BangCheck</strong>
-              <span>ver 1.1 · Pilot</span>
-            </div>
-            <button type="button" aria-label="프로젝트 메뉴" disabled title="MVP 이후 연결 예정">
-              <Icon icon="solar:menu-dots-bold" width={18} />
-            </button>
-          </div>
-
-          <nav className="research-navigation" aria-label="프로젝트 아카이브">
-            <p className="research-section-label">PROJECT VIEW</p>
-            <Link to={ROUTES.PROJECT_DASHBOARD}>
-              <Icon icon="solar:chart-square-outline" width={19} />
-              대시보드
-            </Link>
-            <button type="button" className="is-active">
-              <Icon icon="solar:widget-5-outline" width={19} />
-              페이지 맵
-              <span>{RESEARCH_STATS.pages}</span>
-            </button>
-            <button type="button" disabled title="MVP 이후 연결 예정">
-              <Icon icon="solar:folder-with-files-outline" width={19} />
-              자료 아카이브
-              <span>{RESEARCH_STATS.resources}</span>
-            </button>
-            <button type="button" disabled title="MVP 이후 연결 예정">
-              <Icon icon="solar:lightbulb-minimalistic-outline" width={19} />
-              고민과 결정
-              <span>{RESEARCH_STATS.decisions}</span>
-            </button>
-            <button type="button" disabled title="MVP 이후 연결 예정">
-              <Icon icon="solar:calendar-mark-outline" width={19} />
-              타임라인
-            </button>
-          </nav>
-
           <div className="research-discipline-filter">
             <p className="research-section-label">TEAM LENS</p>
             <button
