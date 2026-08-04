@@ -106,6 +106,45 @@ marker/geocoding, 필터·정렬, 600줄 UI가 한 파일에 있다.
 
 처방: `useNaverMap`, 순수 geo/filter 함수, `MapRoomCardCompact` 세 덩어리만 추출.
 
+## FE-8 기존 사용자에게는 토큰 제거가 적용되지 않는다 [전달]
+
+2026-08-04에 FE-1을 고치면서 `partialize`로 `accessToken`을 persist에서 뺐다.
+그런데 `partialize`는 **앞으로 저장할 것만** 줄인다.
+`version`·`migrate`가 없어 이미 `auth-storage`에 저장된 구 데이터는
+zustand 기본 `merge`로 다시 주입된다.
+
+같은 이유로 이미 발급된 7일짜리 `accessToken` 쿠키도 만료되지 않는다.
+`deleteTokenCookie` 호출을 없애면서 정리 경로까지 함께 사라졌다.
+
+즉 **메모리 단일 소스는 새 사용자에게만 참이다.**
+
+처방: persist에 `version` + `migrate`를 넣어 구 저장값에서 토큰을 떨어내고,
+그 시점에 레거시 쿠키를 만료시킨다.
+
+## FE-9 ESLint 경계 규칙에 우회 경로가 있다 [전달]
+
+2026-08-04에 넣은 `no-restricted-imports`는 문자열 패턴 기반이라
+다음이 뚫린다 — codex가 probe로 실측했다.
+
+| 형태 | 결과 |
+|---|---|
+| `'@/features/...'` 정적 import | 막힘 |
+| `'../features/...'` 상대경로 | **안 막힘** |
+| `import('@/features/...')` dynamic | **안 막힘** |
+| `import('axios')` dynamic | **안 막힘** |
+
+현재 트리에 위반은 없으나 "경계를 ESLint가 강제한다"는 주장은 과장이다.
+
+처방: `dependency-cruiser` 도입 시 함께 닫는다(리뷰 권장안).
+그전까지는 ESLint가 정적 `@/` import만 막는다는 것을 계약에 명시한다.
+
+## FE-10 e2e가 새 인증 계약을 검증하지 않는다 [전달]
+
+`e2e/wave2/wave2-p0-3건.spec.ts:34`가 여전히 `auth-storage`에
+`accessToken: 'fake-token'`을 seed한다.
+"재수화 시 토큰 없음 → 401 → refresh 쿠키 → 메모리 set"이라는 새 계약을
+검증하지 않고, 오히려 FE-8의 레거시 누수를 재현하는 fixture다.
+
 ## FE-7 선언된 스택과 실제 사용이 다르다 [확인]
 
 `react-hook-form`, `zod`, `@hookform/resolvers`,
@@ -197,6 +236,26 @@ registry는 `CAPABILITY → FEATURE → OPERATION`,
 없는 것이다. AT-2가 풀리면 이 문제도 성격이 바뀐다.
 
 ---
+
+# 2026-08-04 처리 현황
+
+| 항목 | 상태 |
+|---|---|
+| FE-1 토큰 중복 영속화 | **부분 해소** — 신규 사용자만. 기존 사용자는 FE-8 |
+| FE-2 tsconfig 범위 | **해소** — `src/**/*`, 도달불가 22파일 654줄 삭제 |
+| FE-3 공유→feature 역참조 | **해소** — `app/layout`·report로 이동, 역참조 0 |
+| FE-7 미사용 의존성 | **해소** — 5개 제거 |
+| FE-4·5·6 | 미착수 |
+| FE-8·9·10 | 위 수정이 만들었거나 남긴 것 |
+
+수정 검증(codex terra, 명령 직접 실행): typecheck 통과,
+lint 에러 6·경고 3으로 착수 전 기준선 동일, build 성공,
+import graph 90모듈 순환 0.
+
+착수 중 회귀 하나를 만들고 같은 날 닫았다 — 토큰 재발급이 `setAuth`를 타
+새로고침마다 커스터마이징을 지웠다.
+`refreshToken`을 따로 두어 해소(`1b0ca05`).
+**"고치는 변경이 회귀를 만든다"는 것을 검증 패스가 잡았다.**
 
 # 이슈로 올릴 때의 순서
 
