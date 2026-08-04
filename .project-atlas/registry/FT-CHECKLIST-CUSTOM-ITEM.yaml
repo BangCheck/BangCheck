@@ -17,8 +17,8 @@ owns:
     auth: JWT
     safety:
       sideEffect: WRITE
-      writes: [checklist_custom_item]
-      rerunSafe: false          # 같은 이름을 두 번 보내면 409로 거절된다 — 멱등이 아니다
+      writes: [checklist_items]
+      rerunSafe: false          # 중복 검사도 unique 제약도 없어 같은 이름이 매번 새 row가 된다
       abortOnFail: FULL_ROLLBACK
 
   - operationId: OP-CHECKLIST-CUSTOM-ITEM-DELETE
@@ -26,8 +26,9 @@ owns:
     auth: JWT
     safety:
       sideEffect: WRITE
-      writes: [checklist_custom_item]
-      rerunSafe: false          # 두 번째 호출이 404가 아니라 500이다 (BC-CHK-01)
+      writes: [checklist_items]
+      rerunSafe: true           # findById가 soft-deleted row를 다시 찾아 softDelete를 재호출한다.
+                                # 최종 논리 상태가 같아 이 Map의 기준으로는 safe다 (BC-CHK-01은 없는 id 경로)
       abortOnFail: FULL_ROLLBACK
 
 uses: []
@@ -36,7 +37,7 @@ implementedBy:
   slice: backend/src/main/java/com/room/backend/domain/checklist
   useCase: service/ChecklistService.java
   legacyPath: backend/src/main/java/com/room/backend/domain/checklist/controller/ChecklistController.java#addCustomItem
-  frontendEntry: frontend/src/services/custom-checklist-service.ts#addCustomItem
+  frontendEntry: frontend/src/features/customization/hooks/use-customization.ts#saveCurrentSettings
   switchedOver: false
 
 knownDefects:
@@ -50,7 +51,8 @@ tests: []   # 2026-08-04 main 기준 이 기능을 덮는 test 없음
 sliceShapeNotes:
   - 추가와 삭제를 한 feature로 둔 근거는 같은 테이블의 수명주기를 함께
     소유하고 결함도 같은 지점(입력 검증·오류 매핑)에 몰려 있다는 것이다.
-  - rerunSafe를 둘 다 false로 적었다. 재실행이 안전하다는 뜻이 아니라
-    지금 안전하지 않다는 관측이며, BC-CHK-01·05가 그 실물이다.
+  - rerunSafe가 add는 false, delete는 true다. add는 중복 검사가 없어 재실행이
+    row를 늘리고, delete는 soft-delete 재호출이라 최종 상태가 같다.
+    BC-CHK-01의 500은 이미 지운 것을 다시 지울 때가 아니라 없는 id를 줄 때 난다.
   - 삭제가 권한 위반을 403이 아니라 400으로 내는 것(BC-CHK-06)은
     오류 코드 계약 문제라 여기 함께 둔다.

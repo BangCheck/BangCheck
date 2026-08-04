@@ -36,7 +36,9 @@ implementedBy:
   slice: backend/src/main/java/com/room/backend/domain/checklist
   useCase: service/ChecklistService.java
   legacyPath: backend/src/main/java/com/room/backend/domain/checklist/controller/ChecklistController.java#getCustomizedItems
-  frontendEntry: frontend/src/services/custom-checklist-service.ts#getCustomizedItems
+  # 사용자 흐름의 소비 지점이다. HTTP 어댑터(custom-checklist-service.ts)가 아니라
+  # 그것을 부르는 훅을 적는다 — Map이 답해야 할 질문은 '어느 화면이 쓰나'다.
+  frontendEntry: frontend/src/features/checklist/hooks/use-checklist-items.ts#useChecklistItems
   switchedOver: false
 
 knownDefects:

@@ -26,7 +26,7 @@ owns:
     auth: JWT
     safety:
       sideEffect: WRITE
-      writes: [checklist_user_type]
+      writes: [user_type_selections]
       rerunSafe: true           # 이미 선택된 유형을 다시 보내도 결과 상태가 같다
       abortOnFail: FULL_ROLLBACK
 
@@ -35,7 +35,7 @@ owns:
     auth: JWT
     safety:
       sideEffect: WRITE
-      writes: [checklist_user_type]
+      writes: [user_type_selections]
       rerunSafe: true           # 없는 것을 지워도 최종 상태가 같다
       abortOnFail: FULL_ROLLBACK
 
@@ -44,17 +44,28 @@ owns:
     auth: JWT
     safety:
       sideEffect: WRITE
-      writes: [checklist_item_setting]
+      writes: [user_checklist_settings]
       rerunSafe: true           # 같은 disabledItemIds를 다시 보내면 상태가 같다
       abortOnFail: FULL_ROLLBACK
 
-uses: []
+# 설정 저장 한 번이 남의 operation을 함께 부른다 — 소유는 주장하지 않는다.
+# 근거: frontend/src/features/customization/hooks/use-customization.ts#saveCurrentSettings
+# 순서는 deselect → select → custom delete → custom add → settings save 다.
+uses:
+  - operationId: OP-CHECKLIST-CUSTOM-ITEM-DELETE
+    route: "DELETE /api/checklist/items/custom/{customItemId}"
+  - operationId: OP-CHECKLIST-CUSTOM-ITEM-ADD
+    route: "POST /api/checklist/items/custom"
+  - operationId: OP-CHECKLIST-ITEMS-CUSTOMIZED
+    route: "GET /api/checklist/items"
+  - operationId: OP-CHECKLIST-ITEMS-ALL
+    route: "GET /api/checklist/items/all"
 
 implementedBy:
   slice: backend/src/main/java/com/room/backend/domain/checklist
   useCase: service/ChecklistService.java
   legacyPath: backend/src/main/java/com/room/backend/domain/checklist/controller/ChecklistController.java#saveSettings
-  frontendEntry: frontend/src/services/custom-checklist-service.ts#saveSettings
+  frontendEntry: frontend/src/features/customization/hooks/use-customization.ts#saveCurrentSettings
   switchedOver: false
 
 knownDefects:
