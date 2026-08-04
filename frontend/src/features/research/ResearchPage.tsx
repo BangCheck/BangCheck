@@ -1,9 +1,8 @@
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { Icon } from '@iconify/react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ROUTES } from '@/lib/routes';
-import { ARTIFACT_META, RESEARCH_NODES, RESEARCH_STATS, STATUS_META } from './research-data';
-import type { ResearchArtifactKind, ResearchNodeStatus } from '@/types/research';
+import { ARTIFACT_META, RESEARCH_NODES, STATUS_META } from './research-data';
 import './research.css';
 
 const CANVAS_WIDTH = 1480;
@@ -33,14 +32,6 @@ function getInitialTheme(): MapTheme {
     : 'vscode-light';
 }
 
-const statusFilters: Array<{ value: 'all' | ResearchNodeStatus; label: string }> = [
-  { value: 'all', label: '전체' },
-  { value: 'building', label: '개발 중' },
-  { value: 'review', label: '검토 필요' },
-  { value: 'live', label: '운영 중' },
-  { value: 'planned', label: '예정' },
-];
-
 function ArtifactStatus({ status }: { status: 'ready' | 'working' | 'missing' }) {
   const meta = {
     ready: { label: '연결됨', icon: 'solar:check-circle-bold', className: 'is-ready' },
@@ -59,9 +50,6 @@ function ArtifactStatus({ status }: { status: 'ready' | 'working' | 'missing' })
 export default function ProjectMapPage() {
   const navigate = useNavigate();
   const [selectedId, setSelectedId] = useState('landing');
-  const [query, setQuery] = useState('');
-  const [status, setStatus] = useState<'all' | ResearchNodeStatus>('all');
-  const [discipline, setDiscipline] = useState<'all' | ResearchArtifactKind>('all');
   const [zoom, setZoom] = useState(0.86);
   const [theme, setTheme] = useState<MapTheme>(getInitialTheme);
   const [isThemeMenuOpen, setIsThemeMenuOpen] = useState(false);
@@ -70,27 +58,7 @@ export default function ProjectMapPage() {
   );
 
   const selectedNode = RESEARCH_NODES.find((node) => node.id === selectedId) ?? RESEARCH_NODES[0];
-  const normalizedQuery = query.trim().toLowerCase();
-
-  const visibleNodeIds = useMemo(() => {
-    return new Set(
-      RESEARCH_NODES.filter((node) => {
-        const matchesStatus = status === 'all' || node.status === status;
-        const haystack = [
-          node.title,
-          node.description,
-          node.route,
-          ...node.tags,
-          ...node.artifacts.flatMap((artifact) => [artifact.title, artifact.detail]),
-        ].join(' ').toLowerCase();
-        return matchesStatus && (!normalizedQuery || haystack.includes(normalizedQuery));
-      }).map((node) => node.id),
-    );
-  }, [normalizedQuery, status]);
-
-  const selectedArtifacts = selectedNode.artifacts.filter(
-    (artifact) => discipline === 'all' || artifact.kind === discipline,
-  );
+  const selectedArtifacts = selectedNode.artifacts;
 
   const selectNode = (id: string) => {
     if (id === 'landing') {
@@ -196,71 +164,7 @@ export default function ProjectMapPage() {
       </header>
 
       <div className="research-workspace">
-        <aside className="research-sidebar">
-          <div className="research-discipline-filter">
-            <p className="research-section-label">TEAM LENS</p>
-            <button
-              type="button"
-              className={discipline === 'all' ? 'is-active' : ''}
-              onClick={() => setDiscipline('all')}
-            >
-              <span className="research-discipline-dot is-all" />
-              모든 자료
-            </button>
-            {(Object.entries(ARTIFACT_META) as Array<[ResearchArtifactKind, typeof ARTIFACT_META[ResearchArtifactKind]]>).map(([key, meta]) => (
-              <button
-                key={key}
-                type="button"
-                className={discipline === key ? 'is-active' : ''}
-                onClick={() => setDiscipline(key)}
-              >
-                <span className={`research-discipline-dot is-${key}`} />
-                {meta.label}
-              </button>
-            ))}
-          </div>
-
-          <div className="research-health-card">
-            <div className="research-health-head">
-              <span>MOCK 준비도</span>
-              <strong>{RESEARCH_STATS.readiness}%</strong>
-            </div>
-            <div className="research-health-track">
-              <span style={{ width: `${RESEARCH_STATS.readiness}%` }} />
-            </div>
-            <p><span /> SNAPSHOT · P1 6건</p>
-          </div>
-        </aside>
-
         <section className="research-main">
-          <div className="research-toolbar">
-            <label className="research-search">
-              <Icon icon="solar:magnifer-linear" width={18} />
-              <input
-                value={query}
-                onChange={(event) => setQuery(event.target.value)}
-                placeholder="페이지, 기능, 파일 검색"
-                aria-label="페이지와 자료 검색"
-              />
-              <kbd>FILTER</kbd>
-            </label>
-            <div className="research-status-filters" role="group" aria-label="진행 상태 필터">
-              {statusFilters.map((filter) => (
-                <button
-                  key={filter.value}
-                  type="button"
-                  className={status === filter.value ? 'is-active' : ''}
-                  onClick={() => setStatus(filter.value)}
-                >
-                  {filter.label}
-                </button>
-              ))}
-            </div>
-            <div className="research-result-count">
-              <strong>{visibleNodeIds.size}</strong> / {RESEARCH_NODES.length} pages
-            </div>
-          </div>
-
           <div className="research-canvas-viewport">
             <div className="research-canvas-corner">
               <Icon icon="solar:map-arrow-square-outline" width={16} />
@@ -311,7 +215,6 @@ export default function ProjectMapPage() {
 
               {RESEARCH_NODES.map((node) => {
                 const statusMeta = STATUS_META[node.status];
-                const isVisible = visibleNodeIds.has(node.id);
                 const isSelected = selectedNode.id === node.id;
                 const readyCount = node.artifacts.filter((artifact) => artifact.status === 'ready').length;
 
@@ -319,7 +222,7 @@ export default function ProjectMapPage() {
                   <button
                     key={node.id}
                     type="button"
-                    className={`research-node ${isSelected ? 'is-selected' : ''} ${isVisible ? '' : 'is-muted'}`}
+                    className={`research-node ${isSelected ? 'is-selected' : ''}`}
                     style={{ left: node.position.x, top: node.position.y }}
                     data-row={node.position.y < 400 ? 'top' : 'bottom'}
                     onClick={() => selectNode(node.id)}
@@ -362,7 +265,7 @@ export default function ProjectMapPage() {
             </div>
 
             <div className="research-zoom-controls">
-              <button type="button" onClick={() => setZoom((value) => Math.min(1.08, value + 0.08))} aria-label="확대">
+              <button type="button" onClick={() => setZoom((value) => Math.min(1.4, value + 0.08))} aria-label="확대">
                 <Icon icon="solar:add-square-outline" width={19} />
               </button>
               <span>{Math.round(zoom * 100)}%</span>
@@ -373,14 +276,6 @@ export default function ProjectMapPage() {
                 <Icon icon="solar:maximize-square-minimalistic-outline" width={19} />
               </button>
             </div>
-
-            {visibleNodeIds.size === 0 && (
-              <div className="research-empty-search">
-                <Icon icon="solar:map-point-remove-outline" width={34} />
-                <strong>조건에 맞는 페이지가 없어요</strong>
-                <button type="button" onClick={() => { setQuery(''); setStatus('all'); }}>필터 초기화</button>
-              </div>
-            )}
           </div>
         </section>
 
