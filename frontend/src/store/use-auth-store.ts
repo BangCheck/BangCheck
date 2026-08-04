@@ -9,6 +9,8 @@ interface AuthState {
   accessToken: string | null;
   isLoggedIn: boolean;
   setAuth: (accessToken: string, user: User) => void;
+  /** 같은 세션의 토큰 재발급. 로그인이 아니므로 로컬 데이터를 지우지 않는다. */
+  refreshToken: (accessToken: string) => void;
   logout: () => void;
 }
 
@@ -24,6 +26,9 @@ export const useAuthStore = create<AuthState>()(
         useCustomizationStore.getState().reset();
         set({ accessToken, user, isLoggedIn: true });
       },
+      // 토큰 재발급은 같은 사용자의 세션 유지이지 로그인이 아니다.
+      // 여기서 cleanup을 돌리면 새로고침마다 사용자 커스터마이징이 지워진다.
+      refreshToken: (accessToken) => set({ accessToken }),
       logout: () => {
         // 로그아웃 시에도 동일 cleanup (NFR 보안 — 다른 사용자 로그인 대비)
         useGuestRoomStore.getState().clearGuestRooms();

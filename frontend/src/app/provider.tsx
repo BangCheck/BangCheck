@@ -12,9 +12,11 @@ configureApi({
     useAuthStore.getState().logout();
     if (typeof window !== 'undefined') window.location.href = loginRedirect('expired');
   },
+  // 재발급은 세션 유지다 — setAuth를 쓰면 로그인 cleanup이 돌아
+  // 새로고침마다 게스트 방·커스터마이징이 지워진다.
+  // user 유무와 무관하게 토큰을 넣어야 재시도가 같은 요청에서 끝난다.
   onTokenRefresh: (newAccessToken) => {
-    const user = useAuthStore.getState().user;
-    if (user) useAuthStore.getState().setAuth(newAccessToken, user);
+    useAuthStore.getState().refreshToken(newAccessToken);
   },
 });
 
