@@ -127,7 +127,7 @@ export const RESEARCH_NODES: ResearchNode[] = [
   },
   {
     id: 'checklist-detail',
-    sequence: '04b',
+    sequence: '05',
     title: '체크리스트 상세·수정',
     eyebrow: 'CAPTURE',
     description: '이미 기록한 방을 다시 열어 고치거나 지우는 화면',
@@ -138,7 +138,9 @@ export const RESEARCH_NODES: ResearchNode[] = [
     owner: 'FE + BE',
     updatedAt: '08.04',
     tags: ['수정', '삭제', '조회'],
-    position: { x: 780, y: 300 },
+    // 격자는 x 342 간격 · y 182/480 두 줄이다. 노드 높이가 186px라
+    // 두 줄 사이(y=300)에 두면 68px 겹친다 — 윗줄 빈 열에 놓는다.
+    position: { x: 1464, y: 182 },
     // 이 노드는 2026-08-04에 Atlas pageId(checklist-detail)와 맞추려고 신설했다.
     // 자료·결정 기록은 아직 없다 — 지어내지 않고 비워 둔다.
     artifacts: [],
@@ -146,7 +148,7 @@ export const RESEARCH_NODES: ResearchNode[] = [
   },
   {
     id: 'custom',
-    sequence: '05',
+    sequence: '06',
     title: '내 체크항목',
     eyebrow: 'CAPTURE',
     description: '사용자 상황에 맞춰 기본 항목을 켜고 나만의 질문을 추가',
@@ -168,7 +170,7 @@ export const RESEARCH_NODES: ResearchNode[] = [
   },
   {
     id: 'map',
-    sequence: '06',
+    sequence: '07',
     title: '지도 · 동선',
     eyebrow: 'DECIDE',
     description: '학교와 역 같은 기준점까지 실제 이동 부담을 비교',
@@ -193,7 +195,7 @@ export const RESEARCH_NODES: ResearchNode[] = [
   },
   {
     id: 'report',
-    sequence: '07',
+    sequence: '08',
     title: '비교 리포트',
     eyebrow: 'DECIDE',
     description: '2~3개 방의 조건과 위험 신호를 같은 눈금에서 비교',
@@ -218,7 +220,7 @@ export const RESEARCH_NODES: ResearchNode[] = [
   },
   {
     id: 'my',
-    sequence: '08',
+    sequence: '09',
     title: '마이페이지',
     eyebrow: 'MANAGE',
     description: '계정 상태와 개인 기록을 관리하는 서비스의 뒤편',
@@ -251,7 +253,10 @@ export const RESEARCH_CONNECTIONS: ResearchConnection[] = [
   { from: 'checklist', to: 'map' },
   { from: 'checklist', to: 'report' },
   { from: 'map', to: 'report', variant: 'support' },
-  { from: 'rooms', to: 'mypage', variant: 'support' },
+  { from: 'rooms', to: 'my', variant: 'support' },
+  // 목록에서 방을 누르면 상세로 간다(RoomsPage.tsx#L494). 상세에서 수정·삭제가 일어난다.
+  { from: 'rooms', to: 'checklist-detail' },
+  { from: 'checklist', to: 'checklist-detail', variant: 'support' },
 ];
 
 export const RESEARCH_STATS = {
