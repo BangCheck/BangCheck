@@ -71,7 +71,7 @@ export const ROOMS_PAGE_CARDS: AtlasPageCards = {
           method: 'GET',
           path: '/api/v1/rooms',
           security: 'JWT',
-          request: 'transactionType, sortOption (질의 파라미터, 둘 다 선택)',
+          request: 'rentType, sort (질의 파라미터, 둘 다 선택). 프론트 인자명은 transactionType·sortOption이고 room-service.ts가 이 이름으로 바꿔 보낸다',
           responses: [
             { code: '200', when: '로그인 상태. 방 목록을 낸다' },
             { code: 'skip', when: '비로그인. enabled: isLoggedIn이라 요청 자체가 나가지 않는다' },

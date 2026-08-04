@@ -29,7 +29,7 @@ export const MAP_PAGE_CARDS: AtlasPageCards = {
   cards: [
     {
       id: 'map-view-tabs',
-      code: 'M.00',
+      code: 'P.00',
       title: '보기 전환 탭',
       status: 'LIVE',
       headline: '카드 보기와 지도 보기를 오간다. 두 화면은 서로 다른 라우트다',
@@ -79,7 +79,7 @@ export const MAP_PAGE_CARDS: AtlasPageCards = {
 
     {
       id: 'map-landmark',
-      code: 'M.01',
+      code: 'P.01',
       title: '기준점 선택 · 저장',
       status: 'LIVE',
       headline: '기준점은 코드 안 상수 8개뿐이고 localStorage에만 남는다. 서버 기준점 API는 쓰지 않는다',
@@ -165,7 +165,7 @@ export const MAP_PAGE_CARDS: AtlasPageCards = {
 
     {
       id: 'map-filter',
-      code: 'M.02',
+      code: 'P.02',
       title: '필터 · 정렬 바',
       status: 'LIVE',
       headline: '거래방식과 정렬을 고른다. 서버 파라미터가 아니라 브라우저 계산이다',
@@ -250,7 +250,7 @@ export const MAP_PAGE_CARDS: AtlasPageCards = {
 
     {
       id: 'map-counter',
-      code: 'M.03',
+      code: 'P.03',
       title: '등록 방 수 · 모바일 정렬',
       status: 'LIVE',
       headline: '한도는 로그인 여부로 갈린다. 두 숫자의 출처가 다르다',
@@ -299,7 +299,7 @@ export const MAP_PAGE_CARDS: AtlasPageCards = {
 
     {
       id: 'map-rooms',
-      code: 'M.04',
+      code: 'P.04',
       title: '방 카드 목록',
       status: 'BOUND',
       headline: '거리는 카드가 직접 계산하고, 카드를 고르면 그때만 도보 경로를 부른다',
@@ -420,7 +420,7 @@ export const MAP_PAGE_CARDS: AtlasPageCards = {
 
     {
       id: 'map-canvas',
-      code: 'M.05',
+      code: 'P.05',
       title: 'NCP 지도 본체',
       status: 'BOUND',
       headline: '방 좌표는 브라우저가 네이버 지오코딩으로 매번 다시 구한다',
@@ -510,7 +510,7 @@ export const MAP_PAGE_CARDS: AtlasPageCards = {
 
     {
       id: 'map-empty',
-      code: 'M.06',
+      code: 'P.06',
       title: '주소 있는 방 없음',
       status: 'LIVE',
       headline: '주소 있는 방이 0개면 지도도 카드도 그리지 않는다',

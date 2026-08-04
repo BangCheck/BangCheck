@@ -17,6 +17,11 @@ export default function MyPage() {
   const navigate = useNavigate();
   const { user, logout, isLoggedIn } = useAuthStore();
 
+  // Atlas 상세 캔버스가 이 페이지를 띄우면 [data-atlas-node] 좌표를 부모로 보고한다.
+  // early return 앞에 두어야 한다 — 뒤에 두면 로그인 상태가 바뀌는 렌더에서
+  // Hook 순서가 달라진다(2026-08-04 교차 검토가 잡은 회귀).
+  useAtlasPreview(ROUTES.MY);
+
   // 마이페이지는 로그인 사용자 전용(유일 액션이 로그아웃). 게스트 진입 시 로그인으로 유도.
   if (!isLoggedIn) {
     return <Navigate to={`${ROUTES.LOGIN}?redirect=${ROUTES.MY}`} replace />;
@@ -26,9 +31,6 @@ export default function MyPage() {
   // Figma의 "김"은 placeholder — User 타입에는 nickname/email만 존재(name 필드 없음).
   const displayName = user?.nickname?.trim() || user?.email?.trim() || '';
   const initial = displayName ? displayName.charAt(0).toUpperCase() : '?';
-
-  // Atlas 상세 캔버스가 이 페이지를 띄우면 [data-atlas-node] 좌표를 부모로 보고한다.
-  useAtlasPreview(ROUTES.MY);
 
   const handleLogout = () => {
     // TODO(api-spec A-4): 서버 세션 종료 POST /api/v1/auth/logout 미연동.

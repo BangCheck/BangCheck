@@ -424,7 +424,11 @@ export const REPORT_PAGE_CARDS: AtlasPageCards = {
       // 다섯 건 모두 백엔드 /api/v1/report/* 경로의 결함이다.
       // 이 화면이 그 경로를 부르지 않으므로 지금은 사용자에게 나타나지 않는다.
       // 여기 다는 이유는 "이 화면이 대신 하고 있는 일이 무엇의 중복인가"를 가리키기 위해서다.
-      defects: ['BC-RPT-01', 'BC-RPT-02', 'BC-RPT-03', 'BC-RPT-04', 'BC-RPT-05'],
+      // BC-RPT-01~05는 여기 적지 않는다. 이 화면이 /api/v1/report/*를 부르지
+      // 않으므로 사용자에게 나타나지 않는다 — 위 related의 INCONSISTENT_WITH가
+      // 그 사실의 자리다. 화면 결함과 백엔드 결함을 같은 칸에 두면
+      // "이 화면을 고치려면 무엇을 봐야 하나"에 답할 수 없다.
+      defects: [],
     },
   ],
 };

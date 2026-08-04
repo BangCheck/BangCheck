@@ -98,7 +98,14 @@ export interface AtlasCard {
 
   // --- 근거 ---
   sources: readonly CardSource[];
-  /** .project-atlas/registry/defects.yaml의 결함 ID */
+  /**
+   * .project-atlas/registry/defects.yaml의 결함 ID.
+   *
+   * 기준(2026-08-04 확정) — **이 영역을 쓰는 사용자에게 실제로 나타나는 결함만.**
+   * 이 화면이 부르지 않는 API의 결함은 여기 적지 않는다. 그것은 관계이지
+   * 이 영역의 결함이 아니므로 related의 INCONSISTENT_WITH로 적는다.
+   * 이 구분이 없으면 "이 화면을 고치려면 무엇을 봐야 하나"에 답할 수 없다.
+   */
   defects: readonly string[];
 }
 

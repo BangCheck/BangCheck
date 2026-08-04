@@ -254,7 +254,9 @@ export const LOGIN_PAGE_CARDS: AtlasPageCards = {
       ],
       // BC-AUTH-01: 여기서 만드는 state가 1회용이 아니다(TTL 안에서 재사용 가능).
       // BC-AUTH-90: 같은 auth-service.ts에 백엔드에 없는 /api/v1/users/me를 부르는 죽은 함수가 있다.
-      defects: ['BC-AUTH-01', 'BC-AUTH-90'],
+      // BC-AUTH-90(죽은 getCurrentUser)은 뺐다. 같은 파일에 있을 뿐 이 버튼의
+      // 흐름이 부르지 않아 사용자에게 나타나지 않는다.
+      defects: ['BC-AUTH-01'],
     },
 
     {
