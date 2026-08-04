@@ -126,6 +126,25 @@ export const RESEARCH_NODES: ResearchNode[] = [
     ],
   },
   {
+    id: 'checklist-detail',
+    sequence: '04b',
+    title: '체크리스트 상세·수정',
+    eyebrow: 'CAPTURE',
+    description: '이미 기록한 방을 다시 열어 고치거나 지우는 화면',
+    route: '/checklist/:id',
+    icon: 'solar:pen-new-square-outline',
+    status: 'building',
+    progress: 70,
+    owner: 'FE + BE',
+    updatedAt: '08.04',
+    tags: ['수정', '삭제', '조회'],
+    position: { x: 780, y: 300 },
+    // 이 노드는 2026-08-04에 Atlas pageId(checklist-detail)와 맞추려고 신설했다.
+    // 자료·결정 기록은 아직 없다 — 지어내지 않고 비워 둔다.
+    artifacts: [],
+    decisions: [],
+  },
+  {
     id: 'custom',
     sequence: '05',
     title: '내 체크항목',
@@ -198,7 +217,7 @@ export const RESEARCH_NODES: ResearchNode[] = [
     ],
   },
   {
-    id: 'mypage',
+    id: 'my',
     sequence: '08',
     title: '마이페이지',
     eyebrow: 'MANAGE',
