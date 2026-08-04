@@ -1,0 +1,75 @@
+# 축 1 — report 묶음의 둘째 조각.
+#
+# 이 ID도 새로 만든 것이 아니다. defects.yaml의 BC-RPT-02/03/04/05가
+# 이미 relatedFeature로 가리키고 있었다.
+#
+# 알려진 결함 4건 중 P1이 둘이다. 이 묶음에서 가장 위험한 조각이다.
+
+capabilityId: CAP-ROOM-COMPARE
+capabilityTitle: 방을 비교해서 고른다
+
+featureId: FT-REPORT-COMPARE
+title: 선택한 방들을 카테고리별로 비교
+status: PLANNED
+owner: "@Woo-JongHo"
+
+owns:
+  - operationId: OP-REPORT-COMPARE
+    route: "POST /api/v1/report/compare"
+    auth: JWT                     # 인증은 걸려 있다. 다만 인가(방 소유권)가 없다 — BC-RPT-02
+    safety:
+      sideEffect: READ            # POST지만 쓰기가 아니다. 요청 본문이 큰 조회다
+      writes: []
+      # ReportService#compareRooms를 두 번 호출해도 결과가 같다.
+      # 호출 경로 전체(compareRooms → buildBasicInfoItems / buildBuildingInfoItems /
+      # buildCompareItem → getSelectedOptions)가 findById·findByCategory·
+      # findByRoomIdInAndItemId·findByResultId 뿐이고 save·delete·flush가 하나도 없다.
+      # 클래스에 @Transactional(readOnly = true)가 걸려 있어 dirty checking도 안 돈다.
+      # 최종 논리 상태가 같으므로 true.
+      rerunSafe: true
+      # 쓰기가 없어 롤백할 대상이 없다. BC-RPT-03/04의 500은 실패 모드이지
+      # 부분 반영이 아니다 — 예외가 나면 응답만 없고 저장된 것도 없다.
+      abortOnFail: NONE
+
+# 2026-08-04 main 기준 이 operation을 부르는 프런트 모듈이 없다.
+# `grep -rn "api/v1/report" frontend/` 가 0건이라 함께 불리는 operation을
+# 실측할 대상 자체가 없다. 비워 두는 근거는 "안 찾아봤다"가 아니라 "소비자가 없다"다.
+#
+# 참고: 요청 DTO의 roomIds·categories를 실제로 채워 줄 수 있는 것은 OP-REPORT-INFO의
+# 응답(rooms[].roomId, categories[])이다. 다만 그것은 DTO를 읽고 얻은 설계상 짝이지
+# 관측된 호출이 아니라서 uses에 적지 않는다.
+uses: []
+
+implementedBy:
+  slice: backend/src/main/java/com/room/backend/api/report
+  useCase: service/ReportService.java
+  legacyPath: backend/src/main/java/com/room/backend/api/report/controller/ReportController.java#compareRooms
+  # frontendEntry 없음 — 소비 지점이 실재하지 않는다.
+  # frontend/src/features/report/ReportPage.tsx는 이 API를 부르지 않는다.
+  # useRoomsList(/api/v1/rooms) + getRoomDetail(/api/v1/rooms/{id}) +
+  # useChecklistItems(/api/checklist/items)로 받아 CompareTable이 브라우저에서
+  # 비교표를 조립한다. 즉 백엔드 비교 로직과 프런트 비교 로직이 이중으로 존재한다.
+  switchedOver: false
+
+knownDefects:
+  - BC-RPT-02
+  - BC-RPT-03
+  - BC-RPT-04
+  - BC-RPT-05
+
+tests: []   # 2026-08-04 main 기준 이 기능을 덮는 test 없음.
+            # defects가 "계약 test RPT-06/RPT-07이 재현한다"고 적지만
+            # backend/src/test에 해당 파일이 없다 — 아직 작성 예정인 test다.
+
+sliceShapeNotes:
+  - operation 하나만 owns 하는데도 별도 feature로 둔 근거는 defects.yaml의
+    relatedFeature 배치다. P1 둘(BC-RPT-02 소유권 미검증, BC-RPT-03 NPE)이
+    전부 이 operation에 몰려 있어 info와 수명주기가 다르다.
+  - sideEffect를 READ로 둔 것은 HTTP 동사가 아니라 실제 효과로 판정한 결과다.
+    POST인 이유는 roomIds·categories를 본문으로 받기 때문이지 상태를 바꿔서가 아니다.
+  - 이 feature의 가장 큰 위험은 안전 필드가 아니라 인가에 있다.
+    controller가 SecurityUtil.getCurrentUserId()로 userId를 구해 놓고
+    reportService.compareRooms(requestDTO)에 넘기지 않고 버린다(BC-RPT-02).
+    rerunSafe=true는 "안전하다"가 아니라 "반복 호출이 상태를 안 바꾼다"만 뜻한다.
+  - 백엔드 비교 로직이 프런트에서 쓰이지 않는다는 사실은 리팩토링 순서에 직접 영향을 준다.
+    소비자가 없으므로 BC-RPT-02~05를 고칠 때 응답 형태를 깨도 화면이 깨지지 않는다.
