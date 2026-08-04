@@ -203,14 +203,24 @@ registry의 `BC-REG-05`가 이 결함을 이미 등재하고 있다.
 
 # Atlas / registry
 
-## AT-1 resolver의 검사 구멍 셋 [전달]
+## AT-1 resolver의 검사 구멍 셋 [해소]
 
-- `defects`의 `relatedFeature`를 검사하지 않는다 — registry에 없는
-  feature를 가리켜도 통과한다
-- `frontendEntry`가 schema에 있으나 required가 아니고 resolver도 안 본다
+지적 당시 세 구멍이 있었다.
+
+- `defects`의 `relatedFeature`를 검사하지 않는다
+- `frontendEntry`가 schema에 있으나 resolver가 안 본다
 - `uses`는 operation ID 존재를 확인하지 않고 route 문자열만 본다
 
-그래서 "검사 N건 위반 0건"은 **현 validator 범위에서만 참**이다.
+2026-08-04에 앞의 둘을 닫았다(REF-01 양방향, SRC-01/02를 frontendEntry에 적용).
+검사 943 → 989건. 위반 세 방향을 실제로 넣어 무는 것을 확인했다.
+
+**닫으면서 드러난 것** — 이 검사들이 없는 동안 실제 오류가 초록불 안에 있었다.
+같은 날 추가한 WRT-01은 `rooms.is_deleted`(컬럼을 테이블로 적음)를,
+FEC-01은 `GET /api/v1/users/me` 유령 호출을 켜자마자 잡았다.
+`relatedFeature` dangling도 FT-CHECKLIST-* 셋과 FT-REPORT-* 둘이 그 상태였다.
+
+세 번째(`uses`의 operation ID 미검사)는 남았다. 지금 uses가 2건뿐이고
+둘 다 실존을 눈으로 확인했다. operation ID 대조를 넣는 것이 다음이다.
 
 ## AT-2 registry가 제품 표면의 36%만 덮는다 [확인]
 

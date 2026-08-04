@@ -7,7 +7,7 @@ registry에 적힌 값이 실제 저장소와 맞는지 기계적으로 검사�
 검사 항목
   ID-01  ID 형식이 schema의 패턴과 맞는가
   ID-02  ID가 유일한가
-  REF-01 참조한 ID가 실제로 정의되어 있는가 (dangling reference)
+  REF-01 참조한 ID가 실제로 정의되어 있는가 (양방향 — knownDefects·relatedFeature)
   SRC-01 evidence·implementedBy의 경로가 실제로 존재하는가
   SRC-02 evidence.symbol이 그 파일 안에 실제로 등장하는가
   RTE-01 route가 제품 정답지(routes.txt)에 존재하는가
@@ -253,6 +253,7 @@ def main() -> int:
     # --- 결함 registry ---------------------------------------------------
     defect_ids: set[str] = set()
     defect_evidence_paths: set[str] = set()
+    defect_related: list[tuple[str, str]] = []
     defects_file = ATLAS_DIR / "registry" / "defects.yaml"
     if defects_file.is_file():
         spec = entities["defect"]
@@ -270,6 +271,10 @@ def main() -> int:
                        spec["fields"]["severity"]["values"])
             check_enum(report, where, "disposition", defect.get("disposition"),
                        spec["fields"]["disposition"]["values"])
+
+            related = defect.get("relatedFeature")
+            if related:
+                defect_related.append((where, str(related)))
 
             evidence = defect.get("evidence") or {}
             relative = evidence.get("path")
@@ -357,6 +362,17 @@ def main() -> int:
             if target and legacy_symbol:
                 check_symbol(report, where, target, legacy_path, legacy_symbol)
 
+        # frontendEntry — Map이 Front를 가리키는 유일한 줄이다.
+        # schema에 선언만 있고 아무도 안 보던 필드라, 2026-08-04에 11개를 채우면서
+        # 그 값이 맞는지 기계가 확인하지 않는 상태였다. 빈 값은 위반이 아니다 —
+        # 소비자 부재를 실측한 결과일 수 있고 그 사유는 파일 주석이 갖는다.
+        front = implementation.get("frontendEntry")
+        if front:
+            front_path, _, front_symbol = front.partition("#")
+            target = check_path(report, "SRC-01", where, front_path)
+            if target and front_symbol:
+                check_symbol(report, where, target, front_path, front_symbol)
+
         # dangling reference
         for defect_ref in feature.get("knownDefects") or []:
             if defect_ref not in defect_ids:
@@ -368,6 +384,15 @@ def main() -> int:
             check_path(report, "SRC-01", where, test)
 
     # --- 출력 -------------------------------------------------------------
+    # relatedFeature dangling — defect가 없는 feature를 가리키면 Map에 구멍이 있다는 뜻이다.
+    # 2026-08-04에 FT-CHECKLIST-* 셋과 FT-REPORT-* 둘이 정확히 그 상태였고,
+    # 검사가 없어 초록불이었다. 채워서 0이 됐지만 검사가 없으면 언제든 다시 생긴다.
+    for where, related in defect_related:
+        if related in feature_ids:
+            report.ok()
+        else:
+            report.fail("REF-01", where, f"정의되지 않은 feature를 가리킨다: {related}")
+
     if as_json:
         print(json.dumps({"checked": report.checked, "violations": report.violations},
                          ensure_ascii=False, indent=2))
