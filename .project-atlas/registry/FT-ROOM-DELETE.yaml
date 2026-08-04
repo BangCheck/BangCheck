@@ -14,6 +14,7 @@ implementedBy:
   slice: backend/src/main/java/com/room/backend/api/room
   useCase: service/RoomService.java
   legacyPath: backend/src/main/java/com/room/backend/api/room/controller/RoomController.java#deleteRoom
+  frontendEntry: frontend/src/features/rooms/hooks/use-rooms-query.ts#useDeleteRoom
   switchedOver: false
 knownDefects: []
 switchoverReadiness: { controllerSwitched: true, legacyMethodRemoved: true }

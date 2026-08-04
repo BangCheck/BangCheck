@@ -47,6 +47,7 @@ implementedBy:
   slice: backend/src/main/java/com/room/backend/api/auth
   useCase: service/AuthService.java
   legacyPath: backend/src/main/java/com/room/backend/api/auth/controller/AuthController.java#callback
+  frontendEntry: frontend/src/features/auth/AuthCallbackPage.tsx#exchangeOAuthCode
   switchedOver: false
 
 knownDefects:

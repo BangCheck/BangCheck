@@ -38,6 +38,7 @@ implementedBy:
   useCase: service/RoomService.java
   # 컨트롤러가 신규 use case로 전환됐고 legacy RoomService.createRoomWithCheckAnswers는 제거됐다
   legacyPath: backend/src/main/java/com/room/backend/api/room/controller/RoomController.java#createRoom
+  frontendEntry: frontend/src/features/rooms/hooks/use-rooms-query.ts#useCreateRoom
   switchedOver: false
 # 이 기능에서 관찰된 현행 결함. 고치지 않고 이슈로 넘긴다.
 knownDefects:

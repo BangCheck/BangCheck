@@ -63,6 +63,8 @@ implementedBy:
   legacyPath: backend/src/main/java/com/room/backend/api/map/controller/MapController.java#createMapPoint
   # frontendEntry 없음 — 위 실측대로 소비 지점이 존재하지 않는다.
   # HTTP 어댑터를 대신 적지 않는다. 적을 것이 없다는 사실이 이 feature의 관측치다.
+  # frontendEntry 없음 = 이 프론트에 소비 지점이 실재하지 않는다(2026-08-04 실측).
+  # 아직 안 채운 것과 구별하기 위해 이 주석을 둔다 — 빈칸 두 뜻이 섞이면 Map이 거짓말한다.
   switchedOver: false
 
 knownDefects: []   # 2026-08-04 defects.yaml에 map 계열 결함 항목 없음

@@ -14,6 +14,7 @@ implementedBy:
   slice: backend/src/main/java/com/room/backend/api/room
   useCase: service/RoomService.java
   legacyPath: backend/src/main/java/com/room/backend/api/room/controller/RoomController.java#updateRoom
+  frontendEntry: frontend/src/features/rooms/hooks/use-rooms-query.ts#useUpdateRoom
   switchedOver: false
 knownDefects: [BC-REG-02, BC-REG-03, BC-REG-04]
 switchoverReadiness: { controllerSwitched: true, legacyMethodRemoved: true }

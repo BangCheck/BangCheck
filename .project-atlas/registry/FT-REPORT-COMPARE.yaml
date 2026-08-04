@@ -49,6 +49,8 @@ implementedBy:
   # useRoomsList(/api/v1/rooms) + getRoomDetail(/api/v1/rooms/{id}) +
   # useChecklistItems(/api/checklist/items)로 받아 CompareTable이 브라우저에서
   # 비교표를 조립한다. 즉 백엔드 비교 로직과 프런트 비교 로직이 이중으로 존재한다.
+  # frontendEntry 없음 = 이 프론트에 소비 지점이 실재하지 않는다(2026-08-04 실측).
+  # 아직 안 채운 것과 구별하기 위해 이 주석을 둔다 — 빈칸 두 뜻이 섞이면 Map이 거짓말한다.
   switchedOver: false
 
 knownDefects:

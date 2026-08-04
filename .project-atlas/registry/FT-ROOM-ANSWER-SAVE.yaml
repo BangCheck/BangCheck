@@ -14,6 +14,8 @@ implementedBy:
   slice: backend/src/main/java/com/room/backend/api/room
   useCase: service/RoomCheckResultService.java
   legacyPath: backend/src/main/java/com/room/backend/api/room/controller/RoomController.java#saveCheckResults
+  # frontendEntry 없음 = 이 프론트에 소비 지점이 실재하지 않는다(2026-08-04 실측).
+  # 아직 안 채운 것과 구별하기 위해 이 주석을 둔다 — 빈칸 두 뜻이 섞이면 Map이 거짓말한다.
   switchedOver: false
 knownDefects: [BC-SEC-01, BC-REG-02, BC-REG-03]
 switchoverReadiness: { controllerSwitched: true, legacyMethodRemoved: true }

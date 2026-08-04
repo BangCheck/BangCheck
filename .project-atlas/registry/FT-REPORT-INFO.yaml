@@ -39,6 +39,8 @@ implementedBy:
   # OP-ROOM-LIST + OP-ROOM-DETAIL + OP-CHECKLIST-ITEMS-CUSTOMIZED로
   # 비교표를 클라이언트에서 직접 조립한다. 훅도 어댑터도 없으므로
   # 여기에 ReportPage를 적으면 없는 배선을 사실로 만드는 것이 된다.
+  # frontendEntry 없음 = 이 프론트에 소비 지점이 실재하지 않는다(2026-08-04 실측).
+  # 아직 안 채운 것과 구별하기 위해 이 주석을 둔다 — 빈칸 두 뜻이 섞이면 Map이 거짓말한다.
   switchedOver: false
 
 knownDefects:

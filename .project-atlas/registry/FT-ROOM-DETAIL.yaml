@@ -24,6 +24,7 @@ implementedBy:
   slice: backend/src/main/java/com/room/backend/api/room
   useCase: service/RoomService.java
   legacyPath: backend/src/main/java/com/room/backend/api/room/controller/RoomController.java#getRoom
+  frontendEntry: frontend/src/features/rooms/hooks/use-rooms-query.ts#useRoomDetail
   switchedOver: false
 knownDefects: []
 
