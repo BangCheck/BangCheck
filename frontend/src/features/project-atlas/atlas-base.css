@@ -1,0 +1,149 @@
+/* 캔버스 셸과 테마 토큰. 여섯 테마가 여기서 변수만 갈아끼운다.
+   project-atlas.css가 순서대로 불러온다 — 순서가 곧 캐스케이드다. */
+
+.project-atlas {
+  --atlas-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  --atlas-sans: "Pretendard", "Noto Sans KR", system-ui, sans-serif;
+  min-width: 1180px;
+  min-height: 100vh;
+  background: var(--map-bg);
+  color: var(--map-text);
+  font-family: var(--atlas-sans);
+}
+
+.project-atlas *,
+.project-atlas *::before,
+.project-atlas *::after {
+  box-sizing: border-box;
+}
+
+.project-atlas button,
+.project-atlas a {
+  font: inherit;
+}
+
+.project-map-theme-circuit {
+  --map-bg: #071012;
+  --map-top: #091113;
+  --map-side: #0a1214;
+  --map-panel: #0e191b;
+  --map-panel-raised: #111f21;
+  --map-border: #294348;
+  --map-border-strong: #4b8c83;
+  --map-accent: #58c3ad;
+  --map-accent-soft: #2f7c71;
+  --map-text: #dce8e4;
+  --map-muted: #7f9690;
+  --map-grid-major: rgba(77, 130, 124, 0.1);
+  --map-grid-minor: rgba(81, 161, 149, 0.035);
+  --map-secondary: #bb9af7;
+  --map-live: #9ece6a;
+  --map-warning: #e0af68;
+  --map-danger: #f7768e;
+  --map-info: #7dcfff;
+}
+
+.project-map-theme-blueprint {
+  --map-bg: #061426;
+  --map-top: #07111f;
+  --map-side: #071522;
+  --map-panel: #0a1b2b;
+  --map-panel-raised: #0d2336;
+  --map-border: #245174;
+  --map-border-strong: #3e93c4;
+  --map-accent: #48bfff;
+  --map-accent-soft: #236f9a;
+  --map-text: #dfedf7;
+  --map-muted: #7797ad;
+  --map-grid-major: rgba(73, 166, 220, 0.12);
+  --map-grid-minor: rgba(73, 166, 220, 0.04);
+  --map-secondary: #bf616a;
+  --map-live: #8fbcbb;
+  --map-warning: #ebcb8b;
+  --map-danger: #bf616a;
+  --map-info: #88c0d0;
+}
+
+.project-map-theme-terminal {
+  --map-bg: #050906;
+  --map-top: #060b07;
+  --map-side: #070d08;
+  --map-panel: #09120b;
+  --map-panel-raised: #0d1a10;
+  --map-border: #285432;
+  --map-border-strong: #4da965;
+  --map-accent: #63f58b;
+  --map-accent-soft: #268b43;
+  --map-text: #def8e4;
+  --map-muted: #75a27f;
+  --map-grid-major: rgba(84, 196, 111, 0.12);
+  --map-grid-minor: rgba(84, 196, 111, 0.035);
+  --map-secondary: #bd93f9;
+  --map-live: #50fa7b;
+  --map-warning: #f1fa8c;
+  --map-danger: #ff79c6;
+  --map-info: #8be9fd;
+}
+
+.project-map-theme-amber {
+  --map-bg: #120d07;
+  --map-top: #100c08;
+  --map-side: #120e09;
+  --map-panel: #1a130b;
+  --map-panel-raised: #22180d;
+  --map-border: #5a4428;
+  --map-border-strong: #aa7635;
+  --map-accent: #ffad4a;
+  --map-accent-soft: #a56422;
+  --map-text: #f3e6d4;
+  --map-muted: #a48b6c;
+  --map-grid-major: rgba(213, 150, 72, 0.12);
+  --map-grid-minor: rgba(213, 150, 72, 0.04);
+  --map-secondary: #2aa198;
+  --map-live: #2aa198;
+  --map-warning: #d3a52c;
+  --map-danger: #dc6b5f;
+  --map-info: #6c8fd5;
+}
+
+.project-map-theme-vscode-light {
+  --map-bg: #ffffff;
+  --map-top: #f8f8f8;
+  --map-side: #f3f3f3;
+  --map-panel: #ffffff;
+  --map-panel-raised: #f3f3f3;
+  --map-border: #e5e5e5;
+  --map-border-strong: #c8c8c8;
+  --map-accent: #005fb8;
+  --map-accent-soft: #cce4f7;
+  --map-text: #1f1f1f;
+  --map-muted: #616161;
+  --map-grid-major: rgba(31, 31, 31, 0.07);
+  --map-grid-minor: rgba(31, 31, 31, 0.025);
+  --map-secondary: #af00db;
+  --map-live: #16825d;
+  --map-warning: #bf8803;
+  --map-danger: #e51400;
+  --map-info: #0067c0;
+}
+
+.project-map-theme-vscode-dark {
+  --map-bg: #1e1e1e;
+  --map-top: #323233;
+  --map-side: #252526;
+  --map-panel: #252526;
+  --map-panel-raised: #2d2d30;
+  --map-border: #3c3c3c;
+  --map-border-strong: #6f6f6f;
+  --map-accent: #3794ff;
+  --map-accent-soft: #0e639c;
+  --map-text: #d4d4d4;
+  --map-muted: #858585;
+  --map-grid-major: rgba(212, 212, 212, 0.08);
+  --map-grid-minor: rgba(212, 212, 212, 0.03);
+  --map-secondary: #c586c0;
+  --map-live: #89d185;
+  --map-warning: #cca700;
+  --map-danger: #f14c4c;
+  --map-info: #75beff;
+}
