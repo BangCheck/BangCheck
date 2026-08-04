@@ -318,3 +318,18 @@ defects:
       symbol: CUSTOM_ITEM_FORBIDDEN
     relatedFeature: FT-CHECKLIST-CUSTOM-ITEM
     disposition: FIX_PLANNED
+
+  - id: BC-AUTH-90
+    severity: P3
+    title: 프론트에 없는 엔드포인트를 부르는 죽은 함수가 있다
+    detail: >
+      getCurrentUser가 GET /api/v1/users/me를 호출하는데 백엔드에 그 매핑이 없다.
+      호출하면 404다. 지금은 이 함수를 쓰는 곳이 없어 실행되지 않으므로 장애는
+      아니지만, 이름만 보고 쓰는 순간 404가 된다.
+      2026-08-04 resolver에 FEC-01(프론트 호출 route 실존 검사)을 넣자마자
+      잡혔다 — 손으로 registry를 채우는 동안에는 방향이 반대여서 못 봤다.
+    evidence:
+      path: frontend/src/services/auth-service.ts
+      symbol: getCurrentUser
+    relatedFeature: FT-AUTH-OAUTH-LOGIN
+    disposition: RECORD_ONLY

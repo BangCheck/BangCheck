@@ -12,6 +12,7 @@ registry에 적힌 값이 실제 저장소와 맞는지 기계적으로 검사�
   SRC-02 evidence.symbol이 그 파일 안에 실제로 등장하는가
   RTE-01 route가 제품 정답지(routes.txt)에 존재하는가
   WRT-01 safety.writes의 테이블이 Flyway 마이그레이션에 실재하는가
+  FEC-01 프론트가 부르는 route가 제품에 실재하는가 (코드에서 추출)
   FLD-01 required 필드가 누락되지 않았는가
   ENM-01 enum 값이 schema가 허용한 값인가
 
@@ -41,6 +42,7 @@ REPO_ROOT = ATLAS_DIR.parent
 class Report:
     def __init__(self) -> None:
         self.violations: list[dict] = []
+        self.knowns: list[str] = []
         self.checked = 0
 
     def fail(self, rule: str, where: str, detail: str) -> None:
@@ -48,6 +50,11 @@ class Report:
 
     def ok(self) -> None:
         self.checked += 1
+
+    def known(self, note: str) -> None:
+        """등재된 결함. 위반은 아니지만 사라진 것도 아니라 따로 센다."""
+        self.checked += 1
+        self.knowns.append(note)
 
 
 def load(path: Path):
@@ -113,6 +120,81 @@ def check_writes(report: Report, where: str, writes, tables: set[str]) -> None:
             report.fail("WRT-01", where, f"실재하지 않는 테이블: '{name}'")
 
 
+FRONT_CALL = re.compile(
+    r"""\b(?:api|axios)\s*\.\s*(get|post|put|patch|delete)\s*(?:<[\s\S]*?>)?\s*\(\s*"""
+    r"""(?:`([^`]+)`|'([^']+)'|"([^"]+)")""",
+    re.S,
+)
+
+
+def normalize_route(route: str) -> str:
+    """경로 변수 이름을 지운다. `/rooms/{id}`와 `/rooms/${roomId}`를 같게 본다."""
+    return re.sub(r"\$?\{[^}]*\}", "{}", route.strip())
+
+
+def collect_frontend_calls(project: dict, report: Report) -> tuple[dict[str, str], int]:
+    """프론트 코드에서 실제 호출하는 route를 뽑는다.
+
+    선언이 아니라 코드가 정답지다 — 선언은 낡지만 코드는 동작 그 자체다.
+    route oracle이 백엔드 표면의 근거이듯 이것이 프론트 소비의 근거다.
+
+    한계: 문자열 리터럴로 시작하는 호출만 잡는다. 경로를 변수로 조립하면
+    못 잡으며, 그 경우 unresolved로 세어 보고한다.
+    **못 잡은 것을 '호출 없음'으로 흘리지 않는 것이 이 함수의 계약이다.**
+    """
+    relative = project.get("sources", {}).get("frontendRoot")
+    if not relative:
+        return {}, 0
+
+    root = REPO_ROOT / relative
+    if not root.is_dir():
+        report.fail("FEC-01", relative, "frontendRoot 디렉터리가 없다")
+        return {}, 0
+
+    calls: dict[str, str] = {}
+    unresolved = 0
+    for path in sorted(list(root.rglob("*.ts")) + list(root.rglob("*.tsx"))):
+        if "project-atlas" in str(path):
+            continue  # Atlas 자신은 관측 대상이 아니다
+        source = path.read_text(encoding="utf-8")
+        for match in FRONT_CALL.finditer(source):
+            raw = match.group(2) or match.group(3) or match.group(4)
+            stripped = re.sub(r"^\$\{[^}]+\}", "", raw)  # ${API_BASE_URL} 접두
+            if not stripped.startswith("/"):
+                unresolved += 1
+                continue
+            line = source[: match.start()].count("\n") + 1
+            route = f"{match.group(1).upper()} {normalize_route(stripped)}"
+            calls.setdefault(route, f"{path.relative_to(REPO_ROOT)}:{line}")
+    return calls, unresolved
+
+
+def check_frontend_calls(report: Report, calls: dict[str, str], unresolved: int,
+                         routes: set[str], known: set[str]) -> None:
+    """프론트가 부르는 route가 제품에 실재하는가 (FEC-01).
+
+    반대 방향(제품에 있는데 프론트가 안 부름)은 위반이 아니다 — 죽은 표면은
+    결함이 아니라 관측치이고, feature 파일의 frontendEntry 부재로 이미 기록된다.
+
+    defects.yaml의 evidence가 이미 가리키는 파일은 위반이 아니라 known으로 센다.
+    등재된 결함까지 매번 빨간불이면 새 위반이 그 속에 묻힌다 — 그러면 검사가
+    신호가 아니라 배경이 된다. 다만 조용히 넘기지 않고 건수를 따로 보고한다.
+    """
+    if not routes:
+        return
+    normalized = {normalize_route(r) for r in routes}
+    for route, where in sorted(calls.items()):
+        if route in normalized:
+            report.ok()
+        elif where.split(":")[0] in known:
+            report.known(f"FEC-01 {route} ({where}) — defects.yaml에 등재됨")
+        else:
+            report.fail("FEC-01", where, f"프론트가 부르는 route가 제품에 없다: {route}")
+    if unresolved:
+        report.fail("FEC-01", "frontend",
+                    f"경로를 정적으로 해석하지 못한 호출 {unresolved}건 — 호출 없음과 구별되지 않는다")
+
+
 def check_path(report: Report, rule: str, where: str, relative: str, *, directory: bool = False) -> Path | None:
     target = REPO_ROOT / relative
     if directory:
@@ -166,9 +248,11 @@ def main() -> int:
 
     routes = load_route_oracle(project, report)
     tables = load_table_oracle(project, report)
+    front_calls, front_unresolved = collect_frontend_calls(project, report)
 
     # --- 결함 registry ---------------------------------------------------
     defect_ids: set[str] = set()
+    defect_evidence_paths: set[str] = set()
     defects_file = ATLAS_DIR / "registry" / "defects.yaml"
     if defects_file.is_file():
         spec = entities["defect"]
@@ -190,9 +274,12 @@ def main() -> int:
             evidence = defect.get("evidence") or {}
             relative = evidence.get("path")
             if relative:
+                defect_evidence_paths.add(relative)
                 target = check_path(report, "SRC-01", where, relative)
                 if target and evidence.get("symbol"):
                     check_symbol(report, where, target, relative, evidence["symbol"])
+
+    check_frontend_calls(report, front_calls, front_unresolved, routes, defect_evidence_paths)
 
     # --- feature registry ------------------------------------------------
     feature_ids: set[str] = set()
@@ -285,7 +372,8 @@ def main() -> int:
         print(json.dumps({"checked": report.checked, "violations": report.violations},
                          ensure_ascii=False, indent=2))
     else:
-        print(f"Atlas resolver — 검사 {report.checked}건, 위반 {len(report.violations)}건")
+        known_note = f", 등재된 결함 {len(report.knowns)}건" if report.knowns else ""
+        print(f"Atlas resolver — 검사 {report.checked}건, 위반 {len(report.violations)}건{known_note}")
         if report.violations:
             print()
             for violation in report.violations:
@@ -293,6 +381,8 @@ def main() -> int:
                 print(f"           {violation['detail']}")
         else:
             print("registry의 모든 참조가 실제 저장소에서 resolve 됨")
+        for note in report.knowns:
+            print(f"  [known] {note}")
 
     return 1 if report.violations else 0
 
