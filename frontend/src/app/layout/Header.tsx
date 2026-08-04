@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { LogoWithText } from './Logo';
+import { LogoWithText } from '@/components/Logo';
 import { useAuthStore } from '@/store/use-auth-store';
 import { useGuestRoomStore } from '@/store/use-guest-room-store';
 import { useRoomsList } from '@/features/rooms/hooks/use-rooms-query';
-import { LogoutConfirmModal, LoginRequiredModal } from './ui/Modals';
+import { LogoutConfirmModal, LoginRequiredModal } from '@/components/ui/Modals';
 import { cn } from '@/lib/utils';
 import { ROUTES } from '@/lib/routes';
 import { GUEST_ROOM_LIMIT, ROOM_LIMIT } from '@/lib/constants';

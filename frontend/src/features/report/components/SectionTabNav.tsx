@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { SectionIcon } from '@/components/ui/SectionIcon';
+import { SectionIcon } from './SectionIcon';
 import { REPORT_SECTIONS, type ReportSectionId } from '@/features/report/lib/sections';
 
 type Props = {

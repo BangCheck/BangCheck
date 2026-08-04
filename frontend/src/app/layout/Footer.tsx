@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import { LogoWithText } from './Logo';
+import { LogoWithText } from '@/components/Logo';
 
 export default function Footer() {
   const { pathname } = useLocation();

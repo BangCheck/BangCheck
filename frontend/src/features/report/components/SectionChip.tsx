@@ -1,4 +1,4 @@
-import { SectionIcon } from '@/components/ui/SectionIcon';
+import { SectionIcon } from './SectionIcon';
 import type { ReportSectionId } from '@/features/report/lib/sections';
 
 type Props = {

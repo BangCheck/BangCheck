@@ -12,9 +12,9 @@ import ReportPage from '@/features/report/ReportPage';
 import SettingsPage from '@/features/customization/SettingsPage';
 import MapPage from '@/features/map/MapPage';
 import MyPage from '@/features/mypage/MyPage';
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
-import BottomNavigation from '@/components/BottomNavigation';
+import Header from '@/app/layout/Header';
+import Footer from '@/app/layout/Footer';
+import BottomNavigation from '@/app/layout/BottomNavigation';
 import { DevLoginButton } from '@/features/dev/DevLoginButton';
 
 const ProjectMapPage = import.meta.env.DEV

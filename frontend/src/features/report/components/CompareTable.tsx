@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import { Icon } from '@iconify/react';
-import { SectionIcon } from '@/components/ui/SectionIcon';
+import { SectionIcon } from './SectionIcon';
 import type { Room } from '@/types/room';
 import type { RoomFormState } from '@/types';
 import { REPORT_SECTIONS, type ReportSectionId } from '@/features/report/lib/sections';

@@ -24,11 +24,7 @@
     }
   },
   "include": [
-    "src/main.tsx",
-    "src/vite-env.d.ts",
-    "src/app/router.tsx",
-    "src/app/provider.tsx",
-    "src/services/get-query-client.ts",
+    "src/**/*",
     "vite.config.ts"
   ],
   "exclude": ["node_modules", "dist", ".next"]
