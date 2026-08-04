@@ -8,7 +8,7 @@ owns:
   - operationId: OP-ROOM-DELETE
     route: "DELETE /api/v1/rooms/{id}"
     auth: JWT
-    safety: { sideEffect: WRITE, writes: [rooms.is_deleted], rerunSafe: true, abortOnFail: FULL_ROLLBACK }
+    safety: { sideEffect: WRITE, writes: [rooms], rerunSafe: true, abortOnFail: FULL_ROLLBACK }
 uses: []
 implementedBy:
   slice: backend/src/main/java/com/room/backend/api/room

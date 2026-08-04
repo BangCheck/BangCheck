@@ -11,6 +11,7 @@ registry에 적힌 값이 실제 저장소와 맞는지 기계적으로 검사�
   SRC-01 evidence·implementedBy의 경로가 실제로 존재하는가
   SRC-02 evidence.symbol이 그 파일 안에 실제로 등장하는가
   RTE-01 route가 제품 정답지(routes.txt)에 존재하는가
+  WRT-01 safety.writes의 테이블이 Flyway 마이그레이션에 실재하는가
   FLD-01 required 필드가 누락되지 않았는가
   ENM-01 enum 값이 schema가 허용한 값인가
 
@@ -69,6 +70,49 @@ def load_route_oracle(project: dict, report: Report) -> set[str]:
     return {line.strip() for line in oracle.read_text(encoding="utf-8").splitlines() if line.strip()}
 
 
+def load_table_oracle(project: dict, report: Report) -> set[str]:
+    """제품 테이블 정답지. safety.writes 주장의 기계적 근거다.
+
+    Flyway 마이그레이션의 CREATE TABLE에서 뽑는다 — 스키마의 실제 원천이
+    거기이기 때문이다. 엔티티의 @Table을 쓰지 않는 이유는 엔티티가 없는
+    조인 테이블도 writes 대상이 될 수 있어서다.
+    """
+    relative = project.get("sources", {}).get("migrationRoot")
+    if not relative:
+        report.fail("WRT-01", "project.yaml", "sources.migrationRoot가 없어 writes를 검증할 수 없다")
+        return set()
+
+    root = REPO_ROOT / relative
+    if not root.is_dir():
+        report.fail("WRT-01", relative, "마이그레이션 디렉터리가 없다")
+        return set()
+
+    pattern = re.compile(r"create\s+table\s+(?:if\s+not\s+exists\s+)?[`\"]?([a-z_][a-z0-9_]*)", re.I)
+    tables: set[str] = set()
+    for sql in sorted(root.glob("*.sql")):
+        tables.update(m.group(1).lower() for m in pattern.finditer(sql.read_text(encoding="utf-8")))
+
+    if not tables:
+        report.fail("WRT-01", relative, "마이그레이션에서 CREATE TABLE을 하나도 찾지 못했다")
+    return tables
+
+
+def check_writes(report: Report, where: str, writes, tables: set[str]) -> None:
+    """writes에 적힌 이름이 실재하는 테이블인가.
+
+    이 검사가 없던 동안 registry에 없는 테이블명 셋이 초록불로 통과했다
+    (2026-08-04: checklist_custom_item·checklist_user_type·checklist_item_setting).
+    자유 문자열이면 오타와 유추가 사실처럼 남는다.
+    """
+    if not tables:
+        return
+    for name in writes or []:
+        if name in tables:
+            report.ok()
+        else:
+            report.fail("WRT-01", where, f"실재하지 않는 테이블: '{name}'")
+
+
 def check_path(report: Report, rule: str, where: str, relative: str, *, directory: bool = False) -> Path | None:
     target = REPO_ROOT / relative
     if directory:
@@ -121,6 +165,7 @@ def main() -> int:
     entities = schema["entities"]
 
     routes = load_route_oracle(project, report)
+    tables = load_table_oracle(project, report)
 
     # --- 결함 registry ---------------------------------------------------
     defect_ids: set[str] = set()
@@ -194,6 +239,11 @@ def main() -> int:
                 if safety.get(field) is not None:
                     check_enum(report, op_where, field, safety[field],
                                entities["safety"]["fields"][field]["values"])
+            check_writes(report, op_where, safety.get("writes"), tables)
+            # 쓰기라고 선언했으면 무엇을 쓰는지 밝혀야 한다.
+            # 빈 writes로 WRITE를 주장하면 영향 범위를 아무도 못 읽는다.
+            if safety.get("sideEffect") == "WRITE" and not (safety.get("writes") or []):
+                report.fail("WRT-01", op_where, "sideEffect가 WRITE인데 writes가 비어 있다")
 
         # uses — 소유를 주장하지 않지만 route는 실재해야 한다
         for operation in feature.get("uses") or []:
