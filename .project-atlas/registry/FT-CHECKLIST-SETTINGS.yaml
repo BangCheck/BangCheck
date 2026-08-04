@@ -51,15 +51,9 @@ owns:
 # 설정 저장 한 번이 남의 operation을 함께 부른다 — 소유는 주장하지 않는다.
 # 근거: frontend/src/features/customization/hooks/use-customization.ts#saveCurrentSettings
 # 순서는 deselect → select → custom delete → custom add → settings save 다.
-uses:
-  - operationId: OP-CHECKLIST-CUSTOM-ITEM-DELETE
-    route: "DELETE /api/checklist/items/custom/{customItemId}"
-  - operationId: OP-CHECKLIST-CUSTOM-ITEM-ADD
-    route: "POST /api/checklist/items/custom"
-  - operationId: OP-CHECKLIST-ITEMS-CUSTOMIZED
-    route: "GET /api/checklist/items"
-  - operationId: OP-CHECKLIST-ITEMS-ALL
-    route: "GET /api/checklist/items/all"
+uses: []   # 화면이 함께 부르는 것은 페이지 축이 답한다 (schema.yaml operationRef 참고).
+           # 이 기능이 성립하려면 반드시 선행되어야 하는 operation만 여기 적는다.
+           # 설정 저장이 custom-item·catalog를 함께 부르는 것은 SettingsPage의 사실이다
 
 implementedBy:
   slice: backend/src/main/java/com/room/backend/domain/checklist

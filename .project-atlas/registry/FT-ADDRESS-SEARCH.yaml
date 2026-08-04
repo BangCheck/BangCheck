@@ -1,0 +1,44 @@
+# 축 1 — 주소 검색.
+#
+# 2026-08-04 페이지 축 뷰가 이 구멍을 잡았다. OP-ADDRESS-SEARCH가 다른 feature의
+# uses에만 있고 소유자가 없어서, uses를 비우자 registry에서 통째로 사라졌다.
+# route는 제품 정답지에 있는데 아무도 owns하지 않는 상태였다.
+
+capabilityId: CAP-ROOM-COMPARE
+capabilityTitle: 방을 비교해서 고른다
+
+featureId: FT-ADDRESS-SEARCH
+title: 주소 검색
+status: PLANNED
+owner: "@Woo-JongHo"
+
+owns:
+  - operationId: OP-ADDRESS-SEARCH
+    route: "GET /api/v1/address/search"
+    auth: PUBLIC   # SecurityConfig:61이 GET /api/v1/address/search를 permitAll로 연다
+    safety:
+      sideEffect: EXTERNAL   # 행정안전부 주소 API(business.juso.go.kr)를 RestClient로 호출한다
+      writes: []             # 우리 DB를 건드리지 않는다
+      rerunSafe: true        # 조회뿐이라 반복해도 최종 상태가 같다
+      abortOnFail: NONE      # 롤백 대상이 없다
+
+uses: []   # 화면이 함께 부르는 것은 페이지 축이 답한다 (schema.yaml operationRef 참고).
+           # 이 기능이 성립하려면 반드시 선행되어야 하는 operation만 여기 적는다.
+
+implementedBy:
+  slice: backend/src/main/java/com/room/backend/api/address
+  useCase: service/AddressSearchService.java
+  legacyPath: backend/src/main/java/com/room/backend/api/address/controller/AddressController.java#search
+  frontendEntry: frontend/src/services/address-service.ts#searchAddress
+  switchedOver: false
+
+knownDefects: []
+
+tests: []   # 2026-08-04 main 기준 이 기능을 덮는 test 없음
+
+sliceShapeNotes:
+  - 외부 API 의존이라 우리 DB 스키마와 무관하게 바뀐다.
+    바뀌는 이유가 juso.go.kr의 계약이지 우리 도메인이 아니다.
+  - directions와 성격이 같다 — 외부 호출·저장 없음·PUBLIC.
+    둘 다 우리 DB 밖의 계약에 매달려 바뀐다.
+  - 방 등록·수정 화면이 함께 부르지만 그 사실은 페이지 축이 소유한다.

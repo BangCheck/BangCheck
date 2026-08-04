@@ -27,10 +27,9 @@ owns:
       abortOnFail: FULL_ROLLBACK # 단일 트랜잭션 경계
 
 # 이 기능이 쓰지만 소유하지는 않는 operation
-uses:
-  - operationId: OP-ADDRESS-SEARCH
-    route: "GET /api/v1/address/search"
-    note: 주소 입력 자동완성. AddressController가 소유한다.
+uses: []   # 화면이 함께 부르는 것은 페이지 축이 답한다 (schema.yaml operationRef 참고).
+           # 이 기능이 성립하려면 반드시 선행되어야 하는 operation만 여기 적는다.
+           # 등록 화면이 주소 검색을 함께 부르는 것은 그 화면의 사실이다
 
 # 축 2와 만나는 유일한 지점
 implementedBy:
