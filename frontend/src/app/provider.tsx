@@ -24,10 +24,15 @@ interface AppProviderProps {
 
 export const AppProvider = ({ children }: AppProviderProps) => {
   const queryClient = getQueryClient();
+  const isAtlasSurface = typeof window !== 'undefined' && (
+    window.location.pathname.startsWith('/project-')
+    || new URLSearchParams(window.location.search).get('atlasPreview') === '1'
+  );
+
   return (
     <QueryClientProvider client={queryClient}>
       {children}
-      {import.meta.env.DEV && <ReactQueryDevtools initialIsOpen={false} />}
+      {import.meta.env.DEV && !isAtlasSurface && <ReactQueryDevtools initialIsOpen={false} />}
     </QueryClientProvider>
   );
 };

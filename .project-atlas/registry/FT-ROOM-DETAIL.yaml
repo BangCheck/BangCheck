@@ -1,0 +1,40 @@
+# 축 1 — 세 번째 조각
+
+capabilityId: CAP-ROOM-INSPECT
+capabilityTitle: 방 하나의 계약 조건과 체크 결과를 확인한다
+
+featureId: FT-ROOM-DETAIL
+title: 내 방 상세 조회
+status: PLANNED
+owner: "@Woo-JongHo"
+
+owns:
+  - operationId: OP-ROOM-DETAIL
+    route: "GET /api/v1/rooms/{id}"
+    auth: JWT
+    safety:
+      sideEffect: READ
+      writes: []
+      rerunSafe: true
+      abortOnFail: NONE
+
+uses: []
+
+implementedBy:
+  slice: backend/src/main/java/com/room/backend/api/room
+  useCase: service/RoomService.java
+  legacyPath: backend/src/main/java/com/room/backend/api/room/controller/RoomController.java#getRoom
+  switchedOver: false
+knownDefects: []
+
+switchoverReadiness:
+  requestMapper: NOT_NEEDED
+  responseMapper: READY
+  errorMapper: NOT_NEEDED
+  controllerSwitched: false
+  legacyMethodRemoved: false  # main 기준 legacy가 유일 구현이다
+
+sliceShapeNotes:
+  - 소유자와 soft-delete를 확인한 방이 존재할 때만 체크리스트 결과를 조회한다.
+  - 방과 답변을 각각 output port 뒤에서 snapshot으로 바꿔 JPA entity와 legacy DTO를 public boundary에 노출하지 않는다.
+  - 목록과 마찬가지로 읽기 slice이지만 두 repository 결과를 순서 있게 조립한다.

@@ -1,3 +1,4 @@
+import { lazy, Suspense } from 'react';
 import { Routes, Route, Outlet, Navigate } from 'react-router-dom';
 import { ROUTES } from '@/lib/routes';
 import LandingPage from '@/features/landing/LandingPage';
@@ -15,6 +16,22 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import BottomNavigation from '@/components/BottomNavigation';
 import { DevLoginButton } from '@/features/dev/DevLoginButton';
+
+const ProjectMapPage = import.meta.env.DEV
+  ? lazy(() => import('@/features/research/ResearchPage'))
+  : null;
+const ProjectDashboardPage = import.meta.env.DEV
+  ? lazy(() => import('@/features/project-dashboard/ProjectDashboardPage'))
+  : null;
+const ProjectAtlasPage = import.meta.env.DEV
+  ? lazy(() => import('@/features/project-atlas/ProjectAtlasPage'))
+  : null;
+
+const AtlasLoading = () => (
+  <div className="min-h-screen bg-white text-[#616161] grid place-items-center font-mono text-xs tracking-[0.2em]">
+    PROJECT ATLAS / LOADING
+  </div>
+);
 
 // 글로벌 헤더가 있는 레이아웃
 const AppLayout = () => (
@@ -35,6 +52,22 @@ export const Router = () => (
       <Route path="/" element={<LandingPage />} />
       <Route path="/login-error" element={<LoginErrorPage />} />
       <Route path="/auth/callback/:provider" element={<AuthCallbackPage />} />
+      {import.meta.env.DEV && ProjectMapPage && ProjectDashboardPage && ProjectAtlasPage && (
+        <>
+          <Route
+            path={ROUTES.PROJECT_MAP}
+            element={<Suspense fallback={<AtlasLoading />}><ProjectMapPage /></Suspense>}
+          />
+          <Route
+            path={ROUTES.PROJECT_DASHBOARD}
+            element={<Suspense fallback={<AtlasLoading />}><ProjectDashboardPage /></Suspense>}
+          />
+          <Route
+            path={ROUTES.PROJECT_PAGE_PATTERN}
+            element={<Suspense fallback={<AtlasLoading />}><ProjectAtlasPage /></Suspense>}
+          />
+        </>
+      )}
 
       {/* 헤더 있는 페이지 */}
       <Route element={<AppLayout />}>

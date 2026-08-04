@@ -5,7 +5,11 @@ type Props = {
 
 export function BannerLoggedOut({ onGuest, onLogin }: Props) {
   return (
-    <div className="bg-bg-gray border border-border-light rounded-[6px] px-6 lg:px-[30px] py-6 lg:py-[12px] flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 lg:gap-6">
+    <div
+      data-atlas-node="custom-guest-gate"
+      data-atlas-label="비로그인 게이트"
+      className="bg-bg-gray border border-border-light rounded-[6px] px-6 lg:px-[30px] py-6 lg:py-[12px] flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 lg:gap-6"
+    >
       <div className="text-center lg:text-left space-y-1.5 md:space-y-2">
         <p className="text-[16px] md:text-[18px] font-bold text-text-main">커스텀 설정은 로그인 후 이용 가능해요</p>
         <p className="text-[12px] md:text-[14px] text-text-mute font-medium leading-relaxed">

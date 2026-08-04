@@ -1,0 +1,19 @@
+capabilityId: CAP-ROOM-MANAGE
+capabilityTitle: 저장한 방을 수정하고 관리한다
+featureId: FT-ROOM-DELETE
+title: 내 방 삭제
+status: PLANNED
+owner: "@Woo-JongHo"
+owns:
+  - operationId: OP-ROOM-DELETE
+    route: "DELETE /api/v1/rooms/{id}"
+    auth: JWT
+    safety: { sideEffect: WRITE, writes: [rooms.is_deleted], rerunSafe: true, abortOnFail: FULL_ROLLBACK }
+uses: []
+implementedBy:
+  slice: backend/src/main/java/com/room/backend/api/room
+  useCase: service/RoomService.java
+  legacyPath: backend/src/main/java/com/room/backend/api/room/controller/RoomController.java#deleteRoom
+  switchedOver: false
+knownDefects: []
+switchoverReadiness: { controllerSwitched: true, legacyMethodRemoved: true }

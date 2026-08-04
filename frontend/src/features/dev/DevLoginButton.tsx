@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/store/use-auth-store';
 import { ROUTES } from '@/lib/routes';
 import type { User } from '@/types';
@@ -23,9 +23,15 @@ const DEV_USER: User = {
 
 export function DevLoginButton() {
   const navigate = useNavigate();
+  const { pathname, search } = useLocation();
   const { setAuth } = useAuthStore();
+  const isAtlasPreview = new URLSearchParams(search).get('atlasPreview') === '1';
 
-  if (!import.meta.env.DEV) return null;
+  if (
+    !import.meta.env.DEV
+    || pathname.startsWith('/project-')
+    || isAtlasPreview
+  ) return null;
 
   const token = DEV_TOKENS[ACTIVE_USER_ID];
 

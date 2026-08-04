@@ -1,0 +1,320 @@
+# 관찰된 현행 결함 — 이슈 등록 대기
+#
+# 전부 리팩토링 중 발견했고 고치지 않았다. 리팩토링과 결함 수정을 섞으면
+# 회귀 원인이 "구조 때문인지 수정 때문인지" 구분되지 않는다.
+#
+# 상태: Atlas 구축 후 GitHub Issue로 투영한다. 지금은 파일이 정본이다.
+# 각 항목의 evidence는 실제 소스 위치이며 resolver가 존재성을 검증할 대상이다.
+
+defects:
+  - id: BC-SEC-01
+    severity: P1
+    title: 고아 엔드포인트가 방 소유권을 검증하지 않는다
+    detail: >
+      POST /api/v1/rooms/{roomId}/check-results 는 인증만 확인하고 room의 소유자·soft-delete를
+      확인하지 않는다. 타인 방과 삭제된 방에도 답변 row가 생성된다. Front consumer는 0건이다.
+    evidence:
+      path: backend/src/main/java/com/room/backend/api/room/controller/RoomController.java
+      symbol: saveCheckResults
+      line: 92
+    relatedFeature: FT-ROOM-CREATE-WITH-CHECKLIST
+    relatedStory: s01-4-orphan-answer-operation-security
+    disposition: UNDECIDED   # 제거 또는 소유권 보호. 403/404 정책 결정 필요
+
+  - id: BC-REG-04
+    severity: P1
+    title: geocoding provider 오류가 미래핑으로 샌다
+    detail: >
+      RestClient의 4xx·5xx·timeout을 잡지 않아 GlobalExceptionHandler의 마지막 분기에서
+      COMMON_500이 된다. 사용자는 원인을 알 수 없다. ver1.1 P1 silent-500-geocoding과 동일 항목.
+    evidence:
+      path: backend/src/main/java/com/room/backend/global/geocoding/service/GeocodingService.java
+      symbol: getCoordinates
+      line: 29
+    relatedFeature: FT-ROOM-CREATE-WITH-CHECKLIST
+    disposition: FIX_PLANNED
+
+  - id: BC-REG-01
+    severity: P2
+    title: rentType이 null이거나 SHORT_TERM이면 임대조건 검증이 전무하다
+    detail: >
+      JEONSE와 MONTHLY에만 분기가 있다. 그 외에는 보증금·월세를 전혀 검증하지 않고 통과시킨다.
+      리팩토링에서는 RentTerms.Unspecified로 이 동작을 그대로 보존했다.
+    evidence:
+      path: backend/src/main/java/com/room/backend/domain/room/entity/Room.java
+      symbol: create
+      line: 129
+    relatedFeature: FT-ROOM-CREATE-WITH-CHECKLIST
+    disposition: NEEDS_PRODUCT_DECISION   # SHORT_TERM의 필수 필드가 무엇인지 미정
+
+  - id: BC-REG-02
+    severity: P2
+    title: 체크리스트 항목과 선택지의 관계를 검증하지 않는다
+    detail: >
+      다른 item에 속한 option ID를 보내도 그대로 저장된다. FK는 option의 존재만 보고
+      item-option 관계는 보지 않는다.
+    evidence:
+      path: backend/src/main/java/com/room/backend/api/room/service/RoomCheckResultService.java
+      symbol: saveCheckResult
+    relatedFeature: FT-ROOM-CREATE-WITH-CHECKLIST
+    disposition: FIX_PLANNED
+
+  - id: BC-REG-03
+    severity: P2
+    title: 한 답변에 동일 선택지를 중복 저장할 수 있다
+    detail: >
+      room_check_selected_options에 (result_id, option_id) unique 제약이 없어 같은 option ID를
+      두 번 보내면 row가 2개 생긴다.
+    evidence:
+      path: backend/src/main/resources/db/migration/V14__create_room_check_tables.sql
+      line: 15
+    relatedFeature: FT-ROOM-CREATE-WITH-CHECKLIST
+    disposition: FIX_PLANNED   # 신규 migration 필요. 적용된 V14는 수정 금지
+
+  - id: BC-DB-01
+    severity: P2
+    title: 중복 마이그레이션 4개가 적용돼 있다
+    detail: >
+      V9 ≡ V11 (create user type selections table, checksum 767665077),
+      V10 ≡ V12 (create user checklist settings table, checksum -419783200)이 바이트 단위로 동일하다.
+      CREATE TABLE IF NOT EXISTS 덕분에 실패하지 않았을 뿐이다.
+    evidence:
+      path: backend/src/test/resources/atlas-baseline/flyway-checksums.txt
+    disposition: RECORD_ONLY   # 적용된 migration은 수정 금지. 향후 baseline 정리 시 처리
+
+  - id: BC-REG-05
+    severity: P3
+    title: 방 등록이 비멱등이고 6개 상한이 경쟁 상태에서 뚫린다
+    detail: >
+      같은 payload를 두 번 보내면 방이 2개 생긴다. count 조회와 insert 사이에 락이 없어
+      방 5개 사용자의 동시 2건 요청이 7개를 만들 수 있다.
+    evidence:
+      path: backend/src/main/java/com/room/backend/api/room/service/RoomService.java
+      symbol: createRoomWithCheckAnswers
+    relatedFeature: FT-ROOM-CREATE-WITH-CHECKLIST
+    relatedStory: s01-5-room-create-retry-concurrency-baseline
+    disposition: NEEDS_PRODUCT_DECISION
+
+  - id: BC-ARCH-01
+    severity: P3
+    title: 도메인 entity가 API DTO를 import한다
+    detail: >
+      Room이 RoomUpdateRequestDTO를 직접 참조해 domain → api 역방향 의존이 생긴다.
+      Room.update(RoomUpdateRequestDTO, ...) 시그니처를 바꾸지 않으면 사라지지 않는다.
+    evidence:
+      path: backend/src/main/java/com/room/backend/domain/room/entity/Room.java
+      line: 3
+    disposition: FIX_WHEN_SLICE_MIGRATED   # 방 수정 slice 이관 시 함께 제거
+
+  - id: BC-ARCH-02
+    severity: P3
+    title: 요청 DTO가 상속으로 재사용된다
+    detail: >
+      RoomWithCheckAnswerRequestDTO extends RoomCreateRequestDTO. 코드 재사용 목적 상속이며
+      Bean Validation 메시지 계약이 두 클래스에 묶인다.
+    evidence:
+      path: backend/src/main/java/com/room/backend/api/room/dto/request/RoomWithCheckAnswerRequestDTO.java
+      line: 15
+    disposition: FIX_WHEN_SLICE_MIGRATED   # 컨트롤러 전환 시 command로 대체
+
+  - id: BC-LIST-01
+    severity: P2
+    title: 문제 뱃지가 체크리스트 항목 이름 문자열로만 연결된다
+    detail: >
+      목록의 곰팡이·누수·벌레·냄새·결로 뱃지는 항목 이름을 하드코딩한 문자열 비교로 결정된다.
+      시드에서 항목 이름이 한 글자라도 바뀌면 해당 뱃지는 예외 없이 조용히 항상 false가 된다.
+      리팩토링에서 IssueTopic enum으로 옮겨 위치는 한 곳이 됐지만 취약성 자체는 그대로다.
+    evidence:
+      path: backend/src/main/java/com/room/backend/api/room/service/RoomCheckResultService.java
+      symbol: getRoomIssuesSummary
+    relatedFeature: FT-ROOM-LIST
+    disposition: NEEDS_PRODUCT_DECISION   # 항목에 안정 코드를 부여할지, 뱃지를 데이터 주도로 바꿀지
+
+  - id: BC-LIST-02
+    severity: P3
+    title: 미확인과 문제없음을 구분하지 않는다
+    detail: >
+      아직 답변하지 않은 항목과 "없음"을 고른 항목이 모두 false로 표시된다. 사용자는 확인을
+      안 한 것인지 문제가 없는 것인지 알 수 없다.
+    evidence:
+      path: backend/src/main/java/com/room/backend/api/room/service/RoomCheckResultService.java
+    relatedFeature: FT-ROOM-LIST
+    disposition: NEEDS_PRODUCT_DECISION
+
+  - id: BC-LIST-03
+    severity: P2
+    title: 목록 조회가 N+1을 넘어 N*M+1 쿼리를 낸다
+    detail: >
+      방마다 답변을 조회하고, 답변마다 항목을 조회하고, 선택된 선택지마다 다시 조회한다.
+      방 6개 상한 덕에 현재는 견디지만 항목·선택지가 늘면 그대로 증가한다.
+      쿼리 수를 바꾸면 성능 특성이 달라지므로 리팩토링에서 건드리지 않았다.
+    evidence:
+      path: backend/src/main/java/com/room/backend/api/room/service/RoomCheckResultService.java
+      symbol: hasIssue
+    relatedFeature: FT-ROOM-LIST
+    disposition: FIX_PLANNED
+
+  - id: BC-RPT-03
+    severity: P1
+    title: 선택 입력이 비어 있는 방을 비교하면 NPE로 500이 난다
+    detail: >
+      buildRoomFieldItem이 fieldExtractor를 null 가드 없이 호출한다. 추출식이
+      room.getRentType().name(), room.getHasLoan().toString(),
+      room.getCanRegisterAddress().toString(), room.getBuildingType().name(),
+      room.getHasElevator().toString(), room.getDirection().getDescription()이라
+      해당 컬럼이 null이면 NullPointerException → COMMON_500이 된다.
+      V18이 이 컬럼들을 nullable로 풀었고 등록 API도 null을 허용하므로 실사용 가능한 조합이다.
+      계약 test RPT-07이 실제로 재현한다.
+    evidence:
+      path: backend/src/main/java/com/room/backend/api/report/service/ReportService.java
+      symbol: buildRoomFieldItem
+    relatedFeature: FT-REPORT-COMPARE
+    disposition: FIX_PLANNED
+
+  - id: BC-RPT-02
+    severity: P1
+    title: 비교 API가 방 소유권을 검증하지 않는다
+    detail: >
+      ReportController.compareRooms는 SecurityUtil.getCurrentUserId()로 사용자 ID를 구한 뒤
+      reportService.compareRooms(requestDTO)에 넘기지 않고 버린다. 인증만 되면 임의의 roomId를
+      비교할 수 있어 타인 방의 이름·주소·보증금·월세가 그대로 노출된다.
+      ver1.1 P1 IDOR-RPT-13/14와 같은 항목이다. 계약 test RPT-06이 재현한다.
+    evidence:
+      path: backend/src/main/java/com/room/backend/api/report/controller/ReportController.java
+      symbol: compareRooms
+    relatedFeature: FT-REPORT-COMPARE
+    disposition: FIX_PLANNED
+
+  - id: BC-RPT-01
+    severity: P2
+    title: 리포트 응답만 공통 ApiResponse 봉투를 쓰지 않는다
+    detail: >
+      다른 모든 엔드포인트는 ApiResponse{success,code,message,data}로 감싸는데
+      /report/info와 /report/compare는 DTO를 그대로 돌려준다. 프런트가 이 두 경로만
+      다르게 파싱해야 한다. 봉투를 붙이면 응답 형태가 바뀌므로 리팩토링에서 바꾸지 않았다.
+    evidence:
+      path: backend/src/main/java/com/room/backend/api/report/controller/ReportController.java
+      symbol: getRoomsForCompare
+    relatedFeature: FT-REPORT-INFO
+    disposition: NEEDS_PRODUCT_DECISION
+
+  - id: BC-RPT-04
+    severity: P2
+    title: 알 수 없는 카테고리 이름이 500으로 샌다
+    detail: >
+      ChecklistCategory.valueOf(categoryName)이 IllegalArgumentException을 던지고
+      GlobalExceptionHandler의 포괄 분기가 COMMON_500으로 만든다. 400이어야 할 입력 오류다.
+    evidence:
+      path: backend/src/main/java/com/room/backend/api/report/service/ReportService.java
+      symbol: compareRooms
+    relatedFeature: FT-REPORT-COMPARE
+    disposition: FIX_PLANNED
+
+  - id: BC-RPT-05
+    severity: P2
+    title: 비교가 방·필드마다 findById를 반복 호출한다
+    detail: >
+      buildRoomFieldItem이 필드 하나마다 roomIds 전체를 두 번 순회하며 findById를 호출한다.
+      기본 정보 10필드 + 건물 정보 4필드이면 방 하나당 최대 28회 조회가 된다.
+      쿼리 수를 바꾸면 성능 특성이 달라지므로 리팩토링에서 건드리지 않는다.
+    evidence:
+      path: backend/src/main/java/com/room/backend/api/report/service/ReportService.java
+      symbol: buildRoomFieldItem
+    relatedFeature: FT-REPORT-COMPARE
+    disposition: FIX_PLANNED
+
+  - id: BC-AUTH-01
+    severity: P2
+    title: OAuth state가 이름과 달리 소비되지 않아 재사용될 수 있다
+    detail: >
+      validateAndDeleteState는 이름이 삭제를 주장하지만 실제로는 서명과 만료만 검증하고
+      아무것도 지우지 않는다. state는 서버에 저장되지 않는 서명 JWT(TTL 10분)라
+      같은 state를 TTL 안에서 반복 제출해도 매번 통과한다. CSRF 방어가 1회성이 아니다.
+      메서드 이름이 실제 동작보다 강한 보장을 주장하는 것도 함께 기록한다.
+    evidence:
+      path: backend/src/main/java/com/room/backend/global/auth/oauth/service/OAuthStateService.java
+      symbol: validateAndDeleteState
+    relatedFeature: FT-AUTH-OAUTH-LOGIN
+    disposition: UNDECIDED   # 1회성 저장소를 두거나, 이름을 동작에 맞추거나
+
+  # --- 체크리스트 커스터마이징 (/custom) — 2026-08-03 관찰 -------------------
+  # 조사는 서브에이전트가 수행했고 근거 경로·심볼은 resolver가 다시 검증한다.
+
+  - id: BC-CHK-01
+    severity: P2
+    title: 없는 커스텀 항목을 지우면 404가 아니라 500이 난다
+    detail: >
+      deleteCustomItem이 findById 실패 시 IllegalArgumentException을 던지는데
+      GlobalExceptionHandler에 이 예외의 전용 분기가 없어 포괄 분기가 500으로 만든다.
+      리소스 미존재는 404여야 한다.
+    evidence:
+      path: backend/src/main/java/com/room/backend/domain/checklist/service/ChecklistService.java
+      symbol: deleteCustomItem
+    relatedFeature: FT-CHECKLIST-CUSTOM-ITEM
+    disposition: FIX_PLANNED
+
+  - id: BC-CHK-02
+    severity: P2
+    title: disabledItemIds가 null이면 NPE가 500으로 샌다
+    detail: >
+      ChecklistSettingsRequest에 @NotNull·@Valid가 없어 필드를 생략한 요청이 통과하고,
+      saveSettings가 disabledItemIds.stream()에서 NPE를 낸다. 포괄 분기가 500으로 만든다.
+      입력 오류이므로 400이어야 한다. 트랜잭션 롤백 덕에 DB 상태는 보존된다.
+    evidence:
+      path: backend/src/main/java/com/room/backend/domain/checklist/service/ChecklistService.java
+      symbol: saveSettings
+    relatedFeature: FT-CHECKLIST-SETTINGS
+    disposition: FIX_PLANNED
+
+  - id: BC-CHK-03
+    severity: P2
+    title: 항목 조회가 항목 수만큼 옵션 쿼리를 반복한다
+    detail: >
+      getCustomizedItems가 items를 순회하며 항목 하나마다
+      checklistOptionRepository.findByChecklistItemId를 개별 호출한다.
+      getEssentialsOnlyItems·getAllItemsForSettings도 같은 형태다.
+      쿼리 수를 바꾸면 성능 특성이 달라지므로 정형화 단계에서는 건드리지 않는다.
+    evidence:
+      path: backend/src/main/java/com/room/backend/domain/checklist/service/ChecklistService.java
+      symbol: getCustomizedItems
+    relatedFeature: FT-CHECKLIST-CATALOG
+    disposition: RECORD_ONLY
+
+  - id: BC-CHK-04
+    severity: P3
+    title: 나만의 항목 이름을 검증하지 않아 입력 오류가 409로 나간다
+    detail: >
+      CustomItemCreateRequest.itemName에 @NotBlank·@Size가 없다. null·공백·100자 초과가
+      그대로 DB까지 내려가 제약 위반이 되고 DataIntegrityViolationException이 409를 만든다.
+      클라이언트 입력 오류이므로 400이어야 한다.
+    evidence:
+      path: backend/src/main/java/com/room/backend/domain/checklist/dto/request/CustomItemCreateRequest.java
+      symbol: itemName
+    relatedFeature: FT-CHECKLIST-CUSTOM-ITEM
+    disposition: FIX_PLANNED
+
+  - id: BC-CHK-05
+    severity: P3
+    title: 커스텀 항목 삭제가 이미 지운 항목을 걸러내지 않는다
+    detail: >
+      다른 조회는 isDeleted=false 조건을 명시하는데 deleteCustomItem은 JpaRepository의
+      기본 findById를 써서 그 필터가 없다. 이미 소프트 삭제된 항목에 DELETE를 반복해도
+      404 없이 200이 나가고 deletedAt만 갱신된다. 보안 문제는 아니고 REST 의미의 불일치다.
+    evidence:
+      path: backend/src/main/java/com/room/backend/domain/checklist/service/ChecklistService.java
+      symbol: deleteCustomItem
+    relatedFeature: FT-CHECKLIST-CUSTOM-ITEM
+    disposition: NEEDS_PRODUCT_DECISION
+
+  - id: BC-CHK-06
+    severity: P3
+    title: 남의 항목 삭제 시도가 403이 아니라 400으로 응답한다
+    detail: >
+      소유권 검증 자체는 있다(ownerUserId 대조). 다만 CUSTOM_ITEM_FORBIDDEN이
+      HttpStatus.BAD_REQUEST로 정의돼 있어 권한 거부가 입력 오류처럼 보인다.
+      보안 결함이 아니라 응답 의미의 문제다.
+    evidence:
+      path: backend/src/main/java/com/room/backend/global/common/exception/ChecklistErrorCode.java
+      symbol: CUSTOM_ITEM_FORBIDDEN
+    relatedFeature: FT-CHECKLIST-CUSTOM-ITEM
+    disposition: FIX_PLANNED

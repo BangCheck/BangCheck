@@ -10,6 +10,10 @@ export const ROUTES = {
   MAP: '/map',
   LANDING: '/',
   MY: '/my',
+  PROJECT_MAP: '/project-map',
+  PROJECT_DASHBOARD: '/project-dashboard',
+  PROJECT_PAGE_PATTERN: '/project-map/:pageId',
+  PROJECT_PAGE: (pageId: string) => `/project-map/${pageId}`,
 } as const;
 
 export const loginRedirect = (_reason?: string) => ROUTES.LOGIN;

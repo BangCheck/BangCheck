@@ -7,10 +7,38 @@ plugins {
 group = 'com.Login'
 version = '0.0.1-SNAPSHOT'
 
+ext['testcontainers.version'] = '2.0.5'
+
+springBoot {
+    mainClass = 'com.room.backend.BackendApplication'
+}
+
 java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(17)
     }
+}
+
+sourceSets {
+    atlasBaselineTest {
+        java.srcDir 'src/atlasBaselineTest/java'
+        resources.srcDir 'src/atlasBaselineTest/resources'
+        compileClasspath += sourceSets.main.output
+        runtimeClasspath += output + compileClasspath
+    }
+    contractTest {
+        java.srcDir 'src/contractTest/java'
+        resources.srcDir 'src/contractTest/resources'
+        compileClasspath += sourceSets.main.output
+        runtimeClasspath += output + compileClasspath
+    }
+}
+
+configurations {
+    atlasBaselineTestImplementation.extendsFrom testImplementation
+    atlasBaselineTestRuntimeOnly.extendsFrom testRuntimeOnly
+    contractTestImplementation.extendsFrom testImplementation
+    contractTestRuntimeOnly.extendsFrom testRuntimeOnly
 }
 
 repositories {
@@ -37,6 +65,12 @@ dependencies {
     implementation 'org.flywaydb:flyway-mysql'
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    atlasBaselineTestImplementation enforcedPlatform('org.testcontainers:testcontainers-bom:2.0.5')
+    atlasBaselineTestImplementation 'org.testcontainers:testcontainers-junit-jupiter'
+    atlasBaselineTestImplementation 'org.testcontainers:testcontainers-mysql'
+    contractTestImplementation enforcedPlatform('org.testcontainers:testcontainers-bom:2.0.5')
+    contractTestImplementation 'org.testcontainers:testcontainers-junit-jupiter'
+    contractTestImplementation 'org.testcontainers:testcontainers-mysql'
     implementation 'me.paulschwarz:spring-dotenv:4.0.0'
 }
 
@@ -54,4 +88,180 @@ bootJar {
 
 jar {
     enabled = false
+}
+
+def atlasBaselineDirectory = layout.projectDirectory.dir('src/test/resources/atlas-baseline')
+def atlasInformationReportDirectory = layout.buildDirectory.dir('reports/atlas-baseline-info')
+def atlasInformationDigestDirectory = layout.projectDirectory.dir('src/test/resources/atlas-baseline-info')
+
+def normalizedBaselineContent = { List<String> records ->
+    records.findAll { it != null && !it.isBlank() }.unique().toSorted().join('\n') + '\n'
+}
+
+def verifyBaseline = { String fileName, List<String> records ->
+    def baselineFile = atlasBaselineDirectory.file(fileName).asFile
+    def normalized = normalizedBaselineContent(records)
+
+    if (!baselineFile.isFile()) {
+        throw new GradleException("Missing Atlas baseline: ${baselineFile}. Capture a candidate and review it before compare.")
+    }
+
+    def expected = baselineFile.getText('UTF-8').replace('\r\n', '\n')
+    if (expected != normalized) {
+        throw new GradleException("Atlas product oracle drift: ${fileName}. Capture never updates the approved baseline.")
+    }
+}
+
+def requiredCandidateDirectory = {
+    if (!providers.gradleProperty('atlasBaselineCandidateDir').isPresent()) {
+        throw new GradleException('atlasBaselineCandidateDir is required for capture.')
+    }
+    file(providers.gradleProperty('atlasBaselineCandidateDir').get())
+}
+
+def writeCandidate = { String relativePath, List<String> records ->
+    def candidateFile = new File(requiredCandidateDirectory(), relativePath)
+    candidateFile.parentFile.mkdirs()
+    candidateFile.setText(normalizedBaselineContent(records), 'UTF-8')
+    logger.lifecycle("Captured Atlas candidate: ${candidateFile}")
+}
+
+tasks.register('atlasRuntimeDependencyReport') {
+    group = 'verification'
+    description = 'Writes normalized production runtime dependencies as informational evidence.'
+
+    doLast {
+        def coordinates = configurations.runtimeClasspath.resolvedConfiguration.resolvedArtifacts.collect {
+            def id = it.moduleVersion.id
+            "${id.group}:${id.name}:${id.version}"
+        }.unique()
+        def reportFile = atlasInformationReportDirectory.get().file('runtime-dependencies.txt').asFile
+        reportFile.parentFile.mkdirs()
+        def content = normalizedBaselineContent(coordinates)
+        reportFile.setText(content, 'UTF-8')
+        def expectedFile = atlasInformationDigestDirectory.file('runtime-dependencies.txt.sha256').asFile
+        if (!expectedFile.isFile()) {
+            throw new GradleException("Missing approved Atlas information digest: ${expectedFile}")
+        }
+        def digest = java.security.MessageDigest.getInstance('SHA-256')
+                .digest(content.getBytes('UTF-8')).encodeHex().toString()
+        if (expectedFile.getText('UTF-8').trim() != digest) {
+            def owner = providers.gradleProperty('atlasInfoChangeOwner').orNull
+            def reason = providers.gradleProperty('atlasInfoChangeReason').orNull
+            if (!owner?.trim() || !reason?.trim()) {
+                throw new GradleException('Atlas runtime dependency drift requires -PatlasInfoChangeOwner and -PatlasInfoChangeReason.')
+            }
+        }
+    }
+}
+
+tasks.register('atlasRuntimeDependencyCapture') {
+    group = 'baseline capture'
+    description = 'Captures runtime dependencies as informational candidate evidence; it is not a verification task.'
+
+    doLast {
+        def coordinates = configurations.runtimeClasspath.resolvedConfiguration.resolvedArtifacts.collect {
+            def id = it.moduleVersion.id
+            "${id.group}:${id.name}:${id.version}"
+        }.unique()
+        writeCandidate('info/runtime-dependencies.txt', coordinates)
+    }
+}
+
+tasks.register('atlasBootEntryCompare') {
+    group = 'verification'
+    description = 'Compares the executable jar Start-Class product oracle.'
+    dependsOn tasks.named('bootJar')
+
+    doLast {
+        def executableJar = tasks.named('bootJar').get().archiveFile.get().asFile
+        def jarFile = new java.util.jar.JarFile(executableJar)
+        try {
+            def attributes = jarFile.manifest.mainAttributes
+            verifyBaseline('start-class.txt', ["start-class=${attributes.getValue('Start-Class')}"])
+        } finally {
+            jarFile.close()
+        }
+    }
+}
+
+tasks.register('atlasBootEntryCapture') {
+    group = 'baseline capture'
+    description = 'Captures Start-Class and boot loader candidate evidence; it is not a verification task.'
+    dependsOn tasks.named('bootJar')
+
+    doLast {
+        def executableJar = tasks.named('bootJar').get().archiveFile.get().asFile
+        def jarFile = new java.util.jar.JarFile(executableJar)
+        try {
+            def attributes = jarFile.manifest.mainAttributes
+            writeCandidate('oracle/start-class.txt', [
+                    "start-class=${attributes.getValue('Start-Class')}"
+            ])
+            writeCandidate('info/boot-loader.txt', [
+                    "main-class=${attributes.getValue('Main-Class')}"
+            ])
+        } finally {
+            jarFile.close()
+        }
+    }
+}
+
+tasks.register('atlasBaselineTest', Test) {
+    group = 'verification'
+    description = 'Runs the MySQL-backed context, route and Flyway product oracle comparison.'
+    testClassesDirs = sourceSets.atlasBaselineTest.output.classesDirs
+    classpath = sourceSets.atlasBaselineTest.runtimeClasspath
+    useJUnitPlatform()
+    systemProperty 'atlas.baseline.mode', 'compare'
+    systemProperty 'atlas.baseline.directory', atlasBaselineDirectory.asFile.absolutePath
+    systemProperty 'atlas.baseline.info-directory', atlasInformationReportDirectory.get().asFile.absolutePath
+    if (providers.gradleProperty('atlasInfoChangeOwner').isPresent()) {
+        systemProperty 'atlas.info.change-owner', providers.gradleProperty('atlasInfoChangeOwner').get()
+    }
+    if (providers.gradleProperty('atlasInfoChangeReason').isPresent()) {
+        systemProperty 'atlas.info.change-reason', providers.gradleProperty('atlasInfoChangeReason').get()
+    }
+    shouldRunAfter tasks.named('test')
+}
+
+tasks.register('atlasBaselineCaptureTest', Test) {
+    group = 'baseline capture'
+    description = 'Captures MySQL-backed candidate evidence; it never updates approved baselines.'
+    testClassesDirs = sourceSets.atlasBaselineTest.output.classesDirs
+    classpath = sourceSets.atlasBaselineTest.runtimeClasspath
+    useJUnitPlatform()
+    systemProperty 'atlas.baseline.mode', 'capture'
+    doFirst {
+        systemProperty 'atlas.baseline.directory',
+                new File(requiredCandidateDirectory(), 'oracle').absolutePath
+        systemProperty 'atlas.baseline.info-directory',
+                new File(requiredCandidateDirectory(), 'info').absolutePath
+    }
+}
+
+tasks.register('contractTest', Test) {
+    group = 'verification'
+    description = 'Runs MySQL-backed API contract characterization against the real SecurityFilterChain.'
+    testClassesDirs = sourceSets.contractTest.output.classesDirs
+    classpath = sourceSets.contractTest.runtimeClasspath
+    useJUnitPlatform()
+    // Docker가 필요하다. 일반 test는 이 task에 도달하지 않으며 실패도 서로 가리지 않는다.
+    shouldRunAfter tasks.named('test')
+}
+
+tasks.register('atlasBaselineCompare') {
+    group = 'verification'
+    description = 'Runs all blocking product oracle comparisons and writes informational reports.'
+    dependsOn tasks.named('atlasBaselineTest')
+    dependsOn tasks.named('atlasBootEntryCompare')
+    dependsOn tasks.named('atlasRuntimeDependencyReport')
+}
+
+tasks.register('atlasBaselineCapture') {
+    group = 'baseline capture'
+    description = 'Creates candidate evidence only. Review and promote it separately before compare.'
+    dependsOn tasks.named('atlasBaselineCaptureTest')
+    dependsOn tasks.named('atlasBootEntryCapture')
+    dependsOn tasks.named('atlasRuntimeDependencyCapture')
 }

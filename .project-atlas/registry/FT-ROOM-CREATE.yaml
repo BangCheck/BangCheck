@@ -1,0 +1,19 @@
+capabilityId: CAP-ROOM-MANAGE
+capabilityTitle: 저장한 방을 수정하고 관리한다
+featureId: FT-ROOM-CREATE
+title: 체크리스트 없는 기본 방 등록
+status: PLANNED
+owner: "@Woo-JongHo"
+owns:
+  - operationId: OP-ROOM-CREATE
+    route: "POST /api/v1/rooms"
+    auth: JWT
+    safety: { sideEffect: WRITE, writes: [rooms], rerunSafe: false, abortOnFail: FULL_ROLLBACK }
+uses: []
+implementedBy:
+  slice: backend/src/main/java/com/room/backend/api/room
+  useCase: service/RoomService.java
+  legacyPath: backend/src/main/java/com/room/backend/api/room/controller/RoomController.java#createRoom
+  switchedOver: false
+knownDefects: [BC-REG-01, BC-REG-04, BC-REG-05]
+switchoverReadiness: { controllerSwitched: true, legacyMethodRemoved: true }

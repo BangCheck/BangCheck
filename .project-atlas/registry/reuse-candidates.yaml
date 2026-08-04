@@ -1,0 +1,104 @@
+# 재사용 승격 후보 — 중복 장부
+#
+# 결정(2026-07-31, 사용자): 조각을 전부 이관한 뒤 마지막에 한 번 추출한다.
+# 근거는 증거 최대화다. 대신 위험은 "그때 중복 물량이 커진다"는 것이므로,
+# 이 파일을 진행하면서 계속 쌓아 마지막 추출이 고고학이 아니라 목록 작업이 되게 한다.
+#
+# consumers는 실제로 그 코드를 쓰는 독립 feature의 수다. 2 미만이면 추출 대상이 아니다.
+# 갱신 시점: 조각 하나를 이관할 때마다.
+
+lastUpdated: 2026-08-01
+slicesMigrated: [FT-ROOM-CREATE-WITH-CHECKLIST, FT-ROOM-LIST, FT-ROOM-DETAIL, FT-ROOM-ANSWER-SAVE, FT-ROOM-UPDATE, FT-ROOM-DELETE, FT-ROOM-CREATE]
+
+candidates:
+
+  # --- consumers 2 이상 — 마지막 추출 대상 -----------------------------------
+
+  - name: 계약 test 스캐폴드
+    kind: TEST_INFRA
+    consumers: 2
+    usedBy: [RoomCreateWithChecklistContractTest, RoomListContractTest]
+    duplicated: >
+      @Testcontainers + MySQLContainer + @DynamicPropertySource + 14줄짜리 @SpringBootTest
+      properties 블록 + JWT 토큰 빌더가 두 파일에 글자 단위로 거의 동일하게 있다.
+    recommendation: >
+      가장 명확한 추출 대상이다. 제품 코드가 아니라 test 기반이라 위험도 낮다.
+      세 번째 계약 test를 쓰기 전에 뽑는 것을 권한다.
+    blockedBy: 없음. 사용자 결정에 따라 마지막 일괄 추출까지 보류
+
+  - name: test 리플렉션 헬퍼 set(target, owner, field, value)
+    kind: TEST_INFRA
+    consumers: 2
+    usedBy: [RoomRegistrationResponseTest, RoomListItemResponseTest]
+    duplicated: JPA가 채우는 id·createdAt을 test에서 심기 위한 4줄짜리 헬퍼
+    recommendation: 계약 test 스캐폴드와 함께 뽑는다
+
+  - name: 문제 뱃지 조회 로직
+    kind: PRODUCT
+    consumers: 2
+    usedBy: [FT-ROOM-LIST(JpaRoomIssueLookup), MapController(RoomCheckResultService.getRoomIssuesSummary)]
+    duplicated: >
+      같은 계산이 두 곳에 있다. 목록은 신규 slice로 이관됐지만 지도는 아직 legacy를 쓴다.
+      의미·불변식·변경 주기가 같다는 증거가 이미 있는 유일한 제품 코드 후보다.
+    recommendation: >
+      지도 slice를 이관할 때 RoomIssueLookup port를 공유할지 판단한다.
+      단, 지도는 거리·도보시간을 함께 붙이므로 요구가 완전히 같은지 먼저 확인해야 한다.
+    blockedBy: 지도 slice 미이관
+
+  # --- consumers 1 — 아직 판단 불가 ------------------------------------------
+
+  - name: TransactionBoundary
+    kind: PRODUCT
+    consumers: 5
+    usedBy: [FT-ROOM-CREATE-WITH-CHECKLIST, FT-ROOM-ANSWER-SAVE, FT-ROOM-UPDATE, FT-ROOM-DELETE, FT-ROOM-CREATE]
+    note: >
+      쓰기 조각 5개가 모두 transaction을 요구했지만 각 use case의 원자성 범위가 달랐다.
+      Spring TransactionTemplate 자체를 재사용하고 generic 자체 abstraction은 만들지 않는다.
+
+  - name: Coordinates
+    kind: PRODUCT
+    consumers: 1
+    usedBy: [FT-ROOM-CREATE-WITH-CHECKLIST]
+    note: 지도 slice가 같은 정밀도·좌표계를 쓰는지 확인 전까지 보류
+
+  # --- 추출하지 않기로 판단한 것 ----------------------------------------------
+
+  - name: Rule enum → ErrorCode 매퍼
+    kind: PATTERN_ONLY
+    consumers: 1
+    decision: DO_NOT_EXTRACT
+    rationale: >
+      제네릭 기반 클래스를 만들면 feature마다 다른 enum을 억지로 한 타입에 묶게 된다.
+      재사용 대상은 코드가 아니라 "도메인이 HTTP를 모르게 한다"는 패턴이다.
+
+  - name: slice별 @Configuration
+    kind: PATTERN_ONLY
+    consumers: 2
+    decision: DO_NOT_EXTRACT
+    rationale: >
+      두 조각 모두 같은 모양이지만 내용은 전부 다르다. 공통 상위 타입을 만들면
+      조립 코드를 감추게 되어 명시적 조립이라는 목적 자체를 잃는다.
+
+  - name: port 네이밍·배치 규약
+    kind: RULE
+    consumers: 2
+    decision: ENFORCE_AS_GATE
+    rationale: >
+      "side-effect port만 interface로 둔다"는 규칙은 코드가 아니라 구조 규칙이다.
+      ATLAS-JAVA-002 fitness gate로 강제할 대상이지 공통 코드로 뽑을 대상이 아니다.
+
+# 두 조각을 비교해 얻은 관찰 — 세 번째 조각 설계의 입력
+observations:
+  - 7개 room operation의 Controller 전환과 legacy RoomService 제거가 완료됐다.
+  - 등록·답변추가·수정 세 쓰기 조각에서 동일한 answer/option append가 확인되어
+    feature/shared/checklist의 ChecklistAnswerPersistence로 추출했다. replace는 append를 재사용한다.
+  - 읽기 slice는 TransactionBoundary·에러 매퍼·요청 매퍼가 전부 필요 없었다.
+    "쓰기 slice 형태"와 "읽기 slice 형태"는 다른 템플릿으로 봐야 한다.
+  - 두 조각 모두 신규 @Entity 0개로 끝났다. 기존 entity를 port 뒤에서 재사용하는 방식이
+    두 번 연속 통했으므로 세 번째도 같은 방식을 기본으로 둔다.
+  - JSON 동등성 test가 두 번 모두 전환 전에 오류를 잡을 기회를 줬다.
+    이 test는 조각마다 반드시 만든다.
+  - 세 번째 조각도 신규 @Entity 없이 기존 repository를 adapter 뒤에서 재사용했다.
+    entity 비노출과 feature별 snapshot은 세 조각에서 반복됐지만 코드 추출 대상이 아니라 경계 규칙이다.
+  - roomlist와 roomdetail은 모두 읽기 slice지만 조회 모델과 조립 순서가 다르다.
+    공통 ReadUseCase나 generic catalog는 만들지 않는다.

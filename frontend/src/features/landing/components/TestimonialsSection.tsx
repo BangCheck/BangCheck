@@ -57,7 +57,11 @@ function QuoteCard({ quote }: { quote: Quote }) {
 
 export default function TestimonialsSection() {
   return (
-    <SectionWrapper className="bg-bg-dark flex flex-col gap-[50px] md:gap-[100px] items-start px-6 py-[120px] md:px-[190px] md:py-[140px]">
+    <SectionWrapper
+      atlasNode="landing-testimonials"
+      atlasLabel="사용자 후기"
+      className="bg-bg-dark flex flex-col gap-[50px] md:gap-[100px] items-start px-6 py-[120px] md:px-[190px] md:py-[140px]"
+    >
       <div className="flex flex-col gap-[16px] md:gap-[60px] items-center md:items-start text-white tracking-[-0.5px] w-full max-w-[837px] mx-auto md:mx-0 text-center md:text-left">
         <h2 className="font-bold text-fluid-5xl leading-[1.22] not-italic">
           서대문구 자취생을 위한 필수 체크리스트

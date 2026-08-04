@@ -1,0 +1,71 @@
+# 축 1 — 사용자 가치 계층 (CAPABILITY → FEATURE → OPERATION)
+#
+# 관계 규칙:
+#   owns : 반드시 1개. "이 operation의 주인은 누구인가"에 답이 하나로 나온다 → 나무 유지
+#   uses : 몇 개든. 여러 기능이 같은 operation을 쓰는 현실을 표현한다 → 그물 허용
+#
+# 화면(PAGE)은 최상위가 아니라 옆 축이다. 화면을 개편해도 이 뼈대는 흔들리지 않는다.
+
+capabilityId: CAP-ROOM-COMPARE
+capabilityTitle: 방을 비교해서 고른다
+
+featureId: FT-ROOM-CREATE-WITH-CHECKLIST
+title: 방 + 체크리스트 등록
+status: PLANNED
+owner: "@Woo-JongHo"
+
+# 이 기능이 주인인 operation
+owns:
+  - operationId: OP-ROOM-CREATE-WITH-CHECKLIST
+    route: "POST /api/v1/rooms/check-results"
+    auth: JWT
+    # RPA의 Unit 안전 스키마에 대응한다. 값은 현행 코드를 관찰한 결과다.
+    safety:
+      sideEffect: WRITE
+      writes: [rooms, room_check_results, room_check_selected_options]
+      rerunSafe: false          # 두 번 호출하면 방이 2개 생긴다
+      abortOnFail: FULL_ROLLBACK # 단일 트랜잭션 경계
+
+# 이 기능이 쓰지만 소유하지는 않는 operation
+uses:
+  - operationId: OP-ADDRESS-SEARCH
+    route: "GET /api/v1/address/search"
+    note: 주소 입력 자동완성. AddressController가 소유한다.
+
+# 축 2와 만나는 유일한 지점
+implementedBy:
+  slice: backend/src/main/java/com/room/backend/api/room
+  useCase: service/RoomService.java
+  # 컨트롤러가 신규 use case로 전환됐고 legacy RoomService.createRoomWithCheckAnswers는 제거됐다
+  legacyPath: backend/src/main/java/com/room/backend/api/room/controller/RoomController.java#createRoom
+  switchedOver: false
+# 이 기능에서 관찰된 현행 결함. 고치지 않고 이슈로 넘긴다.
+knownDefects:
+  - BC-REG-01
+  - BC-REG-02
+  - BC-REG-03
+  - BC-REG-04
+  - BC-REG-05
+
+tests: []   # 2026-08-04 main 기준 이 기능을 덮는 test 없음
+
+# 전환 준비 상태 — 컨트롤러를 붙이기 전에 갖춰야 할 것
+switchoverReadiness:
+  requestMapper: READY      # adapter/web/RoomRegistrationRequestMapper
+  responseMapper: READY     # adapter/web/RoomRegistrationResponse (JSON 동등성 test 통과)
+  errorMapper: READY        # adapter/web/RoomRegistrationErrorMapper (전수 매핑 test 통과)
+  contractTest: PARTIAL     # RCWC 20건 중 17건. 미커버 3건은 아래 참조
+  controllerSwitched: false
+  legacyMethodRemoved: false  # main 기준 legacy가 유일 구현이다
+
+# 계약 test 커버리지 — Story 1.1의 RCWC-01~20 기준
+contractCoverage:
+  covered: [RCWC-01, RCWC-02, RCWC-03, RCWC-04, RCWC-05, RCWC-06, RCWC-07, RCWC-08,
+            RCWC-09, RCWC-10, RCWC-11, RCWC-12, RCWC-13, RCWC-14, RCWC-15, RCWC-16, RCWC-18]
+  uncovered:
+    - id: RCWC-17
+      reason: Front consumer 0건 확인은 test가 아니라 source scan이다
+    - id: RCWC-19
+      reason: soft-deleted 방에 대한 고아 operation 동작. BC-SEC-01 처분 Story가 소유한다
+    - id: RCWC-20
+      reason: 미존재 방에 대한 고아 operation 동작. BC-SEC-01 처분 Story가 소유한다

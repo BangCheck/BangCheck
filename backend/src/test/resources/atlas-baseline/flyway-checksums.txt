@@ -1,0 +1,24 @@
+10|create user checklist settings table|-419783200
+11|create user type selections table|767665077
+12|create user checklist settings table|-419783200
+13|add room fields|1640342938
+14|create room check tables|25493844
+15|add soft delete to room check results|1412242636
+16|change special floor to enum|729001637
+17|insert checklist items and options|375182320
+18|alter room columns nullable|-1641405035
+19|reseed checklist data|689205592
+1|init schema|-579871187
+20|correct checklist seed data|1823395227
+21|fix zombie custom items|-1578942543
+22|realign checklist item type mapping|-389998292
+23|drop checklist item user type column|-268781951
+24|fix checklist item type classification|-100495127
+2|rename user id and add refresh tokens|616987860
+3|make email nullable|-1696195661
+4|add profile image url to users|1630049125
+5|create rooms table|-909288366
+6|create checklist tables|-2047981855
+7|add map tables|292731180
+8|add owner user id to checklist items|-1492736183
+9|create user type selections table|767665077

@@ -1,0 +1,53 @@
+# 축 1 — 두 번째 조각
+#
+# 첫 조각과 같은 형태를 의도적으로 복제했다. 형태가 같아야 재사용 판단의 비교가 가능하다.
+
+capabilityId: CAP-ROOM-COMPARE
+capabilityTitle: 방을 비교해서 고른다
+
+featureId: FT-ROOM-LIST
+title: 내 방 목록 조회
+status: PLANNED
+owner: "@Woo-JongHo"
+
+owns:
+  - operationId: OP-ROOM-LIST
+    route: "GET /api/v1/rooms"
+    auth: JWT
+    safety:
+      sideEffect: READ
+      writes: []
+      rerunSafe: true           # 읽기 전용. 반복 호출이 상태를 바꾸지 않는다
+      abortOnFail: NONE         # 쓰기가 없어 롤백할 대상이 없다
+
+uses: []
+
+implementedBy:
+  slice: backend/src/main/java/com/room/backend/api/room
+  useCase: service/RoomService.java
+  legacyPath: backend/src/main/java/com/room/backend/api/room/controller/RoomController.java#getRooms
+  switchedOver: false
+knownDefects:
+  - BC-LIST-01
+  - BC-LIST-02
+  - BC-LIST-03
+
+tests: []   # 2026-08-04 main 기준 이 기능을 덮는 test 없음
+
+switchoverReadiness:
+  requestMapper: NOT_NEEDED   # 쿼리 파라미터 2개뿐이라 컨트롤러가 직접 query record를 만든다
+  responseMapper: READY       # adapter/web/RoomListItemResponse (JSON 동등성 test 통과)
+  errorMapper: NOT_NEEDED     # 이 operation은 도메인 거절을 만들지 않는다
+  contractTest: READY         # RLST-01~06
+  controllerSwitched: false
+  legacyMethodRemoved: false  # main 기준 legacy가 유일 구현이다
+
+contractCoverage:
+  covered: [RLST-01, RLST-02, RLST-03, RLST-04, RLST-05, RLST-06]
+
+# 첫 조각과 달랐던 점 — 재사용 판단의 입력이다
+sliceShapeNotes:
+  - 읽기 경로라 TransactionBoundary port가 없다. legacy의 readOnly 트랜잭션은 dirty checking을
+    끄는 최적화이고 이 경로에는 지연 로딩 연관이 없어 관측 결과가 같다.
+  - 도메인 거절이 없어 에러 매퍼와 exception handler가 없다.
+  - 정렬이 도메인 정책(RoomOrdering)으로 올라왔다. 첫 조각에는 대응물이 없다.
