@@ -1,0 +1,53 @@
+# 축 1 — checklist 묶음의 첫 조각.
+#
+# 이 ID는 새로 만든 것이 아니다. defects.yaml의 BC-CHK-03이 이미 가리키고 있었고
+# 실체가 없어 resolver의 relatedFeature 검사를 넣을 수 없었다.
+
+capabilityId: CAP-CHECKLIST-CUSTOMIZE
+capabilityTitle: 내가 볼 체크리스트를 내 상황에 맞춘다
+
+featureId: FT-CHECKLIST-CATALOG
+title: 체크리스트 항목 카탈로그 조회
+status: PLANNED
+owner: "@Woo-JongHo"
+
+owns:
+  - operationId: OP-CHECKLIST-ITEMS-CUSTOMIZED
+    route: "GET /api/checklist/items"
+    auth: JWT
+    safety:
+      sideEffect: READ
+      writes: []
+      rerunSafe: true           # 읽기 전용
+      abortOnFail: NONE         # 쓰기가 없어 롤백할 대상이 없다
+
+  - operationId: OP-CHECKLIST-ITEMS-ALL
+    route: "GET /api/checklist/items/all"
+    auth: JWT
+    safety:
+      sideEffect: READ
+      writes: []
+      rerunSafe: true
+      abortOnFail: NONE
+
+uses: []
+
+implementedBy:
+  slice: backend/src/main/java/com/room/backend/domain/checklist
+  useCase: service/ChecklistService.java
+  legacyPath: backend/src/main/java/com/room/backend/domain/checklist/controller/ChecklistController.java#getCustomizedItems
+  frontendEntry: frontend/src/services/custom-checklist-service.ts#getCustomizedItems
+  switchedOver: false
+
+knownDefects:
+  - BC-CHK-03
+
+tests: []   # 2026-08-04 main 기준 이 기능을 덮는 test 없음
+
+# 두 operation을 한 feature로 묶은 근거
+sliceShapeNotes:
+  - 둘 다 같은 카탈로그를 읽고 필터만 다르다.
+    `/items`는 사용자 설정이 반영된 목록, `/items/all`은 설정 화면이 쓰는 전량이다.
+  - 쓰기가 없어 안전 필드가 동일하고, 변경 사유도 같다(카탈로그 스키마가 바뀔 때).
+  - BC-CHK-03의 N+1은 `/items` 경로에서 관측됐으나 원인이 공통 조회 로직이라
+    이 feature 전체의 결함으로 둔다.
