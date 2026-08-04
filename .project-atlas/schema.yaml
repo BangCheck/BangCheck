@@ -99,6 +99,10 @@ entities:
       severity:    { type: enum, values: [P1, P2, P3] }
       evidence:    { type: object, of: evidence }
       disposition: { type: enum, values: [UNDECIDED, FIX_PLANNED, RECORD_ONLY, NEEDS_PRODUCT_DECISION, FIX_WHEN_SLICE_MIGRATED] }
+      # 결함 생애주기에서 사람이 적는 값은 이것 하나다 (선택).
+      # OBSERVED(이슈 없음) → TRACKED(이슈 등록) → IN_PROGRESS(PR 열림) → RESOLVED(머지됨)
+      # 뒤의 셋은 이 번호에서 파생될 값이라 사람이 적지 않는다 — 두 곳에 적으면 갈라진다.
+      issue:       { type: integer }
 
   evidence:
     required: [path]

@@ -15,6 +15,7 @@ registry에 적힌 값이 실제 저장소와 맞는지 기계적으로 검사�
   FEC-01 프론트가 부르는 route가 제품에 실재하는가 (코드에서 추출)
   FLD-01 required 필드가 누락되지 않았는가
   ENM-01 enum 값이 schema가 허용한 값인가
+  ISS-01 defect.issue가 실재할 수 있는 이슈 번호인가 (양의 정수)
 
 알려진 한계
   SRC-02는 단순 문자열 포함 검사다. 심볼이 주석 안에만 남아 있어도 통과한다.
@@ -230,6 +231,33 @@ def check_required(report: Report, where: str, data: dict, required: list[str]) 
             report.ok()
 
 
+def check_issue(report: Report, where: str, value) -> None:
+    """defect.issue가 실재할 수 있는 이슈 번호인가 (ISS-01).
+
+    schema는 `issue: { type: integer }`라고 선언했지만 선언만으로는 아무것도
+    막지 못했다 — 2026-08-04 교차검증 시점에 `issue: true`, `issue: "ABC"`,
+    `issue: -1`이 전부 통과해 TRACKED가 됐다.
+
+    이 필드는 결함 생애주기에서 사람이 적는 유일한 값이다. 그 하나가 틀리면
+    나머지 상태가 전부 그 위에서 파생되므로, 여기서 걸리지 않으면 잘못된 값이
+    화면까지 그대로 간다.
+
+    - 없는 것(None)은 위반이 아니다. 아직 이슈로 올리지 않았다는 관측이고,
+      그 경우 lifecycle이 OBSERVED로 남는 것이 사실이다.
+    - bool은 파이썬·YAML에서 int의 하위형이라 `issue: true`가 1로 샌다. 따로 막는다.
+    - 0 이하는 실재할 수 없다. GitHub 이슈 번호는 1부터다.
+    """
+    if value is None:
+        return
+    if isinstance(value, bool) or not isinstance(value, int):
+        report.fail("ISS-01", where, f"issue는 정수여야 한다: {value!r} ({type(value).__name__})")
+        return
+    if value < 1:
+        report.fail("ISS-01", where, f"issue는 1 이상이어야 한다 (이슈 번호는 1부터다): {value}")
+        return
+    report.ok()
+
+
 def check_id(report: Report, where: str, value: str, pattern: str, id_type: str) -> None:
     if not re.match(pattern, str(value)):
         report.fail("ID-01", where, f"{id_type} ID 형식 위반: '{value}' (기대 {pattern})")
@@ -271,6 +299,8 @@ def main() -> int:
                        spec["fields"]["severity"]["values"])
             check_enum(report, where, "disposition", defect.get("disposition"),
                        spec["fields"]["disposition"]["values"])
+
+            check_issue(report, where, defect.get("issue"))
 
             related = defect.get("relatedFeature")
             if related:

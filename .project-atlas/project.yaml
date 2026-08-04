@@ -11,6 +11,9 @@
 # 검증 기준이 "현재 체크아웃"에서 "고정된 제품 commit SHA"로 바뀐다.
 
 projectId: bangcheck
+# 정본은 이 값이다. 로컬 origin URL은 SWYP-Backend/BangCheck이지만 그것은 옛 org 이름이고
+# GitHub이 리다이렉트할 뿐이다 — 두 경로 모두 gh api에서 full_name: BangCheck/BangCheck를 답한다.
+# (2026-08-05 확인. remote URL만 보고 이 값을 틀렸다고 판단한 적이 있어 근거를 남긴다.)
 repo: BangCheck/BangCheck
 defaultBranch: main
 workingBranch: v0.2.0

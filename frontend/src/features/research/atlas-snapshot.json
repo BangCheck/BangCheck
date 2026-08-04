@@ -1,0 +1,1541 @@
+{
+  "generator": ".project-atlas/tools/pm_snapshot.py",
+  "note": "생성물이다. 원천은 registry와 코드다. 직접 편집하지 않는다.",
+  "sourceDigest": "69a605e26a32844cfb137abd97776e987a4cf982c0cb7a0442b4cf0cc273f71e",
+  "pages": [
+    {
+      "page": "/",
+      "component": "frontend/src/features/landing/LandingPage.tsx",
+      "features": []
+    },
+    {
+      "page": "/auth/callback/:provider",
+      "component": "frontend/src/features/auth/AuthCallbackPage.tsx",
+      "features": [
+        {
+          "featureId": "FT-AUTH-OAUTH-LOGIN",
+          "title": "소셜 계정으로 로그인",
+          "owner": "@dlwldP",
+          "capability": "나를 식별하고 로그인 상태를 유지한다",
+          "operations": [
+            {
+              "operationId": "OP-AUTH-OAUTH-CALLBACK",
+              "route": "GET /api/v1/auth/oauth2/{}/callback",
+              "auth": "PUBLIC",
+              "safety": "EXTERNAL",
+              "frontend": "frontend/src/services/auth-service.ts:27"
+            }
+          ],
+          "defects": [
+            {
+              "id": "BC-AUTH-01",
+              "severity": "P2",
+              "title": "OAuth state가 이름과 달리 소비되지 않아 재사용될 수 있다",
+              "detail": "validateAndDeleteState는 이름이 삭제를 주장하지만 실제로는 서명과 만료만 검증하고 아무것도 지우지 않는다. state는 서버에 저장되지 않는 서명 JWT(TTL 10분)라 같은 state를 TTL 안에서 반복 제출해도 매번 통과한다. CSRF 방어가 1회성이 아니다. 메서드 이름이 실제 동작보다 강한 보장을 주장하는 것도 함께 기록한다.",
+              "disposition": "UNDECIDED",
+              "evidence": {
+                "path": "backend/src/main/java/com/room/backend/global/auth/oauth/service/OAuthStateService.java",
+                "symbol": "validateAndDeleteState",
+                "line": null
+              },
+              "relatedFeature": "FT-AUTH-OAUTH-LOGIN",
+              "relatedStory": null,
+              "issue": null,
+              "lifecycle": "OBSERVED"
+            },
+            {
+              "id": "BC-AUTH-90",
+              "severity": "P3",
+              "title": "프론트에 없는 엔드포인트를 부르는 죽은 함수가 있다",
+              "detail": "getCurrentUser가 GET /api/v1/users/me를 호출하는데 백엔드에 그 매핑이 없다. 호출하면 404다. 지금은 이 함수를 쓰는 곳이 없어 실행되지 않으므로 장애는 아니지만, 이름만 보고 쓰는 순간 404가 된다. 2026-08-04 resolver에 FEC-01(프론트 호출 route 실존 검사)을 넣자마자 잡혔다 — 손으로 registry를 채우는 동안에는 방향이 반대여서 못 봤다.",
+              "disposition": "RECORD_ONLY",
+              "evidence": {
+                "path": "frontend/src/services/auth-service.ts",
+                "symbol": "getCurrentUser",
+                "line": null
+              },
+              "relatedFeature": "FT-AUTH-OAUTH-LOGIN",
+              "relatedStory": null,
+              "issue": null,
+              "lifecycle": "OBSERVED"
+            }
+          ],
+          "tests": [],
+          "front": {
+            "path": "frontend/src/services/auth-service.ts:27",
+            "state": "built"
+          },
+          "back": {
+            "path": "backend/src/main/java/com/room/backend/api/auth/service/AuthService.java",
+            "state": "built"
+          }
+        }
+      ]
+    },
+    {
+      "page": "/checklist/:id",
+      "component": "frontend/src/features/checklist/ChecklistDetailPage.tsx",
+      "features": [
+        {
+          "featureId": "FT-ROOM-DELETE",
+          "title": "내 방 삭제",
+          "owner": "@minwoo-l",
+          "capability": "저장한 방을 수정하고 관리한다",
+          "operations": [
+            {
+              "operationId": "OP-ROOM-DELETE",
+              "route": "DELETE /api/v1/rooms/{}",
+              "auth": "JWT",
+              "safety": "WRITE",
+              "frontend": "frontend/src/services/room-service.ts:29"
+            }
+          ],
+          "defects": [],
+          "tests": [],
+          "front": {
+            "path": "frontend/src/services/room-service.ts:29",
+            "state": "built"
+          },
+          "back": {
+            "path": "backend/src/main/java/com/room/backend/api/room/service/RoomService.java",
+            "state": "built"
+          }
+        },
+        {
+          "featureId": "FT-CHECKLIST-CATALOG",
+          "title": "체크리스트 항목 카탈로그 조회",
+          "owner": "@std-yong",
+          "capability": "내가 볼 체크리스트를 내 상황에 맞춘다",
+          "operations": [
+            {
+              "operationId": "OP-CHECKLIST-ITEMS-CUSTOMIZED",
+              "route": "GET /api/checklist/items",
+              "auth": "JWT",
+              "safety": "READ",
+              "frontend": "frontend/src/services/custom-checklist-service.ts:9"
+            }
+          ],
+          "defects": [
+            {
+              "id": "BC-CHK-03",
+              "severity": "P2",
+              "title": "항목 조회가 항목 수만큼 옵션 쿼리를 반복한다",
+              "detail": "getCustomizedItems가 items를 순회하며 항목 하나마다 checklistOptionRepository.findByChecklistItemId를 개별 호출한다. getEssentialsOnlyItems·getAllItemsForSettings도 같은 형태다. 쿼리 수를 바꾸면 성능 특성이 달라지므로 정형화 단계에서는 건드리지 않는다.",
+              "disposition": "RECORD_ONLY",
+              "evidence": {
+                "path": "backend/src/main/java/com/room/backend/domain/checklist/service/ChecklistService.java",
+                "symbol": "getCustomizedItems",
+                "line": null
+              },
+              "relatedFeature": "FT-CHECKLIST-CATALOG",
+              "relatedStory": null,
+              "issue": null,
+              "lifecycle": "OBSERVED"
+            }
+          ],
+          "tests": [],
+          "front": {
+            "path": "frontend/src/services/custom-checklist-service.ts:9",
+            "state": "built"
+          },
+          "back": {
+            "path": "backend/src/main/java/com/room/backend/domain/checklist/service/ChecklistService.java",
+            "state": "built"
+          }
+        },
+        {
+          "featureId": "FT-ADDRESS-SEARCH",
+          "title": "주소 검색",
+          "owner": "@minwoo-l",
+          "capability": "방을 비교해서 고른다",
+          "operations": [
+            {
+              "operationId": "OP-ADDRESS-SEARCH",
+              "route": "GET /api/v1/address/search",
+              "auth": "PUBLIC",
+              "safety": "EXTERNAL",
+              "frontend": "frontend/src/services/address-service.ts:11"
+            }
+          ],
+          "defects": [],
+          "tests": [],
+          "front": {
+            "path": "frontend/src/services/address-service.ts:11",
+            "state": "built"
+          },
+          "back": {
+            "path": "backend/src/main/java/com/room/backend/api/address/service/AddressSearchService.java",
+            "state": "built"
+          }
+        },
+        {
+          "featureId": "FT-ROOM-LIST",
+          "title": "내 방 목록 조회",
+          "owner": "@minwoo-l",
+          "capability": "방을 비교해서 고른다",
+          "operations": [
+            {
+              "operationId": "OP-ROOM-LIST",
+              "route": "GET /api/v1/rooms",
+              "auth": "JWT",
+              "safety": "READ",
+              "frontend": "frontend/src/services/room-service.ts:19"
+            }
+          ],
+          "defects": [
+            {
+              "id": "BC-LIST-01",
+              "severity": "P2",
+              "title": "문제 뱃지가 체크리스트 항목 이름 문자열로만 연결된다",
+              "detail": "목록의 곰팡이·누수·벌레·냄새·결로 뱃지는 항목 이름을 하드코딩한 문자열 비교로 결정된다. 시드에서 항목 이름이 한 글자라도 바뀌면 해당 뱃지는 예외 없이 조용히 항상 false가 된다. 리팩토링에서 IssueTopic enum으로 옮겨 위치는 한 곳이 됐지만 취약성 자체는 그대로다.",
+              "disposition": "NEEDS_PRODUCT_DECISION",
+              "evidence": {
+                "path": "backend/src/main/java/com/room/backend/api/room/service/RoomCheckResultService.java",
+                "symbol": "getRoomIssuesSummary",
+                "line": null
+              },
+              "relatedFeature": "FT-ROOM-LIST",
+              "relatedStory": null,
+              "issue": null,
+              "lifecycle": "OBSERVED"
+            },
+            {
+              "id": "BC-LIST-02",
+              "severity": "P3",
+              "title": "미확인과 문제없음을 구분하지 않는다",
+              "detail": "아직 답변하지 않은 항목과 \"없음\"을 고른 항목이 모두 false로 표시된다. 사용자는 확인을 안 한 것인지 문제가 없는 것인지 알 수 없다.",
+              "disposition": "NEEDS_PRODUCT_DECISION",
+              "evidence": {
+                "path": "backend/src/main/java/com/room/backend/api/room/service/RoomCheckResultService.java",
+                "symbol": null,
+                "line": null
+              },
+              "relatedFeature": "FT-ROOM-LIST",
+              "relatedStory": null,
+              "issue": null,
+              "lifecycle": "OBSERVED"
+            },
+            {
+              "id": "BC-LIST-03",
+              "severity": "P2",
+              "title": "목록 조회가 N+1을 넘어 N*M+1 쿼리를 낸다",
+              "detail": "방마다 답변을 조회하고, 답변마다 항목을 조회하고, 선택된 선택지마다 다시 조회한다. 방 6개 상한 덕에 현재는 견디지만 항목·선택지가 늘면 그대로 증가한다. 쿼리 수를 바꾸면 성능 특성이 달라지므로 리팩토링에서 건드리지 않았다.",
+              "disposition": "FIX_PLANNED",
+              "evidence": {
+                "path": "backend/src/main/java/com/room/backend/api/room/service/RoomCheckResultService.java",
+                "symbol": "hasIssue",
+                "line": null
+              },
+              "relatedFeature": "FT-ROOM-LIST",
+              "relatedStory": null,
+              "issue": null,
+              "lifecycle": "OBSERVED"
+            }
+          ],
+          "tests": [],
+          "front": {
+            "path": "frontend/src/services/room-service.ts:19",
+            "state": "built"
+          },
+          "back": {
+            "path": "backend/src/main/java/com/room/backend/api/room/service/RoomService.java",
+            "state": "built"
+          }
+        },
+        {
+          "featureId": "FT-ROOM-DETAIL",
+          "title": "내 방 상세 조회",
+          "owner": "@minwoo-l",
+          "capability": "방 하나의 계약 조건과 체크 결과를 확인한다",
+          "operations": [
+            {
+              "operationId": "OP-ROOM-DETAIL",
+              "route": "GET /api/v1/rooms/{}",
+              "auth": "JWT",
+              "safety": "READ",
+              "frontend": "frontend/src/services/room-service.ts:33"
+            }
+          ],
+          "defects": [],
+          "tests": [],
+          "front": {
+            "path": "frontend/src/services/room-service.ts:33",
+            "state": "built"
+          },
+          "back": {
+            "path": "backend/src/main/java/com/room/backend/api/room/service/RoomService.java",
+            "state": "built"
+          }
+        },
+        {
+          "featureId": "FT-ROOM-UPDATE",
+          "title": "방과 체크리스트 수정",
+          "owner": "@minwoo-l",
+          "capability": "저장한 방을 수정하고 관리한다",
+          "operations": [
+            {
+              "operationId": "OP-ROOM-UPDATE",
+              "route": "PUT /api/v1/rooms/{}",
+              "auth": "JWT",
+              "safety": "WRITE",
+              "frontend": "frontend/src/services/room-service.ts:64"
+            }
+          ],
+          "defects": [
+            {
+              "id": "BC-REG-02",
+              "severity": "P2",
+              "title": "체크리스트 항목과 선택지의 관계를 검증하지 않는다",
+              "detail": "다른 item에 속한 option ID를 보내도 그대로 저장된다. FK는 option의 존재만 보고 item-option 관계는 보지 않는다.",
+              "disposition": "FIX_PLANNED",
+              "evidence": {
+                "path": "backend/src/main/java/com/room/backend/api/room/service/RoomCheckResultService.java",
+                "symbol": "saveCheckResult",
+                "line": null
+              },
+              "relatedFeature": "FT-ROOM-CREATE-WITH-CHECKLIST",
+              "relatedStory": null,
+              "issue": null,
+              "lifecycle": "OBSERVED"
+            },
+            {
+              "id": "BC-REG-03",
+              "severity": "P2",
+              "title": "한 답변에 동일 선택지를 중복 저장할 수 있다",
+              "detail": "room_check_selected_options에 (result_id, option_id) unique 제약이 없어 같은 option ID를 두 번 보내면 row가 2개 생긴다.",
+              "disposition": "FIX_PLANNED",
+              "evidence": {
+                "path": "backend/src/main/resources/db/migration/V14__create_room_check_tables.sql",
+                "symbol": null,
+                "line": 15
+              },
+              "relatedFeature": "FT-ROOM-CREATE-WITH-CHECKLIST",
+              "relatedStory": null,
+              "issue": null,
+              "lifecycle": "OBSERVED"
+            },
+            {
+              "id": "BC-REG-04",
+              "severity": "P1",
+              "title": "geocoding provider 오류가 미래핑으로 샌다",
+              "detail": "RestClient의 4xx·5xx·timeout을 잡지 않아 GlobalExceptionHandler의 마지막 분기에서 COMMON_500이 된다. 사용자는 원인을 알 수 없다. ver1.1 P1 silent-500-geocoding과 동일 항목.",
+              "disposition": "FIX_PLANNED",
+              "evidence": {
+                "path": "backend/src/main/java/com/room/backend/global/geocoding/service/GeocodingService.java",
+                "symbol": "getCoordinates",
+                "line": 29
+              },
+              "relatedFeature": "FT-ROOM-CREATE-WITH-CHECKLIST",
+              "relatedStory": null,
+              "issue": null,
+              "lifecycle": "OBSERVED"
+            }
+          ],
+          "tests": [],
+          "front": {
+            "path": "frontend/src/services/room-service.ts:64",
+            "state": "built"
+          },
+          "back": {
+            "path": "backend/src/main/java/com/room/backend/api/room/service/RoomService.java",
+            "state": "defect"
+          }
+        }
+      ]
+    },
+    {
+      "page": "/checklist/new",
+      "component": "frontend/src/features/checklist/ChecklistNewPage.tsx",
+      "features": [
+        {
+          "featureId": "FT-CHECKLIST-CATALOG",
+          "title": "체크리스트 항목 카탈로그 조회",
+          "owner": "@std-yong",
+          "capability": "내가 볼 체크리스트를 내 상황에 맞춘다",
+          "operations": [
+            {
+              "operationId": "OP-CHECKLIST-ITEMS-CUSTOMIZED",
+              "route": "GET /api/checklist/items",
+              "auth": "JWT",
+              "safety": "READ",
+              "frontend": "frontend/src/services/custom-checklist-service.ts:9"
+            }
+          ],
+          "defects": [
+            {
+              "id": "BC-CHK-03",
+              "severity": "P2",
+              "title": "항목 조회가 항목 수만큼 옵션 쿼리를 반복한다",
+              "detail": "getCustomizedItems가 items를 순회하며 항목 하나마다 checklistOptionRepository.findByChecklistItemId를 개별 호출한다. getEssentialsOnlyItems·getAllItemsForSettings도 같은 형태다. 쿼리 수를 바꾸면 성능 특성이 달라지므로 정형화 단계에서는 건드리지 않는다.",
+              "disposition": "RECORD_ONLY",
+              "evidence": {
+                "path": "backend/src/main/java/com/room/backend/domain/checklist/service/ChecklistService.java",
+                "symbol": "getCustomizedItems",
+                "line": null
+              },
+              "relatedFeature": "FT-CHECKLIST-CATALOG",
+              "relatedStory": null,
+              "issue": null,
+              "lifecycle": "OBSERVED"
+            }
+          ],
+          "tests": [],
+          "front": {
+            "path": "frontend/src/services/custom-checklist-service.ts:9",
+            "state": "built"
+          },
+          "back": {
+            "path": "backend/src/main/java/com/room/backend/domain/checklist/service/ChecklistService.java",
+            "state": "built"
+          }
+        },
+        {
+          "featureId": "FT-ADDRESS-SEARCH",
+          "title": "주소 검색",
+          "owner": "@minwoo-l",
+          "capability": "방을 비교해서 고른다",
+          "operations": [
+            {
+              "operationId": "OP-ADDRESS-SEARCH",
+              "route": "GET /api/v1/address/search",
+              "auth": "PUBLIC",
+              "safety": "EXTERNAL",
+              "frontend": "frontend/src/services/address-service.ts:11"
+            }
+          ],
+          "defects": [],
+          "tests": [],
+          "front": {
+            "path": "frontend/src/services/address-service.ts:11",
+            "state": "built"
+          },
+          "back": {
+            "path": "backend/src/main/java/com/room/backend/api/address/service/AddressSearchService.java",
+            "state": "built"
+          }
+        },
+        {
+          "featureId": "FT-ROOM-LIST",
+          "title": "내 방 목록 조회",
+          "owner": "@minwoo-l",
+          "capability": "방을 비교해서 고른다",
+          "operations": [
+            {
+              "operationId": "OP-ROOM-LIST",
+              "route": "GET /api/v1/rooms",
+              "auth": "JWT",
+              "safety": "READ",
+              "frontend": "frontend/src/services/room-service.ts:19"
+            }
+          ],
+          "defects": [
+            {
+              "id": "BC-LIST-01",
+              "severity": "P2",
+              "title": "문제 뱃지가 체크리스트 항목 이름 문자열로만 연결된다",
+              "detail": "목록의 곰팡이·누수·벌레·냄새·결로 뱃지는 항목 이름을 하드코딩한 문자열 비교로 결정된다. 시드에서 항목 이름이 한 글자라도 바뀌면 해당 뱃지는 예외 없이 조용히 항상 false가 된다. 리팩토링에서 IssueTopic enum으로 옮겨 위치는 한 곳이 됐지만 취약성 자체는 그대로다.",
+              "disposition": "NEEDS_PRODUCT_DECISION",
+              "evidence": {
+                "path": "backend/src/main/java/com/room/backend/api/room/service/RoomCheckResultService.java",
+                "symbol": "getRoomIssuesSummary",
+                "line": null
+              },
+              "relatedFeature": "FT-ROOM-LIST",
+              "relatedStory": null,
+              "issue": null,
+              "lifecycle": "OBSERVED"
+            },
+            {
+              "id": "BC-LIST-02",
+              "severity": "P3",
+              "title": "미확인과 문제없음을 구분하지 않는다",
+              "detail": "아직 답변하지 않은 항목과 \"없음\"을 고른 항목이 모두 false로 표시된다. 사용자는 확인을 안 한 것인지 문제가 없는 것인지 알 수 없다.",
+              "disposition": "NEEDS_PRODUCT_DECISION",
+              "evidence": {
+                "path": "backend/src/main/java/com/room/backend/api/room/service/RoomCheckResultService.java",
+                "symbol": null,
+                "line": null
+              },
+              "relatedFeature": "FT-ROOM-LIST",
+              "relatedStory": null,
+              "issue": null,
+              "lifecycle": "OBSERVED"
+            },
+            {
+              "id": "BC-LIST-03",
+              "severity": "P2",
+              "title": "목록 조회가 N+1을 넘어 N*M+1 쿼리를 낸다",
+              "detail": "방마다 답변을 조회하고, 답변마다 항목을 조회하고, 선택된 선택지마다 다시 조회한다. 방 6개 상한 덕에 현재는 견디지만 항목·선택지가 늘면 그대로 증가한다. 쿼리 수를 바꾸면 성능 특성이 달라지므로 리팩토링에서 건드리지 않았다.",
+              "disposition": "FIX_PLANNED",
+              "evidence": {
+                "path": "backend/src/main/java/com/room/backend/api/room/service/RoomCheckResultService.java",
+                "symbol": "hasIssue",
+                "line": null
+              },
+              "relatedFeature": "FT-ROOM-LIST",
+              "relatedStory": null,
+              "issue": null,
+              "lifecycle": "OBSERVED"
+            }
+          ],
+          "tests": [],
+          "front": {
+            "path": "frontend/src/services/room-service.ts:19",
+            "state": "built"
+          },
+          "back": {
+            "path": "backend/src/main/java/com/room/backend/api/room/service/RoomService.java",
+            "state": "built"
+          }
+        },
+        {
+          "featureId": "FT-ROOM-CREATE-WITH-CHECKLIST",
+          "title": "방 + 체크리스트 등록",
+          "owner": "@minwoo-l",
+          "capability": "방을 비교해서 고른다",
+          "operations": [
+            {
+              "operationId": "OP-ROOM-CREATE-WITH-CHECKLIST",
+              "route": "POST /api/v1/rooms/check-results",
+              "auth": "JWT",
+              "safety": "WRITE",
+              "frontend": "frontend/src/services/room-service.ts:47"
+            }
+          ],
+          "defects": [
+            {
+              "id": "BC-SEC-01",
+              "severity": "P1",
+              "title": "고아 엔드포인트가 방 소유권을 검증하지 않는다",
+              "detail": "POST /api/v1/rooms/{roomId}/check-results 는 인증만 확인하고 room의 소유자·soft-delete를 확인하지 않는다. 타인 방과 삭제된 방에도 답변 row가 생성된다. Front consumer는 0건이다.",
+              "disposition": "UNDECIDED",
+              "evidence": {
+                "path": "backend/src/main/java/com/room/backend/api/room/controller/RoomController.java",
+                "symbol": "saveCheckResults",
+                "line": 92
+              },
+              "relatedFeature": "FT-ROOM-CREATE-WITH-CHECKLIST",
+              "relatedStory": "s01-4-orphan-answer-operation-security",
+              "issue": null,
+              "lifecycle": "OBSERVED"
+            },
+            {
+              "id": "BC-REG-04",
+              "severity": "P1",
+              "title": "geocoding provider 오류가 미래핑으로 샌다",
+              "detail": "RestClient의 4xx·5xx·timeout을 잡지 않아 GlobalExceptionHandler의 마지막 분기에서 COMMON_500이 된다. 사용자는 원인을 알 수 없다. ver1.1 P1 silent-500-geocoding과 동일 항목.",
+              "disposition": "FIX_PLANNED",
+              "evidence": {
+                "path": "backend/src/main/java/com/room/backend/global/geocoding/service/GeocodingService.java",
+                "symbol": "getCoordinates",
+                "line": 29
+              },
+              "relatedFeature": "FT-ROOM-CREATE-WITH-CHECKLIST",
+              "relatedStory": null,
+              "issue": null,
+              "lifecycle": "OBSERVED"
+            },
+            {
+              "id": "BC-REG-01",
+              "severity": "P2",
+              "title": "rentType이 null이거나 SHORT_TERM이면 임대조건 검증이 전무하다",
+              "detail": "JEONSE와 MONTHLY에만 분기가 있다. 그 외에는 보증금·월세를 전혀 검증하지 않고 통과시킨다. 리팩토링에서는 RentTerms.Unspecified로 이 동작을 그대로 보존했다.",
+              "disposition": "NEEDS_PRODUCT_DECISION",
+              "evidence": {
+                "path": "backend/src/main/java/com/room/backend/domain/room/entity/Room.java",
+                "symbol": "create",
+                "line": 129
+              },
+              "relatedFeature": "FT-ROOM-CREATE-WITH-CHECKLIST",
+              "relatedStory": null,
+              "issue": null,
+              "lifecycle": "OBSERVED"
+            },
+            {
+              "id": "BC-REG-02",
+              "severity": "P2",
+              "title": "체크리스트 항목과 선택지의 관계를 검증하지 않는다",
+              "detail": "다른 item에 속한 option ID를 보내도 그대로 저장된다. FK는 option의 존재만 보고 item-option 관계는 보지 않는다.",
+              "disposition": "FIX_PLANNED",
+              "evidence": {
+                "path": "backend/src/main/java/com/room/backend/api/room/service/RoomCheckResultService.java",
+                "symbol": "saveCheckResult",
+                "line": null
+              },
+              "relatedFeature": "FT-ROOM-CREATE-WITH-CHECKLIST",
+              "relatedStory": null,
+              "issue": null,
+              "lifecycle": "OBSERVED"
+            },
+            {
+              "id": "BC-REG-03",
+              "severity": "P2",
+              "title": "한 답변에 동일 선택지를 중복 저장할 수 있다",
+              "detail": "room_check_selected_options에 (result_id, option_id) unique 제약이 없어 같은 option ID를 두 번 보내면 row가 2개 생긴다.",
+              "disposition": "FIX_PLANNED",
+              "evidence": {
+                "path": "backend/src/main/resources/db/migration/V14__create_room_check_tables.sql",
+                "symbol": null,
+                "line": 15
+              },
+              "relatedFeature": "FT-ROOM-CREATE-WITH-CHECKLIST",
+              "relatedStory": null,
+              "issue": null,
+              "lifecycle": "OBSERVED"
+            },
+            {
+              "id": "BC-REG-05",
+              "severity": "P3",
+              "title": "방 등록이 비멱등이고 6개 상한이 경쟁 상태에서 뚫린다",
+              "detail": "같은 payload를 두 번 보내면 방이 2개 생긴다. count 조회와 insert 사이에 락이 없어 방 5개 사용자의 동시 2건 요청이 7개를 만들 수 있다.",
+              "disposition": "NEEDS_PRODUCT_DECISION",
+              "evidence": {
+                "path": "backend/src/main/java/com/room/backend/api/room/service/RoomService.java",
+                "symbol": "createRoomWithCheckAnswers",
+                "line": null
+              },
+              "relatedFeature": "FT-ROOM-CREATE-WITH-CHECKLIST",
+              "relatedStory": "s01-5-room-create-retry-concurrency-baseline",
+              "issue": null,
+              "lifecycle": "OBSERVED"
+            }
+          ],
+          "tests": [],
+          "front": {
+            "path": "frontend/src/services/room-service.ts:47",
+            "state": "built"
+          },
+          "back": {
+            "path": "backend/src/main/java/com/room/backend/api/room/service/RoomService.java",
+            "state": "defect"
+          }
+        }
+      ]
+    },
+    {
+      "page": "/custom",
+      "component": "frontend/src/features/customization/SettingsPage.tsx",
+      "features": [
+        {
+          "featureId": "FT-CHECKLIST-CUSTOM-ITEM",
+          "title": "나만의 체크 항목 추가·삭제",
+          "owner": "@std-yong",
+          "capability": "내가 볼 체크리스트를 내 상황에 맞춘다",
+          "operations": [
+            {
+              "operationId": "OP-CHECKLIST-CUSTOM-ITEM-DELETE",
+              "route": "DELETE /api/checklist/items/custom/{}",
+              "auth": "JWT",
+              "safety": "WRITE",
+              "frontend": "frontend/src/services/custom-checklist-service.ts:68"
+            },
+            {
+              "operationId": "OP-CHECKLIST-CUSTOM-ITEM-ADD",
+              "route": "POST /api/checklist/items/custom",
+              "auth": "JWT",
+              "safety": "WRITE",
+              "frontend": "frontend/src/services/custom-checklist-service.ts:63"
+            }
+          ],
+          "defects": [
+            {
+              "id": "BC-CHK-01",
+              "severity": "P2",
+              "title": "없는 커스텀 항목을 지우면 404가 아니라 500이 난다",
+              "detail": "deleteCustomItem이 findById 실패 시 IllegalArgumentException을 던지는데 GlobalExceptionHandler에 이 예외의 전용 분기가 없어 포괄 분기가 500으로 만든다. 리소스 미존재는 404여야 한다.",
+              "disposition": "FIX_PLANNED",
+              "evidence": {
+                "path": "backend/src/main/java/com/room/backend/domain/checklist/service/ChecklistService.java",
+                "symbol": "deleteCustomItem",
+                "line": null
+              },
+              "relatedFeature": "FT-CHECKLIST-CUSTOM-ITEM",
+              "relatedStory": null,
+              "issue": null,
+              "lifecycle": "OBSERVED"
+            },
+            {
+              "id": "BC-CHK-04",
+              "severity": "P3",
+              "title": "나만의 항목 이름을 검증하지 않아 입력 오류가 409로 나간다",
+              "detail": "CustomItemCreateRequest.itemName에 @NotBlank·@Size가 없다. null·공백·100자 초과가 그대로 DB까지 내려가 제약 위반이 되고 DataIntegrityViolationException이 409를 만든다. 클라이언트 입력 오류이므로 400이어야 한다.",
+              "disposition": "FIX_PLANNED",
+              "evidence": {
+                "path": "backend/src/main/java/com/room/backend/domain/checklist/dto/request/CustomItemCreateRequest.java",
+                "symbol": "itemName",
+                "line": null
+              },
+              "relatedFeature": "FT-CHECKLIST-CUSTOM-ITEM",
+              "relatedStory": null,
+              "issue": null,
+              "lifecycle": "OBSERVED"
+            },
+            {
+              "id": "BC-CHK-05",
+              "severity": "P3",
+              "title": "커스텀 항목 삭제가 이미 지운 항목을 걸러내지 않는다",
+              "detail": "다른 조회는 isDeleted=false 조건을 명시하는데 deleteCustomItem은 JpaRepository의 기본 findById를 써서 그 필터가 없다. 이미 소프트 삭제된 항목에 DELETE를 반복해도 404 없이 200이 나가고 deletedAt만 갱신된다. 보안 문제는 아니고 REST 의미의 불일치다.",
+              "disposition": "NEEDS_PRODUCT_DECISION",
+              "evidence": {
+                "path": "backend/src/main/java/com/room/backend/domain/checklist/service/ChecklistService.java",
+                "symbol": "deleteCustomItem",
+                "line": null
+              },
+              "relatedFeature": "FT-CHECKLIST-CUSTOM-ITEM",
+              "relatedStory": null,
+              "issue": null,
+              "lifecycle": "OBSERVED"
+            },
+            {
+              "id": "BC-CHK-06",
+              "severity": "P3",
+              "title": "남의 항목 삭제 시도가 403이 아니라 400으로 응답한다",
+              "detail": "소유권 검증 자체는 있다(ownerUserId 대조). 다만 CUSTOM_ITEM_FORBIDDEN이 HttpStatus.BAD_REQUEST로 정의돼 있어 권한 거부가 입력 오류처럼 보인다. 보안 결함이 아니라 응답 의미의 문제다.",
+              "disposition": "FIX_PLANNED",
+              "evidence": {
+                "path": "backend/src/main/java/com/room/backend/global/common/exception/ChecklistErrorCode.java",
+                "symbol": "CUSTOM_ITEM_FORBIDDEN",
+                "line": null
+              },
+              "relatedFeature": "FT-CHECKLIST-CUSTOM-ITEM",
+              "relatedStory": null,
+              "issue": null,
+              "lifecycle": "OBSERVED"
+            }
+          ],
+          "tests": [],
+          "front": {
+            "path": "frontend/src/services/custom-checklist-service.ts:68",
+            "state": "built"
+          },
+          "back": {
+            "path": "backend/src/main/java/com/room/backend/domain/checklist/service/ChecklistService.java",
+            "state": "built"
+          }
+        },
+        {
+          "featureId": "FT-CHECKLIST-SETTINGS",
+          "title": "사용자 유형 선택과 항목 표시 설정",
+          "owner": "@std-yong",
+          "capability": "내가 볼 체크리스트를 내 상황에 맞춘다",
+          "operations": [
+            {
+              "operationId": "OP-CHECKLIST-TYPE-DESELECT",
+              "route": "DELETE /api/checklist/types/{}",
+              "auth": "JWT",
+              "safety": "WRITE",
+              "frontend": "frontend/src/services/custom-checklist-service.ts:49"
+            },
+            {
+              "operationId": "OP-CHECKLIST-TYPES-LIST",
+              "route": "GET /api/checklist/types",
+              "auth": "JWT",
+              "safety": "READ",
+              "frontend": "frontend/src/services/custom-checklist-service.ts:38"
+            },
+            {
+              "operationId": "OP-CHECKLIST-SETTINGS-SAVE",
+              "route": "POST /api/checklist/items/settings",
+              "auth": "JWT",
+              "safety": "WRITE",
+              "frontend": "frontend/src/services/custom-checklist-service.ts:57"
+            },
+            {
+              "operationId": "OP-CHECKLIST-TYPE-SELECT",
+              "route": "POST /api/checklist/types/{}",
+              "auth": "JWT",
+              "safety": "WRITE",
+              "frontend": "frontend/src/services/custom-checklist-service.ts:44"
+            }
+          ],
+          "defects": [
+            {
+              "id": "BC-CHK-02",
+              "severity": "P2",
+              "title": "disabledItemIds가 null이면 NPE가 500으로 샌다",
+              "detail": "ChecklistSettingsRequest에 @NotNull·@Valid가 없어 필드를 생략한 요청이 통과하고, saveSettings가 disabledItemIds.stream()에서 NPE를 낸다. 포괄 분기가 500으로 만든다. 입력 오류이므로 400이어야 한다. 트랜잭션 롤백 덕에 DB 상태는 보존된다.",
+              "disposition": "FIX_PLANNED",
+              "evidence": {
+                "path": "backend/src/main/java/com/room/backend/domain/checklist/service/ChecklistService.java",
+                "symbol": "saveSettings",
+                "line": null
+              },
+              "relatedFeature": "FT-CHECKLIST-SETTINGS",
+              "relatedStory": null,
+              "issue": null,
+              "lifecycle": "OBSERVED"
+            }
+          ],
+          "tests": [],
+          "front": {
+            "path": "frontend/src/services/custom-checklist-service.ts:49",
+            "state": "built"
+          },
+          "back": {
+            "path": "backend/src/main/java/com/room/backend/domain/checklist/service/ChecklistService.java",
+            "state": "built"
+          }
+        },
+        {
+          "featureId": "FT-CHECKLIST-CATALOG",
+          "title": "체크리스트 항목 카탈로그 조회",
+          "owner": "@std-yong",
+          "capability": "내가 볼 체크리스트를 내 상황에 맞춘다",
+          "operations": [
+            {
+              "operationId": "OP-CHECKLIST-ITEMS-CUSTOMIZED",
+              "route": "GET /api/checklist/items",
+              "auth": "JWT",
+              "safety": "READ",
+              "frontend": "frontend/src/services/custom-checklist-service.ts:9"
+            },
+            {
+              "operationId": "OP-CHECKLIST-ITEMS-ALL",
+              "route": "GET /api/checklist/items/all",
+              "auth": "JWT",
+              "safety": "READ",
+              "frontend": "frontend/src/services/custom-checklist-service.ts:31"
+            }
+          ],
+          "defects": [
+            {
+              "id": "BC-CHK-03",
+              "severity": "P2",
+              "title": "항목 조회가 항목 수만큼 옵션 쿼리를 반복한다",
+              "detail": "getCustomizedItems가 items를 순회하며 항목 하나마다 checklistOptionRepository.findByChecklistItemId를 개별 호출한다. getEssentialsOnlyItems·getAllItemsForSettings도 같은 형태다. 쿼리 수를 바꾸면 성능 특성이 달라지므로 정형화 단계에서는 건드리지 않는다.",
+              "disposition": "RECORD_ONLY",
+              "evidence": {
+                "path": "backend/src/main/java/com/room/backend/domain/checklist/service/ChecklistService.java",
+                "symbol": "getCustomizedItems",
+                "line": null
+              },
+              "relatedFeature": "FT-CHECKLIST-CATALOG",
+              "relatedStory": null,
+              "issue": null,
+              "lifecycle": "OBSERVED"
+            }
+          ],
+          "tests": [],
+          "front": {
+            "path": "frontend/src/services/custom-checklist-service.ts:9",
+            "state": "built"
+          },
+          "back": {
+            "path": "backend/src/main/java/com/room/backend/domain/checklist/service/ChecklistService.java",
+            "state": "built"
+          }
+        },
+        {
+          "featureId": "FT-ROOM-LIST",
+          "title": "내 방 목록 조회",
+          "owner": "@minwoo-l",
+          "capability": "방을 비교해서 고른다",
+          "operations": [
+            {
+              "operationId": "OP-ROOM-LIST",
+              "route": "GET /api/v1/rooms",
+              "auth": "JWT",
+              "safety": "READ",
+              "frontend": "frontend/src/services/room-service.ts:19"
+            }
+          ],
+          "defects": [
+            {
+              "id": "BC-LIST-01",
+              "severity": "P2",
+              "title": "문제 뱃지가 체크리스트 항목 이름 문자열로만 연결된다",
+              "detail": "목록의 곰팡이·누수·벌레·냄새·결로 뱃지는 항목 이름을 하드코딩한 문자열 비교로 결정된다. 시드에서 항목 이름이 한 글자라도 바뀌면 해당 뱃지는 예외 없이 조용히 항상 false가 된다. 리팩토링에서 IssueTopic enum으로 옮겨 위치는 한 곳이 됐지만 취약성 자체는 그대로다.",
+              "disposition": "NEEDS_PRODUCT_DECISION",
+              "evidence": {
+                "path": "backend/src/main/java/com/room/backend/api/room/service/RoomCheckResultService.java",
+                "symbol": "getRoomIssuesSummary",
+                "line": null
+              },
+              "relatedFeature": "FT-ROOM-LIST",
+              "relatedStory": null,
+              "issue": null,
+              "lifecycle": "OBSERVED"
+            },
+            {
+              "id": "BC-LIST-02",
+              "severity": "P3",
+              "title": "미확인과 문제없음을 구분하지 않는다",
+              "detail": "아직 답변하지 않은 항목과 \"없음\"을 고른 항목이 모두 false로 표시된다. 사용자는 확인을 안 한 것인지 문제가 없는 것인지 알 수 없다.",
+              "disposition": "NEEDS_PRODUCT_DECISION",
+              "evidence": {
+                "path": "backend/src/main/java/com/room/backend/api/room/service/RoomCheckResultService.java",
+                "symbol": null,
+                "line": null
+              },
+              "relatedFeature": "FT-ROOM-LIST",
+              "relatedStory": null,
+              "issue": null,
+              "lifecycle": "OBSERVED"
+            },
+            {
+              "id": "BC-LIST-03",
+              "severity": "P2",
+              "title": "목록 조회가 N+1을 넘어 N*M+1 쿼리를 낸다",
+              "detail": "방마다 답변을 조회하고, 답변마다 항목을 조회하고, 선택된 선택지마다 다시 조회한다. 방 6개 상한 덕에 현재는 견디지만 항목·선택지가 늘면 그대로 증가한다. 쿼리 수를 바꾸면 성능 특성이 달라지므로 리팩토링에서 건드리지 않았다.",
+              "disposition": "FIX_PLANNED",
+              "evidence": {
+                "path": "backend/src/main/java/com/room/backend/api/room/service/RoomCheckResultService.java",
+                "symbol": "hasIssue",
+                "line": null
+              },
+              "relatedFeature": "FT-ROOM-LIST",
+              "relatedStory": null,
+              "issue": null,
+              "lifecycle": "OBSERVED"
+            }
+          ],
+          "tests": [],
+          "front": {
+            "path": "frontend/src/services/room-service.ts:19",
+            "state": "built"
+          },
+          "back": {
+            "path": "backend/src/main/java/com/room/backend/api/room/service/RoomService.java",
+            "state": "built"
+          }
+        }
+      ]
+    },
+    {
+      "page": "/login",
+      "component": "frontend/src/features/login/LoginPage.tsx",
+      "features": [
+        {
+          "featureId": "FT-AUTH-OAUTH-LOGIN",
+          "title": "소셜 계정으로 로그인",
+          "owner": "@dlwldP",
+          "capability": "나를 식별하고 로그인 상태를 유지한다",
+          "operations": [
+            {
+              "operationId": "OP-AUTH-OAUTH-AUTHORIZE",
+              "route": "GET /api/v1/auth/oauth2/{}",
+              "auth": "PUBLIC",
+              "safety": "READ",
+              "frontend": "frontend/src/services/auth-service.ts:5"
+            }
+          ],
+          "defects": [
+            {
+              "id": "BC-AUTH-01",
+              "severity": "P2",
+              "title": "OAuth state가 이름과 달리 소비되지 않아 재사용될 수 있다",
+              "detail": "validateAndDeleteState는 이름이 삭제를 주장하지만 실제로는 서명과 만료만 검증하고 아무것도 지우지 않는다. state는 서버에 저장되지 않는 서명 JWT(TTL 10분)라 같은 state를 TTL 안에서 반복 제출해도 매번 통과한다. CSRF 방어가 1회성이 아니다. 메서드 이름이 실제 동작보다 강한 보장을 주장하는 것도 함께 기록한다.",
+              "disposition": "UNDECIDED",
+              "evidence": {
+                "path": "backend/src/main/java/com/room/backend/global/auth/oauth/service/OAuthStateService.java",
+                "symbol": "validateAndDeleteState",
+                "line": null
+              },
+              "relatedFeature": "FT-AUTH-OAUTH-LOGIN",
+              "relatedStory": null,
+              "issue": null,
+              "lifecycle": "OBSERVED"
+            },
+            {
+              "id": "BC-AUTH-90",
+              "severity": "P3",
+              "title": "프론트에 없는 엔드포인트를 부르는 죽은 함수가 있다",
+              "detail": "getCurrentUser가 GET /api/v1/users/me를 호출하는데 백엔드에 그 매핑이 없다. 호출하면 404다. 지금은 이 함수를 쓰는 곳이 없어 실행되지 않으므로 장애는 아니지만, 이름만 보고 쓰는 순간 404가 된다. 2026-08-04 resolver에 FEC-01(프론트 호출 route 실존 검사)을 넣자마자 잡혔다 — 손으로 registry를 채우는 동안에는 방향이 반대여서 못 봤다.",
+              "disposition": "RECORD_ONLY",
+              "evidence": {
+                "path": "frontend/src/services/auth-service.ts",
+                "symbol": "getCurrentUser",
+                "line": null
+              },
+              "relatedFeature": "FT-AUTH-OAUTH-LOGIN",
+              "relatedStory": null,
+              "issue": null,
+              "lifecycle": "OBSERVED"
+            }
+          ],
+          "tests": [],
+          "front": {
+            "path": "frontend/src/services/auth-service.ts:5",
+            "state": "built"
+          },
+          "back": {
+            "path": "backend/src/main/java/com/room/backend/api/auth/service/AuthService.java",
+            "state": "built"
+          }
+        },
+        {
+          "featureId": "FT-ROOM-LIST",
+          "title": "내 방 목록 조회",
+          "owner": "@minwoo-l",
+          "capability": "방을 비교해서 고른다",
+          "operations": [
+            {
+              "operationId": "OP-ROOM-LIST",
+              "route": "GET /api/v1/rooms",
+              "auth": "JWT",
+              "safety": "READ",
+              "frontend": "frontend/src/services/room-service.ts:19"
+            }
+          ],
+          "defects": [
+            {
+              "id": "BC-LIST-01",
+              "severity": "P2",
+              "title": "문제 뱃지가 체크리스트 항목 이름 문자열로만 연결된다",
+              "detail": "목록의 곰팡이·누수·벌레·냄새·결로 뱃지는 항목 이름을 하드코딩한 문자열 비교로 결정된다. 시드에서 항목 이름이 한 글자라도 바뀌면 해당 뱃지는 예외 없이 조용히 항상 false가 된다. 리팩토링에서 IssueTopic enum으로 옮겨 위치는 한 곳이 됐지만 취약성 자체는 그대로다.",
+              "disposition": "NEEDS_PRODUCT_DECISION",
+              "evidence": {
+                "path": "backend/src/main/java/com/room/backend/api/room/service/RoomCheckResultService.java",
+                "symbol": "getRoomIssuesSummary",
+                "line": null
+              },
+              "relatedFeature": "FT-ROOM-LIST",
+              "relatedStory": null,
+              "issue": null,
+              "lifecycle": "OBSERVED"
+            },
+            {
+              "id": "BC-LIST-02",
+              "severity": "P3",
+              "title": "미확인과 문제없음을 구분하지 않는다",
+              "detail": "아직 답변하지 않은 항목과 \"없음\"을 고른 항목이 모두 false로 표시된다. 사용자는 확인을 안 한 것인지 문제가 없는 것인지 알 수 없다.",
+              "disposition": "NEEDS_PRODUCT_DECISION",
+              "evidence": {
+                "path": "backend/src/main/java/com/room/backend/api/room/service/RoomCheckResultService.java",
+                "symbol": null,
+                "line": null
+              },
+              "relatedFeature": "FT-ROOM-LIST",
+              "relatedStory": null,
+              "issue": null,
+              "lifecycle": "OBSERVED"
+            },
+            {
+              "id": "BC-LIST-03",
+              "severity": "P2",
+              "title": "목록 조회가 N+1을 넘어 N*M+1 쿼리를 낸다",
+              "detail": "방마다 답변을 조회하고, 답변마다 항목을 조회하고, 선택된 선택지마다 다시 조회한다. 방 6개 상한 덕에 현재는 견디지만 항목·선택지가 늘면 그대로 증가한다. 쿼리 수를 바꾸면 성능 특성이 달라지므로 리팩토링에서 건드리지 않았다.",
+              "disposition": "FIX_PLANNED",
+              "evidence": {
+                "path": "backend/src/main/java/com/room/backend/api/room/service/RoomCheckResultService.java",
+                "symbol": "hasIssue",
+                "line": null
+              },
+              "relatedFeature": "FT-ROOM-LIST",
+              "relatedStory": null,
+              "issue": null,
+              "lifecycle": "OBSERVED"
+            }
+          ],
+          "tests": [],
+          "front": {
+            "path": "frontend/src/services/room-service.ts:19",
+            "state": "built"
+          },
+          "back": {
+            "path": "backend/src/main/java/com/room/backend/api/room/service/RoomService.java",
+            "state": "built"
+          }
+        }
+      ]
+    },
+    {
+      "page": "/login-error",
+      "component": "frontend/src/features/auth/LoginErrorPage.tsx",
+      "features": []
+    },
+    {
+      "page": "/map",
+      "component": "frontend/src/features/map/MapPage.tsx",
+      "features": [
+        {
+          "featureId": "FT-DIRECTIONS-WALKING",
+          "title": "기준점-방 도보 경로 조회",
+          "owner": "@Woo-JongHo",
+          "capability": "기준점을 잡고 방까지의 거리를 비교한다",
+          "operations": [
+            {
+              "operationId": "OP-DIRECTIONS-WALKING",
+              "route": "GET /api/v1/directions/walking",
+              "auth": "PUBLIC",
+              "safety": "EXTERNAL",
+              "frontend": "frontend/src/services/directions-service.ts:7"
+            }
+          ],
+          "defects": [],
+          "tests": [],
+          "front": {
+            "path": "frontend/src/services/directions-service.ts:7",
+            "state": "built"
+          },
+          "back": {
+            "path": "backend/src/main/java/com/room/backend/api/directions/service/DirectionsService.java",
+            "state": "built"
+          }
+        },
+        {
+          "featureId": "FT-ROOM-LIST",
+          "title": "내 방 목록 조회",
+          "owner": "@minwoo-l",
+          "capability": "방을 비교해서 고른다",
+          "operations": [
+            {
+              "operationId": "OP-ROOM-LIST",
+              "route": "GET /api/v1/rooms",
+              "auth": "JWT",
+              "safety": "READ",
+              "frontend": "frontend/src/services/room-service.ts:19"
+            }
+          ],
+          "defects": [
+            {
+              "id": "BC-LIST-01",
+              "severity": "P2",
+              "title": "문제 뱃지가 체크리스트 항목 이름 문자열로만 연결된다",
+              "detail": "목록의 곰팡이·누수·벌레·냄새·결로 뱃지는 항목 이름을 하드코딩한 문자열 비교로 결정된다. 시드에서 항목 이름이 한 글자라도 바뀌면 해당 뱃지는 예외 없이 조용히 항상 false가 된다. 리팩토링에서 IssueTopic enum으로 옮겨 위치는 한 곳이 됐지만 취약성 자체는 그대로다.",
+              "disposition": "NEEDS_PRODUCT_DECISION",
+              "evidence": {
+                "path": "backend/src/main/java/com/room/backend/api/room/service/RoomCheckResultService.java",
+                "symbol": "getRoomIssuesSummary",
+                "line": null
+              },
+              "relatedFeature": "FT-ROOM-LIST",
+              "relatedStory": null,
+              "issue": null,
+              "lifecycle": "OBSERVED"
+            },
+            {
+              "id": "BC-LIST-02",
+              "severity": "P3",
+              "title": "미확인과 문제없음을 구분하지 않는다",
+              "detail": "아직 답변하지 않은 항목과 \"없음\"을 고른 항목이 모두 false로 표시된다. 사용자는 확인을 안 한 것인지 문제가 없는 것인지 알 수 없다.",
+              "disposition": "NEEDS_PRODUCT_DECISION",
+              "evidence": {
+                "path": "backend/src/main/java/com/room/backend/api/room/service/RoomCheckResultService.java",
+                "symbol": null,
+                "line": null
+              },
+              "relatedFeature": "FT-ROOM-LIST",
+              "relatedStory": null,
+              "issue": null,
+              "lifecycle": "OBSERVED"
+            },
+            {
+              "id": "BC-LIST-03",
+              "severity": "P2",
+              "title": "목록 조회가 N+1을 넘어 N*M+1 쿼리를 낸다",
+              "detail": "방마다 답변을 조회하고, 답변마다 항목을 조회하고, 선택된 선택지마다 다시 조회한다. 방 6개 상한 덕에 현재는 견디지만 항목·선택지가 늘면 그대로 증가한다. 쿼리 수를 바꾸면 성능 특성이 달라지므로 리팩토링에서 건드리지 않았다.",
+              "disposition": "FIX_PLANNED",
+              "evidence": {
+                "path": "backend/src/main/java/com/room/backend/api/room/service/RoomCheckResultService.java",
+                "symbol": "hasIssue",
+                "line": null
+              },
+              "relatedFeature": "FT-ROOM-LIST",
+              "relatedStory": null,
+              "issue": null,
+              "lifecycle": "OBSERVED"
+            }
+          ],
+          "tests": [],
+          "front": {
+            "path": "frontend/src/services/room-service.ts:19",
+            "state": "built"
+          },
+          "back": {
+            "path": "backend/src/main/java/com/room/backend/api/room/service/RoomService.java",
+            "state": "built"
+          }
+        }
+      ]
+    },
+    {
+      "page": "/my",
+      "component": "frontend/src/features/mypage/MyPage.tsx",
+      "features": [
+        {
+          "featureId": "FT-ROOM-LIST",
+          "title": "내 방 목록 조회",
+          "owner": "@minwoo-l",
+          "capability": "방을 비교해서 고른다",
+          "operations": [
+            {
+              "operationId": "OP-ROOM-LIST",
+              "route": "GET /api/v1/rooms",
+              "auth": "JWT",
+              "safety": "READ",
+              "frontend": "frontend/src/services/room-service.ts:19"
+            }
+          ],
+          "defects": [
+            {
+              "id": "BC-LIST-01",
+              "severity": "P2",
+              "title": "문제 뱃지가 체크리스트 항목 이름 문자열로만 연결된다",
+              "detail": "목록의 곰팡이·누수·벌레·냄새·결로 뱃지는 항목 이름을 하드코딩한 문자열 비교로 결정된다. 시드에서 항목 이름이 한 글자라도 바뀌면 해당 뱃지는 예외 없이 조용히 항상 false가 된다. 리팩토링에서 IssueTopic enum으로 옮겨 위치는 한 곳이 됐지만 취약성 자체는 그대로다.",
+              "disposition": "NEEDS_PRODUCT_DECISION",
+              "evidence": {
+                "path": "backend/src/main/java/com/room/backend/api/room/service/RoomCheckResultService.java",
+                "symbol": "getRoomIssuesSummary",
+                "line": null
+              },
+              "relatedFeature": "FT-ROOM-LIST",
+              "relatedStory": null,
+              "issue": null,
+              "lifecycle": "OBSERVED"
+            },
+            {
+              "id": "BC-LIST-02",
+              "severity": "P3",
+              "title": "미확인과 문제없음을 구분하지 않는다",
+              "detail": "아직 답변하지 않은 항목과 \"없음\"을 고른 항목이 모두 false로 표시된다. 사용자는 확인을 안 한 것인지 문제가 없는 것인지 알 수 없다.",
+              "disposition": "NEEDS_PRODUCT_DECISION",
+              "evidence": {
+                "path": "backend/src/main/java/com/room/backend/api/room/service/RoomCheckResultService.java",
+                "symbol": null,
+                "line": null
+              },
+              "relatedFeature": "FT-ROOM-LIST",
+              "relatedStory": null,
+              "issue": null,
+              "lifecycle": "OBSERVED"
+            },
+            {
+              "id": "BC-LIST-03",
+              "severity": "P2",
+              "title": "목록 조회가 N+1을 넘어 N*M+1 쿼리를 낸다",
+              "detail": "방마다 답변을 조회하고, 답변마다 항목을 조회하고, 선택된 선택지마다 다시 조회한다. 방 6개 상한 덕에 현재는 견디지만 항목·선택지가 늘면 그대로 증가한다. 쿼리 수를 바꾸면 성능 특성이 달라지므로 리팩토링에서 건드리지 않았다.",
+              "disposition": "FIX_PLANNED",
+              "evidence": {
+                "path": "backend/src/main/java/com/room/backend/api/room/service/RoomCheckResultService.java",
+                "symbol": "hasIssue",
+                "line": null
+              },
+              "relatedFeature": "FT-ROOM-LIST",
+              "relatedStory": null,
+              "issue": null,
+              "lifecycle": "OBSERVED"
+            }
+          ],
+          "tests": [],
+          "front": {
+            "path": "frontend/src/services/room-service.ts:19",
+            "state": "built"
+          },
+          "back": {
+            "path": "backend/src/main/java/com/room/backend/api/room/service/RoomService.java",
+            "state": "built"
+          }
+        }
+      ]
+    },
+    {
+      "page": "/project-map",
+      "component": "frontend/src/features/research/ResearchPage.tsx",
+      "features": []
+    },
+    {
+      "page": "/project-map/:pageId",
+      "component": "frontend/src/features/project-atlas/ProjectAtlasPage.tsx",
+      "features": []
+    },
+    {
+      "page": "/report",
+      "component": "frontend/src/features/report/ReportPage.tsx",
+      "features": [
+        {
+          "featureId": "FT-CHECKLIST-CATALOG",
+          "title": "체크리스트 항목 카탈로그 조회",
+          "owner": "@std-yong",
+          "capability": "내가 볼 체크리스트를 내 상황에 맞춘다",
+          "operations": [
+            {
+              "operationId": "OP-CHECKLIST-ITEMS-CUSTOMIZED",
+              "route": "GET /api/checklist/items",
+              "auth": "JWT",
+              "safety": "READ",
+              "frontend": "frontend/src/services/custom-checklist-service.ts:9"
+            }
+          ],
+          "defects": [
+            {
+              "id": "BC-CHK-03",
+              "severity": "P2",
+              "title": "항목 조회가 항목 수만큼 옵션 쿼리를 반복한다",
+              "detail": "getCustomizedItems가 items를 순회하며 항목 하나마다 checklistOptionRepository.findByChecklistItemId를 개별 호출한다. getEssentialsOnlyItems·getAllItemsForSettings도 같은 형태다. 쿼리 수를 바꾸면 성능 특성이 달라지므로 정형화 단계에서는 건드리지 않는다.",
+              "disposition": "RECORD_ONLY",
+              "evidence": {
+                "path": "backend/src/main/java/com/room/backend/domain/checklist/service/ChecklistService.java",
+                "symbol": "getCustomizedItems",
+                "line": null
+              },
+              "relatedFeature": "FT-CHECKLIST-CATALOG",
+              "relatedStory": null,
+              "issue": null,
+              "lifecycle": "OBSERVED"
+            }
+          ],
+          "tests": [],
+          "front": {
+            "path": "frontend/src/services/custom-checklist-service.ts:9",
+            "state": "built"
+          },
+          "back": {
+            "path": "backend/src/main/java/com/room/backend/domain/checklist/service/ChecklistService.java",
+            "state": "built"
+          }
+        },
+        {
+          "featureId": "FT-ROOM-LIST",
+          "title": "내 방 목록 조회",
+          "owner": "@minwoo-l",
+          "capability": "방을 비교해서 고른다",
+          "operations": [
+            {
+              "operationId": "OP-ROOM-LIST",
+              "route": "GET /api/v1/rooms",
+              "auth": "JWT",
+              "safety": "READ",
+              "frontend": "frontend/src/services/room-service.ts:19"
+            }
+          ],
+          "defects": [
+            {
+              "id": "BC-LIST-01",
+              "severity": "P2",
+              "title": "문제 뱃지가 체크리스트 항목 이름 문자열로만 연결된다",
+              "detail": "목록의 곰팡이·누수·벌레·냄새·결로 뱃지는 항목 이름을 하드코딩한 문자열 비교로 결정된다. 시드에서 항목 이름이 한 글자라도 바뀌면 해당 뱃지는 예외 없이 조용히 항상 false가 된다. 리팩토링에서 IssueTopic enum으로 옮겨 위치는 한 곳이 됐지만 취약성 자체는 그대로다.",
+              "disposition": "NEEDS_PRODUCT_DECISION",
+              "evidence": {
+                "path": "backend/src/main/java/com/room/backend/api/room/service/RoomCheckResultService.java",
+                "symbol": "getRoomIssuesSummary",
+                "line": null
+              },
+              "relatedFeature": "FT-ROOM-LIST",
+              "relatedStory": null,
+              "issue": null,
+              "lifecycle": "OBSERVED"
+            },
+            {
+              "id": "BC-LIST-02",
+              "severity": "P3",
+              "title": "미확인과 문제없음을 구분하지 않는다",
+              "detail": "아직 답변하지 않은 항목과 \"없음\"을 고른 항목이 모두 false로 표시된다. 사용자는 확인을 안 한 것인지 문제가 없는 것인지 알 수 없다.",
+              "disposition": "NEEDS_PRODUCT_DECISION",
+              "evidence": {
+                "path": "backend/src/main/java/com/room/backend/api/room/service/RoomCheckResultService.java",
+                "symbol": null,
+                "line": null
+              },
+              "relatedFeature": "FT-ROOM-LIST",
+              "relatedStory": null,
+              "issue": null,
+              "lifecycle": "OBSERVED"
+            },
+            {
+              "id": "BC-LIST-03",
+              "severity": "P2",
+              "title": "목록 조회가 N+1을 넘어 N*M+1 쿼리를 낸다",
+              "detail": "방마다 답변을 조회하고, 답변마다 항목을 조회하고, 선택된 선택지마다 다시 조회한다. 방 6개 상한 덕에 현재는 견디지만 항목·선택지가 늘면 그대로 증가한다. 쿼리 수를 바꾸면 성능 특성이 달라지므로 리팩토링에서 건드리지 않았다.",
+              "disposition": "FIX_PLANNED",
+              "evidence": {
+                "path": "backend/src/main/java/com/room/backend/api/room/service/RoomCheckResultService.java",
+                "symbol": "hasIssue",
+                "line": null
+              },
+              "relatedFeature": "FT-ROOM-LIST",
+              "relatedStory": null,
+              "issue": null,
+              "lifecycle": "OBSERVED"
+            }
+          ],
+          "tests": [],
+          "front": {
+            "path": "frontend/src/services/room-service.ts:19",
+            "state": "built"
+          },
+          "back": {
+            "path": "backend/src/main/java/com/room/backend/api/room/service/RoomService.java",
+            "state": "built"
+          }
+        },
+        {
+          "featureId": "FT-ROOM-DETAIL",
+          "title": "내 방 상세 조회",
+          "owner": "@minwoo-l",
+          "capability": "방 하나의 계약 조건과 체크 결과를 확인한다",
+          "operations": [
+            {
+              "operationId": "OP-ROOM-DETAIL",
+              "route": "GET /api/v1/rooms/{}",
+              "auth": "JWT",
+              "safety": "READ",
+              "frontend": "frontend/src/services/room-service.ts:33"
+            }
+          ],
+          "defects": [],
+          "tests": [],
+          "front": {
+            "path": "frontend/src/services/room-service.ts:33",
+            "state": "built"
+          },
+          "back": {
+            "path": "backend/src/main/java/com/room/backend/api/room/service/RoomService.java",
+            "state": "built"
+          }
+        }
+      ]
+    },
+    {
+      "page": "/rooms",
+      "component": "frontend/src/features/rooms/pages/RoomsPage.tsx",
+      "features": [
+        {
+          "featureId": "FT-ROOM-DELETE",
+          "title": "내 방 삭제",
+          "owner": "@minwoo-l",
+          "capability": "저장한 방을 수정하고 관리한다",
+          "operations": [
+            {
+              "operationId": "OP-ROOM-DELETE",
+              "route": "DELETE /api/v1/rooms/{}",
+              "auth": "JWT",
+              "safety": "WRITE",
+              "frontend": "frontend/src/services/room-service.ts:29"
+            }
+          ],
+          "defects": [],
+          "tests": [],
+          "front": {
+            "path": "frontend/src/services/room-service.ts:29",
+            "state": "built"
+          },
+          "back": {
+            "path": "backend/src/main/java/com/room/backend/api/room/service/RoomService.java",
+            "state": "built"
+          }
+        },
+        {
+          "featureId": "FT-CHECKLIST-CATALOG",
+          "title": "체크리스트 항목 카탈로그 조회",
+          "owner": "@std-yong",
+          "capability": "내가 볼 체크리스트를 내 상황에 맞춘다",
+          "operations": [
+            {
+              "operationId": "OP-CHECKLIST-ITEMS-CUSTOMIZED",
+              "route": "GET /api/checklist/items",
+              "auth": "JWT",
+              "safety": "READ",
+              "frontend": "frontend/src/services/custom-checklist-service.ts:9"
+            }
+          ],
+          "defects": [
+            {
+              "id": "BC-CHK-03",
+              "severity": "P2",
+              "title": "항목 조회가 항목 수만큼 옵션 쿼리를 반복한다",
+              "detail": "getCustomizedItems가 items를 순회하며 항목 하나마다 checklistOptionRepository.findByChecklistItemId를 개별 호출한다. getEssentialsOnlyItems·getAllItemsForSettings도 같은 형태다. 쿼리 수를 바꾸면 성능 특성이 달라지므로 정형화 단계에서는 건드리지 않는다.",
+              "disposition": "RECORD_ONLY",
+              "evidence": {
+                "path": "backend/src/main/java/com/room/backend/domain/checklist/service/ChecklistService.java",
+                "symbol": "getCustomizedItems",
+                "line": null
+              },
+              "relatedFeature": "FT-CHECKLIST-CATALOG",
+              "relatedStory": null,
+              "issue": null,
+              "lifecycle": "OBSERVED"
+            }
+          ],
+          "tests": [],
+          "front": {
+            "path": "frontend/src/services/custom-checklist-service.ts:9",
+            "state": "built"
+          },
+          "back": {
+            "path": "backend/src/main/java/com/room/backend/domain/checklist/service/ChecklistService.java",
+            "state": "built"
+          }
+        },
+        {
+          "featureId": "FT-ROOM-LIST",
+          "title": "내 방 목록 조회",
+          "owner": "@minwoo-l",
+          "capability": "방을 비교해서 고른다",
+          "operations": [
+            {
+              "operationId": "OP-ROOM-LIST",
+              "route": "GET /api/v1/rooms",
+              "auth": "JWT",
+              "safety": "READ",
+              "frontend": "frontend/src/services/room-service.ts:19"
+            }
+          ],
+          "defects": [
+            {
+              "id": "BC-LIST-01",
+              "severity": "P2",
+              "title": "문제 뱃지가 체크리스트 항목 이름 문자열로만 연결된다",
+              "detail": "목록의 곰팡이·누수·벌레·냄새·결로 뱃지는 항목 이름을 하드코딩한 문자열 비교로 결정된다. 시드에서 항목 이름이 한 글자라도 바뀌면 해당 뱃지는 예외 없이 조용히 항상 false가 된다. 리팩토링에서 IssueTopic enum으로 옮겨 위치는 한 곳이 됐지만 취약성 자체는 그대로다.",
+              "disposition": "NEEDS_PRODUCT_DECISION",
+              "evidence": {
+                "path": "backend/src/main/java/com/room/backend/api/room/service/RoomCheckResultService.java",
+                "symbol": "getRoomIssuesSummary",
+                "line": null
+              },
+              "relatedFeature": "FT-ROOM-LIST",
+              "relatedStory": null,
+              "issue": null,
+              "lifecycle": "OBSERVED"
+            },
+            {
+              "id": "BC-LIST-02",
+              "severity": "P3",
+              "title": "미확인과 문제없음을 구분하지 않는다",
+              "detail": "아직 답변하지 않은 항목과 \"없음\"을 고른 항목이 모두 false로 표시된다. 사용자는 확인을 안 한 것인지 문제가 없는 것인지 알 수 없다.",
+              "disposition": "NEEDS_PRODUCT_DECISION",
+              "evidence": {
+                "path": "backend/src/main/java/com/room/backend/api/room/service/RoomCheckResultService.java",
+                "symbol": null,
+                "line": null
+              },
+              "relatedFeature": "FT-ROOM-LIST",
+              "relatedStory": null,
+              "issue": null,
+              "lifecycle": "OBSERVED"
+            },
+            {
+              "id": "BC-LIST-03",
+              "severity": "P2",
+              "title": "목록 조회가 N+1을 넘어 N*M+1 쿼리를 낸다",
+              "detail": "방마다 답변을 조회하고, 답변마다 항목을 조회하고, 선택된 선택지마다 다시 조회한다. 방 6개 상한 덕에 현재는 견디지만 항목·선택지가 늘면 그대로 증가한다. 쿼리 수를 바꾸면 성능 특성이 달라지므로 리팩토링에서 건드리지 않았다.",
+              "disposition": "FIX_PLANNED",
+              "evidence": {
+                "path": "backend/src/main/java/com/room/backend/api/room/service/RoomCheckResultService.java",
+                "symbol": "hasIssue",
+                "line": null
+              },
+              "relatedFeature": "FT-ROOM-LIST",
+              "relatedStory": null,
+              "issue": null,
+              "lifecycle": "OBSERVED"
+            }
+          ],
+          "tests": [],
+          "front": {
+            "path": "frontend/src/services/room-service.ts:19",
+            "state": "built"
+          },
+          "back": {
+            "path": "backend/src/main/java/com/room/backend/api/room/service/RoomService.java",
+            "state": "built"
+          }
+        }
+      ]
+    }
+  ],
+  "links": {
+    "source": null,
+    "byFeature": {}
+  }
+}

@@ -1,8 +1,13 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Icon } from '@iconify/react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { ROUTES } from '@/lib/routes';
-import { ARTIFACT_META, RESEARCH_NODES, STATUS_META } from './research-data';
+import { useFocusTrap } from '@/lib/use-focus-trap';
+import { RESEARCH_NODES, STATUS_META } from './research-data';
+import { findSnapshotPage, rollupPage } from './atlas-snapshot';
+import { useMapViewport } from './use-map-viewport';
+import { FeatureDashboard } from './components/FeatureDashboard';
+import { PageBriefBody } from './components/PageBriefBody';
 import './research.css';
 
 const CANVAS_WIDTH = 1480;
@@ -32,42 +37,42 @@ function getInitialTheme(): MapTheme {
     : 'vscode-light';
 }
 
-function ArtifactStatus({ status }: { status: 'ready' | 'working' | 'missing' }) {
-  const meta = {
-    ready: { label: '연결됨', icon: 'solar:check-circle-bold', className: 'is-ready' },
-    working: { label: '진행 중', icon: 'solar:clock-circle-bold', className: 'is-working' },
-    missing: { label: '필요', icon: 'solar:add-circle-bold', className: 'is-missing' },
-  }[status];
-
-  return (
-    <span className={`research-artifact-status ${meta.className}`}>
-      <Icon icon={meta.icon} width={13} />
-      {meta.label}
-    </span>
-  );
-}
-
 export default function ProjectMapPage() {
-  const navigate = useNavigate();
   const [selectedId, setSelectedId] = useState('landing');
-  const [zoom, setZoom] = useState(0.86);
   const [theme, setTheme] = useState<MapTheme>(getInitialTheme);
   const [isThemeMenuOpen, setIsThemeMenuOpen] = useState(false);
-  const [isDetailOpen, setIsDetailOpen] = useState(
-    () => window.matchMedia('(min-width: 901px)').matches,
-  );
+  const [isDetailOpen, setIsDetailOpen] = useState(false);
+  const viewport = useMapViewport(CANVAS_WIDTH, CANVAS_HEIGHT);
+  // aria-modal="true"를 선언한 이상 포커스도 실제로 갇혀야 한다.
+  // 트랩 로직은 캔버스의 카드 상세(AtlasCardDetail)와 같은 것을 쓴다.
+  const detailRef = useFocusTrap<HTMLDivElement>(isDetailOpen);
 
   const selectedNode = RESEARCH_NODES.find((node) => node.id === selectedId) ?? RESEARCH_NODES[0];
-  const selectedArtifacts = selectedNode.artifacts;
+  // 노드가 든 route로 스냅샷을 찾는다. 스냅샷은 생성물이라 없을 수 있다.
+  const snapshotFeatures = findSnapshotPage(selectedNode.route)?.features ?? [];
+  const rollup = rollupPage(snapshotFeatures);
 
+  /**
+   * 노드를 누르면 그 자리에서 카드로 펼친다. 예전에는 landing만 곧장 캔버스
+   * URL로 튕겼는데, 지도를 보다가 화면이 통째로 바뀌어 맥락이 끊겼다.
+   * 캔버스로 가는 길은 카드 안의 링크로만 남긴다.
+   */
   const selectNode = (id: string) => {
-    if (id === 'landing') {
-      navigate(ROUTES.PROJECT_PAGE(id));
-      return;
-    }
+    if (viewport.didDrag()) return;
     setSelectedId(id);
     setIsDetailOpen(true);
   };
+
+  const closeDetail = () => setIsDetailOpen(false);
+
+  useEffect(() => {
+    if (!isDetailOpen) return;
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setIsDetailOpen(false);
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isDetailOpen]);
 
   const selectTheme = (nextTheme: MapTheme) => {
     setTheme(nextTheme);
@@ -165,18 +170,28 @@ export default function ProjectMapPage() {
 
       <div className="research-workspace">
         <section className="research-main">
-          <div className="research-canvas-viewport">
+          <div
+            ref={viewport.viewportRef}
+            className={`research-canvas-viewport ${viewport.isPanning ? 'is-panning' : ''}`}
+            onPointerDown={viewport.beginPan}
+            style={{
+              // 바탕 격자가 캔버스와 같이 움직이고 같이 커져야 끌고 있다는 게 보인다.
+              '--atlas-grid-scale': viewport.view.zoom,
+              '--atlas-grid-x': `${viewport.view.x}px`,
+              '--atlas-grid-y': `${viewport.view.y}px`,
+            } as React.CSSProperties}
+          >
             <div className="research-canvas-corner">
               <Icon icon="solar:map-arrow-square-outline" width={16} />
               사용자 여정 기준
             </div>
 
             <div
-              className="research-canvas"
+              className={`research-canvas ${viewport.isSmooth ? 'is-smooth' : ''}`}
               style={{
                 width: CANVAS_WIDTH,
                 height: CANVAS_HEIGHT,
-                transform: `scale(${zoom})`,
+                transform: `translate(${viewport.view.x}px, ${viewport.view.y}px) scale(${viewport.view.zoom})`,
               }}
             >
               <div className="research-lane research-lane-discover">
@@ -265,116 +280,91 @@ export default function ProjectMapPage() {
             </div>
 
             <div className="research-zoom-controls">
-              <button type="button" onClick={() => setZoom((value) => Math.min(1.4, value + 0.08))} aria-label="확대">
+              <button type="button" onClick={viewport.zoomIn} aria-label="확대">
                 <Icon icon="solar:add-square-outline" width={19} />
               </button>
-              <span>{Math.round(zoom * 100)}%</span>
-              <button type="button" onClick={() => setZoom((value) => Math.max(0.62, value - 0.08))} aria-label="축소">
+              <span>{Math.round(viewport.view.zoom * 100)}%</span>
+              <button type="button" onClick={viewport.zoomOut} aria-label="축소">
                 <Icon icon="solar:minus-square-outline" width={19} />
               </button>
-              <button type="button" onClick={() => setZoom(0.86)} aria-label="화면에 맞추기">
+              <button type="button" onClick={() => viewport.fitToScreen()} aria-label="화면에 맞추기">
                 <Icon icon="solar:maximize-square-minimalistic-outline" width={19} />
               </button>
+              <em className="research-zoom-hint">휠 확대 · 끌어서 이동</em>
             </div>
           </div>
         </section>
 
-        <aside className={`research-detail ${isDetailOpen ? 'is-open' : ''}`}>
+        {isDetailOpen && (
+        <div
+          className="research-modal-scrim"
+          onClick={closeDetail}
+          onPointerDown={(event) => event.stopPropagation()}
+        >
+        <div
+          className="research-detail"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="research-detail-title"
+          // 안에 포커스 가능한 컨트롤이 없을 때 포커스가 갈 자리. 트랩의 전제다.
+          tabIndex={-1}
+          ref={detailRef}
+          onClick={(event) => event.stopPropagation()}
+        >
+          {/* 카드 직속이라야 sticky가 카드 스크롤을 기준으로 붙는다 — head 안에 두면 head와 함께 밀려난다. */}
+          <button type="button" className="research-detail-close" onClick={closeDetail} aria-label="상세 카드 닫기">
+            <Icon icon="solar:close-circle-outline" width={21} />
+          </button>
+
           <div className="research-detail-head">
-            <button type="button" className="research-detail-close" onClick={() => setIsDetailOpen(false)} aria-label="상세 패널 닫기">
-              <Icon icon="solar:close-circle-outline" width={21} />
-            </button>
             <div className="research-detail-kicker">
               <span>{selectedNode.sequence}</span>
               PAGE BRIEF
             </div>
-            <h1>{selectedNode.title}</h1>
+            <h1 id="research-detail-title">{selectedNode.title}</h1>
             <p>{selectedNode.description}</p>
             <div className="research-detail-meta">
               <span><Icon icon="solar:user-circle-outline" width={15} /> {selectedNode.owner}</span>
               <span><Icon icon="solar:calendar-outline" width={15} /> {selectedNode.updatedAt}</span>
               <span><Icon icon="solar:link-circle-outline" width={15} /> {selectedNode.route}</span>
             </div>
-            {selectedNode.id === 'landing' && (
-              <Link className="research-open-canvas" to={ROUTES.PROJECT_PAGE(selectedNode.id)}>
-                LIVE CANVAS 열기
-                <Icon icon="solar:arrow-right-up-outline" width={16} />
-              </Link>
-            )}
+            {/* 캔버스로 나가는 유일한 문. 노드 id는 캔버스의 pageId와 같은 이름을 쓴다 —
+                아직 등재되지 않은 페이지로 가도 캔버스가 안내 문구를 대신 띄운다. */}
+            <Link className="research-open-canvas" to={ROUTES.PROJECT_PAGE(selectedNode.id)}>
+              LIVE CANVAS 열기
+              <Icon icon="solar:arrow-right-up-outline" width={16} />
+            </Link>
             <div className="research-detail-tags">
               {selectedNode.tags.map((tag) => <span key={tag}>#{tag}</span>)}
             </div>
           </div>
 
-          <div className="research-detail-body">
-            <section className="research-readiness">
-              <div>
-                <span>PAGE READINESS</span>
-                <strong>{selectedNode.progress}%</strong>
-              </div>
-              <div><span style={{ width: `${selectedNode.progress}%` }} /></div>
-            </section>
-
-            <section className="research-artifacts">
-              <div className="research-detail-section-title">
-                <div>
-                  <span>CONNECTED WORK</span>
-                  <h2>개발 자료</h2>
-                </div>
-                <strong>{selectedArtifacts.length}</strong>
-              </div>
-
-              {selectedArtifacts.length > 0 ? selectedArtifacts.map((artifact) => {
-                const meta = ARTIFACT_META[artifact.kind];
-                return (
-                  <button type="button" className="research-artifact" data-kind={artifact.kind} key={artifact.id}>
-                    <span className={`research-artifact-icon is-${artifact.kind}`}>
-                      <Icon icon={meta.icon} width={19} />
-                    </span>
-                    <span className="research-artifact-copy">
-                      <small>{meta.label}</small>
-                      <strong>{artifact.title}</strong>
-                      <span>{artifact.path ?? artifact.detail}</span>
-                    </span>
-                    <ArtifactStatus status={artifact.status} />
-                  </button>
-                );
-              }) : (
-                <div className="research-artifact-empty">선택한 팀에 연결된 자료가 아직 없어요.</div>
-              )}
-            </section>
-
-            <section className="research-decisions">
-              <div className="research-detail-section-title">
-                <div>
-                  <span>WHY WE BUILT IT</span>
-                  <h2>고민과 결정</h2>
-                </div>
-                <Icon icon="solar:lightbulb-bolt-outline" width={21} />
-              </div>
-              {selectedNode.decisions.length > 0 ? selectedNode.decisions.map((decision) => (
-                <article key={`${decision.date}-${decision.title}`}>
-                  <time>{decision.date}</time>
-                  <div>
-                    <strong>{decision.title}</strong>
-                    <p>{decision.description}</p>
-                  </div>
-                </article>
-              )) : (
-                <button type="button" className="research-add-decision" disabled title="MVP 이후 연결 예정">
-                  <Icon icon="solar:add-circle-outline" width={18} />
-                  첫 결정 기록 남기기
-                </button>
-              )}
-            </section>
+          {/* 대시보드는 고정, 그 아래만 스크롤한다 — 진행 상황은 스크롤로 밀려나면 안 된다. */}
+          <div className="research-detail-summary">
+            <div className="research-rollup">
+              <span><strong>{rollup.featureCount}</strong> 기능</span>
+              {/* '프론트/백엔드'는 파일이 관측된 기능 수다. 구현 완료 수가 아니다 —
+                  숫자만 보면 진척률로 읽히므로 근거를 툴팁으로 붙여둔다. */}
+              <span title="registry가 가리킨 프론트 경로에 파일이 있는 기능 수예요.">
+                <strong>{rollup.frontBuilt}</strong> 프론트
+              </span>
+              <span title="registry가 가리킨 백엔드 경로에 파일이 있는 기능 수예요.">
+                <strong>{rollup.backBuilt}</strong> 백엔드
+              </span>
+              {/* 결함은 ID 기준 dedupe 값이다(rollupPage). 본문 목록과 반드시 같은 수여야 한다. */}
+              <span className={rollup.p1Count ? 'is-danger' : ''}>
+                <strong>{rollup.defectCount}</strong> 결함{rollup.p1Count > 0 && ` · P1 ${rollup.p1Count}`}
+              </span>
+              <span className={rollup.testedCount ? '' : 'is-warn'}>
+                <strong>{rollup.testedCount}</strong> 테스트 보유
+              </span>
+            </div>
+            <FeatureDashboard features={snapshotFeatures} />
           </div>
-        </aside>
 
-        {!isDetailOpen && (
-          <button type="button" className="research-detail-reopen" onClick={() => setIsDetailOpen(true)}>
-            <Icon icon="solar:sidebar-minimalistic-outline" width={20} />
-            상세 보기
-          </button>
+          <PageBriefBody decisions={selectedNode.decisions} features={snapshotFeatures} />
+        </div>
+        </div>
         )}
       </div>
     </main>

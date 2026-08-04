@@ -307,7 +307,12 @@ def load_pages(consts: dict[str, str]) -> list[tuple[str, Path, list[Path]]]:
     return pages
 
 
-def main() -> int:
+def build() -> list[dict]:
+    """페이지 축을 조립해 돌려준다. 출력 형식은 --json과 같다.
+
+    main()에서 떼어낸 이유 — 다른 뷰(pm_snapshot.py)가 같은 조인을 다시
+    구현하면 두 뷰가 갈라진다. 조립은 한 곳에만 둔다.
+    """
     registry = load_registry()
     consts = dict(re.findall(r"""^\s+([A-Z_]+):\s*'([^']+)'""",
                              (FE / "lib" / "routes.ts").read_text(encoding="utf-8"), re.M))
@@ -332,6 +337,11 @@ def main() -> int:
             "layouts": [str(l.relative_to(REPO_ROOT)) for l in layouts],
             "calls": entries,
         })
+    return result
+
+
+def main() -> int:
+    result = build()
 
     if "--json" in sys.argv:
         print(json.dumps(result, ensure_ascii=False, indent=2))

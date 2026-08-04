@@ -1,32 +1,116 @@
-/* 카드 상세 4절과 화면 상태 탭.
+/* 카드 상세 모달과 화면 상태 탭.
    project-atlas.css가 순서대로 불러온다 — 순서가 곧 캐스케이드다. */
 
-.atlas-detail {
-  margin: 0 18px 14px;
-  border: 1px solid var(--map-border);
-  border-radius: 3px;
-  background: var(--map-panel);
+/* ---- 모달 셸 -----------------------------------------------------------
+   캔버스 아래에 붙던 패널을 화면 한가운데로 옮겼다. 누른 자리와 읽는 자리가
+   떨어져 있으면 카드마다 스크롤로 찾아 내려가야 했다. */
+
+.atlas-modal-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(2px);
+  animation: atlas-scrim-in 130ms ease;
 }
 
+/* 스크롤은 이 하나뿐이다. 안쪽 어디에도 두 번째 스크롤 컨테이너를 만들지 않는다 —
+   카드 안에서 영역마다 따로 구르면 지금 어디를 보고 있는지 알 수 없다.
+   폭 min(1320px, 94vw)는 /project-map의 노드 카드와 같은 값이다. 같은 저장소의
+   두 상세 표면이 서로 다른 폭이면 같은 것으로 읽히지 않는다. */
+.atlas-modal {
+  display: flex;
+  width: min(1320px, 94vw);
+  max-height: 90vh;
+  flex-direction: column;
+  border: 1px solid var(--map-border-strong);
+  border-radius: 4px;
+  background: var(--map-panel);
+  box-shadow: 0 26px 70px rgba(0, 0, 0, 0.45);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: var(--map-border-strong) transparent;
+  animation: atlas-modal-in 150ms cubic-bezier(0.2, 0.8, 0.3, 1);
+}
+
+.atlas-modal:focus { outline: none; }
+
+/* 웹킷은 표준 scrollbar-* 를 안 본다. 같은 모양을 두 번 적어야 두 엔진이 같아진다. */
+.atlas-modal::-webkit-scrollbar { width: 10px; }
+.atlas-modal::-webkit-scrollbar-track { background: transparent; }
+
+.atlas-modal::-webkit-scrollbar-thumb {
+  border: 3px solid transparent;
+  border-radius: 8px;
+  background-clip: content-box;
+  background-color: var(--map-border-strong);
+}
+
+@keyframes atlas-scrim-in { from { opacity: 0; } }
+
+@keyframes atlas-modal-in {
+  from { opacity: 0; transform: translateY(10px) scale(0.985); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .atlas-modal-scrim,
+  .atlas-modal { animation: none; }
+}
+
+/* sticky다 — 스크롤이 하나뿐이라 그냥 두면 제목이 내용과 함께 위로 사라진다.
+   sticky는 새 스크롤 컨테이너를 만들지 않으므로 "스크롤 하나" 규칙을 깨지 않는다. */
 .atlas-detail-head {
+  position: sticky;
+  top: 0;
+  z-index: 2;
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
   gap: 12px;
-  padding: 13px 16px;
+  padding: 15px 18px;
   border-bottom: 1px solid var(--map-border);
+  background: var(--map-panel-raised);
 }
 
-.atlas-detail-head span {
+.atlas-detail-head-main { min-width: 0; }
+
+.atlas-detail-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   font-family: var(--atlas-mono);
   font-size: 8px;
   letter-spacing: 0.12em;
   color: var(--map-muted);
 }
 
-.atlas-detail-head h2 { margin: 4px 0 0; font-size: 15px; color: var(--map-text); }
+.atlas-detail-eyebrow em {
+  padding: 1px 5px;
+  border: 1px solid currentcolor;
+  border-radius: 2px;
+  font-style: normal;
+  letter-spacing: 0.08em;
+}
+
+.atlas-detail-eyebrow em[data-state='LIVE'] { color: var(--map-live); }
+.atlas-detail-eyebrow em[data-state='BOUND'] { color: var(--map-accent); }
+.atlas-detail-eyebrow em[data-state='MOCK'],
+.atlas-detail-eyebrow em[data-state='PLANNED'] { color: var(--map-warning); }
+
+.atlas-detail-head h2 { margin: 6px 0 0; font-size: 16px; color: var(--map-text); }
+
+.atlas-detail-head-main p {
+  margin: 4px 0 0;
+  font-size: 11px;
+  color: var(--map-muted);
+}
 
 .atlas-detail-head button {
+  flex: none;
   border: 0;
   background: transparent;
   color: var(--map-muted);
@@ -35,17 +119,31 @@
 
 .atlas-detail-head button:hover { color: var(--map-danger); }
 
+/* 좌: 정체(개요·연관) / 우: 동작(FLOW·API).
+   1fr 1.35fr — 오른쪽이 표와 다이어그램이라 더 넓어야 접히지 않는다. */
 .atlas-detail-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.35fr);
+  gap: 1px;
+  background: var(--map-border);
+}
+
+.atlas-detail-col {
+  display: flex;
+  flex-direction: column;
   gap: 1px;
   background: var(--map-border);
 }
 
 .atlas-detail-block {
-  padding: 14px 16px 16px;
+  flex: 0 0 auto;
+  padding: 15px 18px 18px;
   background: var(--map-panel);
 }
+
+/* 남는 세로 공간은 마지막 절이 먹는다. 절마다 균등히 늘리면 짧은 절 안에
+   빈 여백이 생겨 내용이 끊긴 것처럼 보인다. */
+.atlas-detail-col > :last-child { flex: 1 1 auto; }
 
 .atlas-detail-block h3 {
   display: flex;
@@ -72,110 +170,306 @@
   line-height: 1.6;
 }
 
-.atlas-detail-block p.is-muted { color: var(--map-muted); }
+.atlas-detail-block p.is-muted,
+.atlas-detail-block .is-muted { color: var(--map-muted); }
 
-.atlas-detail-sources {
-  margin: 10px 0 0;
+/* ---- 개요 명세 표 -------------------------------------------------------
+   산문 문단을 이름표-값 행으로 바꿨다. 한 행에 한 사실만 둔다. */
+
+.atlas-spec { margin: 0; display: flex; flex-direction: column; gap: 9px; }
+
+.atlas-spec > div {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr);
+  gap: 10px;
+  align-items: baseline;
+}
+
+.atlas-spec dt {
+  font-family: var(--atlas-mono);
+  font-size: 8px;
+  letter-spacing: 0.06em;
+  color: var(--map-muted);
+}
+
+.atlas-spec dd {
+  min-width: 0;
+  margin: 0;
+  font-size: 11px;
+  line-height: 1.6;
+  color: var(--map-text);
+}
+
+.atlas-spec-stack {
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  align-items: flex-start;
+  gap: 4px;
 }
 
-.atlas-detail-sources > div { display: flex; gap: 7px; align-items: baseline; }
+/* ---- 복사되는 코드 식별자 ----------------------------------------------
+   경로·심볼·operationId·DOM 노드는 전부 등폭이고 전부 눌러서 복사한다.
+   화면에서 본 문자열을 그대로 편집기에 붙일 수 있어야 코드와 이어진다. */
 
-.atlas-detail-sources dt {
-  flex: none;
-  padding: 1px 5px;
+.atlas-code-ref {
+  display: inline-flex;
+  max-width: 100%;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 6px;
   border: 1px solid var(--map-border);
   border-radius: 2px;
-  font-family: var(--atlas-mono);
-  font-size: 7px;
+  background: var(--map-panel-raised);
   color: var(--map-muted);
+  text-align: left;
+  cursor: pointer;
 }
 
-.atlas-detail-sources dd {
-  margin: 0;
+.atlas-code-ref:hover { border-color: var(--map-border-strong); color: var(--map-text); }
+.atlas-code-ref[data-copy-state='done'] { border-color: var(--map-live); color: var(--map-live); }
+.atlas-code-ref[data-copy-state='fail'] { border-color: var(--map-danger); color: var(--map-danger); }
+
+.atlas-code-ref code {
+  min-width: 0;
   font-family: var(--atlas-mono);
   font-size: 9px;
-  color: var(--map-muted);
+  line-height: 1.5;
+  color: inherit;
   word-break: break-all;
 }
 
-.atlas-detail-steps {
+.atlas-code-ref em {
+  flex: none;
+  font-family: var(--atlas-mono);
+  font-size: 7px;
+  font-style: normal;
+  letter-spacing: 0.08em;
+  color: var(--map-muted);
+}
+
+.atlas-code-ref em[data-accent='on'] {
+  padding: 1px 4px;
+  border-radius: 2px;
+  background: var(--map-accent);
+  color: #fff;
+}
+
+.atlas-code-ref svg { flex: none; opacity: 0.5; }
+.atlas-code-ref:hover svg { opacity: 1; }
+
+.atlas-code-ref-say { flex: none; font-family: var(--atlas-mono); font-size: 7px; }
+
+/* ---- 기능 통신 FLOW -----------------------------------------------------
+   사용자 / 화면 / 서버 세 레인을 세로로 두고, 단계가 레인을 넘을 때마다
+   화살표로 잇는다. 시퀀스 다이어그램의 왕복 화살표와 같은 읽기 방식이다.
+   외부 라이브러리를 쓰지 않는다 — grid 열 지정만으로 충분하고 그래야
+   6개 테마 변수를 그대로 탄다. */
+
+.atlas-flow { display: flex; flex-direction: column; gap: 6px; }
+
+.atlas-flow-head,
+.atlas-flow-lanes,
+.atlas-flow-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.atlas-flow-head span {
+  padding: 3px 0;
+  border-radius: 2px;
+  background: var(--map-panel-raised);
+  font-family: var(--atlas-mono);
+  font-size: 8px;
+  letter-spacing: 0.08em;
+  text-align: center;
+  color: var(--map-muted);
+}
+
+.atlas-flow-head span[data-actor='USER'] { color: var(--map-accent); }
+.atlas-flow-head span[data-actor='BACK'] { color: var(--map-live); }
+
+.atlas-flow-body { position: relative; }
+
+/* 레인 세로선. 단계가 없는 구간에도 축이 이어져 보여야 왕복이 읽힌다 */
+.atlas-flow-lanes {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.atlas-flow-lanes span {
+  width: 0;
+  justify-self: center;
+  border-left: 1px dashed var(--map-border);
+}
+
+.atlas-flow-steps {
+  position: relative;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* 화살표는 1행, 단계 상자는 2행에 못 박는다. 자동 배치에 맡기면 서로 다른
+   열을 차지한다는 이유로 둘을 같은 줄에 끼워 넣어 순서가 무너진다. */
+.atlas-flow-row { grid-template-rows: auto auto; }
+
+.atlas-flow-arrow {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 6px 5px;
+}
+
+.atlas-flow-arrow[data-dir='left'] { flex-direction: row-reverse; }
+
+.atlas-flow-arrow-line {
+  flex: 1;
+  height: 0;
+  border-top: 1px dashed var(--map-accent-soft);
+}
+
+.atlas-flow-arrow-head {
+  flex: none;
+  width: 0;
+  height: 0;
+  border-top: 4px solid transparent;
+  border-bottom: 4px solid transparent;
+  border-left: 6px solid var(--map-accent-soft);
+}
+
+.atlas-flow-arrow[data-dir='left'] .atlas-flow-arrow-head {
+  border-left: 0;
+  border-right: 6px solid var(--map-accent-soft);
+}
+
+.atlas-flow-arrow b {
+  flex: none;
+  font-family: var(--atlas-mono);
+  font-size: 7px;
+  font-weight: 500;
+  color: var(--map-muted);
+  white-space: nowrap;
+}
+
+.atlas-flow-box {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  padding: 8px 9px;
+  border: 1px solid var(--map-border);
+  border-left: 2px solid var(--map-border-strong);
+  border-radius: 2px;
+  background: var(--map-panel-raised);
+}
+
+.atlas-flow-box[data-actor='USER'] { border-left-color: var(--map-accent); }
+.atlas-flow-box[data-actor='FRONT'] { border-left-color: var(--map-info); }
+.atlas-flow-box[data-actor='BACK'] { border-left-color: var(--map-live); }
+
+.atlas-flow-box em {
+  font-family: var(--atlas-mono);
+  font-size: 7px;
+  font-style: normal;
+  color: var(--map-muted);
+}
+
+.atlas-flow-text { font-size: 11px; line-height: 1.55; color: var(--map-text); }
+
+/* ---- API 명세 표 --------------------------------------------------------
+   OpenAPI Operation Object에서 채택한 필드(atlas-card.ts 머리 주석)를
+   그 순서 그대로 행으로 세운다. 표가 곧 명세서 양식이다. */
+
+.atlas-api-spec {
+  width: 100%;
+  margin: 0 0 14px;
+  border: 1px solid var(--map-border);
+  border-radius: 2px;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.atlas-api-spec:last-child { margin-bottom: 0; }
+
+.atlas-api-spec caption {
+  padding: 7px 9px;
+  border-bottom: 1px solid var(--map-border);
+  background: var(--map-panel-raised);
+  color: var(--map-text);
+  font-size: 11px;
+  text-align: left;
+}
+
+.atlas-api-spec th {
+  width: 96px;
+  padding: 6px 9px;
+  border-top: 1px solid var(--map-border);
+  vertical-align: top;
+  font-family: var(--atlas-mono);
+  font-size: 8px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-align: left;
+  color: var(--map-muted);
+}
+
+.atlas-api-spec td {
+  padding: 6px 9px;
+  border-top: 1px solid var(--map-border);
+  vertical-align: top;
+  font-size: 10px;
+  line-height: 1.6;
+  color: var(--map-text);
+  overflow-wrap: anywhere;
+}
+
+.atlas-api-spec tr:first-child th,
+.atlas-api-spec tr:first-child td { border-top: 0; }
+
+.atlas-id-note {
+  display: block;
+  margin-top: 3px;
+  font-size: 9px;
+  color: var(--map-muted);
+}
+
+/* registry 체계를 따르는 ID는 초록, 갈라진 자리는 경고색이다.
+   조용히 같은 색으로 두면 "코드와 이어졌는지"를 화면에서 판단할 수 없다. */
+.atlas-id-note[data-tone='registry'] { color: var(--map-live); }
+.atlas-id-note[data-tone='warn'] { color: var(--map-warning); }
+
+.atlas-api-responses,
+.atlas-api-safety {
   margin: 0;
   padding: 0;
   list-style: none;
   display: flex;
   flex-direction: column;
-  gap: 9px;
+  gap: 3px;
 }
 
-.atlas-detail-steps li { display: flex; gap: 8px; }
+.atlas-api-responses li { display: grid; grid-template-columns: 104px minmax(0, 1fr); gap: 8px; }
+.atlas-api-safety li { display: grid; grid-template-columns: 62px minmax(0, 1fr); gap: 8px; }
 
-.atlas-detail-steps em {
-  flex: none;
-  width: 44px;
-  padding: 2px 0;
-  border-radius: 2px;
-  background: var(--map-panel-raised);
-  color: var(--map-muted);
+.atlas-api-responses b {
+  font-family: var(--atlas-mono);
+  font-size: 9px;
+  color: var(--map-accent);
+  overflow-wrap: anywhere;
+}
+
+.atlas-api-safety i {
   font-family: var(--atlas-mono);
   font-size: 8px;
   font-style: normal;
-  text-align: center;
-}
-
-.atlas-detail-steps em[data-actor='USER'] { color: var(--map-accent); }
-.atlas-detail-steps em[data-actor='BACK'] { color: var(--map-live); }
-
-.atlas-detail-steps p { margin: 0; font-size: 11px; }
-
-.atlas-detail-steps code {
-  display: block;
-  margin-top: 3px;
-  font-family: var(--atlas-mono);
-  font-size: 8px;
-  color: var(--map-muted);
-  word-break: break-all;
-}
-
-.atlas-api-rule {
-  padding: 10px 0;
-  border-top: 1px solid var(--map-border);
-}
-
-.atlas-api-rule:first-of-type { border-top: 0; padding-top: 0; }
-
-.atlas-api-line { display: flex; align-items: center; gap: 7px; margin-bottom: 5px; }
-
-.atlas-api-line strong {
-  padding: 2px 6px;
-  border-radius: 2px;
-  background: var(--map-accent);
-  color: #fff;
-  font-family: var(--atlas-mono);
-  font-size: 8px;
-}
-
-.atlas-api-line code {
-  font-family: var(--atlas-mono);
-  font-size: 9px;
-  color: var(--map-text);
-  word-break: break-all;
-}
-
-.atlas-api-rule dl { margin: 8px 0 0; display: flex; flex-direction: column; gap: 6px; }
-.atlas-api-rule dl > div { display: grid; grid-template-columns: 78px minmax(0, 1fr); gap: 8px; }
-
-.atlas-api-rule dt {
-  font-family: var(--atlas-mono);
-  font-size: 8px;
   color: var(--map-muted);
 }
 
-.atlas-api-rule dd { margin: 0; font-size: 10px; color: var(--map-text); }
-.atlas-api-rule dd span { display: block; margin-bottom: 2px; }
-.atlas-api-rule dd b { color: var(--map-accent); font-weight: 600; }
+.atlas-api-safety b { font-family: var(--atlas-mono); font-size: 9px; color: var(--map-text); }
+.atlas-api-safety b[data-risk='on'] { color: var(--map-danger); }
+.atlas-api-safety b[data-risk='off'] { color: var(--map-live); }
 
 .atlas-detail-links {
   margin: 0;
@@ -218,18 +512,15 @@
 .atlas-detail-links strong { font-size: 11px; color: var(--map-text); }
 .atlas-detail-links p { margin: 0; font-size: 10px; color: var(--map-muted); }
 
-.atlas-detail-defects {
-  margin-top: 12px;
-  padding-top: 10px;
-  border-top: 1px solid var(--map-border);
-  font-family: var(--atlas-mono);
-  font-size: 9px;
-  color: var(--map-danger);
-}
-
 @media (max-width: 1280px) {
   .atlas-canvas { grid-template-columns: minmax(0, 1fr); }
   .atlas-card-rail { flex-direction: column; }
+}
+
+/* 94vw가 1120px 아래로 내려가면 두 단이 버티지 못한다. FLOW의 세 레인이
+   먼저 찌그러지므로 그 전에 한 단으로 접는다. */
+@media (max-width: 1120px) {
+  .atlas-detail-grid { grid-template-columns: minmax(0, 1fr); }
 }
 
 /* ---- 화면 상태 탭 -------------------------------------------------------

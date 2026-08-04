@@ -1,0 +1,13 @@
+# .project-atlas 도구가 요구하는 파이썬 의존성.
+#
+# 여기 두는 이유: AD-12에 따라 .project-atlas/는 별도 저장소로 분리될 예정이다.
+# 의존성 선언이 frontend/의 node 쪽에 섞여 있으면 분리하는 날 끊긴다.
+# 도구가 사는 디렉터리가 자기 의존성을 갖는다.
+#
+# 설치:
+#   python3 -m venv .venv && .venv/bin/pip install -r .project-atlas/requirements.txt
+#
+# 이것이 없으면 pagemap.py·pm_snapshot.py·resolve.py가
+# ModuleNotFoundError: No module named 'yaml' 로 즉시 죽는다.
+# 2026-08-04 교차검증에서 실제로 그 상태였다 — 임시 venv에서만 돌아가고 있었다.
+PyYAML==6.0.2

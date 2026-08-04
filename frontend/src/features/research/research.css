@@ -146,21 +146,31 @@
 
 /* inset이 0인 이유 — 예전에는 위에 58px 툴바(검색·상태 필터)가 있어서
    그만큼 내렸다. 툴바를 걷어냈으니 캔버스가 research-main 전체를 쓴다. */
+/* 스크롤 대신 확대·축소와 끌기로 다룬다. 그래서 overflow는 hidden이고,
+   touch-action은 none이어야 한다 — 터치 팬을 브라우저에 뺏기면 캔버스가 안 따라온다. */
 .research-canvas-viewport {
   position: absolute;
   inset: 0;
-  overflow: auto;
+  overflow: hidden;
+  touch-action: none;
+  cursor: grab;
   background-color: #f1f2ec;
   background-image: radial-gradient(circle, rgba(79, 100, 94, 0.20) 1px, transparent 1.2px);
-  background-size: 20px 20px;
-  overscroll-behavior: contain;
+  background-size: calc(20px * var(--atlas-grid-scale, 1)) calc(20px * var(--atlas-grid-scale, 1));
+  background-position: var(--atlas-grid-x, 0) var(--atlas-grid-y, 0);
 }
 
+.research-canvas-viewport.is-panning { cursor: grabbing; }
+
 .research-canvas {
-  position: relative;
-  transform-origin: top left;
-  transition: transform 180ms ease;
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: 0 0;
 }
+
+/* 버튼으로 조작할 때만 부드럽게. 휠과 끌기는 손을 따라와야 한다. */
+.research-canvas.is-smooth { transition: transform 200ms ease; }
 
 .research-canvas::after {
   position: absolute;
@@ -463,19 +473,79 @@
   text-align: center;
 }
 
-.research-detail {
-  position: relative;
-  z-index: 35;
-  display: none;
-  flex: 0 0 380px;
-  background: #fff;
-  border-left: 1px solid var(--atlas-line);
-  box-shadow: -12px 0 30px rgba(44, 60, 55, 0.04);
-  overflow: hidden;
+.research-zoom-hint {
+  padding: 0 8px 0 4px;
+  border-left: 1px solid #dfe4e0;
+  margin-left: 3px;
+  color: #93a09c;
+  font-size: 8px;
+  font-style: normal;
+  font-weight: 650;
+  white-space: nowrap;
 }
 
-.research-detail.is-open {
-  display: block;
+/* 노드를 누르면 사이드바가 아니라 이 카드가 화면 한가운데 뜬다.
+   좁은 패널에 밀어넣던 내용을 두 단으로 펼쳐 한 번에 읽게 한다. */
+.research-modal-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  place-items: center;
+  padding: 26px;
+  background: rgba(17, 29, 26, 0.46);
+  backdrop-filter: blur(2px);
+  animation: research-scrim-in 130ms ease;
+}
+
+/* 스크롤은 이 하나뿐이다. 안쪽 어디에도 두 번째 스크롤 컨테이너를 만들지 않는다 —
+   카드 안에서 영역마다 따로 구르면 지금 어디를 보고 있는지 알 수 없다. */
+/* 폭 1320px — 1060의 120%(1272)를 흔히 쓰는 컨테이너 단계로 올린 값이다.
+   1280(Tailwind 7xl)이 바로 위 표준이고, 그 다음 단계인 1320(Bootstrap
+   container-xxl)을 골랐다. 두 단 배치가 한 단으로 접히지 않고 버티는 폭이다. */
+.research-detail {
+  position: relative;
+  display: flex;
+  width: min(1320px, 94vw);
+  max-height: min(880px, 90vh);
+  flex-direction: column;
+  border: 1px solid var(--atlas-line);
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 30px 80px rgba(20, 38, 33, 0.32);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: #c3cec9 transparent;
+  animation: research-modal-in 160ms cubic-bezier(0.2, 0.8, 0.3, 1);
+}
+
+/* 웹킷은 표준 scrollbar-* 를 안 본다. 같은 모양을 두 번 적어야 두 엔진이 같아진다. */
+.research-detail::-webkit-scrollbar { width: 11px; }
+.research-detail::-webkit-scrollbar-track { background: transparent; }
+
+.research-detail::-webkit-scrollbar-thumb {
+  border: 3px solid transparent;
+  border-radius: 8px;
+  /* content-box라야 투명 테두리가 여백이 되어 막대가 가늘어 보인다. */
+  background-clip: content-box;
+  background-color: #c3cec9;
+}
+
+.research-detail::-webkit-scrollbar-thumb:hover { background-color: #a3b1ab; }
+
+@keyframes research-scrim-in {
+  from { opacity: 0; }
+}
+
+@keyframes research-modal-in {
+  from { opacity: 0; transform: translateY(10px) scale(0.985); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .research-modal-scrim,
+  .research-detail { animation: none; }
+  .research-canvas.is-smooth { transition: none; }
 }
 
 .research-detail-head {
@@ -487,22 +557,27 @@
     #fbfcfa;
 }
 
+/* sticky다 — 스크롤이 하나뿐이라 absolute로 두면 내용과 함께 위로 사라진다.
+   sticky는 스크롤 컨테이너를 새로 만들지 않으므로 "스크롤 하나" 규칙을 깨지 않는다. */
 .research-detail-close {
-  position: absolute;
-  top: 17px;
-  right: 17px;
+  position: sticky;
+  z-index: 6;
+  top: 13px;
   display: grid;
   width: 31px;
   height: 31px;
+  align-self: flex-end;
+  margin: 13px 13px -31px 0;
   place-items: center;
-  border: 0;
+  border: 1px solid transparent;
   border-radius: 7px;
-  background: transparent;
+  background: rgba(255, 255, 255, 0.86);
   color: #88938f;
+  backdrop-filter: blur(6px);
   cursor: pointer;
 }
 
-.research-detail-close:hover { background: #edf0ed; }
+.research-detail-close:hover { border-color: #e0e5e1; background: #edf0ed; }
 
 .research-detail-kicker {
   gap: 7px;
@@ -568,11 +643,603 @@
   font-weight: 650;
 }
 
+/* ── 고정 대시보드 ─────────────────────────────────────────────────────── */
+
+.research-detail-summary {
+  flex: 0 0 auto;
+  padding: 15px 24px 16px;
+  border-bottom: 1px solid #e4e8e4;
+  background: #fbfcfa;
+}
+
+.research-rollup {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-bottom: 13px;
+}
+
+.research-rollup span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 10px;
+  border: 1px solid #e0e5e1;
+  border-radius: 7px;
+  background: #fff;
+  color: #6d7b77;
+  font-size: 9px;
+  font-weight: 650;
+}
+
+.research-rollup strong {
+  color: #2f4a43;
+  font-size: 12px;
+}
+
+.research-rollup .is-danger { border-color: #f0d3d8; background: #fdf6f7; }
+.research-rollup .is-danger strong { color: #a3384a; }
+.research-rollup .is-warn { border-color: #f0e4c8; background: #fdfaf3; }
+.research-rollup .is-warn strong { color: #8a6518; }
+
+.feature-dashboard {
+  display: grid;
+  gap: 7px;
+}
+
+/* 범례 — 배지가 무엇을 관측한 것인지 밝힌다. 이게 없으면 '파일 있음'이
+   "다 됐다"로 읽힌다. 눈에는 걸리되 목록보다 앞서지는 않게 작고 흐리게 둔다. */
+.feature-dashboard-legend {
+  display: flex;
+  align-items: flex-start;
+  gap: 5px;
+  margin: 0;
+  color: #8a9793;
+  font-size: 9px;
+  line-height: 1.5;
+}
+
+.feature-dashboard-legend b {
+  color: #5f6f6b;
+  font-weight: 700;
+}
+
+.feature-dashboard-legend svg {
+  flex: 0 0 auto;
+  margin-top: 1px;
+}
+
+.feature-row {
+  padding: 10px 12px;
+  border: 1px solid #e3e8e4;
+  border-radius: 9px;
+  background: #fff;
+}
+
+.feature-row.is-unmapped {
+  border-style: dashed;
+  background: #fcfbf7;
+}
+
+.feature-row-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 7px;
+  margin-bottom: 7px;
+}
+
+.feature-row-id {
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: #eef2ee;
+  color: #4f6b62;
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
+.feature-row-head strong {
+  color: #26332f;
+  font-size: 11px;
+}
+
+/* 담당자. 예전엔 #8d9995 맨텍스트라 배경과 거의 붙어 읽히지 않았다 —
+   "누구에게 물어야 하나"의 답인데 가장 흐렸다. 칩으로 면을 주고 대비를 확보한다. */
+.feature-owner {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 7px;
+  border: 1px solid #cadfd4;
+  border-radius: 999px;
+  background: #edf6f1;
+  color: #245446;
+  font-size: 9px;
+  font-style: normal;
+  font-weight: 700;
+}
+
+.feature-row-layers {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.feature-layer,
+.feature-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border: 1px solid #e0e5e1;
+  border-radius: 6px;
+  color: #5f6f6b;
+  font-size: 9px;
+  font-weight: 650;
+}
+
+.feature-layer small {
+  margin-right: 2px;
+  color: #96a29e;
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+}
+
+.feature-layer.is-built { border-color: #cfe6d8; background: #f4faf6; color: #2e6a52; }
+.feature-layer.is-defect { border-color: #f0d3d8; background: #fdf6f7; color: #a3384a; }
+.feature-layer.is-absent { border-color: #e2e5e8; background: #f7f8f9; color: #7d8a92; }
+
+.feature-chip.is-warn { border-color: #f0e4c8; background: #fdfaf3; color: #8a6518; }
+.feature-chip.is-danger { border-color: #f0d3d8; background: #fdf6f7; color: #a3384a; }
+
+.feature-row-ops {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 7px;
+}
+
+.feature-row-ops span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: #8a9793;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 8.5px;
+}
+
+.feature-row-ops i {
+  padding: 1px 4px;
+  border-radius: 3px;
+  background: #eef1ee;
+  color: #6f7d78;
+  font-style: normal;
+  font-size: 7.5px;
+  font-weight: 700;
+}
+
+.feature-dashboard-empty {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 13px;
+  border: 1px dashed #dbe2dd;
+  border-radius: 9px;
+  color: #7d8a86;
+  font-size: 10px;
+}
+
+/* ── 스크롤 영역 ───────────────────────────────────────────────────────── */
+
 .research-detail-body {
-  height: calc(100vh - 72px - 220px);
-  min-height: 430px;
-  padding: 17px 20px 60px;
-  overflow-y: auto;
+  display: grid;
+  flex: 0 0 auto;
+  align-content: start;
+  padding: 18px 24px 26px;
+  gap: 22px;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+}
+
+/* 결함은 펼치면 길어지므로 오른쪽 단을 통째로 쓴다.
+   왼쪽 단에는 의사결정 · 테스트 · 이슈PR이 위에서부터 쌓인다. */
+.research-detail-body > .brief-section:first-child { grid-column: 1; }
+.research-detail-body > .brief-section:nth-child(2) { grid-column: 2; grid-row: 1 / span 3; }
+.research-detail-body > .brief-section:nth-child(3) { grid-column: 1; }
+.research-detail-body > .brief-section:nth-child(4) { grid-column: 1; }
+
+.brief-section-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.brief-section-title span {
+  color: #98a29f;
+  font-size: 7px;
+  font-weight: 850;
+  letter-spacing: 0.11em;
+}
+
+.brief-section-title h2 {
+  margin-top: 2px;
+  color: #26332f;
+  font-size: 12px;
+}
+
+.brief-section-title > strong {
+  color: #5f6f6b;
+  font-size: 12px;
+}
+
+.brief-empty {
+  padding: 12px;
+  border: 1px dashed #dbe2dd;
+  border-radius: 8px;
+  color: #8a9793;
+  font-size: 10px;
+}
+
+.brief-decisions,
+.brief-defects {
+  display: grid;
+  gap: 7px;
+}
+
+.brief-decisions article {
+  display: flex;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 1px solid #e3e8e4;
+  border-radius: 9px;
+  background: #fff;
+}
+
+.brief-decisions time {
+  flex: 0 0 auto;
+  color: #8d9995;
+  font-size: 9px;
+  font-weight: 700;
+}
+
+.brief-decisions strong {
+  color: #26332f;
+  font-size: 10.5px;
+}
+
+.brief-decisions p {
+  margin-top: 3px;
+  color: #6d7b77;
+  font-size: 10px;
+  line-height: 1.55;
+}
+
+.brief-defects article {
+  border: 1px solid #e3e8e4;
+  border-left-width: 3px;
+  border-radius: 9px;
+  background: #fff;
+}
+
+.brief-defects article[data-severity="P1"] { border-left-color: #c9536a; }
+.brief-defects article[data-severity="P2"] { border-left-color: #d99a3c; }
+.brief-defects article[data-severity="P3"] { border-left-color: #9aa8a4; }
+
+/* 카드 전체가 펼침 버튼이다 — 제목만 눌러야 하면 어디를 눌러야 하는지 알기 어렵다. */
+.brief-defect-summary {
+  display: block;
+  width: 100%;
+  padding: 10px 12px;
+  border: 0;
+  background: none;
+  text-align: left;
+  cursor: pointer;
+}
+
+.brief-defect-summary:hover { background: #f7faf8; }
+.brief-defects article.is-open .brief-defect-summary { background: #f4f8f5; }
+
+.brief-defect-caret {
+  flex: 0 0 auto;
+  color: #8d9995;
+  transition: transform 0.14s ease;
+}
+
+.brief-defects article.is-open .brief-defect-caret { transform: rotate(180deg); }
+
+@media (prefers-reduced-motion: reduce) {
+  .brief-defect-caret { transition: none; }
+}
+
+.brief-defect-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 5px;
+}
+
+/* 생애주기 — 사람이 적는 값은 이슈 번호 하나뿐이고 나머지는 파생이다.
+   OBSERVED는 결함의 잘못이 아니라 "아직 아무도 이슈로 올리지 않았다"는 사실이라
+   경고색이 아니라 중립색으로 둔다. */
+.brief-lifecycle {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 2px 6px;
+  border: 1px solid #dde4e0;
+  border-radius: 999px;
+  background: #f4f7f5;
+  color: #4f6259;
+  font-size: 8px;
+  font-weight: 750;
+}
+
+.brief-lifecycle.is-TRACKED { border-color: #cddfec; background: #f1f7fb; color: #23536f; }
+.brief-lifecycle.is-IN_PROGRESS { border-color: #f0e4c8; background: #fdfaf3; color: #7d5b13; }
+.brief-lifecycle.is-RESOLVED { border-color: #cfe6d8; background: #f4faf6; color: #23624a; }
+
+.brief-defect-detail {
+  padding: 0 12px 12px;
+  border-top: 1px solid #eaefeb;
+  margin-top: 2px;
+}
+
+.brief-defect-detail > p {
+  margin-top: 10px;
+  color: #55635f;
+  font-size: 10px;
+  line-height: 1.65;
+}
+
+.brief-defect-noevidence {
+  margin-top: 9px;
+  color: #8a7a4a;
+  font-size: 9.5px;
+}
+
+/* 측정 내용. 파일·심볼·줄이 있어야 주장이 확인 가능한 관측이 된다. */
+.brief-evidence {
+  display: grid;
+  gap: 4px;
+  margin-top: 10px;
+  padding: 9px 10px;
+  border: 1px solid #e6ebe7;
+  border-radius: 7px;
+  background: #f8faf9;
+}
+
+.brief-evidence > div {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.brief-evidence dt {
+  flex: 0 0 34px;
+  color: #7d8a86;
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+}
+
+.brief-evidence dd code {
+  color: #33463f;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 9px;
+  overflow-wrap: anywhere;
+}
+
+.brief-defect-facts {
+  display: grid;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.brief-defect-facts span {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  color: #3f4f4a;
+  font-size: 9.5px;
+  font-weight: 600;
+}
+
+.brief-defect-facts small {
+  flex: 0 0 58px;
+  color: #7d8a86;
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+}
+
+.brief-defect-facts code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 9px;
+  overflow-wrap: anywhere;
+}
+
+/* 해결된 결함은 기본으로 접는다. 0건이면 이 버튼 자체가 나오지 않는다. */
+.brief-resolved-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 10px;
+  border: 1px dashed #d5ded8;
+  border-radius: 8px;
+  background: #f7faf8;
+  color: #4f6259;
+  font-size: 9.5px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.brief-resolved-toggle:hover { border-color: #b9cbc1; background: #f1f6f3; }
+
+/* ── 테스트 ────────────────────────────────────────────────────────────── */
+
+.brief-uncovered {
+  display: flex;
+  gap: 9px;
+  padding: 12px;
+  border: 1px solid #f0ddc8;
+  border-radius: 9px;
+  background: #fdf9f2;
+  color: #8a6518;
+  margin-bottom: 8px;
+}
+
+.brief-uncovered strong {
+  display: block;
+  margin-bottom: 4px;
+  color: #7a5a14;
+  font-size: 10.5px;
+}
+
+.brief-uncovered p {
+  color: #86704a;
+  font-size: 9.5px;
+  line-height: 1.6;
+}
+
+.brief-uncovered code {
+  padding: 1px 4px;
+  border-radius: 3px;
+  background: #f6ecd9;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 9px;
+}
+
+.brief-tests {
+  display: grid;
+  gap: 6px;
+  list-style: none;
+}
+
+.brief-tests li {
+  padding: 8px 11px;
+  border: 1px solid #e3e8e4;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.brief-tests li.is-uncovered {
+  border-style: dashed;
+  border-color: #ded4c2;
+  background: #fdfbf7;
+}
+
+.brief-test-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 7px;
+}
+
+.brief-test-head code {
+  color: #4f6b62;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 8px;
+  font-weight: 800;
+}
+
+.brief-test-head strong {
+  color: #26332f;
+  font-size: 10px;
+}
+
+.brief-test-head em {
+  margin-left: auto;
+  color: #2e6a52;
+  font-size: 9px;
+  font-style: normal;
+  font-weight: 750;
+}
+
+.brief-tests li.is-uncovered .brief-test-head em { color: #8a6518; }
+
+.brief-test-paths {
+  display: grid;
+  gap: 2px;
+  margin-top: 5px;
+}
+
+.brief-test-paths code {
+  color: #5f6f6b;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 8.5px;
+  overflow-wrap: anywhere;
+}
+
+.brief-severity {
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 8px;
+  font-weight: 850;
+}
+
+.brief-severity.is-P1 { background: #fbe4e8; color: #a3384a; }
+.brief-severity.is-P2 { background: #fdf1dc; color: #8a6518; }
+.brief-severity.is-P3 { background: #eef1ee; color: #66736f; }
+
+.brief-defect-head code {
+  color: #7d8a86;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 8.5px;
+}
+
+.brief-defect-head em {
+  margin-left: auto;
+  color: #8d9995;
+  font-size: 8.5px;
+  font-style: normal;
+  font-weight: 650;
+}
+
+.brief-defect-summary > strong {
+  display: block;
+  color: #26332f;
+  font-size: 10.5px;
+  line-height: 1.5;
+}
+
+.brief-defect-summary > small {
+  display: block;
+  margin-top: 4px;
+  color: #7a8783;
+  font-size: 9px;
+}
+
+.brief-pending {
+  display: flex;
+  gap: 9px;
+  padding: 12px;
+  border: 1px dashed #dbe2dd;
+  border-radius: 9px;
+  background: #fafbf8;
+  color: #7d8a86;
+}
+
+.brief-pending strong {
+  display: block;
+  margin-bottom: 4px;
+  color: #4f5d59;
+  font-size: 10.5px;
+}
+
+.brief-pending p {
+  color: #808d89;
+  font-size: 9.5px;
+  line-height: 1.6;
+}
+
+.brief-pending code {
+  padding: 1px 4px;
+  border-radius: 3px;
+  background: #eef1ee;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 9px;
 }
 
 .research-readiness {
@@ -776,31 +1443,6 @@
   cursor: pointer;
 }
 
-.research-detail-reopen {
-  position: fixed;
-  right: 16px;
-  bottom: 18px;
-  z-index: 40;
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  height: 37px;
-  padding: 0 13px;
-  border: 1px solid #d4dbd7;
-  border-radius: 9px;
-  background: #fff;
-  color: #3e504c;
-  font-family: inherit;
-  font-size: 9px;
-  font-weight: 750;
-  box-shadow: 0 7px 22px rgba(40, 61, 55, 0.10);
-  cursor: pointer;
-}
-
-@media (max-width: 1180px) {
-  .research-detail { flex-basis: 340px; }
-}
-
 @media (max-width: 900px) {
   .research-topbar {
     grid-template-columns: 1fr auto;
@@ -816,16 +1458,14 @@
   }
   .research-canvas-viewport { inset: 0; }
 
-  .research-detail {
-    position: fixed;
-    inset: 64px 0 0 auto;
-    width: min(390px, 92vw);
-    flex-basis: auto;
-    box-shadow: -18px 0 46px rgba(28, 49, 43, 0.17);
+  /* 좁아지면 두 단을 접는다 — 카드 폭이 읽을 수 있는 한계 아래로 내려가지 않게. */
+  .research-detail-body {
+    grid-template-columns: minmax(0, 1fr);
   }
 
-  .research-detail-body {
-    height: calc(100vh - 64px - 220px);
+  .research-detail-body > .brief-section {
+    grid-column: 1;
+    grid-row: auto;
   }
 }
 
@@ -843,8 +1483,10 @@
   .research-canvas-viewport { inset: 0; }
   .research-canvas-corner { display: none; }
   .research-zoom-controls { bottom: 11px; margin-left: 10px; }
-  .research-detail { top: 58px; width: 100vw; }
-  .research-detail-body { height: calc(100vh - 58px - 220px); }
+  .research-zoom-hint { display: none; }
+  .research-modal-scrim { padding: 12px; }
+  .research-detail { width: 100%; max-height: 92vh; }
+  .research-detail-body { padding: 15px 16px 22px; }
 }
 
 /* ─── Project map / circuit-board pilot ─────────────────────────────────── */
@@ -921,7 +1563,12 @@
     linear-gradient(90deg, var(--map-grid-major) 1px, transparent 1px),
     linear-gradient(var(--map-grid-minor) 1px, transparent 1px),
     linear-gradient(90deg, var(--map-grid-minor) 1px, transparent 1px);
-  background-size: 80px 80px, 80px 80px, 20px 20px, 20px 20px;
+  background-size:
+    calc(80px * var(--atlas-grid-scale, 1)) calc(80px * var(--atlas-grid-scale, 1)),
+    calc(80px * var(--atlas-grid-scale, 1)) calc(80px * var(--atlas-grid-scale, 1)),
+    calc(20px * var(--atlas-grid-scale, 1)) calc(20px * var(--atlas-grid-scale, 1)),
+    calc(20px * var(--atlas-grid-scale, 1)) calc(20px * var(--atlas-grid-scale, 1));
+  background-position: var(--atlas-grid-x, 0) var(--atlas-grid-y, 0);
 }
 
 .project-map-shell .research-canvas::after {
@@ -1149,8 +1796,7 @@
   color: var(--map-muted);
 }
 
-.project-map-shell .research-zoom-controls,
-.project-map-shell .research-detail-reopen {
+.project-map-shell .research-zoom-controls {
   border-color: var(--map-border);
   border-radius: 3px;
   background: color-mix(in srgb, var(--map-top) 95%, transparent);
@@ -1173,8 +1819,21 @@
 
 .project-map-shell .research-detail {
   background: var(--map-bg);
-  border-color: var(--map-border);
-  box-shadow: -8px 0 0 rgba(0, 0, 0, 0.18);
+  border-color: var(--map-border-strong);
+  border-radius: 3px;
+  box-shadow: 8px 8px 0 rgba(0, 0, 0, 0.30);
+  scrollbar-color: var(--map-border-strong) transparent;
+}
+
+/* 계측기 섀시에는 둥근 막대가 안 어울린다 — 각을 세우고 잡으면 강조색으로 켠다. */
+.project-map-shell .research-detail::-webkit-scrollbar-thumb {
+  border-width: 3px;
+  border-radius: 1px;
+  background-color: var(--map-border-strong);
+}
+
+.project-map-shell .research-detail::-webkit-scrollbar-thumb:hover {
+  background-color: var(--map-accent);
 }
 
 .project-map-shell .research-detail-head {
@@ -1186,10 +1845,13 @@
 
 .project-map-shell .research-detail-close {
   border-radius: 2px;
+  /* 밝은 반투명 기본값이 그대로 오면 다크 테마에서 흰 버튼이 뜬다. */
+  background: color-mix(in srgb, var(--map-panel) 88%, transparent);
   color: var(--map-muted);
 }
 
 .project-map-shell .research-detail-close:hover {
+  border-color: var(--map-border);
   background: var(--map-panel-raised);
 }
 
@@ -1226,6 +1888,171 @@
     linear-gradient(color-mix(in srgb, var(--map-top) 4%, transparent) 1px, transparent 1px),
     var(--map-bg);
   background-size: 100% 24px;
+}
+
+/* 새 블록들의 테마 대응. 밝은 값이 그대로 남으면 다크 테마에서 흰 판이 뜬다. */
+.project-map-shell .research-detail-summary {
+  border-color: var(--map-border);
+  background: var(--map-panel);
+}
+
+.project-map-shell .research-rollup span,
+.project-map-shell .feature-row,
+.project-map-shell .brief-decisions article,
+.project-map-shell .brief-defects article {
+  border-color: var(--map-border);
+  border-radius: 2px;
+  background: var(--map-panel-raised);
+  color: var(--map-muted);
+}
+
+.project-map-shell .research-rollup strong,
+.project-map-shell .feature-row-head strong,
+.project-map-shell .brief-decisions strong,
+.project-map-shell .brief-defect-summary > strong,
+.project-map-shell .brief-section-title h2,
+.project-map-shell .brief-pending strong,
+.project-map-shell .brief-test-head strong,
+.project-map-shell .brief-uncovered strong {
+  color: var(--map-text);
+}
+
+.project-map-shell .feature-dashboard-legend { color: var(--map-muted); }
+.project-map-shell .feature-dashboard-legend b { color: var(--map-text); }
+
+.project-map-shell .feature-row-id {
+  border-radius: 1px;
+  background: var(--map-bg);
+  color: var(--map-accent);
+}
+
+.project-map-shell .feature-layer,
+.project-map-shell .feature-chip {
+  border-color: var(--map-border);
+  border-radius: 1px;
+  background: var(--map-bg);
+  color: var(--map-muted);
+}
+
+.project-map-shell .feature-layer.is-built { color: var(--map-accent); }
+
+.project-map-shell .feature-row-ops i,
+.project-map-shell .brief-severity,
+.project-map-shell .brief-pending code {
+  border-radius: 1px;
+  background: var(--map-bg);
+  color: var(--map-muted);
+}
+
+.project-map-shell .brief-section-title span,
+.project-map-shell .feature-row-ops span,
+.project-map-shell .brief-decisions p,
+.project-map-shell .brief-decisions time,
+.project-map-shell .brief-defect-summary > small,
+.project-map-shell .brief-defect-head code,
+.project-map-shell .brief-defect-head em,
+.project-map-shell .brief-defect-caret,
+.project-map-shell .brief-evidence dt,
+.project-map-shell .brief-defect-facts small,
+.project-map-shell .brief-test-paths code,
+.project-map-shell .brief-pending p,
+.project-map-shell .brief-uncovered p {
+  color: var(--map-muted);
+}
+
+/* 담당자는 테마에서도 살아나야 한다 — muted로 두면 다크 테마에서 다시 사라진다.
+   accent를 쓰는 이유는 6개 테마가 모두 accent만은 배경 대비를 보장하기 때문이다. */
+.project-map-shell .feature-owner {
+  border-color: color-mix(in srgb, var(--map-accent) 42%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--map-accent) 13%, var(--map-bg));
+  color: var(--map-accent);
+}
+
+/* 결함 아코디언 — 펼침 면과 근거 블록은 카드보다 한 단 어두워야 층이 보인다. */
+.project-map-shell .brief-defect-summary:hover,
+.project-map-shell .brief-defects article.is-open .brief-defect-summary {
+  background: color-mix(in srgb, var(--map-accent) 8%, transparent);
+}
+
+.project-map-shell .brief-defect-detail {
+  border-top-color: var(--map-border);
+}
+
+.project-map-shell .brief-defect-detail > p,
+.project-map-shell .brief-defect-facts span {
+  color: var(--map-text);
+}
+
+.project-map-shell .brief-evidence {
+  border-color: var(--map-border);
+  border-radius: 2px;
+  background: var(--map-bg);
+}
+
+.project-map-shell .brief-evidence dd code,
+.project-map-shell .brief-defect-facts code,
+.project-map-shell .brief-test-head code {
+  color: var(--map-accent);
+}
+
+.project-map-shell .brief-lifecycle,
+.project-map-shell .brief-resolved-toggle {
+  border-color: var(--map-border);
+  border-radius: 2px;
+  background: var(--map-bg);
+  color: var(--map-muted);
+}
+
+.project-map-shell .brief-lifecycle.is-TRACKED,
+.project-map-shell .brief-lifecycle.is-IN_PROGRESS,
+.project-map-shell .brief-lifecycle.is-RESOLVED {
+  border-color: color-mix(in srgb, var(--map-accent) 45%, transparent);
+  color: var(--map-accent);
+}
+
+.project-map-shell .brief-resolved-toggle:hover {
+  border-color: var(--map-border-strong);
+  background: var(--map-panel-raised);
+}
+
+/* 테스트 — 덮이지 않았다는 경고는 테마 색으로 죽이지 않는다.
+   다만 흰 판이 뜨지 않게 배경만 테마에 맞춘다. */
+.project-map-shell .brief-uncovered,
+.project-map-shell .brief-tests li {
+  border-color: var(--map-border);
+  border-radius: 2px;
+  background: var(--map-panel-raised);
+}
+
+.project-map-shell .brief-uncovered {
+  border-color: color-mix(in srgb, var(--map-status-building) 55%, var(--map-border));
+  color: var(--map-status-building);
+}
+
+.project-map-shell .brief-uncovered code {
+  border-radius: 1px;
+  background: var(--map-bg);
+  color: var(--map-status-building);
+}
+
+.project-map-shell .brief-tests li.is-uncovered {
+  border-color: color-mix(in srgb, var(--map-status-building) 40%, var(--map-border));
+  background: var(--map-panel);
+}
+
+.project-map-shell .brief-test-head em { color: var(--map-accent); }
+.project-map-shell .brief-tests li.is-uncovered .brief-test-head em {
+  color: var(--map-status-building);
+}
+
+.project-map-shell .brief-empty,
+.project-map-shell .brief-pending,
+.project-map-shell .feature-dashboard-empty {
+  border-color: var(--map-border);
+  border-radius: 2px;
+  background: var(--map-panel);
+  color: var(--map-muted);
 }
 
 .project-map-shell .research-readiness {
@@ -1963,13 +2790,17 @@
     width: auto;
   }
 }
+/* --accent / --accent-soft / --accent-border / --mono 는 이 저장소 어디에도 정의돼 있지 않다.
+   정의되지 않은 var()는 선언 전체를 무효로 만들기 때문에 이 두 요소는 테두리도 배경도
+   글꼴도 없는 맨 텍스트로 렌더됐다 — LIVE CANVAS가 "버튼인지 모르겠다"는 지적의 원인이다.
+   실제 값으로 되돌리고, 테마 안에서는 아래에서 --map-* 로 다시 칠한다. */
 .research-data-badge {
-  border: 1px solid var(--accent-border);
-  background: var(--accent-soft);
-  color: var(--accent);
+  border: 1px solid #d7e3dd;
+  background: #eef5f1;
+  color: #2c5a4c;
   border-radius: 2px;
   padding: 6px 9px;
-  font: 700 9px/1 var(--mono);
+  font: 700 9px/1 ui-monospace, SFMono-Regular, Menlo, monospace;
   letter-spacing: 0.14em;
 }
 
@@ -1980,14 +2811,57 @@
   gap: 12px;
   width: 100%;
   margin-top: 16px;
-  border: 1px solid var(--accent-border);
-  border-radius: 3px;
-  padding: 11px 12px;
-  color: var(--accent);
-  background: var(--accent-soft);
-  font: 700 10px/1 var(--mono);
+  border: 1px solid #bcd6c9;
+  border-radius: 8px;
+  padding: 12px 14px;
+  color: #1f5142;
+  background: #e9f4ee;
+  box-shadow: 0 1px 0 rgba(31, 81, 66, 0.06);
+  font: 700 10px/1 ui-monospace, SFMono-Regular, Menlo, monospace;
   letter-spacing: 0.12em;
   text-decoration: none;
+  cursor: pointer;
+  transition: background 0.14s ease, border-color 0.14s ease, transform 0.14s ease;
+}
+
+.research-open-canvas:hover {
+  border-color: #8fbfa8;
+  background: #ddeee5;
+  transform: translateY(-1px);
+}
+
+.research-open-canvas:active { transform: none; }
+
+.research-open-canvas:focus-visible {
+  outline: 2px solid #2e6a52;
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .research-open-canvas { transition: none; }
+  .research-open-canvas:hover { transform: none; }
+}
+
+/* 6개 테마 대응. accent를 면으로 깔아 "여기가 나가는 문"이라는 게 색으로 먼저 읽히게 한다. */
+.project-map-shell .research-data-badge,
+.project-map-shell .research-open-canvas {
+  border-color: color-mix(in srgb, var(--map-accent) 48%, transparent);
+  background: color-mix(in srgb, var(--map-accent) 14%, var(--map-bg));
+  color: var(--map-accent);
+  box-shadow: none;
+}
+
+.project-map-shell .research-open-canvas {
+  border-radius: 2px;
+}
+
+.project-map-shell .research-open-canvas:hover {
+  border-color: var(--map-accent);
+  background: color-mix(in srgb, var(--map-accent) 24%, var(--map-bg));
+}
+
+.project-map-shell .research-open-canvas:focus-visible {
+  outline-color: var(--map-accent);
 }
 
 .research-shell button:disabled {
