@@ -6,6 +6,7 @@ import { useRoomsList, useDeleteRoom } from '@/features/rooms/hooks/use-rooms-qu
 import { cn } from '@/lib/utils';
 import { useOnClickOutside } from '@/hooks/use-on-click-outside';
 import { ROUTES } from '@/lib/routes';
+import { useAtlasPreview } from '@/lib/use-atlas-preview';
 import { GUEST_ROOM_LIMIT, ROOM_LIMIT, STORAGE_KEY_ONBOARDING } from '@/lib/constants';
 import RoomCard from '@/components/RoomCard';
 import {
@@ -230,6 +231,9 @@ function UnifiedFilterDropdown({
 // ─── RoomsPage ────────────────────────────────────────────────────────────────
 
 export default function RoomsPage() {
+  // Atlas 상세 캔버스가 이 페이지를 띄우면 [data-atlas-node] 좌표를 부모로 보고한다.
+  useAtlasPreview(ROUTES.HOME);
+
   const { isLoggedIn } = useAuthStore();
   const { guestRooms, deleteGuestRoom } = useGuestRoomStore();
   const navigate = useNavigate();
@@ -323,7 +327,11 @@ export default function RoomsPage() {
     <main className="flex-1 flex flex-col bg-white min-h-[calc(100vh-64px)]">
 
       {/* 서브 탭 (카드로 보기 / 지도로 보기) */}
-      <div className="flex justify-center border-b border-border-light bg-white">
+      <div
+        data-atlas-node="rooms-view-tabs"
+        data-atlas-label="보기 전환 · 카드/지도"
+        className="flex justify-center border-b border-border-light bg-white"
+      >
         <div className="flex gap-7">
           <button className="flex items-center gap-[10px] px-[16px] py-[12px] border-b-2 border-text-main font-bold text-text-main text-fluid-xl cursor-pointer">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><rect x="2" y="3" width="9" height="9" rx="1" /><rect x="13" y="3" width="9" height="9" rx="1" /><rect x="2" y="14" width="9" height="9" rx="1" /><rect x="13" y="14" width="9" height="9" rx="1" /></svg>
@@ -340,7 +348,11 @@ export default function RoomsPage() {
       </div>
 
       {/* 필터 바 — DESKTOP (sm 이상) — 기존 유지 */}
-      <div className="hidden sm:block border-b border-border-light bg-white sticky top-14 md:top-16 z-40">
+      <div
+        data-atlas-node="rooms-filter"
+        data-atlas-label="거래방식 필터 · 정렬"
+        className="hidden sm:block border-b border-border-light bg-white sticky top-14 md:top-16 z-40"
+      >
         <div className="px-4 md:px-10 lg:px-20 py-3 flex justify-between items-center max-w-screen-2xl mx-auto w-full">
           <div className="flex gap-2.5 relative" ref={dropdownRef}>
             <button
@@ -413,7 +425,11 @@ export default function RoomsPage() {
       </div>
 
       {/* Room_Number — MOBILE (sm 미만) — 카운터(좌) + 통합 필터(우) Figma 515:23024 */}
-      <div className="sm:hidden border-b border-border-light bg-white sticky top-14 z-40">
+      <div
+        data-atlas-node="rooms-filter"
+        data-atlas-label="거래방식 필터 · 정렬 (모바일)"
+        className="sm:hidden border-b border-border-light bg-white sticky top-14 z-40"
+      >
         <div className="px-4 py-3 flex justify-between items-center">
           <p className="text-[14px] font-semibold text-text-caption">
             등록된 방 {rooms.length}개/{isLoggedIn ? ROOM_LIMIT : GUEST_ROOM_LIMIT}개
@@ -452,7 +468,11 @@ export default function RoomsPage() {
       </div>
 
       {/* 방 카운터 (DESKTOP) + 메인 컨텐츠 */}
-      <div className="flex-1 flex flex-col px-4 md:px-10 lg:px-20 pb-10 max-w-screen-2xl mx-auto w-full">
+      <div
+        data-atlas-node="rooms-list"
+        data-atlas-label="내 방 목록 · 카드"
+        className="flex-1 flex flex-col px-4 md:px-10 lg:px-20 pb-10 max-w-screen-2xl mx-auto w-full"
+      >
         <p className="hidden sm:block text-fluid-lg font-semibold text-text-caption py-5">
           등록된 방 {rooms.length}개/{isLoggedIn ? ROOM_LIMIT : GUEST_ROOM_LIMIT}개
         </p>

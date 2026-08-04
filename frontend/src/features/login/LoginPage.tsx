@@ -4,6 +4,7 @@ import { LogoWithText } from '@/components/Logo';
 import { useAuthStore } from '@/store/use-auth-store';
 import { getOAuthAuthorizeUrl } from '@/services/auth-service';
 import { ROUTES } from '@/lib/routes';
+import { useAtlasPreview } from '@/lib/use-atlas-preview';
 import type { OAuthProvider } from '@/types';
 
 function useOAuthLogin() {
@@ -57,7 +58,11 @@ function GoogleLoginButton({ onClick, loading }: { onClick: () => void; loading:
 
 function TermsText() {
   return (
-    <p className="text-text-caption text-[12px] text-center leading-[1.3]">
+    <p
+      className="text-text-caption text-[12px] text-center leading-[1.3]"
+      data-atlas-node="login-terms"
+      data-atlas-label="약관 · 개인정보 링크"
+    >
       시작하기를 누르면{' '}
       <Link to="/terms" className="text-brand-primary">이용약관</Link>
       {' '}및{' '}
@@ -79,7 +84,11 @@ function LoginCard({ onNaver, onGoogle, loadingProvider, error, sizeClass }: Log
   return (
     <div className="flex flex-col items-center gap-6">
       <div className="flex flex-col items-center gap-[38px]">
-        <div className="flex flex-col items-center gap-[18px]">
+        <div
+          className="flex flex-col items-center gap-[18px]"
+          data-atlas-node="login-intro"
+          data-atlas-label="로고 · 안내 문구"
+        >
           <LogoWithText size={sizeClass.logo} textClassName={sizeClass.text} />
           <div className="text-center">
             <p className={`text-text-main ${sizeClass.title} font-semibold leading-[1.3]`}>
@@ -93,7 +102,11 @@ function LoginCard({ onNaver, onGoogle, loadingProvider, error, sizeClass }: Log
             </p>
           </div>
         </div>
-        <div className={`flex flex-col gap-[10px] ${sizeClass.width}`}>
+        <div
+          className={`flex flex-col gap-[10px] ${sizeClass.width}`}
+          data-atlas-node="login-oauth"
+          data-atlas-label="소셜 로그인 버튼"
+        >
           {error && (
             <p className="text-red-500 text-[12px] text-center">{error}</p>
           )}
@@ -110,8 +123,11 @@ export default function LoginPage() {
   const { isLoggedIn } = useAuthStore();
   const navigate = useNavigate();
   const { login, loadingProvider, error } = useOAuthLogin();
+  // Atlas 상세 캔버스가 이 페이지를 띄우면 [data-atlas-node] 좌표를 부모로 보고한다.
+  // 미리보기에서는 로그인 상태여도 리다이렉트하지 않는다 — LandingPage와 같은 처리다.
+  const { isPreview: isAtlasPreview } = useAtlasPreview(ROUTES.LOGIN);
 
-  if (isLoggedIn) {
+  if (isLoggedIn && !isAtlasPreview) {
     navigate(ROUTES.HOME, { replace: true });
     return null;
   }

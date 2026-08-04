@@ -7,14 +7,19 @@ type Props = {
   activeSection: SectionId;
   onScrollTo: (id: SectionId) => void;
   filter?: (id: SectionId) => boolean;
+  /** Atlas 상세 캔버스용 식별자. 페이지가 넘긴다 */
+  atlasNode?: string;
+  atlasLabel?: string;
 };
 
-export function ChecklistTabNav({ tabNavRef, activeSection, onScrollTo, filter }: Props) {
+export function ChecklistTabNav({ tabNavRef, activeSection, onScrollTo, filter, atlasNode, atlasLabel }: Props) {
   const tabs = filter ? SECTION_TABS.filter((t) => filter(t.id)) : SECTION_TABS;
   return (
     <nav
       ref={tabNavRef as RefObject<HTMLElement>}
       className="z-30 bg-white border-b border-border-light px-4 py-2 flex gap-2 overflow-x-auto no-scrollbar"
+      data-atlas-node={atlasNode}
+      data-atlas-label={atlasLabel}
     >
       {tabs.map(({ id, label }) => (
         <button

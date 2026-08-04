@@ -7,6 +7,7 @@ import { useWalkingDirections, formatWalkingDistance, formatWalkingDuration } fr
 import { cn, formatAmount, formatDateTime } from '@/lib/utils';
 import { useOnClickOutside } from '@/hooks/use-on-click-outside';
 import { ROUTES } from '@/lib/routes';
+import { useAtlasPreview } from '@/lib/use-atlas-preview';
 import { GUEST_ROOM_LIMIT, ROOM_LIMIT } from '@/lib/constants';
 import { LoginRequiredModal } from '@/components/ui/Modals';
 import type { Room } from '@/types/room';
@@ -263,7 +264,11 @@ function MapRoomCardCompact({
 
 function MapEmptyState({ onStart }: { onStart: () => void }) {
   return (
-    <div className="flex-1 flex flex-col items-center justify-center gap-[10px] py-[80px]">
+    <div
+      className="flex-1 flex flex-col items-center justify-center gap-[10px] py-[80px]"
+      data-atlas-node="map-empty"
+      data-atlas-label="주소 있는 방 없음"
+    >
       <IconMapPin />
       <div className="flex flex-col gap-[6px] items-center text-center mt-2">
         <p className="text-[18px] font-bold text-text-main leading-[1.3]">주소가 등록된 방이 없어요</p>
@@ -426,6 +431,8 @@ function loadNcpMaps(): Promise<void> {
 }
 
 export default function MapPage() {
+  // Atlas 상세 캔버스가 이 페이지를 띄우면 [data-atlas-node] 좌표를 부모로 보고한다
+  useAtlasPreview(ROUTES.MAP);
   const { isLoggedIn } = useAuthStore();
   const { guestRooms } = useGuestRoomStore();
   const navigate = useNavigate();
@@ -779,7 +786,11 @@ export default function MapPage() {
     <main className="flex-1 flex flex-col bg-white">
 
       {/* 탭 — 카드 / 지도 */}
-      <div className="flex justify-center gap-[28px] border-b border-border-light bg-white lg:border-b-0">
+      <div
+        className="flex justify-center gap-[28px] border-b border-border-light bg-white lg:border-b-0"
+        data-atlas-node="map-view-tabs"
+        data-atlas-label="보기 전환 탭"
+      >
         <button
           onClick={() => navigate(ROUTES.HOME)}
           className="flex items-center gap-[10px] px-[16px] py-[12px] text-text-caption font-bold text-[16px] cursor-pointer hover:text-text-sub transition-colors"
@@ -797,7 +808,11 @@ export default function MapPage() {
 
       {/* 기준점 배너 — 기준점 선택 시 상단 sticky 표시 */}
       {landmark && (
-        <div className="sticky top-0 z-40 bg-brand-primary/10 border-b border-brand-primary/20 px-[16px] lg:px-[40px] py-[10px] flex items-center gap-[12px]">
+        <div
+          className="sticky top-0 z-40 bg-brand-primary/10 border-b border-brand-primary/20 px-[16px] lg:px-[40px] py-[10px] flex items-center gap-[12px]"
+          data-atlas-node="map-landmark"
+          data-atlas-label="기준점 배너"
+        >
           <IconSolarPin size={16} color="#0a607d" />
           <span className="flex-1 text-[14px] font-semibold text-brand-primary leading-[1.3]">
             기준점: {landmark.name}
@@ -820,7 +835,11 @@ export default function MapPage() {
       )}
 
       {/* 필터 바 — Desktop: 거래방식 칩 + 기준점 검색 + Sort + Reset + 비교 리포트 */}
-      <div className="hidden lg:flex border border-border-light items-center justify-between px-[40px] py-[12px] w-full">
+      <div
+        className="hidden lg:flex border border-border-light items-center justify-between px-[40px] py-[12px] w-full"
+        data-atlas-node="map-filter"
+        data-atlas-label="필터 · 정렬 바 (데스크톱)"
+      >
         <div className="flex gap-[10px] items-center flex-wrap">
           {/* 거래방식 칩 — SCR-MAP-FILTER-001 */}
           <div className="flex gap-[6px] items-center">
@@ -935,7 +954,11 @@ export default function MapPage() {
       </div>
 
       {/* 모바일 검색 바 */}
-      <div className="lg:hidden border-b border-border-light px-[16px] py-[12px]">
+      <div
+        className="lg:hidden border-b border-border-light px-[16px] py-[12px]"
+        data-atlas-node="map-landmark"
+        data-atlas-label="기준점 선택 (모바일)"
+      >
         <div
           className="flex items-center h-[44px] bg-white border border-border-mute rounded-[6px] pl-[16px] pr-[4px] cursor-pointer"
           onClick={() => setShowLandmarkInput(!showLandmarkInput)}
@@ -970,7 +993,11 @@ export default function MapPage() {
       </div>
 
       {/* 카운터 */}
-      <div className="flex items-center justify-between px-[16px] lg:px-[40px] py-[12px] lg:py-[20px] border-b border-border-light lg:border-b-[#a0a0a0]">
+      <div
+        className="flex items-center justify-between px-[16px] lg:px-[40px] py-[12px] lg:py-[20px] border-b border-border-light lg:border-b-[#a0a0a0]"
+        data-atlas-node="map-counter"
+        data-atlas-label="등록 방 수 · 모바일 정렬"
+      >
         <p className="text-[14px] font-semibold text-text-caption">
           등록된 방 {totalRooms}개/{roomLimit}개
         </p>
@@ -995,7 +1022,11 @@ export default function MapPage() {
       ) : (
         <>
           {/* 카드 그리드 — Desktop 3-col / Tablet 2-col / Mobile 1-col */}
-          <div className="border-b border-[#a0a0a0] px-[16px] lg:px-[40px] pt-[20px] lg:pt-[32px] pb-[20px] lg:pb-[32px]">
+          <div
+            className="border-b border-[#a0a0a0] px-[16px] lg:px-[40px] pt-[20px] lg:pt-[32px] pb-[20px] lg:pb-[32px]"
+            data-atlas-node="map-rooms"
+            data-atlas-label="방 카드 목록"
+          >
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[16px]">
               {sorted.map((r, idx) => {
                 const isSelected = selectedRoomForRoute?.id === r.id;
@@ -1026,7 +1057,11 @@ export default function MapPage() {
           </div>
 
           {/* NCP 지도 본체 */}
-          <div className="px-[16px] lg:px-[40px] py-[16px]">
+          <div
+            className="px-[16px] lg:px-[40px] py-[16px]"
+            data-atlas-node="map-canvas"
+            data-atlas-label="NCP 지도 본체"
+          >
           <div className="relative w-full h-[500px] bg-bg-gray overflow-hidden rounded-[10px]">
             {mapError ? (
               <div className="absolute inset-0 flex items-center justify-center">

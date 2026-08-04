@@ -2,6 +2,7 @@ import { useNavigate, Navigate } from 'react-router-dom';
 import { Icon } from '@iconify/react';
 import { useAuthStore } from '@/store/use-auth-store';
 import { ROUTES } from '@/lib/routes';
+import { useAtlasPreview } from '@/lib/use-atlas-preview';
 
 /**
  * SCR-MYPAGE — 마이페이지 (canonical 모바일 노드 645:45715)
@@ -26,6 +27,9 @@ export default function MyPage() {
   const displayName = user?.nickname?.trim() || user?.email?.trim() || '';
   const initial = displayName ? displayName.charAt(0).toUpperCase() : '?';
 
+  // Atlas 상세 캔버스가 이 페이지를 띄우면 [data-atlas-node] 좌표를 부모로 보고한다.
+  useAtlasPreview(ROUTES.MY);
+
   const handleLogout = () => {
     // TODO(api-spec A-4): 서버 세션 종료 POST /api/v1/auth/logout 미연동.
     // components.md §449 갭 — 현재는 로컬 store 정리만 수행(refresh_token 만료 쿠키 처리 후속).
@@ -36,12 +40,20 @@ export default function MyPage() {
   return (
     <div className="flex-1 bg-white flex flex-col min-h-screen">
       {/* PageTitle — px-16 py-24, border-b */}
-      <div className="px-4 py-6 border-b border-border-light">
+      <div
+        data-atlas-node="my-header"
+        data-atlas-label="페이지 제목"
+        className="px-4 py-6 border-b border-border-light"
+      >
         <h1 className="text-[20px] font-semibold text-text-main">마이페이지</h1>
       </div>
 
       {/* Content Block — 아바타 + 로그아웃 버튼 (모바일 중앙정렬, 데스크탑도 동일 중앙정렬) */}
-      <div className="flex-1 flex flex-col items-center px-4 pt-[60px]">
+      <div
+        data-atlas-node="my-account"
+        data-atlas-label="프로필 · 로그아웃"
+        className="flex-1 flex flex-col items-center px-4 pt-[60px]"
+      >
         <div className="w-full max-w-[320px] flex flex-col items-center gap-[34px]">
           {/* ProfileAvatar — 64×64 원형, bg #78919C(bg-bg-avatar), 이니셜 28px white */}
           <div

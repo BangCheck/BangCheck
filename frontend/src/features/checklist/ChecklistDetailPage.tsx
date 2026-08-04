@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ROUTES } from '@/lib/routes';
+import { useAtlasPreview } from '@/lib/use-atlas-preview';
 import { useGuestRoomStore } from '@/store/use-guest-room-store';
 import { useAuthStore } from '@/store/use-auth-store';
 import { useRoomDetail, useUpdateRoom, useDeleteRoom } from '@/features/rooms/hooks/use-rooms-query';
@@ -24,6 +25,8 @@ export default function ChecklistDetailPage() {
   const { id } = useParams<{ id: string }>();
   const { isLoggedIn } = useAuthStore();
   const { getGuestRoom, updateGuestRoom, deleteGuestRoom } = useGuestRoomStore();
+  // Atlas 상세 캔버스가 이 페이지를 띄우면 [data-atlas-node] 영역 좌표를 부모로 보고한다.
+  const atlasPreview = useAtlasPreview(ROUTES.CHECKLIST_DETAIL(id ?? ''));
 
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -119,9 +122,20 @@ export default function ChecklistDetailPage() {
     navigate(ROUTES.HOME);
   };
 
-  if (notFound) {
+  // Atlas 미리보기는 실재하지 않는 id로 열려 늘 '찾을 수 없음'만 그린다.
+  // 편집 폼 자체를 보려면 그 분기를 건너뛴다 — notfound 상태를 고른 때만 그대로 그린다.
+  // DEV 미리보기에서만 유효하다(useAtlasPreview가 import.meta.env.DEV를 본다). 운영 동작은 그대로다.
+  const showNotFound = notFound && !(atlasPreview.isPreview && atlasPreview.state !== 'notfound');
+  // 평소엔 사용자가 삭제를 눌러야만 보이는 모달을 Atlas에서 확인할 수 있게 하는 상태.
+  const showDeleteConfirm = confirmDelete || (atlasPreview.isPreview && atlasPreview.state === 'delete');
+
+  if (showNotFound) {
     return (
-      <div className="min-h-screen bg-white flex flex-col items-center justify-center gap-4 px-6">
+      <div
+        className="min-h-screen bg-white flex flex-col items-center justify-center gap-4 px-6"
+        data-atlas-node="checklist-detail-notfound"
+        data-atlas-label="찾을 수 없음"
+      >
         <h1 className="text-[18px] font-bold text-text-main">체크리스트를 찾을 수 없어요</h1>
         <p className="text-[13px] text-text-caption text-center">
           요청하신 방이 삭제되었거나, 다른 브라우저에서 저장된 데이터일 수 있어요.
@@ -142,6 +156,8 @@ export default function ChecklistDetailPage() {
       <ChecklistPageHeader
         title="체크리스트 수정"
         onBack={() => navigate(ROUTES.HOME)}
+        atlasNode="checklist-detail-header"
+        atlasLabel="헤더 · 삭제 진입"
         actions={
           <button
             type="button"
@@ -156,10 +172,16 @@ export default function ChecklistDetailPage() {
         tabNavRef={tabNavRef}
         activeSection={activeSection}
         onScrollTo={scrollToSection}
+        atlasNode="checklist-detail-tabnav"
+        atlasLabel="섹션 탭"
       />
 
       <main className="flex-1 w-full max-w-2xl md:max-w-3xl lg:max-w-4xl mx-auto px-4 sm:px-6 lg:px-10 py-6 pb-28 flex flex-col gap-8">
-        <section ref={(el) => { sectionRefs.current.basic = el; }}>
+        <section
+          ref={(el) => { sectionRefs.current.basic = el; }}
+          data-atlas-node="checklist-detail-basic"
+          data-atlas-label="기본 정보 · 주소 검색"
+        >
           <BasicInfo data={basic} onChange={patchBasic} />
         </section>
 
@@ -169,11 +191,17 @@ export default function ChecklistDetailPage() {
           optionItems={optionItems}
           buildingRef={(el) => { sectionRefs.current.building = el; }}
           optionsRef={(el) => { sectionRefs.current.options = el; }}
+          buildingAtlasNode="checklist-detail-building"
+          buildingAtlasLabel="건물 정보"
+          optionsAtlasNode="checklist-detail-options"
+          optionsAtlasLabel="옵션"
         />
         <DynamicChecklistSections
           items={checklistItems}
           answers={answers}
           onChange={patchAnswer}
+          atlasNode="checklist-detail-dynamic"
+          atlasLabel="체크 항목 6구간 · 답변 복원"
           sectionRefs={{
             INTERNAL_STATE: (el) => { sectionRefs.current.interior = el; },
             PROBLEM: (el) => { sectionRefs.current.problems = el; },
@@ -188,6 +216,8 @@ export default function ChecklistDetailPage() {
           onChange={patchCustom}
           customRef={(el) => { sectionRefs.current.custom = el; }}
           memoRef={(el) => { sectionRefs.current.memo = el; }}
+          atlasNode="checklist-detail-memo"
+          atlasLabel="메모"
         />
       </main>
 
@@ -197,10 +227,16 @@ export default function ChecklistDetailPage() {
         isSubmitting={isSubmitting}
         error={submitError}
         onClick={handleUpdate}
+        atlasNode="checklist-detail-submit"
+        atlasLabel="수정 완료"
       />
 
-      {confirmDelete && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+      {showDeleteConfirm && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4"
+          data-atlas-node="checklist-detail-delete"
+          data-atlas-label="삭제 확인"
+        >
           <div className="bg-white rounded-[12px] w-full max-w-sm p-6 flex flex-col gap-4">
             <h2 className="text-[16px] font-bold text-text-main">체크리스트를 삭제할까요?</h2>
             <p className="text-[13px] text-text-mute">

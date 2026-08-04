@@ -41,7 +41,11 @@ export function SectionTabNav({ activeSections }: Props) {
   const visible = REPORT_SECTIONS.filter((s) => activeSections.includes(s.id));
 
   return (
-    <nav className="bg-white border-b border-border-light">
+    <nav
+      className="bg-white border-b border-border-light"
+      data-atlas-node="report-section-tabs"
+      data-atlas-label="섹션 탭 내비게이션"
+    >
       <div className="max-w-[1200px] mx-auto px-4 md:px-10 overflow-x-auto scrollbar-none max-w-full">
         <div className="flex flex-wrap gap-y-1 md:flex-nowrap md:min-w-max">
           {visible.map((s) => {

@@ -51,19 +51,31 @@ export function BuildingSections({
   optionItems,
   buildingRef,
   optionsRef,
+  buildingAtlasNode,
+  buildingAtlasLabel,
+  optionsAtlasNode,
+  optionsAtlasLabel,
 }: {
   data: BuildingInfoData;
   onChange: <K extends keyof BuildingInfoData>(key: K, value: BuildingInfoData[K]) => void;
   optionItems: ChecklistItemResponse[];
   buildingRef: React.RefCallback<HTMLElement>;
   optionsRef: React.RefCallback<HTMLElement>;
+  /**
+   * Atlas 상세 캔버스용 식별자. 두 섹션이 서로 다른 카드라 값도 따로 받는다.
+   * /checklist/new와 /checklist/:id가 이 컴포넌트를 공유하므로 페이지가 넘긴다.
+   */
+  buildingAtlasNode?: string;
+  buildingAtlasLabel?: string;
+  optionsAtlasNode?: string;
+  optionsAtlasLabel?: string;
 }) {
   const toggleOption = (v: string) =>
     onChange('options', data.options.includes(v) ? data.options.filter((x) => x !== v) : [...data.options, v]);
 
   return (
     <>
-      <section ref={buildingRef}>
+      <section ref={buildingRef} data-atlas-node={buildingAtlasNode} data-atlas-label={buildingAtlasLabel}>
         <SectionHeader title="건물 정보" />
         <div className="flex flex-col gap-5">
           <div>
@@ -115,7 +127,7 @@ export function BuildingSections({
       </section>
 
       {optionItems.length > 0 && (
-        <section ref={optionsRef}>
+        <section ref={optionsRef} data-atlas-node={optionsAtlasNode} data-atlas-label={optionsAtlasLabel}>
           <SectionHeader title="옵션 (다중 선택)" />
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
             {optionItems.map((item) => (
@@ -252,16 +264,21 @@ export function CustomSections({
   data,
   onChange,
   memoRef,
+  atlasNode,
+  atlasLabel,
 }: {
   data: CustomMemoData;
   onChange: <K extends keyof CustomMemoData>(key: K, value: CustomMemoData[K]) => void;
   customRef?: React.RefCallback<HTMLElement>;
   memoRef: React.RefCallback<HTMLElement>;
   isLoggedIn?: boolean;
+  /** Atlas 상세 캔버스용 식별자. 페이지가 넘긴다 */
+  atlasNode?: string;
+  atlasLabel?: string;
 }) {
   return (
     <>
-      <section ref={memoRef}>
+      <section ref={memoRef} data-atlas-node={atlasNode} data-atlas-label={atlasLabel}>
         <SectionHeader title="메모" />
         <div className="flex flex-col gap-2">
           <div className="flex items-center justify-between">
@@ -363,16 +380,25 @@ export function DynamicChecklistSections({
   answers,
   onChange,
   sectionRefs = {},
+  atlasNode,
+  atlasLabel,
 }: {
   items: ChecklistItemResponse[];
   answers: ChecklistAnswers;
   onChange: (itemId: number, value: string | null) => void;
   sectionRefs?: Partial<Record<ChecklistCategory, React.RefCallback<HTMLElement>>>;
+  /**
+   * Atlas 상세 캔버스용 식별자. 6개 카테고리가 한 코드 경로에서 나오므로 카드도 하나다.
+   * 좌표를 하나로 보고하려면 상자가 필요해 fragment 대신 div로 감싼다 —
+   * flex flex-col gap-8은 부모 main과 같은 값이라 간격은 그대로다.
+   */
+  atlasNode?: string;
+  atlasLabel?: string;
 }) {
   if (items.length === 0) return null;
 
   return (
-    <>
+    <div className="flex flex-col gap-8" data-atlas-node={atlasNode} data-atlas-label={atlasLabel}>
       {FORM_CATEGORY_ORDER.map((cat) => {
         const catItems = items.filter((i) => i.category === cat);
         if (catItems.length === 0) return null;
@@ -392,6 +418,6 @@ export function DynamicChecklistSections({
           </section>
         );
       })}
-    </>
+    </div>
   );
 }

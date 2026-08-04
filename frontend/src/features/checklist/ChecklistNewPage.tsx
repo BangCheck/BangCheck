@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '@/lib/routes';
+import { useAtlasPreview } from '@/lib/use-atlas-preview';
 import { useGuestRoomStore } from '@/store/use-guest-room-store';
 import { useAuthStore } from '@/store/use-auth-store';
 import { useRoomsList, useCreateRoom } from '@/features/rooms/hooks/use-rooms-query';
@@ -23,6 +24,9 @@ import {
 
 export default function ChecklistNewPage() {
   const navigate = useNavigate();
+  // Atlas 상세 캔버스가 이 페이지를 띄우면 [data-atlas-node] 영역 좌표를 부모로 보고한다.
+  // 화면 동작은 바꾸지 않는다 — 이 페이지는 비로그인 상태에서도 폼 전체가 그려지기 때문이다.
+  useAtlasPreview(ROUTES.CHECKLIST_NEW);
   const { addGuestRoom, guestRooms } = useGuestRoomStore();
   const { isLoggedIn } = useAuthStore();
   const { data: apiRooms } = useRoomsList();
@@ -84,16 +88,27 @@ export default function ChecklistNewPage() {
 
   return (
     <div className="min-h-screen bg-white flex flex-col">
-      <ChecklistPageHeader title="방 체크리스트" onBack={() => navigate(ROUTES.HOME)} />
+      <ChecklistPageHeader
+        title="방 체크리스트"
+        onBack={() => navigate(ROUTES.HOME)}
+        atlasNode="checklist-new-header"
+        atlasLabel="헤더 · 나가기"
+      />
       <ChecklistTabNav
         tabNavRef={tabNavRef}
         activeSection={activeSection}
         onScrollTo={scrollToSection}
         filter={(id) => isLoggedIn || id !== 'custom'}
+        atlasNode="checklist-new-tabnav"
+        atlasLabel="섹션 탭 · 로그인 분기"
       />
 
       <main className="flex-1 w-full max-w-2xl md:max-w-3xl lg:max-w-4xl mx-auto px-4 sm:px-6 lg:px-10 py-6 pb-28 flex flex-col gap-8">
-        <section ref={(el) => { sectionRefs.current.basic = el; }}>
+        <section
+          ref={(el) => { sectionRefs.current.basic = el; }}
+          data-atlas-node="checklist-new-basic"
+          data-atlas-label="기본 정보 · 주소 검색"
+        >
           <BasicInfo data={basic} onChange={patchBasic} />
         </section>
 
@@ -103,11 +118,17 @@ export default function ChecklistNewPage() {
           optionItems={optionItems}
           buildingRef={(el) => { sectionRefs.current.building = el; }}
           optionsRef={(el) => { sectionRefs.current.options = el; }}
+          buildingAtlasNode="checklist-new-building"
+          buildingAtlasLabel="건물 정보"
+          optionsAtlasNode="checklist-new-options"
+          optionsAtlasLabel="옵션"
         />
         <DynamicChecklistSections
           items={checklistItems}
           answers={answers}
           onChange={patchAnswer}
+          atlasNode="checklist-new-dynamic"
+          atlasLabel="체크 항목 6구간"
           sectionRefs={{
             INTERNAL_STATE: (el) => { sectionRefs.current.interior = el; },
             PROBLEM: (el) => { sectionRefs.current.problems = el; },
@@ -122,6 +143,8 @@ export default function ChecklistNewPage() {
           onChange={patchCustom}
           customRef={(el) => { sectionRefs.current.custom = el; }}
           memoRef={(el) => { sectionRefs.current.memo = el; }}
+          atlasNode="checklist-new-memo"
+          atlasLabel="메모"
         />
       </main>
 
@@ -131,6 +154,8 @@ export default function ChecklistNewPage() {
         isSubmitting={isSubmitting}
         error={submitError}
         onClick={handleSubmit}
+        atlasNode="checklist-new-submit"
+        atlasLabel="저장 · 방 등록"
       />
     </div>
   );

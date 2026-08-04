@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useQueries } from '@tanstack/react-query';
 import { Icon } from '@iconify/react';
 import { ROUTES } from '@/lib/routes';
+import { useAtlasPreview } from '@/lib/use-atlas-preview';
 import { useGuestRoomStore } from '@/store/use-guest-room-store';
 import { useAuthStore } from '@/store/use-auth-store';
 import { useRoomsList } from '@/features/rooms/hooks/use-rooms-query';
@@ -18,6 +19,8 @@ import { LoginRequiredModal } from '@/components/ui/Modals';
 
 export default function ReportPage() {
   const navigate = useNavigate();
+  // Atlas 상세 캔버스가 이 페이지를 띄우면 [data-atlas-node] 좌표를 부모로 보고한다
+  useAtlasPreview(ROUTES.REPORT);
   const { isLoggedIn } = useAuthStore();
   const { guestRooms } = useGuestRoomStore();
   const { data: apiRooms = [], isLoading: isRoomsLoading } = useRoomsList();
@@ -117,7 +120,11 @@ export default function ReportPage() {
   return (
     <div className="flex-1 bg-bg-footer min-h-screen">
       {/* ── 서브 헤더 ── */}
-      <div className="bg-white border-b border-border-light sticky top-14 md:top-16 z-30">
+      <div
+        className="bg-white border-b border-border-light sticky top-14 md:top-16 z-30"
+        data-atlas-node="report-subheader"
+        data-atlas-label="서브 헤더 · 공유 · PDF"
+      >
         <div className="max-w-screen-xl mx-auto px-4 md:px-10 py-3 md:py-4 flex items-center gap-2 md:gap-4">
           <button
             type="button"
@@ -157,7 +164,11 @@ export default function ReportPage() {
 
       {/* ── 설정 패널 ── */}
       {isConfigOpen && (
-        <div className="bg-white border-b border-border-light">
+        <div
+          className="bg-white border-b border-border-light"
+          data-atlas-node="report-config"
+          data-atlas-label="비교 설정 패널"
+        >
           <div className="max-w-screen-xl mx-auto px-4 md:px-10 py-6">
             <ConfigCard
               rooms={rooms}
@@ -181,7 +192,11 @@ export default function ReportPage() {
 
       {/* ── 비교 테이블 ── */}
       {hasEnoughRooms && (
-        <div className="max-w-screen-xl mx-auto px-4 md:px-10 py-10 space-y-10">
+        <div
+          className="max-w-screen-xl mx-auto px-4 md:px-10 py-10 space-y-10"
+          data-atlas-node="report-compare"
+          data-atlas-label="비교표"
+        >
           <CompareTable rooms={selectedRooms} activeSections={activeSections} details={roomDetails} />
         </div>
       )}
