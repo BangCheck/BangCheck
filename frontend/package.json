@@ -9,6 +9,7 @@
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
     "atlas:check": "node scripts/check-atlas-snapshot.mjs",
+    "atlas:resolve": "python3 ../.project-atlas/tools/resolve.py",
     "atlas:snapshot": "python3 ../.project-atlas/tools/pm_snapshot.py",
     "lint": "eslint .",
     "test:e2e": "playwright test",
