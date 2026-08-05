@@ -36,9 +36,20 @@ jobs:
       - name: Install deps
         run: npm ci
 
+      # VITE_* 를 env 로 주입하지 않는다.
+      #
+      # 예전에는 VITE_API_URL 을 secrets 에서 주입했는데, secret 이 없으면 빈 문자열이
+      # 들어온다. Vite 는 실제 환경변수를 .env 파일보다 우선하고 빈 값도 "설정된 것"으로
+      # 취급하므로, 커밋된 frontend/.env.production 이 무시되고 api.ts 의 프로덕션
+      # 가드가 던져 사이트가 통째로 백지가 된다. 2026-08-05 실제로 그렇게 죽었다 (#222).
+      #
+      # 값의 정본은 frontend/.env.production 하나다. 그 파일은 커밋돼 있고 Vite 가
+      # production 빌드에서 자동으로 읽는다. 여기서 다시 주입하면 정본이 둘이 되고,
+      # 둘 중 하나가 비는 순간 조용히 이긴다.
+      #
+      # 비밀값이 필요해지면 그때는 .env.production 이 아니라 이 자리로 와야 한다 —
+      # 다만 그 값은 번들에 그대로 박히므로 애초에 VITE_ 접두로 둘 것이 아니다.
       - name: Build
-        env:
-          VITE_API_URL: ${{ secrets.VITE_API_URL }}
         run: npm run build
 
       - name: Configure AWS credentials
