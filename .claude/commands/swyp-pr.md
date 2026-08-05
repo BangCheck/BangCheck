@@ -55,10 +55,16 @@ Wait for the user's answer before proceeding.
 
 ### Auto Status Label Change
 
-On PR creation → change to `status:review`:
-```bash
-gh issue edit {number} --remove-label "status:progress" --add-label "status:review" --repo {repo}
-```
+이 단계는 2026-08-05에 제거했다.
+
+`status:progress`·`status:review` 라벨이 이 저장소에 존재하지 않는다.
+실제 라벨은 `유형:버그`·`유형:작업`·`높음`/`보통`/`낮음`·`백엔드`/`프론트엔드`뿐이라
+위 명령은 `gh` 오류로 끝났다 — 시키는 대로 따라 하면 그 줄에서 멈춘다.
+
+`_compliance-spec.yaml`의 `issue_labels` 규칙도 같은 이유로 비활성화돼 있다(#218).
+라벨 체계가 확정되면 그 시점에 규칙과 이 단계를 한 번에 되살린다(#224).
+
+PR 상태는 GitHub의 PR 상태 자체가 말한다 — 별도 라벨을 두면 정본이 둘이 된다.
 
 ---
 
