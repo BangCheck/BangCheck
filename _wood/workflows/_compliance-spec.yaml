@@ -56,7 +56,9 @@ rules:
   branch_naming:
     severity: error
     enabled: true
-    pattern: '^(feat|fix|refactor|docs|chore|design)/[0-9]+-[a-z0-9-]+$'
+    # revert 추가 — 머지 이력에 revert/be-directions-rollback 이 실재한다(2026-08-05 실측).
+    # 실제로 쓰이는 타입을 목록에서 빼두면 정상 작업이 error로 죽는다.
+    pattern: '^(feat|fix|refactor|docs|chore|design|revert)/[0-9]+-[a-z0-9-]+$'
     description: "Branch name must follow {type}/{issue-number}-{slug} format"
     examples_good:
       - feat/5-login-form
@@ -109,8 +111,12 @@ rules:
       git push --force-with-lease
 
   commit_issue_ref:
+    # 실행기에 구현은 있으나 관측 기준선이 없어 꺼 둔다.
+    # spec이 enabled인데 실행기에 없던 규칙이라, spec을 실행기의 정본으로 연결하는
+    # 순간 아무 예고 없이 켜질 뻔했다. 켜려면 먼저 현행 커밋들이 이 규칙을 얼마나
+    # 어기는지 측정해야 한다.
     severity: warning
-    enabled: true
+    enabled: false
     pattern: '#[0-9]+'
     description: "Commit body must include an issue number (`#N` format)"
     location: "body"
@@ -122,14 +128,17 @@ rules:
   pr_template:
     severity: warning
     enabled: true
+    # 2026-08-05 실측: 머지된 PR 5건의 본문이 100% 아래 형식이고 swyp-pr 명령도 이것을 만든다.
+    # 이전 값은 What/Why/Test 였는데 그 형식을 쓴 PR은 한 건도 없었다 — 모든 PR에서
+    # 100% 오탐이 떴고, 경고가 상시로 뜨면 사람은 경고를 안 읽게 된다.
+    # 정본을 관행 쪽으로 잡고 .github/PULL_REQUEST_TEMPLATE.md 를 여기 맞췄다.
     required_sections:
-      - "^##\\s+What"
-      - "^##\\s+Why"
-      - "^##\\s+Test"
-    description: "PR body must contain What/Why/Test sections"
+      - "^##\\s+Summary"
+      - "^##\\s+Linked Issue"
+      - "^##\\s+Changes"
+    description: "PR body must contain Summary/Linked Issue/Changes sections"
     fix_guide: |
-      Edit PR description → refer to docs template
-      docs: _wood/workflows/05-pr.md
+      Edit PR description → follow .github/PULL_REQUEST_TEMPLATE.md
 
   # ─────────────────────────────────────────────
   # Linked issue labels
@@ -137,7 +146,12 @@ rules:
 
   issue_labels:
     severity: warning
-    enabled: true
+    # 2026-08-05 비활성화. 완화가 아니라 중단이다.
+    # 이 저장소에 `순위:` 접두 라벨과 `상태:` 라벨이 존재하지 않아 통과가 구조적으로
+    # 불가능했다(최근 이슈 15건 중 13건이 라벨 0개). 실재하는 라벨만 검사하도록
+    # 완화하면 ISSUE_TEMPLATE으로 라벨을 강제할 때 규칙을 또 고쳐야 한다.
+    # 라벨 체계가 확정되는 시점에 정확한 요구로 한 번만 되켠다.
+    enabled: false
     required_label_prefixes:
       - "유형:"
       - "순위:"
@@ -194,8 +208,10 @@ rules:
   # ─────────────────────────────────────────────
 
   protected_files_mention:
+    # 판정은 protected-files.yml 이 단독으로 소유한다. 여기서 켜도 findings를 만들지
+    # 않으므로 선언만 남아 두 곳이 같은 것을 본다는 오해를 만든다.
     severity: info
-    enabled: true
+    enabled: false
     description: "When protected files are modified, .github/workflows/protected-files.yml handles it separately"
     delegate_to: ".github/workflows/protected-files.yml"
 
@@ -209,9 +225,15 @@ exemptions:
     enabled: false   # Disabled by default (Admin follows the same rules)
     allowed_roles: [Admin]
 
-  # PRs with specific labels skip checks
-  skip_labels:
-    - "skip-compliance"   # Only when Admin explicitly applies it
+  # skip_labels 는 2026-08-05에 제거했다.
+  #
+  # 라벨 기반 우회는 특정 head SHA에 묶이지 않는다. Admin이 한 번 붙인 라벨은
+  # 그 뒤에 올라온 커밋까지 계속 통과시킨다. timeline API로 라벨을 단 actor를
+  # 확인할 수 있지만 그 한계는 해소되지 않으므로, 권한 검사를 붙여도 안전한
+  # 우회가 되지 못한다.
+  #
+  # 긴급 상황의 탈출구는 PR 라벨이 아니라 required check 승격 시 GitHub의
+  # 감사 가능한 Admin bypass로 둔다. 그 전까지는 오탐을 P0로 고친다.
 
 # ============================================================
 # Reporting

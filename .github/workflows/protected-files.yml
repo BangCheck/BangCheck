@@ -41,19 +41,30 @@ permissions:
 env:
   ADMIN_LOGIN: Woo-JongHo
   # Glob patterns of protected files (must mirror AGENTS.md + team-roles.yaml)
+  # AGENTS.md의 "Protected Files — DO NOT MODIFY" 목록과 같은 항목·같은 순서.
+  # 2026-08-05 실측에서 5개가 빠져 있었다 — GEMINI.md, .claude/hooks/**,
+  # .claude/settings.json, _wood/context/**, docs/spec/**.
+  # 선언(AGENTS.md)과 집행(여기)이 갈리면 보호받는다고 적힌 파일이 실제로는 안 막힌다.
+  # compliance-guard.yml 은 CODEOWNERS에만 있고 양쪽 목록에 없어 함께 추가했다.
   PROTECTED_PATTERNS: |
     AGENTS.md
     CLAUDE.md
+    GEMINI.md
     .cursorrules
     .claude/commands/**
+    .claude/hooks/**
+    .claude/settings.json
     .github/CODEOWNERS
     .github/copilot-instructions.md
     .github/workflows/protected-files.yml
+    .github/workflows/compliance-guard.yml
     _wood/workflows/**
     _wood/agents/**
     _wood/team-roles.yaml
     _wood/milestone-meta.yaml
+    _wood/context/**
     docs/team-conventions.md
+    docs/spec/**
 
 jobs:
   guard:
@@ -167,11 +178,20 @@ jobs:
           script: |
             const adminLogin = process.env.ADMIN_LOGIN;
 
-            // Get all reviews on this PR
-            const { data: reviews } = await github.rest.pulls.listReviews({
+            // 현재 head. 승인은 "이 PR"이 아니라 "이 커밋"에 대해서만 유효하다.
+            const { data: pr } = await github.rest.pulls.get({
               owner: context.repo.owner,
               repo: context.repo.repo,
               pull_number: context.issue.number,
+            });
+            const headSha = pr.head.sha;
+
+            // paginate — 리뷰가 30건을 넘으면 예전에는 뒤쪽을 못 봤다.
+            const reviews = await github.paginate(github.rest.pulls.listReviews, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number,
+              per_page: 100,
             });
 
             // Filter latest review per user (most recent state wins)
@@ -181,18 +201,31 @@ jobs:
             }
 
             const adminReview = latestByUser.get(adminLogin);
+
+            // stale approval 차단.
+            //
+            // 예전에는 state === 'APPROVED' 만 봤다. 그러면 Admin이 한 번 승인한 뒤
+            // 새 커밋을 밀어넣어도 승인이 그대로 남아 보호 파일 변경이 통과한다.
+            // 승인은 승인한 시점의 커밋(commit_id)에만 유효하다 — 그 뒤의 변경은
+            // 아무도 본 적이 없기 때문이다.
+            const approvedSha = adminReview && adminReview.commit_id;
             const approved =
-              adminReview && adminReview.state === 'APPROVED';
+              adminReview && adminReview.state === 'APPROVED' && approvedSha === headSha;
 
             if (!approved) {
+              const reason = !adminReview
+                ? 'NO REVIEW'
+                : adminReview.state !== 'APPROVED'
+                  ? adminReview.state
+                  : `STALE — 승인 대상 ${String(approvedSha).substring(0, 7)}, 현재 head ${headSha.substring(0, 7)}`;
               core.setFailed(
-                `🔒 This PR requires explicit APPROVED review from @${adminLogin}.\n` +
-                `Current state: ${adminReview ? adminReview.state : 'NO REVIEW'}\n` +
+                `🔒 This PR requires explicit APPROVED review from @${adminLogin} on the current head.\n` +
+                `Current state: ${reason}\n` +
                 `\n` +
-                `Protected file changes cannot be merged without Admin sign-off.`
+                `Protected file changes cannot be merged without Admin sign-off on the exact commit.`
               );
             } else {
-              core.info(`✅ Approved by @${adminLogin}.`);
+              core.info(`✅ Approved by @${adminLogin} on ${headSha.substring(0, 7)}.`);
             }
 
       # ------------------------------------------------------------

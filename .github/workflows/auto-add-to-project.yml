@@ -14,6 +14,13 @@ jobs:
     steps:
       - uses: actions/add-to-project@v1.0.4
         with:
-          project-url: https://github.com/orgs/SWYP-Backend/projects/2
+          # 조직명이 SWYP-Backend → BangCheck 로 바뀌었다.
+          # 저장소 접근은 GitHub 리다이렉트로 살아 있지만 org 단위 리소스는
+          # 리다이렉트되지 않는다 — `gh project list --owner SWYP-Backend` 가
+          # "unknown owner type" 을 낸다. 그래서 이 워크플로가 2026-05-28 이후
+          # 5회 연속 실패했고 그동안 생성된 이슈가 보드에 올라가지 않았다.
+          # projects/2 의 번호는 조직 rename 시 보존되지만 실측으로 확인하지 못했다
+          # (read:project 스코프 없음). 첫 실행에서 드러난다.
+          project-url: https://github.com/orgs/BangCheck/projects/2
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
