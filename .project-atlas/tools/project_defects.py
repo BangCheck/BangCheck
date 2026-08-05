@@ -123,17 +123,32 @@ def build_body(defect: dict, slug: str) -> str:
 
 
 def write_back(defect_id: str, number: int) -> None:
-    """`- id: <ID>` 줄 바로 뒤에 `issue: N` 을 끼운다. 주석을 건드리지 않는다."""
+    """`- id: <ID>` 줄 바로 뒤에 `issue: N` 을 끼운다. 주석을 건드리지 않는다.
+
+    원자적으로 쓴다. 중간에 죽으면 defects.yaml 이 반쪽으로 남고, 그 파일은
+    registry 의 정본이라 손상되면 resolver·sync 검사가 전부 무의미해진다.
+    """
     text = DEFECTS.read_text(encoding="utf-8")
-    pattern = re.compile(rf"^(  - id: {re.escape(defect_id)}\s*)$", re.M)
+    pattern = re.compile(rf"^(  - id: {re.escape(defect_id)}[ \t]*)$", re.M)
     match = pattern.search(text)
     if not match:
         raise SystemExit(f"defects.yaml 에서 '- id: {defect_id}' 줄을 찾지 못했다")
+
+    # 이미 issue 키가 있으면 덧붙이지 않는다. issue: null / 0 처럼 falsy 로
+    # 적혀 있는 경우 호출부의 `if defect.get("issue")` 를 통과해 여기까지 오는데,
+    # 그대로 삽입하면 같은 블록에 issue 키가 둘이 되어 YAML 이 조용히 뒤엣것만 읽는다.
+    block_end = text.find("\n  - id:", match.end())
+    block = text[match.end(): block_end if block_end != -1 else len(text)]
+    if re.search(r"^\s+issue:", block, re.M):
+        raise SystemExit(
+            f"{defect_id} 에 이미 issue 키가 있다 — 값을 확인하고 손으로 정리하라"
+        )
+
     insert_at = match.end()
-    DEFECTS.write_text(
-        text[:insert_at] + f"\n    issue: {number}" + text[insert_at:],
-        encoding="utf-8",
-    )
+    updated = text[:insert_at] + f"\n    issue: {number}" + text[insert_at:]
+    tmp = DEFECTS.with_suffix(".yaml.tmp")
+    tmp.write_text(updated, encoding="utf-8")
+    tmp.replace(DEFECTS)
 
 
 def main() -> int:
@@ -150,8 +165,10 @@ def main() -> int:
 
     targets, skipped = [], []
     for defect in defects:
-        if defect.get("issue"):
-            skipped.append((defect["id"], f"이미 #{defect['issue']}"))
+        if "issue" in defect and defect.get("issue") is not None:
+            value = defect["issue"]
+            label = f"이미 #{value}" if value else f"issue 키가 {value!r} — 손으로 정리 필요"
+            skipped.append((defect["id"], label))
             continue
         if defect.get("disposition") in SKIP_DISPOSITIONS:
             skipped.append((defect["id"], f"{defect['disposition']} — 이슈 대상 아님"))

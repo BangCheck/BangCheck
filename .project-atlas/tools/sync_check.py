@@ -14,8 +14,16 @@
   SYN-01  registry 가 가리키는 이슈가 실재하는가
   SYN-02  그 이슈가 정말 그 결함인가 (본문 마커 대조)
   SYN-03  마커가 있는 이슈가 registry 에 있는가 (역방향 — 고아 투영)
-  SYN-04  이슈는 닫혔는데 결함이 살아 있는가 (상태 정합)
   SYN-05  registry 밖의 열린 이슈 (--suggest 일 때만, 위반 아님)
+
+SYN-04 를 뺀 이유 (2026-08-05)
+  처음에는 "이슈가 닫혔는데 disposition 이 미해결이면 위반"으로 뒀다. 틀렸다.
+  disposition 은 **처리 방침**이지 해결 상태가 아니다 — FIX_PLANNED 는 "고치기로
+  했다"는 뜻이고 고친 뒤에도 그대로 남는다. schema 가 그렇게 선언한다.
+  그 규칙대로면 BC-DEPLOY-01 을 고친 PR 이 머지되는 순간 #222 가 닫히고, 그 뒤
+  모든 PR 이 "정상적으로 해결했다"는 이유로 빨간불이 된다.
+  해결 상태는 이미 파생값이 소유한다 — pm_snapshot.py 가 issue 번호에서
+  OBSERVED/TRACKED 를 만든다. 같은 것을 두 곳에서 판정하면 갈라진다.
 
 SYN-05 를 기본에서 빼는 이유
   이 저장소의 열린 이슈에는 결함이 아닌 것이 섞여 있다 — 프로세스 개선, 데드락
@@ -45,9 +53,6 @@ import yaml
 ATLAS_DIR = Path(__file__).resolve().parent.parent
 MARKER_PREFIX = "<!-- atlas-defect: "
 
-# 결함이 아직 살아 있다고 보는 처분. 이슈가 닫혔는데 이 상태면 어긋남이다.
-UNRESOLVED = {"UNDECIDED", "FIX_PLANNED", "NEEDS_PRODUCT_DECISION", "FIX_WHEN_SLICE_MIGRATED"}
-
 
 class Report:
     def __init__(self) -> None:
@@ -72,11 +77,16 @@ def gh_json(args: list[str]) -> object:
 
 
 def marker_of(body: str) -> str | None:
-    if MARKER_PREFIX not in (body or ""):
+    """마커를 읽는다. 닫히지 않은 마커에 크래시하지 않는다 —
+    검사기가 예외로 죽으면 '어긋남'과 '버그'를 구별할 수 없게 된다."""
+    text = body or ""
+    if MARKER_PREFIX not in text:
         return None
-    start = body.index(MARKER_PREFIX) + len(MARKER_PREFIX)
-    end = body.index("-->", start)
-    return body[start:end].strip()
+    start = text.index(MARKER_PREFIX) + len(MARKER_PREFIX)
+    end = text.find("-->", start)
+    if end == -1:
+        return None
+    return text[start:end].strip()
 
 
 def main() -> int:
@@ -96,8 +106,11 @@ def main() -> int:
     )["defects"]
     by_id = {d["id"]: d for d in defects}
 
+    # --limit 은 절단이다. 300건을 넘기면 그 뒤 이슈는 아무도 보지 않고,
+    # registry 가 가리키는 번호가 거기 있으면 SYN-01 이 "없다"고 오탐한다.
+    # gh 는 --limit 이 총량 상한이므로 충분히 크게 준다.
     issues = gh_json([
-        "issue", "list", "-R", slug, "--state", "all", "--limit", "300",
+        "issue", "list", "-R", slug, "--state", "all", "--limit", "10000",
         "--json", "number,title,body,state",
     ])
     by_number = {i["number"]: i for i in issues}
@@ -127,12 +140,6 @@ def main() -> int:
         else:
             report.ok()
 
-        if issue["state"] == "CLOSED" and defect.get("disposition") in UNRESOLVED:
-            report.fail("SYN-04", where,
-                        f"#{number} 는 닫혔는데 disposition 이 {defect['disposition']} 이다")
-        else:
-            report.ok()
-
     # ── GitHub → registry ─────────────────────────────────────
     for issue in issues:
         marker = marker_of(issue.get("body") or "")
@@ -158,7 +165,10 @@ def main() -> int:
         print(json.dumps({
             "checked": report.checked,
             "violations": report.violations,
-            "unregistered_open": [{"number": i["number"], "title": i["title"]} for i in unregistered],
+            "unregistered_open": (
+                [{"number": i["number"], "title": i["title"]} for i in unregistered]
+                if args.suggest else None
+            ),
         }, ensure_ascii=False, indent=2))
         return 1 if report.violations else 0
 
