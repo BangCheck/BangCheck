@@ -17,12 +17,10 @@ import Footer from '@/app/layout/Footer';
 import BottomNavigation from '@/app/layout/BottomNavigation';
 import { DevLoginButton } from '@/features/dev/DevLoginButton';
 
-const ProjectMapPage = import.meta.env.DEV
-  ? lazy(() => import('@/features/research/ResearchPage'))
-  : null;
-const ProjectAtlasPage = import.meta.env.DEV
-  ? lazy(() => import('@/features/project-atlas/ProjectAtlasPage'))
-  : null;
+// Atlas는 프로덕션에도 나간다. lazy를 유지해 별도 청크로 떨어뜨린다 —
+// 이 페이지를 열지 않는 사용자는 코드를 받지 않는다.
+const ProjectMapPage = lazy(() => import('@/features/research/ResearchPage'));
+const ProjectAtlasPage = lazy(() => import('@/features/project-atlas/ProjectAtlasPage'));
 
 const AtlasLoading = () => (
   <div className="min-h-screen bg-white text-[#616161] grid place-items-center font-mono text-xs tracking-[0.2em]">
@@ -49,18 +47,15 @@ export const Router = () => (
       <Route path="/" element={<LandingPage />} />
       <Route path="/login-error" element={<LoginErrorPage />} />
       <Route path="/auth/callback/:provider" element={<AuthCallbackPage />} />
-      {import.meta.env.DEV && ProjectMapPage && ProjectAtlasPage && (
-        <>
-          <Route
-            path={ROUTES.PROJECT_MAP}
-            element={<Suspense fallback={<AtlasLoading />}><ProjectMapPage /></Suspense>}
-          />
-          <Route
-            path={ROUTES.PROJECT_PAGE_PATTERN}
-            element={<Suspense fallback={<AtlasLoading />}><ProjectAtlasPage /></Suspense>}
-          />
-        </>
-      )}
+      <Route
+        path={ROUTES.PROJECT_MAP}
+        element={<Suspense fallback={<AtlasLoading />}><ProjectMapPage /></Suspense>}
+      />
+      <Route
+        path={ROUTES.PROJECT_PAGE_PATTERN}
+        element={<Suspense fallback={<AtlasLoading />}><ProjectAtlasPage /></Suspense>}
+      />
+
 
       {/* 헤더 있는 페이지 */}
       <Route element={<AppLayout />}>
