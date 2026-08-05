@@ -26,5 +26,21 @@ sources:
   # 제품 관측치 정답지 — route 목록의 기계적 근거
   routeOracle: backend/src/test/resources/atlas-baseline/routes.txt
 
+  # 정답지에 있으나 어떤 feature도 소유하지 않는 route.
+  #
+  # 왜 목록으로 두는가: RTE-02는 "정답지의 route가 전부 owns 되었는가"를 검사한다.
+  # 프레임워크가 자동으로 여는 경로까지 소유를 요구하면 검사가 통과할 수 없고,
+  # 반대로 "제품이 아닌 것 같으면 넘어간다"는 판정을 코드에 심으면 그 판정 기준이
+  # 어디에도 안 적힌 채 굳는다. 면제는 데이터로 두고 근거를 옆에 적는다.
+  #
+  # 여기에 제품 route를 넣으면 커버리지 검사가 그만큼 눈을 감는다. 추가는 근거와 함께.
+  # 목록이 낡는 것도 검사한다 — 정답지에 없는 항목은 RTE-03이 잡는다.
+  routeOracleExempt:
+    - "* /error"                        # Spring Boot 기본 에러 매핑. 컨트롤러가 아니다
+    - "GET /swagger-ui.html"            # springdoc이 자동 등록
+    - "GET /v3/api-docs"                # springdoc
+    - "GET /v3/api-docs.yaml"           # springdoc
+    - "GET /v3/api-docs/swagger-config" # springdoc
+
 # 이동 전까지만 유효한 경로. 추출 시 이 키는 제거된다 (AD-12).
 registryRoot: .project-atlas/registry

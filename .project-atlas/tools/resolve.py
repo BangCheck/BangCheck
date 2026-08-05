@@ -11,6 +11,8 @@ registry에 적힌 값이 실제 저장소와 맞는지 기계적으로 검사�
   SRC-01 evidence·implementedBy의 경로가 실제로 존재하는가
   SRC-02 evidence.symbol이 그 파일 안에 실제로 등장하는가
   RTE-01 route가 제품 정답지(routes.txt)에 존재하는가
+  RTE-02 정답지의 제품 route가 전부 어떤 feature에 owns 되었는가 (역방향 커버리지)
+  RTE-03 면제 목록의 route가 정답지에 아직 실재하는가 (낡은 면제)
   WRT-01 safety.writes의 테이블이 Flyway 마이그레이션에 실재하는가
   FEC-01 프론트가 부르는 route가 제품에 실재하는가 (코드에서 추출)
   FLD-01 required 필드가 누락되지 않았는가
@@ -319,6 +321,7 @@ def main() -> int:
     # --- feature registry ------------------------------------------------
     feature_ids: set[str] = set()
     operation_ids: set[str] = set()
+    owned_routes: set[str] = set()
     spec = entities["feature"]
 
     for path in sorted((ATLAS_DIR / "registry").glob("FT-*.yaml")):
@@ -354,6 +357,10 @@ def main() -> int:
                 report.fail("RTE-01", op_where, f"route가 제품 정답지에 없다: {route}")
             elif route:
                 report.ok()
+            # owns 된 route만 커버리지에 센다. uses는 소유 주장이 아니므로
+            # 그것으로 정답지를 덮으면 주인 없는 route가 덮인 것처럼 보인다.
+            if route:
+                owned_routes.add(route)
 
             safety = operation.get("safety") or {}
             check_required(report, op_where, safety, entities["safety"]["required"])
@@ -412,6 +419,35 @@ def main() -> int:
 
         for test in feature.get("tests") or []:
             check_path(report, "SRC-01", where, test)
+
+    # --- route 커버리지 (RTE-02 / RTE-03) ---------------------------------
+    # RTE-01은 "registry의 route가 제품에 있는가"만 본다. 그 반대 방향 —
+    # 제품에 있는데 registry가 모르는 route — 은 아무도 보지 않았다.
+    # 그 구멍으로 들어오는 것이 "새 엔드포인트를 추가했는데 Atlas는 모름"이고,
+    # 그때 화면은 그 기능이 없는 것처럼 조용히 답한다.
+    #
+    # 판정 기준은 코드에서 뽑은 route가 아니라 승인된 정답지다.
+    # 코드에서 직접 뽑으면 이 검사가 "승인 없이 들어온 route"까지 정상으로 취급한다 —
+    # 승인 절차(atlasBaselineCompare)를 우회하는 셈이다.
+    if routes:
+        exempt_declared = [str(item) for item in (project.get("sources", {}).get("routeOracleExempt") or [])]
+        exempt = set(exempt_declared)
+
+        # 낡은 면제부터 본다. 면제 목록이 조용히 낡으면 그 항목이 나중에 제품 route로
+        # 되살아나도 계속 눈감아 준다.
+        for item in exempt_declared:
+            if item in routes:
+                report.ok()
+            else:
+                report.fail("RTE-03", "project.yaml#routeOracleExempt",
+                            f"면제 목록에 있으나 정답지에 없다: {item}")
+
+        for route in sorted(routes - exempt):
+            if route in owned_routes:
+                report.ok()
+            else:
+                report.fail("RTE-02", "registry",
+                            f"제품 route를 어떤 feature도 owns 하지 않는다: {route}")
 
     # --- 출력 -------------------------------------------------------------
     # relatedFeature dangling — defect가 없는 feature를 가리키면 Map에 구멍이 있다는 뜻이다.
