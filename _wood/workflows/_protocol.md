@@ -18,7 +18,7 @@ Run them exactly as written in workflow files.
 
 ```
 ❌ Wrong: "Let me check the issues..."  (then make up output)
-✅ Right: Execute `gh issue list --repo SWYP-Backend/project --state open --limit 10`
+✅ Right: Execute `gh issue list --repo BangCheck/BangCheck --state open --limit 10`
          Display actual stdout.
 ```
 
@@ -80,7 +80,9 @@ gh auth status || { echo "Not authenticated. Run: gh auth login"; exit 1; }
 
 # 2. Repo verification
 REPO=$(git remote get-url origin | sed -E 's|.*github.com[:/]([^/]+/[^/.]+).*|\1|')
-[ "$REPO" = "SWYP-Backend/project" ] || { echo "Wrong repo: $REPO"; exit 1; }
+# 저장소 이름을 여기 박아두면 조직·저장소 rename 때마다 preflight가 통째로 죽는다.
+# 실제로 SWYP-Backend/project 로 굳어 있어 이 검사는 항상 실패했다.
+[ -n "$REPO" ] || { echo "Cannot resolve repo"; exit 1; }
 
 # 3. User identification
 USER_LOGIN=$(gh api user --jq .login)
@@ -102,7 +104,7 @@ Workflow files contain bash blocks. Execute them verbatim:
 
 ````markdown
 ```bash
-gh issue list --repo SWYP-Backend/project --state open
+gh issue list --repo BangCheck/BangCheck --state open
 ```
 ````
 
@@ -213,7 +215,7 @@ When executing a workflow, show progress clearly:
 [Workflow: 01-entry.md]
 [Step 1/6] Pre-flight check... ✓
 [Step 2/6] Fetching milestones... 
-  $ gh api repos/SWYP-Backend/project/milestones
+  $ gh api repos/BangCheck/BangCheck/milestones
   → 2 milestones found
 [Step 3/6] Fetching user issues...
   ...
