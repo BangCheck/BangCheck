@@ -1,0 +1,107 @@
+# 이슈 → 파트·담당자 라우팅 규칙
+#
+# 왜 저장소에 두는가
+#   담당이 바뀔 때마다 봇을 다시 배포하지 않기 위해서다. 봇은 이 파일을 읽고
+#   판정한다. 규칙을 봇 코드에 박으면 사람이 바뀔 때마다 코드 변경·배포가 따라온다.
+#
+# 왜 FT 의 owner 를 쓰지 않는가
+#   FT-*.yaml 의 owner 는 그 기능을 만든 사람이다. 결함을 고칠 사람과 다를 수 있고,
+#   registry 는 "결함 수정 담당"을 선언한 적이 없다. 두 개념을 한 필드로 쓰면
+#   나중에 갈라진다.
+#
+# 판정 순서
+#   rules 를 위에서부터 훑어 **처음 맞는 규칙**을 쓴다. 좁은 규칙을 위에 둔다.
+#   checklist 규칙이 frontend 규칙보다 위에 있어야 하는 이유가 그것이다.
+#
+# 봇이 이 파일로 하는 일과 하지 않는 일
+#   한다   — 코멘트로 파트·담당자를 **제안**한다
+#   안 한다 — GitHub assignee 를 실제로 바꾸지 않는다. 라벨도 달지 않는다.
+#            registry 도 고치지 않는다. 제안은 사람이 보고 반영한다.
+
+version: 1
+
+# 이 값이 바뀌면 봇 코멘트의 판정도 바뀐 것으로 본다.
+# 코멘트 토큰에 routingVersion 으로 기록돼, 규칙이 개정된 뒤 다시 판정됐는지
+# 사람이 구별할 수 있다.
+routingVersion: "2026-08-05.1"
+
+# 담당이 나뉘는 축이 프론트와 백엔드에서 다르다.
+#   프론트 — 한 사람이 전부 맡는다. 경로를 더 쪼갤 이유가 없다
+#   백엔드 — 도메인으로 나뉜다. 로그인 / 체크리스트 / 나머지
+parts:
+  frontend: 프론트엔드
+  backend-auth: 백엔드 · 로그인·인증
+  backend-checklist: 백엔드 · 체크리스트
+  backend: 백엔드 · 그 외
+  atlas: Atlas·하네스
+
+# 첫 매칭이 이긴다. 좁은 것부터.
+rules:
+  # ── Atlas·하네스 — 제품이 아니라 도구다 ──
+  # 오늘 만든 이슈 상당수(#217·#220·#221·#224)가 여기 속하는데, 제품 결함과
+  # 섞이면 registry 가 무엇의 지도인지 흐려진다. 파트로 갈라 둔다.
+  # frontend/** 보다 위에 있어야 Atlas UI 경로가 프론트로 흡수되지 않는다.
+  - part: atlas
+    assignee: "@Woo-JongHo"
+    paths:
+      - ".project-atlas/**"
+      - ".github/**"
+      - ".claude/**"
+      - "_wood/**"
+      - "frontend/src/features/project-atlas/**"
+      - "frontend/src/features/research/**"
+
+  # ── 백엔드 · 로그인·인증 ──
+  - part: backend-auth
+    assignee: "@dlwldP"
+    paths:
+      - "backend/src/main/java/com/room/backend/api/auth/**"
+      - "backend/src/main/java/com/room/backend/global/auth/**"
+      - "backend/src/main/java/com/room/backend/domain/user/**"
+
+  # ── 백엔드 · 체크리스트 ──
+  - part: backend-checklist
+    assignee: "@std-yong"
+    paths:
+      - "backend/src/main/java/com/room/backend/domain/checklist/**"
+      - "backend/src/main/java/com/room/backend/api/**/checklist**"
+
+  # ── 백엔드 · 그 외 (지도·방 목록·리포트·주소 등) ──
+  - part: backend
+    assignee: "@minwoo-l"
+    paths:
+      - "backend/**"
+
+  # ── 프론트 전체 ──
+  # 프론트는 도메인을 나누지 않는다. 한 사람이 전부 맡는다.
+  - part: frontend
+    assignee: "@Woo-JongHo"
+    paths:
+      - "frontend/**"
+
+# 어느 규칙에도 안 걸리거나 근거가 없을 때.
+# 임의로 하나를 고르지 않는다 — 틀린 배정은 잘못된 사람을 부르고,
+# 그 코멘트는 봇이 낼 수 없는 권위를 주장하게 된다.
+fallback:
+  part: null
+  assignee: null
+  note: "소스 경로와 명시적 영역 정보가 없어 근거 있게 특정할 수 없습니다."
+
+# 경로가 여러 규칙에 걸릴 때.
+# 예: 이슈가 frontend/features/checklist/ 와 backend/api/room/ 을 함께 언급
+# 하나를 임의로 고르지 않고 사람에게 넘긴다.
+conflict:
+  part: null
+  assignee: null
+  note: "여러 파트에 걸쳐 있어 하나로 특정하지 않습니다. 담당을 사람이 정해 주세요."
+
+# ── 근거 ──────────────────────────────────────────────────────
+#
+# 2026-08-05 사용자 확정:
+#   "frontend - woojongho, backend 중에 로그인 → dlwldP /
+#    체크리스트 관련 → std-yong / 나머지 백엔드 지도라던가 방목록이라던가 → minwoo-l"
+#
+# GitHub 로그인은 이슈 작성 이력으로 확인했다 —
+# Woo-JongHo · dlwldP · std-yong · minwoo-l 네 계정이 실재한다.
+#
+# 담당이 바뀌면 이 파일만 고친다. 봇 재배포는 필요 없다.
