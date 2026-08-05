@@ -1,7 +1,7 @@
 {
   "generator": ".project-atlas/tools/pm_snapshot.py",
   "note": "생성물이다. 원천은 registry와 코드다. 직접 편집하지 않는다.",
-  "sourceDigest": "9f5dfbc76ac8b4b2d09734ff3ce55424b58dcdc66419582a5162ec6a92a1a9ff",
+  "sourceDigest": "16ce0ac98b94cf09541e16cdcab11c92c1644a17bd1a5a174914b0a243bedbd3",
   "pages": [
     {
       "page": "/",
@@ -131,6 +131,22 @@
               "relatedStory": null,
               "issue": null,
               "lifecycle": "OBSERVED"
+            },
+            {
+              "id": "BC-CHK-09",
+              "severity": "P2",
+              "title": "STEP3가 기본 항목을 카테고리에서 빼내 카테고리 두 개가 사라진다",
+              "detail": "STEP3 추가 항목은 카테고리별로 전체 항목을 보여줘야 하는데, 기본 항목 24개를 카테고리에서 제외하고 별도 묶음으로 옮긴다. 그 결과 남는 항목이 없는 카테고리는 화면에서 통째로 사라진다. 기본 옵션과 안전/보안은 전 항목이 기본이라 카테고리 자체가 보이지 않는다. 나머지도 개수가 줄어 문제 요소는 6개 중 5개, 생활 편의는 8개 중 3개, 주변 환경은 8개 중 6개만 남는다. 내부 상태만 6개가 그대로 보인다. 2026-07-29 PM이 관측한 목록에 안전/보안이 없는 이유가 이것이다 — 부정확한 관측이 아니라 화면에 없었다. 확정된 방침은 다음과 같다. 카테고리는 옵션·내부 상태·문제 요소·생활 편의· 주변 환경 다섯이며 각각 전체 개수를 보여준다. 안전/보안은 STEP3에서 제외한다. 기본 항목은 카테고리 안에 되돌리되 이미 선택된 상태로 표시한다. 유형 선택 시 기본과 유형 항목을 활성으로 만드는 코드는 이미 있으므로, 남은 작업은 표시 위치와 상태 표현이다.",
+              "disposition": "FIX_PLANNED",
+              "evidence": {
+                "path": "frontend/src/features/customization/SettingsPage.tsx",
+                "symbol": "catConstItems",
+                "line": 399
+              },
+              "relatedFeature": "FT-CHECKLIST-CATALOG",
+              "relatedStory": null,
+              "issue": 244,
+              "lifecycle": "TRACKED"
             }
           ],
           "tests": [],
@@ -393,6 +409,22 @@
               "relatedStory": null,
               "issue": null,
               "lifecycle": "OBSERVED"
+            },
+            {
+              "id": "BC-CHK-09",
+              "severity": "P2",
+              "title": "STEP3가 기본 항목을 카테고리에서 빼내 카테고리 두 개가 사라진다",
+              "detail": "STEP3 추가 항목은 카테고리별로 전체 항목을 보여줘야 하는데, 기본 항목 24개를 카테고리에서 제외하고 별도 묶음으로 옮긴다. 그 결과 남는 항목이 없는 카테고리는 화면에서 통째로 사라진다. 기본 옵션과 안전/보안은 전 항목이 기본이라 카테고리 자체가 보이지 않는다. 나머지도 개수가 줄어 문제 요소는 6개 중 5개, 생활 편의는 8개 중 3개, 주변 환경은 8개 중 6개만 남는다. 내부 상태만 6개가 그대로 보인다. 2026-07-29 PM이 관측한 목록에 안전/보안이 없는 이유가 이것이다 — 부정확한 관측이 아니라 화면에 없었다. 확정된 방침은 다음과 같다. 카테고리는 옵션·내부 상태·문제 요소·생활 편의· 주변 환경 다섯이며 각각 전체 개수를 보여준다. 안전/보안은 STEP3에서 제외한다. 기본 항목은 카테고리 안에 되돌리되 이미 선택된 상태로 표시한다. 유형 선택 시 기본과 유형 항목을 활성으로 만드는 코드는 이미 있으므로, 남은 작업은 표시 위치와 상태 표현이다.",
+              "disposition": "FIX_PLANNED",
+              "evidence": {
+                "path": "frontend/src/features/customization/SettingsPage.tsx",
+                "symbol": "catConstItems",
+                "line": 399
+              },
+              "relatedFeature": "FT-CHECKLIST-CATALOG",
+              "relatedStory": null,
+              "issue": 244,
+              "lifecycle": "TRACKED"
             }
           ],
           "tests": [],
@@ -630,12 +662,28 @@
               "relatedStory": "s01-5-room-create-retry-concurrency-baseline",
               "issue": null,
               "lifecycle": "OBSERVED"
+            },
+            {
+              "id": "BC-ROOM-06",
+              "severity": "P1",
+              "title": "비로그인 저장이 동적 체크 항목의 답변을 통째로 버린다",
+              "detail": "비로그인으로 체크리스트를 채우고 저장한 뒤 카드를 열면 선택한 항목 상당수가 빈 상태로 보인다. 저장 호출이 answers를 넘기지 않기 때문이다. ChecklistNewPage의 handleSubmit은 basic·building·interior·safety·custom 다섯 덩이만 addGuestRoom에 넘긴다. 화면이 실제로 수집하는 동적 항목의 답변은 answers에 모이는데 그 값이 인자에 없다. 저장 타입에도 자리가 없다. GuestRoomRaw는 다섯 섹션만 선언하며 answers를 담을 필드가 아예 없어서, 넘겼더라도 보관되지 않았을 구조다. 읽는 쪽도 같다. 상세 화면은 room.raw에서 다섯 섹션만 복원하고 answers는 세팅하지 않는데, 항목 렌더는 answers를 읽는다. 그래서 동적 항목은 전부 미선택으로 그려진다. 보조 경로로도 남지 않는다. deriveSafetyFromAnswers는 원본 safety를 그대로 돌려주므로 안전·생활 편의·주변 환경의 선택값이 파생 필드에도 반영되지 않는다. 로그인 경로는 서버가 답변을 저장하므로 이 결함은 비로그인에만 나타난다.",
+              "disposition": "FIX_PLANNED",
+              "evidence": {
+                "path": "frontend/src/features/checklist/ChecklistNewPage.tsx",
+                "symbol": "addGuestRoom",
+                "line": 81
+              },
+              "relatedFeature": "FT-ROOM-CREATE-WITH-CHECKLIST",
+              "relatedStory": null,
+              "issue": 241,
+              "lifecycle": "TRACKED"
             }
           ],
           "tests": [],
           "front": {
             "path": "frontend/src/services/room-service.ts:47",
-            "state": "built"
+            "state": "defect"
           },
           "back": {
             "path": "backend/src/main/java/com/room/backend/api/room/service/RoomService.java",
@@ -733,6 +781,22 @@
               "relatedStory": null,
               "issue": null,
               "lifecycle": "OBSERVED"
+            },
+            {
+              "id": "BC-CHK-07",
+              "severity": "P2",
+              "title": "삭제한 나만의 항목이 한도에 계속 포함돼 재추가가 막힌다",
+              "detail": "나만의 항목을 3개까지 만들 수 있는데, 하나를 지우고 새로 추가하려 하면 한도 초과로 거절된다. 삭제가 물리 삭제가 아니라 softDelete이고, 한도를 세는 쪽이 삭제 상태를 거르지 않기 때문이다. addCustomItem은 findByItemType(CUSTOM)으로 전체를 읽어 소유자만 거른 뒤 개수를 MAX_CUSTOM_ITEMS(3)와 비교한다. 이 목록에 soft-delete된 행이 그대로 들어 있어, 한 번 3개를 채운 사용자는 그 뒤 무엇을 지우든 다시 추가할 수 없다. 화면은 삭제한 항목을 목록에서 빼서 보여주므로 사용자에게는 자리가 비어 보인다. 보이는 상태와 서버 판정이 어긋나 원인을 짐작하기 어렵다. PM이 2026-07-29에 \"나만의 항목 추가가 안됨\"으로 관측한 증상을 정상 길이의 입력에서도 설명한다. 이름 길이·null 입력에서 나는 409는 BC-CHK-04가 따로 담고 있으며 별개다. 중복 이름으로 인한 409는 재현 근거가 없다 — checklist_items.item_name에 유니크 제약이 없다.",
+              "disposition": "FIX_PLANNED",
+              "evidence": {
+                "path": "backend/src/main/java/com/room/backend/domain/checklist/service/ChecklistService.java",
+                "symbol": "addCustomItem",
+                "line": 148
+              },
+              "relatedFeature": "FT-CHECKLIST-CUSTOM-ITEM",
+              "relatedStory": null,
+              "issue": 242,
+              "lifecycle": "TRACKED"
             }
           ],
           "tests": [],
@@ -796,6 +860,22 @@
               "relatedStory": null,
               "issue": null,
               "lifecycle": "OBSERVED"
+            },
+            {
+              "id": "BC-CHK-08",
+              "severity": "P2",
+              "title": "STEP2가 유형과 무관한 기본 항목까지 맞춤 목록에 넣는다",
+              "detail": "사용자가 STEP1에서 유형을 고르면 STEP2 맞춤 체크리스트에는 그 유형에 해당하는 항목만 나와야 하는데, 유형과 무관한 기본 항목 24개가 함께 들어간다. 벌레회피형을 고르면 창문/망충망·현관/문틈·벌레 흔적·하수구 곰팡이 냄새만 보여야 하지만 실제로는 기본 항목이 앞에 붙어 목록이 길어진다. 맞춤 목록을 만드는 코드가 기본 항목을 먼저 넣고 유형 항목을 뒤에 붙인다. 이 동작은 2026년 5월 QA에서 요청한 것이었고 코드 주석도 그렇게 적고 있다. 2026-07-29 PM 요구로 방침이 바뀌어, 이제 유형 항목만 넣는 것이 옳다. 주석의 숫자도 함께 틀렸다. BASE 15라고 적혀 있으나 실제 BASE_ITEM_LABELS는 24개다. 고칠 때 이 숫자도 정정해야 한다.",
+              "disposition": "FIX_PLANNED",
+              "evidence": {
+                "path": "frontend/src/features/customization/SettingsPage.tsx",
+                "symbol": "recommendedItems",
+                "line": 78
+              },
+              "relatedFeature": "FT-CHECKLIST-SETTINGS",
+              "relatedStory": null,
+              "issue": 243,
+              "lifecycle": "TRACKED"
             }
           ],
           "tests": [],
@@ -845,6 +925,22 @@
               "relatedStory": null,
               "issue": null,
               "lifecycle": "OBSERVED"
+            },
+            {
+              "id": "BC-CHK-09",
+              "severity": "P2",
+              "title": "STEP3가 기본 항목을 카테고리에서 빼내 카테고리 두 개가 사라진다",
+              "detail": "STEP3 추가 항목은 카테고리별로 전체 항목을 보여줘야 하는데, 기본 항목 24개를 카테고리에서 제외하고 별도 묶음으로 옮긴다. 그 결과 남는 항목이 없는 카테고리는 화면에서 통째로 사라진다. 기본 옵션과 안전/보안은 전 항목이 기본이라 카테고리 자체가 보이지 않는다. 나머지도 개수가 줄어 문제 요소는 6개 중 5개, 생활 편의는 8개 중 3개, 주변 환경은 8개 중 6개만 남는다. 내부 상태만 6개가 그대로 보인다. 2026-07-29 PM이 관측한 목록에 안전/보안이 없는 이유가 이것이다 — 부정확한 관측이 아니라 화면에 없었다. 확정된 방침은 다음과 같다. 카테고리는 옵션·내부 상태·문제 요소·생활 편의· 주변 환경 다섯이며 각각 전체 개수를 보여준다. 안전/보안은 STEP3에서 제외한다. 기본 항목은 카테고리 안에 되돌리되 이미 선택된 상태로 표시한다. 유형 선택 시 기본과 유형 항목을 활성으로 만드는 코드는 이미 있으므로, 남은 작업은 표시 위치와 상태 표현이다.",
+              "disposition": "FIX_PLANNED",
+              "evidence": {
+                "path": "frontend/src/features/customization/SettingsPage.tsx",
+                "symbol": "catConstItems",
+                "line": 399
+              },
+              "relatedFeature": "FT-CHECKLIST-CATALOG",
+              "relatedStory": null,
+              "issue": 244,
+              "lifecycle": "TRACKED"
             }
           ],
           "tests": [],
@@ -1369,6 +1465,22 @@
               "relatedStory": null,
               "issue": null,
               "lifecycle": "OBSERVED"
+            },
+            {
+              "id": "BC-CHK-09",
+              "severity": "P2",
+              "title": "STEP3가 기본 항목을 카테고리에서 빼내 카테고리 두 개가 사라진다",
+              "detail": "STEP3 추가 항목은 카테고리별로 전체 항목을 보여줘야 하는데, 기본 항목 24개를 카테고리에서 제외하고 별도 묶음으로 옮긴다. 그 결과 남는 항목이 없는 카테고리는 화면에서 통째로 사라진다. 기본 옵션과 안전/보안은 전 항목이 기본이라 카테고리 자체가 보이지 않는다. 나머지도 개수가 줄어 문제 요소는 6개 중 5개, 생활 편의는 8개 중 3개, 주변 환경은 8개 중 6개만 남는다. 내부 상태만 6개가 그대로 보인다. 2026-07-29 PM이 관측한 목록에 안전/보안이 없는 이유가 이것이다 — 부정확한 관측이 아니라 화면에 없었다. 확정된 방침은 다음과 같다. 카테고리는 옵션·내부 상태·문제 요소·생활 편의· 주변 환경 다섯이며 각각 전체 개수를 보여준다. 안전/보안은 STEP3에서 제외한다. 기본 항목은 카테고리 안에 되돌리되 이미 선택된 상태로 표시한다. 유형 선택 시 기본과 유형 항목을 활성으로 만드는 코드는 이미 있으므로, 남은 작업은 표시 위치와 상태 표현이다.",
+              "disposition": "FIX_PLANNED",
+              "evidence": {
+                "path": "frontend/src/features/customization/SettingsPage.tsx",
+                "symbol": "catConstItems",
+                "line": 399
+              },
+              "relatedFeature": "FT-CHECKLIST-CATALOG",
+              "relatedStory": null,
+              "issue": 244,
+              "lifecycle": "TRACKED"
             }
           ],
           "tests": [],
@@ -1557,6 +1669,22 @@
               "relatedStory": null,
               "issue": null,
               "lifecycle": "OBSERVED"
+            },
+            {
+              "id": "BC-CHK-09",
+              "severity": "P2",
+              "title": "STEP3가 기본 항목을 카테고리에서 빼내 카테고리 두 개가 사라진다",
+              "detail": "STEP3 추가 항목은 카테고리별로 전체 항목을 보여줘야 하는데, 기본 항목 24개를 카테고리에서 제외하고 별도 묶음으로 옮긴다. 그 결과 남는 항목이 없는 카테고리는 화면에서 통째로 사라진다. 기본 옵션과 안전/보안은 전 항목이 기본이라 카테고리 자체가 보이지 않는다. 나머지도 개수가 줄어 문제 요소는 6개 중 5개, 생활 편의는 8개 중 3개, 주변 환경은 8개 중 6개만 남는다. 내부 상태만 6개가 그대로 보인다. 2026-07-29 PM이 관측한 목록에 안전/보안이 없는 이유가 이것이다 — 부정확한 관측이 아니라 화면에 없었다. 확정된 방침은 다음과 같다. 카테고리는 옵션·내부 상태·문제 요소·생활 편의· 주변 환경 다섯이며 각각 전체 개수를 보여준다. 안전/보안은 STEP3에서 제외한다. 기본 항목은 카테고리 안에 되돌리되 이미 선택된 상태로 표시한다. 유형 선택 시 기본과 유형 항목을 활성으로 만드는 코드는 이미 있으므로, 남은 작업은 표시 위치와 상태 표현이다.",
+              "disposition": "FIX_PLANNED",
+              "evidence": {
+                "path": "frontend/src/features/customization/SettingsPage.tsx",
+                "symbol": "catConstItems",
+                "line": 399
+              },
+              "relatedFeature": "FT-CHECKLIST-CATALOG",
+              "relatedStory": null,
+              "issue": 244,
+              "lifecycle": "TRACKED"
             }
           ],
           "tests": [],
