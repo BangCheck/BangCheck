@@ -32,7 +32,11 @@ UNMATCHED 와 BROKEN_LINK 를 나눈 이유
 사용:
   python3 .project-atlas/tools/triage_issue.py --issue 241
   python3 .project-atlas/tools/triage_issue.py --issue 241 --dry-run
-종료 코드: 항상 0 (판정 실패로 이슈 등록을 막을 이유가 없다)
+종료 코드
+  0  판정을 내고 코멘트를 남겼다
+  1  gh 조회·게시가 실패해 판정을 남기지 못했다
+  "판정 불가"는 정상 종료다 — UNMATCHED 로 코멘트에 적는다.
+  "판정을 못 남겼다"는 실패다 — 초록불로 흘리면 아무도 모른다.
 """
 
 from __future__ import annotations
@@ -62,11 +66,21 @@ NOT_A_DEFECT_LABEL = "atlas:not-a-defect"
 BOT_LOGINS = {"github-actions[bot]", "github-actions"}
 
 
-def gh(args: list[str]) -> str:
+def gh(args: list[str], *, optional: bool = False) -> str:
+    """gh 호출.
+
+    optional=True 는 "없어도 판정을 낼 수 있는 조회"에만 쓴다. 그 외의 실패는
+    exit 1 로 job 을 죽인다.
+    2026-08-05: 모든 실패를 exit 0 으로 흘렸더니 러너에서 gh 가 403 을 냈는데
+    job 은 success 였고 코멘트는 하나도 안 달렸다. 초록불이 "했다"와 "못 했다"를
+    구별하지 못하는 상태를 스스로 만들었다.
+    """
     proc = subprocess.run(["gh", *args], capture_output=True, text=True)
     if proc.returncode != 0:
         print(f"gh 실패: {' '.join(args[:4])}\n{proc.stderr.strip()}", file=sys.stderr)
-        raise SystemExit(0)
+        if optional:
+            return ""
+        raise SystemExit(1)
     return proc.stdout
 
 
@@ -272,8 +286,11 @@ def main() -> int:
     # 코멘트는 REST 로 읽는다 — `gh issue view --json comments` 는 GraphQL 노드 ID 를
     # 주는데 REST PATCH 는 숫자 ID 를 요구해 404 가 난다 (2026-08-05 실측).
     comments = json.loads(gh(["api", "--paginate", f"repos/{slug}/issues/{args.issue}/comments"]))
-    me = gh(["api", "user", "--jq", ".login"]).strip()
-    allowed = BOT_LOGINS | {me}
+    # `gh api user` 는 GITHUB_TOKEN(앱 설치 토큰)으로는 403 이다 — 그 토큰에는
+    # "현재 사용자"가 없다. 러너에서는 봇 계정만 인정하고, 로컬 실행일 때만
+    # 실행자를 추가한다.
+    me = gh(["api", "user", "--jq", ".login"], optional=True).strip()
+    allowed = BOT_LOGINS | ({me} if me else set())
 
     # 작성자를 확인한다. 토큰만 보고 덮으면 사람이 판정을 인용한 코멘트를 갱신할 수 있다.
     mine = [c for c in comments
