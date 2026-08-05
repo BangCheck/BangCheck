@@ -101,15 +101,32 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # fetch-depth: 0 — 기본값 1로는 base 커밋이 클론에 없어 아래 diff가
+      # "fatal: bad object"로 죽는다. 2026-08-05 첫 실행에서 실제로 그랬다.
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
+      # 범위를 좁히는 검사는 판정을 못 했을 때 어느 쪽으로 흐르는지가 전부다.
+      # 첫 판에서 git diff가 죽었는데 그 실패가 else로 흘러 "변경 없음"이 됐고,
+      # .project-atlas/ 파일 8개를 바꾼 PR에서 job 전체가 skip된 채 green이 났다.
+      # 검사가 틀렸다고 말하지 않고 조용히 틀린 것 — 이 게이트가 막으려던 바로 그 형태다.
+      # 그래서 판정 실패는 skip이 아니라 실행으로 흐른다. 넓게 도는 것은 느릴 뿐이고,
+      # 좁게 안 도는 것은 검사가 없는 것과 같다.
       - name: Detect relevant changes
         id: scope
         run: |
+          set -o pipefail
           base="${{ github.event.pull_request.base.sha }}"
           head="${{ github.event.pull_request.head.sha }}"
-          if git diff --name-only "$base" "$head" \
-               | grep -qE '^(backend/|\.project-atlas/)'; then
+
+          if ! changed=$(git diff --name-only "$base" "$head" 2>&1); then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+            echo "::warning::변경 범위를 판정하지 못해 baseline 비교를 그대로 실행한다: ${changed}"
+            exit 0
+          fi
+
+          if printf '%s\n' "$changed" | grep -qE '^(backend/|\.project-atlas/)'; then
             echo "run=true" >> "$GITHUB_OUTPUT"
           else
             echo "run=false" >> "$GITHUB_OUTPUT"
