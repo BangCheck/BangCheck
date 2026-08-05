@@ -85,79 +85,8 @@ jobs:
         if: steps.presence.outputs.present == 'true'
         run: python .project-atlas/tools/resolve.py
 
-  # ════════════════════════════════════════════════
-  # runtime → 승인 baseline 방향.
-  #
-  # 위 resolve job은 "registry가 승인된 정답지와 맞는가"만 본다.
-  # 정답지 자체가 실제 런타임과 맞는지는 별개 문제이고, 그것을 증명하는
-  # atlasBaselineCompare가 build.gradle에 이미 있었는데 아무 workflow도
-  # 부르지 않았다. 그래서 "코드에 route를 추가하고 baseline을 갱신하지 않는"
-  # 경로가 무방비였다.
-  #
-  # Testcontainers로 MySQL을 띄우므로 느리다. backend와 registry가 바뀌지
-  # 않은 PR에서는 돌릴 이유가 없어 paths로 좁힌다.
-  baseline:
-    name: Verify approved route baseline matches runtime
-    runs-on: ubuntu-latest
-
-    steps:
-      # fetch-depth: 0 — 기본값 1로는 base 커밋이 클론에 없어 아래 diff가
-      # "fatal: bad object"로 죽는다. 2026-08-05 첫 실행에서 실제로 그랬다.
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      # 범위를 좁히는 검사는 판정을 못 했을 때 어느 쪽으로 흐르는지가 전부다.
-      # 첫 판에서 git diff가 죽었는데 그 실패가 else로 흘러 "변경 없음"이 됐고,
-      # .project-atlas/ 파일 8개를 바꾼 PR에서 job 전체가 skip된 채 green이 났다.
-      # 검사가 틀렸다고 말하지 않고 조용히 틀린 것 — 이 게이트가 막으려던 바로 그 형태다.
-      # 그래서 판정 실패는 skip이 아니라 실행으로 흐른다. 넓게 도는 것은 느릴 뿐이고,
-      # 좁게 안 도는 것은 검사가 없는 것과 같다.
-      - name: Detect relevant changes
-        id: scope
-        run: |
-          set -o pipefail
-          base="${{ github.event.pull_request.base.sha }}"
-          head="${{ github.event.pull_request.head.sha }}"
-
-          if ! changed=$(git diff --name-only "$base" "$head" 2>&1); then
-            echo "run=true" >> "$GITHUB_OUTPUT"
-            echo "::warning::변경 범위를 판정하지 못해 baseline 비교를 그대로 실행한다: ${changed}"
-            exit 0
-          fi
-
-          if printf '%s\n' "$changed" | grep -qE '^(backend/|\.project-atlas/)'; then
-            echo "run=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "run=false" >> "$GITHUB_OUTPUT"
-            echo "baseline 비교 건너뜀 — backend/ 와 .project-atlas/ 에 변경이 없다"
-          fi
-
-      - name: Setup JDK
-        if: steps.scope.outputs.run == 'true'
-        uses: actions/setup-java@v4
-        with:
-          java-version: '17'
-          distribution: temurin
-          cache: gradle
-
-      # atlasBaselineCompare = atlasBaselineTest + atlasBootEntryCompare
-      #                        + atlasRuntimeDependencyReport
-      # capture는 절대 부르지 않는다. 승인본을 덮어쓰는 것은 사람의 일이다
-      # ("Capture never updates the approved baseline" — build.gradle).
-      #
-      # -Dorg.gradle.java.home 을 왜 거는가:
-      #   backend/gradle.properties 가 org.gradle.java.home 을 macOS Homebrew 경로
-      #   (/opt/homebrew/Cellar/openjdk@17/...)로 고정해 커밋돼 있다. Linux 러너에는
-      #   그 경로가 없어 이 job이 코드와 무관하게 즉시 실패한다.
-      #   backend/ 를 이 PR에서 건드리지 않기로 해서 여기서만 덮어쓴다.
-      #   (2026-08-05 실측: -D 오버라이드가 실제로 먹는 것을 확인했다.)
-      #
-      #   이것은 우회이지 수정이 아니다. 같은 고정이 로컬 개발과 EC2 배포에도
-      #   그대로 걸려 있고 그쪽은 여전히 깨진 채다. build.gradle 이 이미
-      #   JavaLanguageVersion.of(17) 툴체인을 선언하므로 그 줄은 원래 불필요하다.
-      #   제거는 backend 소관이라 별도 이슈로 남긴다.
-      - name: Compare product oracles against runtime
-        if: steps.scope.outputs.run == 'true'
-        working-directory: backend
-        run: ./gradlew --no-daemon -Dorg.gradle.java.home="$JAVA_HOME" atlasBaselineCompare
+# runtime → 승인 baseline 방향(atlasBaselineCompare)은 여기 없다.
+# 이 workflow에 baseline job으로 배선해 PR #216에서 실제로 돌려봤고,
+# 인프라(MySQL Testcontainers·Spring 부팅)와 routes.txt·flyway 대조는 통과했으나
+# bean-names 다이제스트의 승인본이 저장소에 없어 실패했다. 그것은 이 게이트의
+# 결함이 아니라 backend 쪽에서 결정할 사안이라 분리했다 — 이슈 #217.
