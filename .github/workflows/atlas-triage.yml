@@ -38,6 +38,12 @@ permissions:
   contents: read
   issues: write
 
+# 같은 이슈에서 opened/edited 가 겹치면 두 실행이 서로의 코멘트를 덮어
+# 정정 이력이 오염된다. 이슈 번호 단위로 직렬화한다.
+concurrency:
+  group: atlas-triage-${{ github.event.issue.number || inputs.issue || github.run_id }}
+  cancel-in-progress: false
+
 jobs:
   triage:
     name: Comment Atlas attribution

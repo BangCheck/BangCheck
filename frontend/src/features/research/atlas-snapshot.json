@@ -1,7 +1,7 @@
 {
   "generator": ".project-atlas/tools/pm_snapshot.py",
   "note": "생성물이다. 원천은 registry와 코드다. 직접 편집하지 않는다.",
-  "sourceDigest": "69a605e26a32844cfb137abd97776e987a4cf982c0cb7a0442b4cf0cc273f71e",
+  "sourceDigest": "9f5dfbc76ac8b4b2d09734ff3ce55424b58dcdc66419582a5162ec6a92a1a9ff",
   "pages": [
     {
       "page": "/",
@@ -225,6 +225,22 @@
                 "path": "backend/src/main/java/com/room/backend/api/room/service/RoomCheckResultService.java",
                 "symbol": "hasIssue",
                 "line": null
+              },
+              "relatedFeature": "FT-ROOM-LIST",
+              "relatedStory": null,
+              "issue": null,
+              "lifecycle": "OBSERVED"
+            },
+            {
+              "id": "BC-ATLAS-01",
+              "severity": "P3",
+              "title": "공개된 페이지가 자기를 DEV ONLY라고 말한다",
+              "detail": "ResearchPage 헤더에 \"MOCK DATA / DEV ONLY\" 배지가 하드코딩돼 있다. 2026-08-05에 /project-map을 프로덕션에 열면서 이 문구가 사실과 어긋나게 됐다. 배지는 dev 전용이던 시절의 표시이고, 지금은 공개 URL에서 누구나 본다. 데이터가 실제로 registry 기반 정적 스냅샷이라는 점은 맞지만, \"DEV ONLY\"는 접근 범위를 잘못 말한다. 보는 사람이 내부 페이지라고 오해할 근거가 된다. 배지 문구를 데이터 출처(스냅샷 시각·registry 다이제스트)로 바꾸거나, 노출 범위를 실제로 dev로 되돌리거나 둘 중 하나여야 한다.",
+              "disposition": "NEEDS_PRODUCT_DECISION",
+              "evidence": {
+                "path": "frontend/src/features/research/ResearchPage.tsx",
+                "symbol": "research-data-badge",
+                "line": 106
               },
               "relatedFeature": "FT-ROOM-LIST",
               "relatedStory": null,
@@ -471,6 +487,22 @@
                 "path": "backend/src/main/java/com/room/backend/api/room/service/RoomCheckResultService.java",
                 "symbol": "hasIssue",
                 "line": null
+              },
+              "relatedFeature": "FT-ROOM-LIST",
+              "relatedStory": null,
+              "issue": null,
+              "lifecycle": "OBSERVED"
+            },
+            {
+              "id": "BC-ATLAS-01",
+              "severity": "P3",
+              "title": "공개된 페이지가 자기를 DEV ONLY라고 말한다",
+              "detail": "ResearchPage 헤더에 \"MOCK DATA / DEV ONLY\" 배지가 하드코딩돼 있다. 2026-08-05에 /project-map을 프로덕션에 열면서 이 문구가 사실과 어긋나게 됐다. 배지는 dev 전용이던 시절의 표시이고, 지금은 공개 URL에서 누구나 본다. 데이터가 실제로 registry 기반 정적 스냅샷이라는 점은 맞지만, \"DEV ONLY\"는 접근 범위를 잘못 말한다. 보는 사람이 내부 페이지라고 오해할 근거가 된다. 배지 문구를 데이터 출처(스냅샷 시각·registry 다이제스트)로 바꾸거나, 노출 범위를 실제로 dev로 되돌리거나 둘 중 하나여야 한다.",
+              "disposition": "NEEDS_PRODUCT_DECISION",
+              "evidence": {
+                "path": "frontend/src/features/research/ResearchPage.tsx",
+                "symbol": "research-data-badge",
+                "line": 106
               },
               "relatedFeature": "FT-ROOM-LIST",
               "relatedStory": null,
@@ -887,6 +919,22 @@
               "relatedStory": null,
               "issue": null,
               "lifecycle": "OBSERVED"
+            },
+            {
+              "id": "BC-ATLAS-01",
+              "severity": "P3",
+              "title": "공개된 페이지가 자기를 DEV ONLY라고 말한다",
+              "detail": "ResearchPage 헤더에 \"MOCK DATA / DEV ONLY\" 배지가 하드코딩돼 있다. 2026-08-05에 /project-map을 프로덕션에 열면서 이 문구가 사실과 어긋나게 됐다. 배지는 dev 전용이던 시절의 표시이고, 지금은 공개 URL에서 누구나 본다. 데이터가 실제로 registry 기반 정적 스냅샷이라는 점은 맞지만, \"DEV ONLY\"는 접근 범위를 잘못 말한다. 보는 사람이 내부 페이지라고 오해할 근거가 된다. 배지 문구를 데이터 출처(스냅샷 시각·registry 다이제스트)로 바꾸거나, 노출 범위를 실제로 dev로 되돌리거나 둘 중 하나여야 한다.",
+              "disposition": "NEEDS_PRODUCT_DECISION",
+              "evidence": {
+                "path": "frontend/src/features/research/ResearchPage.tsx",
+                "symbol": "research-data-badge",
+                "line": 106
+              },
+              "relatedFeature": "FT-ROOM-LIST",
+              "relatedStory": null,
+              "issue": null,
+              "lifecycle": "OBSERVED"
             }
           ],
           "tests": [],
@@ -1025,6 +1073,22 @@
               "relatedStory": null,
               "issue": null,
               "lifecycle": "OBSERVED"
+            },
+            {
+              "id": "BC-ATLAS-01",
+              "severity": "P3",
+              "title": "공개된 페이지가 자기를 DEV ONLY라고 말한다",
+              "detail": "ResearchPage 헤더에 \"MOCK DATA / DEV ONLY\" 배지가 하드코딩돼 있다. 2026-08-05에 /project-map을 프로덕션에 열면서 이 문구가 사실과 어긋나게 됐다. 배지는 dev 전용이던 시절의 표시이고, 지금은 공개 URL에서 누구나 본다. 데이터가 실제로 registry 기반 정적 스냅샷이라는 점은 맞지만, \"DEV ONLY\"는 접근 범위를 잘못 말한다. 보는 사람이 내부 페이지라고 오해할 근거가 된다. 배지 문구를 데이터 출처(스냅샷 시각·registry 다이제스트)로 바꾸거나, 노출 범위를 실제로 dev로 되돌리거나 둘 중 하나여야 한다.",
+              "disposition": "NEEDS_PRODUCT_DECISION",
+              "evidence": {
+                "path": "frontend/src/features/research/ResearchPage.tsx",
+                "symbol": "research-data-badge",
+                "line": 106
+              },
+              "relatedFeature": "FT-ROOM-LIST",
+              "relatedStory": null,
+              "issue": null,
+              "lifecycle": "OBSERVED"
             }
           ],
           "tests": [],
@@ -1135,6 +1199,22 @@
               "relatedStory": null,
               "issue": null,
               "lifecycle": "OBSERVED"
+            },
+            {
+              "id": "BC-ATLAS-01",
+              "severity": "P3",
+              "title": "공개된 페이지가 자기를 DEV ONLY라고 말한다",
+              "detail": "ResearchPage 헤더에 \"MOCK DATA / DEV ONLY\" 배지가 하드코딩돼 있다. 2026-08-05에 /project-map을 프로덕션에 열면서 이 문구가 사실과 어긋나게 됐다. 배지는 dev 전용이던 시절의 표시이고, 지금은 공개 URL에서 누구나 본다. 데이터가 실제로 registry 기반 정적 스냅샷이라는 점은 맞지만, \"DEV ONLY\"는 접근 범위를 잘못 말한다. 보는 사람이 내부 페이지라고 오해할 근거가 된다. 배지 문구를 데이터 출처(스냅샷 시각·registry 다이제스트)로 바꾸거나, 노출 범위를 실제로 dev로 되돌리거나 둘 중 하나여야 한다.",
+              "disposition": "NEEDS_PRODUCT_DECISION",
+              "evidence": {
+                "path": "frontend/src/features/research/ResearchPage.tsx",
+                "symbol": "research-data-badge",
+                "line": 106
+              },
+              "relatedFeature": "FT-ROOM-LIST",
+              "relatedStory": null,
+              "issue": null,
+              "lifecycle": "OBSERVED"
             }
           ],
           "tests": [],
@@ -1210,6 +1290,22 @@
                 "path": "backend/src/main/java/com/room/backend/api/room/service/RoomCheckResultService.java",
                 "symbol": "hasIssue",
                 "line": null
+              },
+              "relatedFeature": "FT-ROOM-LIST",
+              "relatedStory": null,
+              "issue": null,
+              "lifecycle": "OBSERVED"
+            },
+            {
+              "id": "BC-ATLAS-01",
+              "severity": "P3",
+              "title": "공개된 페이지가 자기를 DEV ONLY라고 말한다",
+              "detail": "ResearchPage 헤더에 \"MOCK DATA / DEV ONLY\" 배지가 하드코딩돼 있다. 2026-08-05에 /project-map을 프로덕션에 열면서 이 문구가 사실과 어긋나게 됐다. 배지는 dev 전용이던 시절의 표시이고, 지금은 공개 URL에서 누구나 본다. 데이터가 실제로 registry 기반 정적 스냅샷이라는 점은 맞지만, \"DEV ONLY\"는 접근 범위를 잘못 말한다. 보는 사람이 내부 페이지라고 오해할 근거가 된다. 배지 문구를 데이터 출처(스냅샷 시각·registry 다이제스트)로 바꾸거나, 노출 범위를 실제로 dev로 되돌리거나 둘 중 하나여야 한다.",
+              "disposition": "NEEDS_PRODUCT_DECISION",
+              "evidence": {
+                "path": "frontend/src/features/research/ResearchPage.tsx",
+                "symbol": "research-data-badge",
+                "line": 106
               },
               "relatedFeature": "FT-ROOM-LIST",
               "relatedStory": null,
@@ -1342,6 +1438,22 @@
                 "path": "backend/src/main/java/com/room/backend/api/room/service/RoomCheckResultService.java",
                 "symbol": "hasIssue",
                 "line": null
+              },
+              "relatedFeature": "FT-ROOM-LIST",
+              "relatedStory": null,
+              "issue": null,
+              "lifecycle": "OBSERVED"
+            },
+            {
+              "id": "BC-ATLAS-01",
+              "severity": "P3",
+              "title": "공개된 페이지가 자기를 DEV ONLY라고 말한다",
+              "detail": "ResearchPage 헤더에 \"MOCK DATA / DEV ONLY\" 배지가 하드코딩돼 있다. 2026-08-05에 /project-map을 프로덕션에 열면서 이 문구가 사실과 어긋나게 됐다. 배지는 dev 전용이던 시절의 표시이고, 지금은 공개 URL에서 누구나 본다. 데이터가 실제로 registry 기반 정적 스냅샷이라는 점은 맞지만, \"DEV ONLY\"는 접근 범위를 잘못 말한다. 보는 사람이 내부 페이지라고 오해할 근거가 된다. 배지 문구를 데이터 출처(스냅샷 시각·registry 다이제스트)로 바꾸거나, 노출 범위를 실제로 dev로 되돌리거나 둘 중 하나여야 한다.",
+              "disposition": "NEEDS_PRODUCT_DECISION",
+              "evidence": {
+                "path": "frontend/src/features/research/ResearchPage.tsx",
+                "symbol": "research-data-badge",
+                "line": 106
               },
               "relatedFeature": "FT-ROOM-LIST",
               "relatedStory": null,
@@ -1514,6 +1626,22 @@
                 "path": "backend/src/main/java/com/room/backend/api/room/service/RoomCheckResultService.java",
                 "symbol": "hasIssue",
                 "line": null
+              },
+              "relatedFeature": "FT-ROOM-LIST",
+              "relatedStory": null,
+              "issue": null,
+              "lifecycle": "OBSERVED"
+            },
+            {
+              "id": "BC-ATLAS-01",
+              "severity": "P3",
+              "title": "공개된 페이지가 자기를 DEV ONLY라고 말한다",
+              "detail": "ResearchPage 헤더에 \"MOCK DATA / DEV ONLY\" 배지가 하드코딩돼 있다. 2026-08-05에 /project-map을 프로덕션에 열면서 이 문구가 사실과 어긋나게 됐다. 배지는 dev 전용이던 시절의 표시이고, 지금은 공개 URL에서 누구나 본다. 데이터가 실제로 registry 기반 정적 스냅샷이라는 점은 맞지만, \"DEV ONLY\"는 접근 범위를 잘못 말한다. 보는 사람이 내부 페이지라고 오해할 근거가 된다. 배지 문구를 데이터 출처(스냅샷 시각·registry 다이제스트)로 바꾸거나, 노출 범위를 실제로 dev로 되돌리거나 둘 중 하나여야 한다.",
+              "disposition": "NEEDS_PRODUCT_DECISION",
+              "evidence": {
+                "path": "frontend/src/features/research/ResearchPage.tsx",
+                "symbol": "research-data-badge",
+                "line": 106
               },
               "relatedFeature": "FT-ROOM-LIST",
               "relatedStory": null,
