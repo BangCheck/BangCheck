@@ -120,10 +120,10 @@ Current: status:progress
 6. [done]      Done
 ```
 
-Remove existing status:* label then apply new label:
-```bash
-gh issue edit {number} --remove-label "status:progress" --add-label "status:review" --repo {repo}
-```
+상태 라벨 전이는 2026-08-05에 제거했다.
+
+`status:*` 라벨이 이 저장소에 존재하지 않아 위 명령은 `gh` 오류로 끝났다.
+보드의 상태 필드를 쓰거나, 라벨 체계를 먼저 확정한다(#224).
 
 blocked: enter reason → add issue comment
 done: warn if unverified tests exist

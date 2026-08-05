@@ -34,6 +34,7 @@ on:
 
 permissions:
   contents: read
+  issues: read
 
 jobs:
   resolve:
@@ -84,6 +85,22 @@ jobs:
       - name: Run Atlas resolver
         if: steps.presence.outputs.present == 'true'
         run: python .project-atlas/tools/resolve.py
+
+      # ────────────────────────────────────────────
+      # registry ↔ GitHub Issue 양방향 대조.
+      #
+      # resolve.py 는 네트워크를 모른다 — 그것이 그 도구의 성질이라 ISS-01 은
+      # issue 값이 양의 정수인지만 본다. 999999 를 적어도 통과한다.
+      # 번호가 실재하는지, 그 번호가 정말 그 결함인지는 여기서 본다.
+      #
+      # gh 실패는 exit 2 로 나오며 "검사 불가"이지 "어긋남"이 아니다.
+      # 그래도 job 은 실패시킨다 — 검사하지 못한 것을 통과로 적으면
+      # 초록불이 "맞다"와 "안 봤다"를 구별하지 못하게 된다.
+      - name: Verify registry and issues agree
+        if: steps.presence.outputs.present == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python .project-atlas/tools/sync_check.py
 
 # runtime → 승인 baseline 방향(atlasBaselineCompare)은 여기 없다.
 # 이 workflow에 baseline job으로 배선해 PR #216에서 실제로 돌려봤고,

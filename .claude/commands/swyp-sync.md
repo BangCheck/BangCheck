@@ -1,9 +1,9 @@
 # /swyp-sync — 기능명세서 → GitHub Issues 동기화 (PM 전용)
 
-@_wood/agents/pm/workflows/05-doc-sync/steps-c/step-01-read-drive.md
-@_wood/agents/pm/workflows/05-doc-sync/steps-c/step-02-diff.md
-@_wood/agents/pm/workflows/05-doc-sync/steps-c/step-03-create-issues.md
-@_wood/agents/pm/workflows/05-doc-sync/steps-c/step-04-update-docs.md
+@_wood/agents/pm/workflows/06-doc-sync/steps-c/step-01-read-drive.md
+@_wood/agents/pm/workflows/06-doc-sync/steps-c/step-02-diff.md
+@_wood/agents/pm/workflows/06-doc-sync/steps-c/step-03-create-issues.md
+@_wood/agents/pm/workflows/06-doc-sync/steps-c/step-04-update-docs.md
 
 ---
 
