@@ -26,14 +26,64 @@ import json
 import re
 import subprocess
 import sys
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 
 import yaml
 
 ATLAS_DIR = Path(__file__).resolve().parent.parent
 REPO_ROOT = ATLAS_DIR.parent
 ROUTING = ATLAS_DIR / "triage-routing.yaml"
-PATH_RE = re.compile(r"(?:frontend|backend|\.github|\.project-atlas|_wood|\.claude)/[A-Za-z0-9_./-]+")
+
+ROOTS = ("frontend", "backend", ".github", ".project-atlas", "_wood", ".claude")
+# 확장자로 끝나는 것만 경로로 본다. 디렉터리만으로는 배정하지 않는다 —
+# `frontend/src/` 는 어느 파트인지 좁혀주지 않으면서 실재하기 때문에
+# "찾았다"로 오인된다.
+PATH_RE = re.compile(
+    r"(?<![\w/.-])(?:" + "|".join(re.escape(r) for r in ROOTS) + r")/[\w./-]*\w\.[A-Za-z]{2,4}\b"
+)
+# 코드펜스와 URL 은 근거가 아니다. 이슈 본문의 예시·링크를 실제 관측으로 읽으면
+# 판정이 남의 문장 위에 선다.
+FENCE_RE = re.compile(r"```.*?```", re.S)
+INLINE_CODE_RE = re.compile(r"`[^`]*`")
+URL_RE = re.compile(r"https?://\S+")
+
+
+def extract_paths(text: str) -> list[str]:
+    """본문에서 근거가 될 수 있는 경로만 뽑는다.
+
+    걸러내는 것 — 전부 교차검증이 실제로 재현한 오탐이다.
+      코드펜스·인라인 코드 안의 예시   문맥상 "이런 게 있다"이지 관측이 아니다
+      URL 안의 경로                   외부 링크는 이 저장소의 사실이 아니다
+      디렉터리만 (`frontend/src/`)     파트를 좁혀주지 않는데 실재해서 통과한다
+      glob 표기 (`frontend/**`)        경로가 아니라 패턴이다
+    """
+    cleaned = FENCE_RE.sub(" ", text or "")
+    cleaned = INLINE_CODE_RE.sub(" ", cleaned)
+    cleaned = URL_RE.sub(" ", cleaned)
+    return sorted(set(PATH_RE.findall(cleaned)))
+
+
+def is_safe(rel: str) -> bool:
+    """저장소 안의 실재하는 **파일**인가.
+
+    `..` 를 정규화하기 전에 fnmatch 를 돌리면
+    `frontend/../.project-atlas/tools/x.py` 가 frontend 로 배정된다 —
+    실재 검사는 통과하는데 파트가 틀린다. 정규화를 먼저 한다.
+    """
+    if rel.startswith("/") or "\\" in rel:
+        return False
+    normalized = PurePosixPath(rel)
+    if any(part == ".." for part in normalized.parts):
+        return False
+    if not normalized.parts or normalized.parts[0] not in ROOTS:
+        return False
+    target = (REPO_ROOT / normalized)
+    try:
+        resolved = target.resolve()
+        resolved.relative_to(REPO_ROOT.resolve())
+    except (OSError, ValueError):
+        return False
+    return resolved.is_file()
 
 
 def gh(args: list[str], *, optional: bool = False) -> str:
@@ -105,12 +155,12 @@ def main() -> int:
     if args.path:
         paths, source = args.path, "provided"
     else:
-        paths = sorted(set(PATH_RE.findall(f"{raw['title']}\n{raw.get('body') or ''}")))
+        paths = extract_paths(f"{raw['title']}\n{raw.get('body') or ''}")
         source = "issue-body"
 
-    # 실재하지 않는 경로는 근거가 못 된다. LLM 이 지어낸 경로를 그대로 쓰면
-    # 그 순간 판정이 허구 위에 선다 — resolve.py 의 SRC-01 과 같은 검사다.
-    existing = [p for p in paths if (REPO_ROOT / p).exists()]
+    # 실재하지 않거나 저장소 밖을 가리키는 경로는 근거가 못 된다.
+    # LLM 이 지어낸 경로나 `..` 위장을 그대로 쓰면 판정이 허구 위에 선다.
+    existing = [p for p in paths if is_safe(p)]
     missing = [p for p in paths if p not in existing]
 
     verdict = decide(existing, routing)
