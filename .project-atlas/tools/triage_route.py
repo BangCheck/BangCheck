@@ -130,8 +130,17 @@ def decide(paths: list[str], routing: dict) -> dict:
 
     considered = [p for p in paths if not is_ignored(p, routing)]
     if not considered:
-        fb = routing["fallback"]
-        return {"part": None, "assignee": None, "basis": "no-path", "note": fb["note"],
+        # registry 인용만 있는 경우. "경로가 없다"와 다르다 — Atlas 기록은
+        # 있는데 코드 위치가 없는 것이고, 그 차이를 사람이 봐야 한다.
+        #
+        # 이때 Atlas 파트로 보내지 않는다. 2026-08-06 실측: registry 만 인용한
+        # 이슈 6건(#226·227·228·229·243·244)이 전부 제품 결함이었다.
+        # registry 를 근거로 세면 6건 모두 하네스 담당에게 간다.
+        # registry **도구** 결함은 .project-atlas/tools/*.py 를 지목하지
+        # 데이터 파일만 지목하지 않는다.
+        return {"part": None, "assignee": None, "basis": "registry-only",
+                "note": "Atlas registry 기록은 인용돼 있으나 결함이 나는 코드 위치가 "
+                        "없습니다. registry 는 결함이 기록된 곳이지 나는 곳이 아닙니다.",
                 "matched": []}
 
     matched = []

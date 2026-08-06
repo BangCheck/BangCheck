@@ -73,18 +73,36 @@ def main() -> int:
         return 0
 
     print(f"대상 {len(found)}건")
+    done, failed = 0, []
     for c in found:
         issue = (c.get("issue_url") or "").rsplit("/", 1)[-1]
         who = (c.get("user") or {}).get("login")
         if args.dry_run:
             print(f"  [dry-run] #{issue} 코멘트 {c['id']} ({who})")
             continue
-        gh(["api", "-X", "PATCH", f"repos/{slug}/issues/comments/{c['id']}",
-            "-f", f"body={c['body']}{FOOTER}"])
+        # 한 건이 실패해도 멈추지 않는다. gh() 는 실패에 SystemExit 을 내므로
+        # 그대로 쓰면 첫 실패에서 죽고 나머지는 시도조차 안 된다 —
+        # 재실행으로 회복은 되지만 무엇이 남았는지 아무도 모른다.
+        try:
+            gh(["api", "-X", "PATCH", f"repos/{slug}/issues/comments/{c['id']}",
+                "-f", f"body={c['body']}{FOOTER}"])
+        except SystemExit:
+            failed.append((issue, c["id"]))
+            print(f"  #{issue} 코멘트 {c['id']} — 실패")
+            continue
+        done += 1
         print(f"  #{issue} 코멘트 {c['id']} — 은퇴 표시")
 
     if args.dry_run:
         print("\ndry-run — 아무것도 바꾸지 않았다")
+        return 0
+
+    print(f"\n완료 {done}건 · 실패 {len(failed)}건 · 남은 대상 {len(found) - done}건")
+    if failed:
+        for issue, cid in failed:
+            print(f"  남음 #{issue} 코멘트 {cid}")
+        print("다시 실행하면 남은 것만 시도한다 — 성공한 건은 표시가 붙어 건너뛴다")
+        return 1
     return 0
 
 
