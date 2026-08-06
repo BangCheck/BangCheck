@@ -43,8 +43,13 @@ PATH_RE = re.compile(
 )
 # 코드펜스와 URL 은 근거가 아니다. 이슈 본문의 예시·링크를 실제 관측으로 읽으면
 # 판정이 남의 문장 위에 선다.
+#
+# 인라인 백틱은 걷어내지 않는다. 사람이 이슈에 경로를 적는 **정상적인 표기**가
+# `frontend/src/...` 이기 때문이다.
+# 2026-08-06 실측: 인라인 코드까지 걷었더니 열린 이슈 23건이 전부 미분류로
+# 나왔다. 봇은 초록불로 돌면서 아무 말도 못 하고 있었다 — 오탐을 막으려다
+# 유일한 신호를 껐다. 여러 줄 펜스는 대개 샘플이라 그대로 걷는다.
 FENCE_RE = re.compile(r"```.*?```", re.S)
-INLINE_CODE_RE = re.compile(r"`[^`]*`")
 URL_RE = re.compile(r"https?://\S+")
 
 
@@ -52,13 +57,16 @@ def extract_paths(text: str) -> list[str]:
     """본문에서 근거가 될 수 있는 경로만 뽑는다.
 
     걸러내는 것 — 전부 교차검증이 실제로 재현한 오탐이다.
-      코드펜스·인라인 코드 안의 예시   문맥상 "이런 게 있다"이지 관측이 아니다
-      URL 안의 경로                   외부 링크는 이 저장소의 사실이 아니다
-      디렉터리만 (`frontend/src/`)     파트를 좁혀주지 않는데 실재해서 통과한다
-      glob 표기 (`frontend/**`)        경로가 아니라 패턴이다
+      코드펜스 안의 예시   여러 줄 블록은 대개 "이런 게 있다"이지 관측이 아니다
+      URL 안의 경로       외부 링크는 이 저장소의 사실이 아니다
+      디렉터리만          `frontend/src/` 는 파트를 안 좁히는데 실재해서 통과한다
+      glob 표기           `frontend/**` 는 경로가 아니라 패턴이다
+
+    걸러내지 않는 것
+      인라인 백틱 안의 경로   사람이 경로를 적는 정상 표기다. 이것을 걷으면
+                             봇이 볼 수 있는 신호가 사실상 남지 않는다.
     """
     cleaned = FENCE_RE.sub(" ", text or "")
-    cleaned = INLINE_CODE_RE.sub(" ", cleaned)
     cleaned = URL_RE.sub(" ", cleaned)
     return sorted(set(PATH_RE.findall(cleaned)))
 
@@ -96,6 +104,11 @@ def gh(args: list[str], *, optional: bool = False) -> str:
     return proc.stdout
 
 
+def is_ignored(path: str, routing: dict) -> bool:
+    """근거로 세지 않는 경로인가. 규칙 매칭보다 **먼저** 본다."""
+    return any(fnmatch.fnmatch(path, pat) for pat in routing.get("ignore") or [])
+
+
 def match_rule(path: str, routing: dict) -> dict | None:
     """첫 매칭이 이긴다. 좁은 규칙이 위에 있다는 전제다."""
     for rule in routing["rules"]:
@@ -115,8 +128,14 @@ def decide(paths: list[str], routing: dict) -> dict:
         return {"part": None, "assignee": None, "basis": "no-path", "note": fb["note"],
                 "matched": []}
 
+    considered = [p for p in paths if not is_ignored(p, routing)]
+    if not considered:
+        fb = routing["fallback"]
+        return {"part": None, "assignee": None, "basis": "no-path", "note": fb["note"],
+                "matched": []}
+
     matched = []
-    for p in paths:
+    for p in considered:
         rule = match_rule(p, routing)
         if rule:
             matched.append({"path": p, "part": rule["part"], "assignee": rule["assignee"]})
@@ -128,6 +147,16 @@ def decide(paths: list[str], routing: dict) -> dict:
 
     parts = {m["part"] for m in matched}
     if len(parts) > 1:
+        # 파트가 갈려도 담당이 한 사람이면 부를 사람은 정해져 있다.
+        # 그때까지 미배정으로 넘기면 봇이 아는 것을 말하지 않는 셈이 된다.
+        # 충돌이 막으려는 것은 **틀린 사람을 부르는 것**이지 파트 이름의 모호함이 아니다.
+        assignees = {m["assignee"] for m in matched}
+        if len(assignees) == 1:
+            return {"part": None, "assignee": matched[0]["assignee"],
+                    "basis": "multi-part-same-owner",
+                    "note": "여러 파트에 걸쳐 있으나 담당은 한 사람입니다. "
+                            "파트는 사람이 정해 주세요.",
+                    "matched": matched}
         cf = routing["conflict"]
         return {"part": None, "assignee": None, "basis": "conflict", "note": cf["note"],
                 "matched": matched}
