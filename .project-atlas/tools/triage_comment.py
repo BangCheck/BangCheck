@@ -201,12 +201,23 @@ def main() -> int:
         "-f", f"body={comment}"])
 
     if changed and prev_token:
+        # 지문은 part·assignee·basis·matched·routingVersion 을 함께 보는데
+        # 정정 문구가 part 만 비교하면 "미분류 → 미분류"라고 적으면서
+        # 실제 변화(담당자가 생겼다·사라졌다)를 숨긴다.
+        diffs = []
+        for label, key, blank in (("파트", "part", "미분류"),
+                                  ("담당자", "assignee", "미배정"),
+                                  ("근거", "basis", "없음"),
+                                  ("규칙", "routingVersion", "없음")):
+            before, after = prev_token.get(key) or blank, verdict.get(key) or blank
+            if before != after:
+                diffs.append(f"- {label}: `{before}` → `{after}`")
+        body = "**분류 정정**\n\n" + ("\n".join(diffs) if diffs else
+                                    "- 근거로 쓴 경로가 달라졌습니다.")
         gh(["issue", "comment", str(args.issue), "-R", slug, "--body",
-            f"**분류 정정** — `{prev_token.get('part') or '미분류'}` → "
-            f"`{verdict['part'] or '미분류'}`\n\n"
-            "근거가 달라져 제안을 바꿨습니다. 최신 제안은 위 코멘트에 있습니다.\n\n"
+            body + "\n\n최신 제안은 위 코멘트에 있습니다.\n\n"
             f"—\nAtlas Issue Triage · 규칙 `{verdict['routingVersion']}`"])
-        print(f"#{args.issue} {prev_token.get('part')} → {verdict['part']} — 정정 기록")
+        print(f"#{args.issue} 정정 기록 — {len(diffs)}개 항목 변경")
     else:
         print(f"#{args.issue} {verdict['part'] or '미분류'} → 코멘트 갱신")
     return 0

@@ -127,9 +127,30 @@ check("registry 인용은 근거가 아니다 — 결함 위치를 가린다",
                  "service/ChecklistService.java 에서 난다"),
       ("backend-checklist", "@std-yong"))
 
-check("registry 만 있으면 근거가 없는 것과 같다",
+check("registry 만 있으면 배정하지 않는다",
       route_body(".project-atlas/registry/defects.yaml 을 보라"),
       (None, None))
+
+# 그때 "경로가 없다"와 같은 말을 하면 안 된다. Atlas 기록은 있는데 코드 위치가
+# 없는 것이고, 사람이 봐야 할 것은 그 차이다.
+check("registry 만 있는 것은 근거 없음과 다른 상태로 보고한다",
+      tr.decide([".project-atlas/registry/defects.yaml"], ROUTING)["basis"],
+      "registry-only")
+
+
+# ── 알려진 한계 ─────────────────────────────────────────────
+# 인라인 백틱을 근거로 세기로 한 대가다. "예시로 든 경로"와 "관측된 경로"를
+# 표기로는 구별할 수 없다 — 아래는 예시인데 관측처럼 판정된다.
+#
+# 그래도 이쪽을 고른 이유: 반대로 하면 열린 이슈 23건이 전부 미분류였다(실측).
+# 그리고 봇은 **제안만** 하고 배정을 바꾸지 않으므로, 틀린 제안의 대가가
+# 아무 말도 못 하는 대가보다 작다.
+#
+# 이 한계를 지우려면 표기가 아니라 구조가 필요하다 — 이슈 템플릿에 경로 필드를
+# 두고 그 필드만 근거로 쓰는 것. 그때 이 테스트의 기대값이 (None, None) 로 바뀐다.
+check("[한계] 예시로 적은 경로도 관측으로 센다",
+      route_body("예: `frontend/src/app/router.tsx` 같은 파일을 참고하세요"),
+      ("frontend", "@Woo-JongHo"))
 
 
 # ── 충돌 ────────────────────────────────────────────────────
