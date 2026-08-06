@@ -1,7 +1,7 @@
 {
   "generator": ".project-atlas/tools/pm_snapshot.py",
   "note": "생성물이다. 원천은 registry와 코드다. 직접 편집하지 않는다.",
-  "sourceDigest": "16ce0ac98b94cf09541e16cdcab11c92c1644a17bd1a5a174914b0a243bedbd3",
+  "sourceDigest": "7a4397473969fed00091e0d99e6966fbd5be11876020d5b78e1e25643e903a6b",
   "pages": [
     {
       "page": "/",
@@ -129,8 +129,8 @@
               },
               "relatedFeature": "FT-CHECKLIST-CATALOG",
               "relatedStory": null,
-              "issue": null,
-              "lifecycle": "OBSERVED"
+              "issue": 233,
+              "lifecycle": "TRACKED"
             },
             {
               "id": "BC-CHK-09",
@@ -407,8 +407,8 @@
               },
               "relatedFeature": "FT-CHECKLIST-CATALOG",
               "relatedStory": null,
-              "issue": null,
-              "lifecycle": "OBSERVED"
+              "issue": 233,
+              "lifecycle": "TRACKED"
             },
             {
               "id": "BC-CHK-09",
@@ -731,8 +731,8 @@
               },
               "relatedFeature": "FT-CHECKLIST-CUSTOM-ITEM",
               "relatedStory": null,
-              "issue": null,
-              "lifecycle": "OBSERVED"
+              "issue": 231,
+              "lifecycle": "TRACKED"
             },
             {
               "id": "BC-CHK-04",
@@ -747,8 +747,8 @@
               },
               "relatedFeature": "FT-CHECKLIST-CUSTOM-ITEM",
               "relatedStory": null,
-              "issue": null,
-              "lifecycle": "OBSERVED"
+              "issue": 234,
+              "lifecycle": "TRACKED"
             },
             {
               "id": "BC-CHK-05",
@@ -763,8 +763,8 @@
               },
               "relatedFeature": "FT-CHECKLIST-CUSTOM-ITEM",
               "relatedStory": null,
-              "issue": null,
-              "lifecycle": "OBSERVED"
+              "issue": 235,
+              "lifecycle": "TRACKED"
             },
             {
               "id": "BC-CHK-06",
@@ -779,8 +779,8 @@
               },
               "relatedFeature": "FT-CHECKLIST-CUSTOM-ITEM",
               "relatedStory": null,
-              "issue": null,
-              "lifecycle": "OBSERVED"
+              "issue": 236,
+              "lifecycle": "TRACKED"
             },
             {
               "id": "BC-CHK-07",
@@ -858,8 +858,8 @@
               },
               "relatedFeature": "FT-CHECKLIST-SETTINGS",
               "relatedStory": null,
-              "issue": null,
-              "lifecycle": "OBSERVED"
+              "issue": 232,
+              "lifecycle": "TRACKED"
             },
             {
               "id": "BC-CHK-08",
@@ -923,8 +923,8 @@
               },
               "relatedFeature": "FT-CHECKLIST-CATALOG",
               "relatedStory": null,
-              "issue": null,
-              "lifecycle": "OBSERVED"
+              "issue": 233,
+              "lifecycle": "TRACKED"
             },
             {
               "id": "BC-CHK-09",
@@ -1463,8 +1463,8 @@
               },
               "relatedFeature": "FT-CHECKLIST-CATALOG",
               "relatedStory": null,
-              "issue": null,
-              "lifecycle": "OBSERVED"
+              "issue": 233,
+              "lifecycle": "TRACKED"
             },
             {
               "id": "BC-CHK-09",
@@ -1667,8 +1667,8 @@
               },
               "relatedFeature": "FT-CHECKLIST-CATALOG",
               "relatedStory": null,
-              "issue": null,
-              "lifecycle": "OBSERVED"
+              "issue": 233,
+              "lifecycle": "TRACKED"
             },
             {
               "id": "BC-CHK-09",
