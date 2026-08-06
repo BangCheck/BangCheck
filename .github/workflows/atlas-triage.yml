@@ -1,7 +1,22 @@
 # ============================================================
-# Atlas Issue Triage
+# Atlas Issue Triage — 1단
 # ------------------------------------------------------------
-# 이슈가 열리면 그것이 Atlas registry의 무엇에 해당하는지 코멘트로 알린다.
+# 이슈가 열리면 본문의 소스 경로로 파트·담당자를 판정해 코멘트로 제안한다.
+#
+# 왜 registry 판정(v1)이 아니라 배정 판정(v2)인가
+#   v1 은 registry ↔ 이슈 연결을 코멘트로 추정했다. 그 일은 이제 sync_check.py 가
+#   CI 에서 결정론으로 검사한다(SYN-01/02/03/05) — 추정을 게이트가 대신하니
+#   코멘트로 같은 말을 두 번 할 이유가 없다.
+#   팀원이 실제로 막히는 자리는 "이건 누가 봐야 하나"였고, 그것은 registry 가
+#   아니라 소스 경로가 답한다.
+#   옛 v1 코멘트 25건은 지우지 않는다 — retire_v1_comments.py 가 은퇴 표시만 붙인다.
+#
+# 2단이 따로 있다
+#   본문에 경로가 없으면 1단은 미분류를 낸다. 그때 Hermes 머신의
+#   atlas_issue_analyzer.py 가 코드를 뒤져 경로를 찾아 같은 규칙으로 다시 판정한다.
+#   **판정 규칙은 한 벌이다** — 두 단 모두 triage_route.py 를 쓴다.
+#   LLM 은 경로를 찾을 뿐 배정하지 않는다. 배정을 LLM 이 하면 규칙이 두 벌이 되고,
+#   둘이 어긋나도 아무도 모른다.
 #
 # 왜 Claude Code 훅이 아니라 Actions 인가
 #   훅은 Claude Code 세션에서 이슈를 만들 때만 발동한다. 팀원이 웹 UI나 gh 로
@@ -10,13 +25,14 @@
 #   끊긴 채 쌓여 있었고, 아무도 그 사실을 몰랐다.
 #
 # 이 워크플로가 하지 않는 것
-#   registry 를 고치지 않는다. defects.yaml 항목은 evidence 경로·심볼·severity·
-#   disposition 을 요구하는데 자유 서술 이슈에서 그것을 기계가 만들 수 없다.
+#   registry 를 고치지 않는다. 이슈 제목·본문·assignee·label 도 고치지 않는다.
 #   봇은 제안하고 사람이 확정한다.
 #
-# 실패해도 job 을 죽이지 않는다
-#   분류가 안 된다고 이슈 등록을 막을 이유가 없다. triage_issue.py 가 gh 실패나
-#   판정 불가를 exit 0 으로 흘리고, 그 사실을 코멘트나 로그로 말한다.
+# "판정 불가"와 "판정을 못 남겼다"는 다르다
+#   근거 경로가 없으면 미분류로 **코멘트를 남긴다** — 그것도 판정이고 정상 종료다.
+#   gh 조회·게시가 실패해 코멘트를 못 남긴 것은 실패다. exit 1 로 job 을 죽인다.
+#   2026-08-05 실측: 모든 실패를 exit 0 으로 흘렸더니 러너에서 gh 가 403 을 냈는데
+#   job 은 success 였고 코멘트는 하나도 안 달렸다.
 #
 # Companion workflows:
 #   atlas-resolve.yml    (registry ↔ 코드 · registry ↔ Issue 정합)
@@ -52,16 +68,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # AD-12 에 따라 .project-atlas/ 는 별도 저장소로 나갈 예정이다.
-      # 나간 뒤에는 판정할 원천이 없으므로 조용히 건너뛴다.
-      - name: Check registry presence
+      # 판정의 원천은 라우팅 규칙 파일이다. AD-12 로 .project-atlas/ 가 별도
+      # 저장소로 나가면 그 파일이 사라지므로 조용히 건너뛴다.
+      # registry 가 아니라 이 파일을 본다 — v2 는 registry 를 읽지 않는다.
+      - name: Check routing rules presence
         id: presence
         run: |
-          if [ -d .project-atlas/registry ]; then
+          if [ -f .project-atlas/triage-routing.yaml ]; then
             echo "present=true" >> "$GITHUB_OUTPUT"
           else
             echo "present=false" >> "$GITHUB_OUTPUT"
-            echo "triage 건너뜀 — .project-atlas/registry가 없다 (AD-12 분리 후 정상)"
+            echo "triage 건너뜀 — triage-routing.yaml이 없다 (AD-12 분리 후 정상)"
           fi
 
       - name: Setup Python
@@ -74,22 +91,41 @@ jobs:
         if: steps.presence.outputs.present == 'true'
         run: python -m pip install --disable-pip-version-check -r .project-atlas/requirements.txt
 
+      # 판정 규칙을 먼저 검사한다. 규칙이 깨진 채로 코멘트를 달면 틀린 사람을
+      # 부르고, 그 코멘트는 이미 이슈에 남는다 — 되돌릴 자리가 없다.
+      - name: Test routing rules
+        if: steps.presence.outputs.present == 'true'
+        run: |
+          set -euo pipefail
+          python .project-atlas/tools/test_triage_route.py
+          python .project-atlas/tools/test_triage_comment.py
+
       - name: Triage
         if: steps.presence.outputs.present == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
+          ISSUE_EVENT: ${{ github.event.issue.number }}
+          ISSUE_INPUT: ${{ inputs.issue }}
+          REPO: ${{ github.repository }}
         run: |
           set -euo pipefail
-          if [ -n "${{ github.event.issue.number || '' }}" ]; then
-            python .project-atlas/tools/triage_issue.py --issue ${{ github.event.issue.number }}
-          elif [ -n "${{ inputs.issue || '' }}" ]; then
-            python .project-atlas/tools/triage_issue.py --issue ${{ inputs.issue }}
-          else
-            # 소급 적용 — 열린 이슈 전체
-            for n in $(gh issue list -R "${{ github.repository }}" --state open \
-                         --limit 200 --json number --jq '.[].number'); do
-              echo "::group::#$n"
-              python .project-atlas/tools/triage_issue.py --issue "$n" || true
-              echo "::endgroup::"
-            done
+          TARGET="${ISSUE_EVENT:-${ISSUE_INPUT:-}}"
+          if [ -n "$TARGET" ]; then
+            python .project-atlas/tools/triage_comment.py --issue "$TARGET"
+            exit 0
+          fi
+
+          # 소급 적용 — 열린 이슈 전체.
+          # 한 건 실패를 `|| true` 로 흘리면 job 은 성공인데 아무것도 안 달릴 수
+          # 있다. 계속 돌되 실패 수를 세어 마지막에 job 을 실패시킨다.
+          failed=0
+          for n in $(gh issue list -R "$REPO" --state open \
+                       --limit 200 --json number --jq '.[].number'); do
+            echo "::group::#$n"
+            python .project-atlas/tools/triage_comment.py --issue "$n" || failed=$((failed + 1))
+            echo "::endgroup::"
+          done
+          if [ "$failed" -gt 0 ]; then
+            echo "::error::트리아지 실패 ${failed}건"
+            exit 1
           fi

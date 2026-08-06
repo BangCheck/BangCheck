@@ -36,7 +36,7 @@ from pathlib import Path
 import yaml
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from triage_route import PATH_RE, decide, gh  # noqa: E402
+from triage_route import decide, extract_paths, gh, is_safe  # noqa: E402
 
 ATLAS_DIR = Path(__file__).resolve().parent.parent
 REPO_ROOT = ATLAS_DIR.parent
@@ -44,7 +44,51 @@ ROUTING = ATLAS_DIR / "triage-routing.yaml"
 
 TOKEN_OPEN = "<!-- atlas-triage:v2 "
 TOKEN_RE = re.compile(r"<!--\s*atlas-triage:v2\s*(\{.*?\})\s*-->", re.S)
-BOT_LOGINS = {"github-actions[bot]", "github-actions"}
+# 옛 판정. 은퇴했지만 기록이라 지우지 않는다 — 다만 v2 코멘트로 착각해
+# 갱신하지는 않는다. 토큰이 다르므로 서로 간섭하지 않는다.
+LEGACY_TOKEN_OPEN = "<!-- atlas-triage:v1 "
+
+
+def resolve_paths(title: str, body: str, provided: list[str]) -> tuple[list[str], str]:
+    """근거로 쓸 경로를 정한다.
+
+    1단(본문)과 2단(LLM 이 찾아온 경로) 모두 **같은 함수**를 지난다.
+    처음에는 이 자리에서 `PATH_RE.findall` 과 `.exists()` 를 직접 썼는데,
+    그러면 triage_route 에 붙인 하드닝(코드펜스·URL·경로 탈출·디렉터리)이
+    코멘트 경로에만 빠진다 — 판정은 막았는데 코멘트는 통과하는 상태가 된다.
+    """
+    if provided:
+        paths, source = sorted(set(provided)), "provided"
+    else:
+        paths, source = extract_paths(f"{title}\n{body}"), "issue-body"
+    return paths, source
+
+
+def parse_token(body: str) -> dict:
+    """앞선 코멘트의 판정 토큰. 깨져 있으면 빈 dict —
+    사람이 코멘트를 손대 JSON 이 망가졌다고 봇이 죽을 이유가 없다."""
+    m = TOKEN_RE.search(body or "")
+    if not m:
+        return {}
+    try:
+        parsed = json.loads(m.group(1))
+    except json.JSONDecodeError:
+        return {}
+    return parsed if isinstance(parsed, dict) else {}
+
+
+def pick_mine(comments: list[dict], allowed: set[str]) -> dict | None:
+    """갱신할 자기 코멘트. 없으면 None.
+
+    조건 둘을 **함께** 본다 — v2 토큰이 있고, 작성자가 허용 목록에 있다.
+    토큰만 보면 남이 복사해 붙인 글을 덮어쓰고,
+    작성자만 보면 그 사람의 일반 코멘트를 덮어쓴다.
+    v1 토큰만 있는 코멘트는 고르지 않는다 — 판정 종류가 다르다.
+    """
+    mine = [c for c in comments
+            if TOKEN_OPEN in (c.get("body") or "")
+            and (c.get("user") or {}).get("login") in allowed]
+    return mine[-1] if mine else None
 
 
 def fingerprint(v: dict) -> str:
@@ -58,7 +102,12 @@ def fingerprint(v: dict) -> str:
 
 def render(verdict: dict, routing: dict) -> str:
     parts = routing["parts"]
-    part_label = parts.get(verdict["part"], verdict["part"]) if verdict["part"] else "미분류"
+    if verdict["part"]:
+        part_label = parts.get(verdict["part"], verdict["part"])
+    elif verdict["basis"] in ("conflict", "multi-part-same-owner"):
+        part_label = "여러 파트"
+    else:
+        part_label = "미분류"
     token = {
         "routingVersion": verdict["routingVersion"],
         "part": verdict["part"],
@@ -81,11 +130,13 @@ def render(verdict: dict, routing: dict) -> str:
         if len(verdict["matched"]) > 1:
             out.append(f"- 함께 확인된 경로: "
                        + ", ".join(f"`{x['path']}`" for x in verdict["matched"][1:4]))
-    elif verdict["basis"] == "conflict":
+    elif verdict["basis"] in ("conflict", "multi-part-same-owner"):
         out.append(f"- 근거: {verdict['note']}")
         out.append("- 걸린 파트: "
                    + ", ".join(sorted({parts.get(x['part'], x['part'])
                                        for x in verdict["matched"]})))
+        out.append("- 확인된 경로: "
+                   + ", ".join(f"`{x['path']}`" for x in verdict["matched"][:4]))
         out.append("- 확인 필요: 어느 파트가 맡을지 사람이 정해 주세요.")
     else:
         out.append(f"- 근거: {verdict['note']}")
@@ -115,13 +166,8 @@ def main() -> int:
 
     raw = json.loads(gh(["issue", "view", str(args.issue), "-R", slug,
                          "--json", "number,title,body"]))
-    if args.path:
-        paths, source = args.path, "provided"
-    else:
-        paths = sorted(set(PATH_RE.findall(f"{raw['title']}\n{raw.get('body') or ''}")))
-        source = "issue-body"
-
-    existing = [p for p in paths if (REPO_ROOT / p).exists()]
+    paths, source = resolve_paths(raw["title"], raw.get("body") or "", args.path)
+    existing = [p for p in paths if is_safe(p)]
     verdict = decide(existing, routing)
     verdict.update({"routingVersion": routing["routingVersion"], "pathSource": source,
                     "pathsMissing": [p for p in paths if p not in existing]})
@@ -134,22 +180,21 @@ def main() -> int:
     # 코멘트는 REST 로 읽는다 — `gh issue view --json comments` 는 GraphQL 노드 ID 를
     # 주는데 REST PATCH 는 숫자 ID 를 요구해 404 가 난다 (2026-08-05 실측).
     comments = json.loads(gh(["api", "--paginate", f"repos/{slug}/issues/{args.issue}/comments"]))
-    # `gh api user` 는 GITHUB_TOKEN 으로 403 이다 — 앱 설치 토큰에 "현재 사용자"가 없다.
+    # 허용 작성자는 저장소가 선언한다. `gh api user` 는 GITHUB_TOKEN 으로 403 이라
+    # (앱 설치 토큰에 "현재 사용자"가 없다) 그 값만으로는 1단에서 아무도 못 고른다.
+    allowed = set(routing.get("triageAuthors") or [])
     me = gh(["api", "user", "--jq", ".login"], optional=True).strip()
-    allowed = BOT_LOGINS | ({me} if me else set())
+    if me:
+        allowed.add(me)
 
-    mine = [c for c in comments
-            if TOKEN_OPEN in (c.get("body") or "")
-            and (c.get("user") or {}).get("login") in allowed]
+    latest = pick_mine(comments, allowed)
 
-    if not mine:
+    if latest is None:
         gh(["issue", "comment", str(args.issue), "-R", slug, "--body", comment])
         print(f"#{args.issue} {verdict['part'] or '미분류'} → 코멘트 생성")
         return 0
 
-    latest = mine[-1]
-    prev = TOKEN_RE.search(latest.get("body") or "")
-    prev_token = json.loads(prev.group(1)) if prev else {}
+    prev_token = parse_token(latest.get("body") or "")
     changed = prev_token.get("fingerprint") != fingerprint(verdict)
 
     gh(["api", "-X", "PATCH", f"repos/{slug}/issues/comments/{latest['id']}",
