@@ -1,7 +1,7 @@
 {
   "generator": ".project-atlas/tools/pm_snapshot.py",
   "note": "생성물이다. 원천은 registry와 코드다. 직접 편집하지 않는다.",
-  "sourceDigest": "7a4397473969fed00091e0d99e6966fbd5be11876020d5b78e1e25643e903a6b",
+  "sourceDigest": "59b2469f31a2d4a2e7747bf9bfbb3fbc8b280c9cc69ddf017703737f1876303c",
   "pages": [
     {
       "page": "/",
@@ -40,8 +40,8 @@
               },
               "relatedFeature": "FT-AUTH-OAUTH-LOGIN",
               "relatedStory": null,
-              "issue": null,
-              "lifecycle": "OBSERVED"
+              "issue": 255,
+              "lifecycle": "TRACKED"
             },
             {
               "id": "BC-AUTH-90",
@@ -56,8 +56,8 @@
               },
               "relatedFeature": "FT-AUTH-OAUTH-LOGIN",
               "relatedStory": null,
-              "issue": null,
-              "lifecycle": "OBSERVED"
+              "issue": 256,
+              "lifecycle": "TRACKED"
             }
           ],
           "tests": [],
@@ -1077,8 +1077,8 @@
               },
               "relatedFeature": "FT-AUTH-OAUTH-LOGIN",
               "relatedStory": null,
-              "issue": null,
-              "lifecycle": "OBSERVED"
+              "issue": 255,
+              "lifecycle": "TRACKED"
             },
             {
               "id": "BC-AUTH-90",
@@ -1093,8 +1093,8 @@
               },
               "relatedFeature": "FT-AUTH-OAUTH-LOGIN",
               "relatedStory": null,
-              "issue": null,
-              "lifecycle": "OBSERVED"
+              "issue": 256,
+              "lifecycle": "TRACKED"
             }
           ],
           "tests": [],
