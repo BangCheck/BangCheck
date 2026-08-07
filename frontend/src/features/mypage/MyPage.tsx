@@ -3,6 +3,7 @@ import { Icon } from '@iconify/react';
 import { useAuthStore } from '@/store/use-auth-store';
 import { ROUTES } from '@/lib/routes';
 import { useAtlasPreview } from '@/lib/use-atlas-preview';
+import { logoutServer } from '@/services/auth-service';
 
 /**
  * SCR-MYPAGE — 마이페이지 (canonical 모바일 노드 645:45715)
@@ -32,11 +33,18 @@ export default function MyPage() {
   const displayName = user?.nickname?.trim() || user?.email?.trim() || '';
   const initial = displayName ? displayName.charAt(0).toUpperCase() : '?';
 
-  const handleLogout = () => {
-    // TODO(api-spec A-4): 서버 세션 종료 POST /api/v1/auth/logout 미연동.
-    // components.md §449 갭 — 현재는 로컬 store 정리만 수행(refresh_token 만료 쿠키 처리 후속).
-    logout();
-    navigate(ROUTES.HOME);
+  const handleLogout = async () => {
+    // BC-AUTH-02: 서버 세션(refresh_tokens 행 + HttpOnly 쿠키) 종료를 먼저 시도한다.
+    // 실패해도 로컬 정리는 반드시 진행한다 — 사용자 입장에서 "로그아웃이 안 됨"보다
+    // "서버 세션이 약간 늦게 죽음"이 낫다.
+    try {
+      await logoutServer();
+    } catch {
+      // 네트워크 오류·서버 오류 모두 무시하고 클라이언트 로그아웃은 계속한다.
+    } finally {
+      logout();
+      navigate(ROUTES.HOME);
+    }
   };
 
   return (
