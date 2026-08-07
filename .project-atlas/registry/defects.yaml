@@ -238,7 +238,7 @@ defects:
       path: backend/src/main/java/com/room/backend/global/auth/oauth/service/OAuthStateService.java
       symbol: validateAndDeleteState
     relatedFeature: FT-AUTH-OAUTH-LOGIN
-    disposition: UNDECIDED   # 1회성 저장소를 두거나, 이름을 동작에 맞추거나
+    disposition: FIX_PLANNED   # 인메모리 1회성 nonce 저장소(+ 스케줄 청소)로 소비 처리. EC2 단일 인스턴스 전제
     issue: 255
 
   - id: BC-AUTH-02

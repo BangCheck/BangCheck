@@ -1,7 +1,7 @@
 {
   "generator": ".project-atlas/tools/pm_snapshot.py",
   "note": "생성물이다. 원천은 registry와 코드다. 직접 편집하지 않는다.",
-  "sourceDigest": "5fa3b2f13c2bd0f2096a6c2a793e22703183949a74a00791545fd430ee6baf48",
+  "sourceDigest": "f1378fb92894b9e5397bc2aef72eefd19317c00d82efc58f6eb7e806e1103057",
   "pages": [
     {
       "page": "/",
@@ -32,7 +32,7 @@
               "severity": "P2",
               "title": "OAuth state가 이름과 달리 소비되지 않아 재사용될 수 있다",
               "detail": "validateAndDeleteState는 이름이 삭제를 주장하지만 실제로는 서명과 만료만 검증하고 아무것도 지우지 않는다. state는 서버에 저장되지 않는 서명 JWT(TTL 10분)라 같은 state를 TTL 안에서 반복 제출해도 매번 통과한다. CSRF 방어가 1회성이 아니다. 메서드 이름이 실제 동작보다 강한 보장을 주장하는 것도 함께 기록한다.",
-              "disposition": "UNDECIDED",
+              "disposition": "FIX_PLANNED",
               "evidence": {
                 "path": "backend/src/main/java/com/room/backend/global/auth/oauth/service/OAuthStateService.java",
                 "symbol": "validateAndDeleteState",
@@ -1069,7 +1069,7 @@
               "severity": "P2",
               "title": "OAuth state가 이름과 달리 소비되지 않아 재사용될 수 있다",
               "detail": "validateAndDeleteState는 이름이 삭제를 주장하지만 실제로는 서명과 만료만 검증하고 아무것도 지우지 않는다. state는 서버에 저장되지 않는 서명 JWT(TTL 10분)라 같은 state를 TTL 안에서 반복 제출해도 매번 통과한다. CSRF 방어가 1회성이 아니다. 메서드 이름이 실제 동작보다 강한 보장을 주장하는 것도 함께 기록한다.",
-              "disposition": "UNDECIDED",
+              "disposition": "FIX_PLANNED",
               "evidence": {
                 "path": "backend/src/main/java/com/room/backend/global/auth/oauth/service/OAuthStateService.java",
                 "symbol": "validateAndDeleteState",
