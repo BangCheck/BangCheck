@@ -238,6 +238,21 @@ defects:
     disposition: UNDECIDED   # 1회성 저장소를 두거나, 이름을 동작에 맞추거나
     issue: 255
 
+  - id: BC-AUTH-02
+    severity: P2
+    title: 로그아웃이 서버 세션을 종료하지 않아 세션이 생존한다
+    detail: >
+      MyPage.tsx의 handleLogout은 클라이언트 store만 정리하고 서버 세션 종료
+      (POST /api/v1/auth/logout)를 호출하지 않는다. 로그아웃 후에도 refresh_tokens
+      행과 HttpOnly 쿠키가 그대로 남아, 다음 401 발생 시 api.ts 인터셉터가
+      재발급에 성공한다. 화면은 로그아웃 상태를 보여주지만 서버 세션은 생존한다.
+    evidence:
+      path: frontend/src/features/mypage/MyPage.tsx
+      symbol: handleLogout
+    relatedFeature: FT-AUTH-SESSION-LIFECYCLE
+    disposition: UNDECIDED   # 프론트 단독 연동으로 충분한지, 백엔드 무효화 API가 별도로 필요한지 결정 필요
+    issue: 259
+
   # --- 체크리스트 커스터마이징 (/custom) — 2026-08-03 관찰 -------------------
   # 조사는 서브에이전트가 수행했고 근거 경로·심볼은 resolver가 다시 검증한다.
 
