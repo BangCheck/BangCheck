@@ -34,8 +34,3 @@ export const exchangeOAuthCode = async (
   const user: User = { id, email, nickname, profileImageUrl: profileImageUrl ?? undefined };
   return { accessToken, user };
 };
-
-export const getCurrentUser = async (): Promise<User> => {
-  const response = await api.get<ApiResponse<User>>('/api/v1/users/me');
-  return response.data.data;
-};
