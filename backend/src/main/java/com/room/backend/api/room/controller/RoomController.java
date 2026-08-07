@@ -6,6 +6,7 @@ import com.room.backend.api.room.dto.request.RoomWithCheckAnswerRequestDTO;
 import com.room.backend.api.room.dto.response.RoomCreateResponseDTO;
 import com.room.backend.api.room.dto.response.RoomDetailResponseDTO;
 import com.room.backend.api.room.dto.response.RoomListResponseDTO;
+import com.room.backend.api.room.dto.response.RoomIssuesSummaryDTO;
 import com.room.backend.api.room.service.RoomCheckResultService;
 import com.room.backend.api.room.service.RoomService;
 import com.room.backend.domain.checklist.dto.request.RoomCheckAnswerRequestDTO;
@@ -21,6 +22,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -70,9 +72,10 @@ public class RoomController {
             @RequestParam(required = false) RoomSortType sort) {
         Long userId = SecurityUtil.getCurrentUserId();
         List<Room> rooms = roomService.getRooms(userId, rentType, sort);
+        Map<Long, RoomIssuesSummaryDTO> issuesByRoomId = roomCheckResultService.getRoomIssuesSummaries(
+            rooms.stream().map(Room::getId).toList());
         List<RoomListResponseDTO> response = rooms.stream()
-            .map(room -> new RoomListResponseDTO(room,
-                roomCheckResultService.getRoomIssuesSummary(room.getId())))
+            .map(room -> new RoomListResponseDTO(room, issuesByRoomId.get(room.getId())))
             .toList();
         return ResponseEntity.ok(ApiResponse.success(response));
     }

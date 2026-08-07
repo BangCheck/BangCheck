@@ -1,6 +1,7 @@
 package com.room.backend.api.map.controller;
 
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -17,6 +18,7 @@ import com.room.backend.api.map.dto.response.MapPointResponseDTO;
 import com.room.backend.api.map.dto.response.MapRoomResponseDTO;
 import com.room.backend.api.map.service.MapService;
 import com.room.backend.api.room.service.RoomCheckResultService;
+import com.room.backend.api.room.dto.response.RoomIssuesSummaryDTO;
 import com.room.backend.domain.map.entity.MapPoint;
 import com.room.backend.domain.room.entity.Room;
 import com.room.backend.domain.map.entity.enums.MapSortType;
@@ -50,12 +52,14 @@ public class MapController {
             @RequestParam(required = false) MapSortType sort) {
         Long userId = SecurityUtil.getCurrentUserId();
         List<Room> rooms = mapService.getRoomsForMap(userId, rentType);
+        Map<Long, RoomIssuesSummaryDTO> issuesByRoomId = roomCheckResultService.getRoomIssuesSummaries(
+                rooms.stream().map(Room::getId).toList());
 
         List<MapRoomResponseDTO> result;
 
         if (pointId == null) {
             result = rooms.stream()
-                    .map(room -> new MapRoomResponseDTO(room, roomCheckResultService.getRoomIssuesSummary(room.getId())))
+                    .map(room -> new MapRoomResponseDTO(room, issuesByRoomId.get(room.getId())))
                     .collect(java.util.stream.Collectors.toList());
         } else {
             MapPoint point = mapService.getMapPointById(pointId, userId)
@@ -68,7 +72,7 @@ public class MapController {
                                 point.getLat(), point.getLon(),
                                 room.getLat(), room.getLon());
                         int walkMin = DistanceUtil.estimateWalkMinutes(distM);
-                        return new MapRoomResponseDTO(room, roomCheckResultService.getRoomIssuesSummary(room.getId()), (int) distM, walkMin);
+                        return new MapRoomResponseDTO(room, issuesByRoomId.get(room.getId()), (int) distM, walkMin);
                     })
                     .filter(dto -> maxDistance == null || dto.getDistanceM() <= maxDistance)
                     .collect(java.util.stream.Collectors.toList());
