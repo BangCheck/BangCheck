@@ -352,7 +352,9 @@ defects:
       잡혔다 — 손으로 registry를 채우는 동안에는 방향이 반대여서 못 봤다.
     evidence:
       path: frontend/src/services/auth-service.ts
-      symbol: getCurrentUser
+      # symbol: getCurrentUser — PR #261(closes #256)에서 함수 자체를 삭제했다.
+      # 더 이상 존재하지 않는 심볼을 가리키면 SRC-02가 위반으로 잡는다.
+      # path는 남긴다 — 그 결함이 있었던 파일이라는 사실 자체는 여전히 유효하다.
     relatedFeature: FT-AUTH-OAUTH-LOGIN
     disposition: RECORD_ONLY
     issue: 256

@@ -1,7 +1,7 @@
 {
   "generator": ".project-atlas/tools/pm_snapshot.py",
   "note": "생성물이다. 원천은 registry와 코드다. 직접 편집하지 않는다.",
-  "sourceDigest": "4a00511096c68bdce6cc8484666ff7ec45707bbb30ceabce9a8ecba24a424952",
+  "sourceDigest": "3bc1d2907a319f066f306e1f52a6e50081222a2f7a53ba05117a66ff51c640c9",
   "pages": [
     {
       "page": "/",
@@ -51,7 +51,7 @@
               "disposition": "RECORD_ONLY",
               "evidence": {
                 "path": "frontend/src/services/auth-service.ts",
-                "symbol": "getCurrentUser",
+                "symbol": null,
                 "line": null
               },
               "relatedFeature": "FT-AUTH-OAUTH-LOGIN",
@@ -1088,7 +1088,7 @@
               "disposition": "RECORD_ONLY",
               "evidence": {
                 "path": "frontend/src/services/auth-service.ts",
-                "symbol": "getCurrentUser",
+                "symbol": null,
                 "line": null
               },
               "relatedFeature": "FT-AUTH-OAUTH-LOGIN",
