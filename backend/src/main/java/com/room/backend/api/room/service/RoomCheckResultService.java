@@ -20,9 +20,11 @@ import com.room.backend.domain.checklist.entity.RoomCheckSelectedOption;
 import com.room.backend.domain.checklist.entity.enums.ChecklistCategory;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import lombok.RequiredArgsConstructor;
 
@@ -86,23 +88,62 @@ public class RoomCheckResultService {
 
     @Transactional(readOnly = true)
     public RoomIssuesSummaryDTO getRoomIssuesSummary(Long roomId) {
-        List<RoomCheckResult> results = roomCheckResultRepository.findByRoomId(roomId);
+        return getRoomIssuesSummaries(List.of(roomId)).get(roomId);
+    }
 
-        Map<String, Boolean> issueMap = new HashMap<>();
-
-        for (RoomCheckResult result : results) {
-            ChecklistItem item = checklistItemRepository.findById(result.getItemId()).orElse(null);
-            if (item == null || item.getCategory() != ChecklistCategory.PROBLEM) continue;
-
-            boolean hasIssue = roomCheckSelectedOptionRepository.findByResultId(result.getId())
-                .stream()
-                .map(so -> checklistOptionRepository.findById(so.getOptionId()).orElse(null))
-                .filter(Objects::nonNull)
-                .anyMatch(opt -> !"없음".equals(opt.getOptionValue()));
-
-            issueMap.put(item.getItemName(), hasIssue);
+    @Transactional(readOnly = true)
+    public Map<Long, RoomIssuesSummaryDTO> getRoomIssuesSummaries(List<Long> roomIds) {
+        if (roomIds.isEmpty()) {
+            return Map.of();
         }
 
+        List<RoomCheckResult> results = roomCheckResultRepository.findByRoomIdIn(roomIds);
+        Map<Long, ChecklistItem> itemsById = checklistItemRepository.findAllById(
+                results.stream().map(RoomCheckResult::getItemId).distinct().toList())
+            .stream()
+            .collect(Collectors.toMap(ChecklistItem::getId, Function.identity()));
+
+        List<RoomCheckResult> problemResults = results.stream()
+            .filter(result -> {
+                ChecklistItem item = itemsById.get(result.getItemId());
+                return item != null && item.getCategory() == ChecklistCategory.PROBLEM;
+            })
+            .toList();
+
+        List<RoomCheckSelectedOption> selectedOptions = problemResults.isEmpty()
+            ? List.of()
+            : roomCheckSelectedOptionRepository.findByResultIdIn(
+                problemResults.stream().map(RoomCheckResult::getId).toList());
+
+        Map<Long, ChecklistOption> optionsById = checklistOptionRepository.findAllById(
+                selectedOptions.stream().map(RoomCheckSelectedOption::getOptionId).distinct().toList())
+            .stream()
+            .collect(Collectors.toMap(ChecklistOption::getId, Function.identity()));
+
+        Map<Long, List<RoomCheckSelectedOption>> selectedOptionsByResultId = selectedOptions.stream()
+            .collect(Collectors.groupingBy(RoomCheckSelectedOption::getResultId));
+
+        Map<Long, Map<String, Boolean>> issuesByRoomId = new HashMap<>();
+        for (RoomCheckResult result : problemResults) {
+            ChecklistItem item = itemsById.get(result.getItemId());
+            boolean hasIssue = selectedOptionsByResultId.getOrDefault(result.getId(), List.of())
+                .stream()
+                .map(selected -> optionsById.get(selected.getOptionId()))
+                .filter(option -> option != null)
+                .anyMatch(option -> !"없음".equals(option.getOptionValue()));
+
+            issuesByRoomId.computeIfAbsent(result.getRoomId(), ignored -> new HashMap<>())
+                .put(item.getItemName(), hasIssue);
+        }
+
+        return roomIds.stream().distinct().collect(Collectors.toMap(
+            Function.identity(),
+            roomId -> toIssuesSummary(issuesByRoomId.getOrDefault(roomId, Map.of())),
+            (first, ignored) -> first,
+            LinkedHashMap::new));
+    }
+
+    private RoomIssuesSummaryDTO toIssuesSummary(Map<String, Boolean> issueMap) {
         return new RoomIssuesSummaryDTO(
             issueMap.getOrDefault("곰팡이", false),
             issueMap.getOrDefault("누수 흔적", false),
@@ -111,5 +152,4 @@ public class RoomCheckResultService {
             issueMap.getOrDefault("습기 / 결로", false)
         );
     }
-
 }
