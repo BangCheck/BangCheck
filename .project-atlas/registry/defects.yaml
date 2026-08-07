@@ -253,6 +253,7 @@ defects:
       symbol: deleteCustomItem
     relatedFeature: FT-CHECKLIST-CUSTOM-ITEM
     disposition: FIX_PLANNED
+    issue: 231
 
   - id: BC-CHK-02
     severity: P2
@@ -266,6 +267,7 @@ defects:
       symbol: saveSettings
     relatedFeature: FT-CHECKLIST-SETTINGS
     disposition: FIX_PLANNED
+    issue: 232
 
   - id: BC-CHK-03
     severity: P2
@@ -280,6 +282,7 @@ defects:
       symbol: getCustomizedItems
     relatedFeature: FT-CHECKLIST-CATALOG
     disposition: RECORD_ONLY
+    issue: 233
 
   - id: BC-CHK-04
     severity: P3
@@ -293,6 +296,7 @@ defects:
       symbol: itemName
     relatedFeature: FT-CHECKLIST-CUSTOM-ITEM
     disposition: FIX_PLANNED
+    issue: 234
 
   - id: BC-CHK-05
     severity: P3
@@ -306,6 +310,7 @@ defects:
       symbol: deleteCustomItem
     relatedFeature: FT-CHECKLIST-CUSTOM-ITEM
     disposition: NEEDS_PRODUCT_DECISION
+    issue: 235
 
   - id: BC-CHK-06
     severity: P3
@@ -319,6 +324,7 @@ defects:
       symbol: CUSTOM_ITEM_FORBIDDEN
     relatedFeature: FT-CHECKLIST-CUSTOM-ITEM
     disposition: FIX_PLANNED
+    issue: 236
 
   - id: BC-AUTH-90
     severity: P3
