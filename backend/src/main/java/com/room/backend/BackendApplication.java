@@ -9,6 +9,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.core.env.Environment;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 import java.net.Inet4Address;
 import java.net.InetAddress;
@@ -16,6 +17,7 @@ import java.net.NetworkInterface;
 import java.util.Enumeration;
 
 @EnableJpaAuditing
+@EnableScheduling
 @SpringBootApplication
 public class BackendApplication {
 
