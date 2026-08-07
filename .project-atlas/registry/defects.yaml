@@ -253,7 +253,7 @@ defects:
       path: frontend/src/features/mypage/MyPage.tsx
       symbol: handleLogout
     relatedFeature: FT-AUTH-SESSION-LIFECYCLE
-    disposition: UNDECIDED   # 프론트 단독 연동으로 충분한지, 백엔드 무효화 API가 별도로 필요한지 결정 필요
+    disposition: FIX_PLANNED   # 백엔드 POST /api/v1/auth/logout이 이미 구현돼 있어(refresh_tokens 삭제 + 쿠키 만료) 프론트 단독 연동으로 충분
     issue: 259
 
   # --- 체크리스트 커스터마이징 (/custom) — 2026-08-03 관찰 -------------------
