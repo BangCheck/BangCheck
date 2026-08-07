@@ -118,6 +118,7 @@ defects:
     disposition: FIX_WHEN_SLICE_MIGRATED   # 컨트롤러 전환 시 command로 대체
 
   - id: BC-LIST-01
+    issue: 230
     severity: P2
     title: 문제 뱃지가 체크리스트 항목 이름 문자열로만 연결된다
     detail: >
@@ -131,6 +132,7 @@ defects:
     disposition: NEEDS_PRODUCT_DECISION   # 항목에 안정 코드를 부여할지, 뱃지를 데이터 주도로 바꿀지
 
   - id: BC-LIST-02
+    issue: 239
     severity: P3
     title: 미확인과 문제없음을 구분하지 않는다
     detail: >
@@ -142,6 +144,7 @@ defects:
     disposition: NEEDS_PRODUCT_DECISION
 
   - id: BC-LIST-03
+    issue: 240
     severity: P2
     title: 목록 조회가 N+1을 넘어 N*M+1 쿼리를 낸다
     detail: >
