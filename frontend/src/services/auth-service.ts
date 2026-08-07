@@ -34,3 +34,9 @@ export const exchangeOAuthCode = async (
   const user: User = { id, email, nickname, profileImageUrl: profileImageUrl ?? undefined };
   return { accessToken, user };
 };
+
+// BC-AUTH-02: 서버 세션(refresh_tokens 행 + HttpOnly 쿠키)을 종료한다.
+// 실패해도 호출부는 로컬 store 정리를 계속 진행해야 한다 — 여기서는 요청만 보낸다.
+export const logoutServer = async (): Promise<void> => {
+  await api.post<ApiResponse<void>>('/api/v1/auth/logout');
+};
