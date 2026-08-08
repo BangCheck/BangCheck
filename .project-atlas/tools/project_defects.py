@@ -44,12 +44,19 @@ from pathlib import Path
 
 import yaml
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from atlas_marker import has_marker_for, render  # noqa: E402
+
 ATLAS_DIR = Path(__file__).resolve().parent.parent
 REPO_ROOT = ATLAS_DIR.parent
 DEFECTS = ATLAS_DIR / "registry" / "defects.yaml"
 
 # 이슈 본문에 심는 조인 키. 사람이 지우지 않는 한 검색으로 되찾을 수 있다.
-MARKER = "<!-- atlas-defect: {id} -->"
+#
+# 형식과 인식 규칙은 atlas_marker 가 단독으로 소유한다. 예전에는 이 파일이
+# 문자열을 들고 만들고, sync_check.py 가 따로 들고 읽었다 — 둘이 각자 정의를
+# 가지면 한쪽만 고칠 때 조용히 갈라지고, 그 순간 registry ↔ 이슈 대조 전체가
+# 무의미해진다. 조인 키의 정본은 하나여야 한다.
 
 # 이슈로 만들 이유가 없는 처분. RECORD_ONLY 는 "고치지 않기로 하고 기록만 한다"라
 # registry 자신이 결론을 내린 것이라, 이슈로 올리면 열린 채 영원히 남는다.
@@ -77,7 +84,7 @@ def find_existing(slug: str, defect_id: str) -> int | None:
         "--search", defect_id, "--json", "number,body",
     ])
     for item in json.loads(out or "[]"):
-        if MARKER.format(id=defect_id) in (item.get("body") or ""):
+        if has_marker_for(item.get("body"), defect_id):
             return item["number"]
     return None
 
@@ -85,7 +92,7 @@ def find_existing(slug: str, defect_id: str) -> int | None:
 def build_body(defect: dict, slug: str) -> str:
     evidence = defect.get("evidence") or {}
     lines = [
-        MARKER.format(id=defect["id"]),
+        render(defect["id"]),
         "",
         f"> Atlas registry `{defect['id']}` 에서 투영됐다. 정본은 `.project-atlas/registry/defects.yaml` 이다.",
         "",

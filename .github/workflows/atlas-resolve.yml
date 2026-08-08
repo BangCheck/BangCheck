@@ -42,7 +42,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # base 의 defects.yaml 이 필요하다 — 이 PR 이 조인 키를 어디까지 건드렸는지
+      # 그것과 대조해야 안다. fetch-depth: 0 이 아니면 base SHA 가 없어
+      # `git show` 가 실패한다.
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       # ────────────────────────────────────────────
       # AD-12에 따라 .project-atlas/는 별도 저장소로 분리될 예정이다.
@@ -87,20 +92,53 @@ jobs:
         run: python .project-atlas/tools/resolve.py
 
       # ────────────────────────────────────────────
-      # registry ↔ GitHub Issue 양방향 대조.
+      # sync 규칙도 살아 있는지 먼저 본다. resolver 와 같은 이유다.
+      # 2026-08-07 까지 이 도구에는 테스트가 아예 없었고, 그동안 마커 파서의
+      # 오탐이 하루에 두 번 CI 를 깼는데 잡는 자리가 없었다 (#262).
+      - name: Verify sync rules still catch violations
+        if: steps.presence.outputs.present == 'true'
+        run: python .project-atlas/tools/test_sync_check.py
+
+      # ────────────────────────────────────────────
+      # registry ↔ GitHub Issue 대조 — **이 PR 이 건드린 결함만.**
       #
       # resolve.py 는 네트워크를 모른다 — 그것이 그 도구의 성질이라 ISS-01 은
       # issue 값이 양의 정수인지만 본다. 999999 를 적어도 통과한다.
       # 번호가 실재하는지, 그 번호가 정말 그 결함인지는 여기서 본다.
       #
+      # 왜 전역이 아니라 --scope pr 인가 (#262)
+      #   이 검사의 역방향(SYN-03)은 저장소의 **모든 이슈**를 훑는다. PR 과
+      #   인과가 없는 전역 상태다. 이슈를 먼저 열고 registry 항목을 나중에
+      #   넣는 것은 정상 작업 흐름인데(봇 안내문 자신이 그렇게 안내한다),
+      #   그 사이 창이 열릴 때마다 무관한 PR 이 전부 떨어졌다.
+      #   2026-08-07 하루에 세 번 났고, 워크플로 파일 하나를 지운 PR #258 이
+      #   두 번 그 채무를 갚았다 — 그 작성자는 고칠 권한도 맥락도 없었다.
+      #
+      # 전역 검사는 사라지지 않는다. atlas-sync-audit.yml 이 소유한다.
+      #   낮춘 것이 아니라 **옮긴 것**이다. 그쪽은 이슈가 열리거나 편집되는
+      #   즉시 돌기 때문에, PR 을 인질로 잡지 않고도 같은 드리프트가 더 빨리
+      #   드러난다. 여기서 경고로 낮췄다면 "맞다"와 "안 봤다"가 같은 초록불이
+      #   됐을 것이고, 이 job 이 gh 실패조차 죽이는 이유와 정면으로 어긋난다.
+      #
       # gh 실패는 exit 2 로 나오며 "검사 불가"이지 "어긋남"이 아니다.
       # 그래도 job 은 실패시킨다 — 검사하지 못한 것을 통과로 적으면
       # 초록불이 "맞다"와 "안 봤다"를 구별하지 못하게 된다.
-      - name: Verify registry and issues agree
+      - name: Verify registry and issues agree (this PR's scope)
         if: steps.presence.outputs.present == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
-        run: python .project-atlas/tools/sync_check.py
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          # base 에 이 파일이 없을 수 있다 — registry 가 그 시점 이후에
+          # 들어온 경우다. 그때는 빈 목록을 base 로 둔다. 그러면 HEAD 의
+          # 모든 결함이 "이 PR 이 추가한 것"이 되어 전부 검사된다.
+          if git cat-file -e "$BASE_SHA:.project-atlas/registry/defects.yaml" 2>/dev/null; then
+            git show "$BASE_SHA:.project-atlas/registry/defects.yaml" > /tmp/base-defects.yaml
+          else
+            echo "defects: []" > /tmp/base-defects.yaml
+            echo "base 에 defects.yaml 이 없다 — HEAD 전체를 이 PR 의 범위로 본다"
+          fi
+          python .project-atlas/tools/sync_check.py --scope pr --base /tmp/base-defects.yaml
 
       # ────────────────────────────────────────────
       # registry ↔ atlas-snapshot.json 정합. (#237)
