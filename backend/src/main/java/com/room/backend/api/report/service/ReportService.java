@@ -9,6 +9,8 @@ import com.room.backend.domain.checklist.entity.RoomCheckSelectedOption;
 import com.room.backend.domain.checklist.entity.enums.ChecklistCategory;
 import com.room.backend.domain.checklist.repository.*;
 import com.room.backend.domain.room.repository.RoomRepository;
+import com.room.backend.global.common.exception.GeneralException;
+import com.room.backend.global.common.exception.ReportErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -50,7 +52,12 @@ public class ReportService {
         List<CategoryGroupDTO> compareData = new ArrayList<>();
 
         for (String categoryName : categories) {
-            ChecklistCategory category = ChecklistCategory.valueOf(categoryName);
+            ChecklistCategory category;
+            try {
+                category = ChecklistCategory.valueOf(categoryName);
+            } catch (IllegalArgumentException e) {
+                throw new GeneralException(ReportErrorCode.UNKNOWN_CATEGORY);
+            }
 
             List<RoomCompareItemDTO> itemsData = new ArrayList<>();
 
