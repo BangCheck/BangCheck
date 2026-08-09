@@ -9,6 +9,7 @@ interface RoomCardProps {
   room: Room;
   onDelete?: (id: string) => void;
   onClick?: (id: string) => void;
+  onLocate?: (id: string) => void;
 }
 
 const ISSUE_LABELS: Record<string, string> = {
@@ -67,6 +68,7 @@ export default function RoomCard({
   room,
   onDelete,
   onClick,
+  onLocate,
 }: RoomCardProps) {
   const { id, name, address, type, deposit, rent, managementFee, price, issues, memo, createdAt, buildingType, floor, direction } = room;
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -153,6 +155,22 @@ export default function RoomCard({
               <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
             </svg>
           </button>
+          {onLocate && (
+            <button
+              type="button"
+              aria-label="지도에서 방 위치 보기"
+              onClick={(e) => {
+                e.stopPropagation();
+                onLocate(id);
+              }}
+              className="ml-1 text-text-mute hover:text-brand-primary transition-colors cursor-pointer shrink-0"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z" />
+                <circle cx="12" cy="10" r="2.5" />
+              </svg>
+            </button>
+          )}
         </div>
 
         {/* 4. 정보 칩 */}

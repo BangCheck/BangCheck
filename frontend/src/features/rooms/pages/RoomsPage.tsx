@@ -492,6 +492,7 @@ export default function RoomsPage() {
                 key={room.id}
                 room={room}
                 onClick={(id) => navigate(ROUTES.CHECKLIST_DETAIL(id))}
+                onLocate={(id) => navigate(`${ROUTES.MAP}?roomId=${encodeURIComponent(id)}`)}
                 onDelete={handleDeleteRoom}
               />
             ))}

@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuthStore } from '@/store/use-auth-store';
 import { useGuestRoomStore } from '@/store/use-guest-room-store';
 import { useRoomsList } from '@/features/rooms/hooks/use-rooms-query';
@@ -436,6 +436,7 @@ export default function MapPage() {
   const { isLoggedIn } = useAuthStore();
   const { guestRooms } = useGuestRoomStore();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [mapError, setMapError] = useState<string | null>(null);
   const [mapReady, setMapReady] = useState(false);
   const [roomPositions, setRoomPositions] = useState<Record<string, { lat: number; lng: number }>>({});
@@ -482,6 +483,24 @@ export default function MapPage() {
   );
 
   const showEmpty = roomsWithAddress.length === 0;
+
+  useEffect(() => {
+    const targetRoomId = searchParams.get('roomId');
+    if (!targetRoomId || !mapReady || !mapInstanceRef.current) return;
+
+    const targetRoom = rooms.find((room) => room.id === targetRoomId);
+    const targetPosition = roomPositions[targetRoomId];
+    if (!targetRoom || !targetPosition) return;
+
+    mapInstanceRef.current.setCenter(new window.naver.maps.LatLng(targetPosition.lat, targetPosition.lng));
+    setSelectedRoomForRoute(targetRoom);
+    mapContainerRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    setSearchParams((current) => {
+      const next = new URLSearchParams(current);
+      next.delete('roomId');
+      return next;
+    }, { replace: true });
+  }, [mapReady, roomPositions, rooms, searchParams, setSearchParams]);
 
   // LocalStorage hydration
   useEffect(() => {
