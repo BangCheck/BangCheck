@@ -34,13 +34,8 @@ export default function MyPage() {
   const initial = displayName ? displayName.charAt(0).toUpperCase() : '?';
 
   const handleLogout = async () => {
-    // BC-AUTH-02: 서버 세션(refresh_tokens 행 + HttpOnly 쿠키) 종료를 먼저 시도한다.
-    // 실패해도 로컬 정리는 반드시 진행한다 — 사용자 입장에서 "로그아웃이 안 됨"보다
-    // "서버 세션이 약간 늦게 죽음"이 낫다.
     try {
       await logoutServer();
-    } catch {
-      // 네트워크 오류·서버 오류 모두 무시하고 클라이언트 로그아웃은 계속한다.
     } finally {
       logout();
       navigate(ROUTES.HOME);
