@@ -20,14 +20,17 @@ export interface RoomListItem {
   specialFloor?: string | null;
   managementFee?: number | null;
   direction?: string | null;
+  issues?: RoomIssues;
 }
 
+export type RoomIssueStatus = 'UNCHECKED' | 'NONE' | 'PRESENT';
+
 export interface RoomIssues {
-  mold: boolean;
-  leak: boolean;
-  bug: boolean;
-  condensation?: boolean;
-  drainSmell?: boolean;
+  mold: RoomIssueStatus;
+  leak: RoomIssueStatus;
+  bug: RoomIssueStatus;
+  condensation?: RoomIssueStatus;
+  drainSmell?: RoomIssueStatus;
 }
 
 export interface Room {

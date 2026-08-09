@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import type { Room, RoomType, GuestRoomRaw } from '@/types/room';
+import type { Room, RoomIssues, RoomType, GuestRoomRaw } from '@/types/room';
 import { GUEST_ROOM_LIMIT } from '@/lib/constants';
 import { formatRoomPrice } from '@/lib/utils';
 
@@ -75,12 +75,12 @@ const rawToRoomFields = (raw: GuestRoomRaw) => ({
   tags: buildTags(raw),
   score: computeRoomScore(raw),
   issues: {
-    mold: raw.interior.mold === '있음',
-    leak: raw.interior.leak === '있음',
-    bug: raw.interior.pest === '있음',
-    condensation: raw.interior.humidity === '있음',
-    drainSmell: raw.interior.drainSmell === '있음',
-  },
+    mold: raw.interior.mold === '있음' ? 'PRESENT' : 'UNCHECKED',
+    leak: raw.interior.leak === '있음' ? 'PRESENT' : 'UNCHECKED',
+    bug: raw.interior.pest === '있음' ? 'PRESENT' : 'UNCHECKED',
+    condensation: raw.interior.humidity === '있음' ? 'PRESENT' : 'UNCHECKED',
+    drainSmell: raw.interior.drainSmell === '있음' ? 'PRESENT' : 'UNCHECKED',
+  } satisfies RoomIssues,
   memo: raw.custom.memo,
   buildingType: raw.building.buildingType ?? undefined,
   floor: raw.building.floorLevel ?? undefined,

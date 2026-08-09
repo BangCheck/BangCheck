@@ -130,7 +130,7 @@ function MapRoomCardCompact({
   const navigate = useNavigate();
 
   const issueCount = room.issues
-    ? Object.values(room.issues).filter(Boolean).length
+    ? Object.values(room.issues).filter((status) => status === 'PRESENT').length
     : 0;
 
   const tags = [room.buildingType, room.floor, room.direction].filter(Boolean) as string[];
