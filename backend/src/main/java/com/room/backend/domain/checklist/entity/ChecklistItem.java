@@ -1,6 +1,7 @@
 package com.room.backend.domain.checklist.entity;
 
 import com.room.backend.domain.checklist.entity.enums.ChecklistCategory;
+import com.room.backend.domain.checklist.entity.enums.ChecklistIssueType;
 import com.room.backend.domain.checklist.entity.enums.InputType;
 import com.room.backend.domain.checklist.entity.enums.ItemType;
 import com.room.backend.global.common.entity.BaseEntity;
@@ -32,6 +33,10 @@ public class ChecklistItem extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(nullable = true, length = 30)
     private InputType inputType;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "issue_type", length = 30)
+    private ChecklistIssueType issueType;
 
     @Column(length = 600)
     private String description;
