@@ -23,6 +23,7 @@ import com.room.backend.domain.checklist.entity.ChecklistOption;
 import com.room.backend.domain.checklist.entity.RoomCheckResult;
 import com.room.backend.domain.checklist.entity.RoomCheckSelectedOption;
 import com.room.backend.domain.checklist.entity.enums.ChecklistCategory;
+import com.room.backend.domain.checklist.entity.enums.ChecklistIssueType;
 import com.room.backend.domain.checklist.entity.enums.ItemType;
 import com.room.backend.domain.checklist.repository.ChecklistItemRepository;
 import com.room.backend.domain.checklist.repository.ChecklistOptionRepository;
@@ -68,14 +69,16 @@ class RoomCheckResultServiceTest {
 
         ChecklistItem moldItem = ChecklistItem.builder()
             .id(10L)
-            .itemName("곰팡이")
+            .itemName("변경된 곰팡이 표시명")
             .category(ChecklistCategory.PROBLEM)
+            .issueType(ChecklistIssueType.MOLD)
             .itemType(ItemType.DEFAULT)
             .build();
         ChecklistItem leakItem = ChecklistItem.builder()
             .id(20L)
-            .itemName("누수 흔적")
+            .itemName("변경된 누수 표시명")
             .category(ChecklistCategory.PROBLEM)
+            .issueType(ChecklistIssueType.LEAK)
             .itemType(ItemType.DEFAULT)
             .build();
 

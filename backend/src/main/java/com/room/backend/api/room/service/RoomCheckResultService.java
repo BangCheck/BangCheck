@@ -18,7 +18,9 @@ import com.room.backend.domain.checklist.entity.ChecklistOption;
 import com.room.backend.domain.checklist.entity.RoomCheckResult;
 import com.room.backend.domain.checklist.entity.RoomCheckSelectedOption;
 import com.room.backend.domain.checklist.entity.enums.ChecklistCategory;
+import com.room.backend.domain.checklist.entity.enums.ChecklistIssueType;
 
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -123,17 +125,20 @@ public class RoomCheckResultService {
         Map<Long, List<RoomCheckSelectedOption>> selectedOptionsByResultId = selectedOptions.stream()
             .collect(Collectors.groupingBy(RoomCheckSelectedOption::getResultId));
 
-        Map<Long, Map<String, Boolean>> issuesByRoomId = new HashMap<>();
+        Map<Long, Map<ChecklistIssueType, Boolean>> issuesByRoomId = new HashMap<>();
         for (RoomCheckResult result : problemResults) {
             ChecklistItem item = itemsById.get(result.getItemId());
+            if (item.getIssueType() == null) {
+                continue;
+            }
             boolean hasIssue = selectedOptionsByResultId.getOrDefault(result.getId(), List.of())
                 .stream()
                 .map(selected -> optionsById.get(selected.getOptionId()))
                 .filter(option -> option != null)
                 .anyMatch(option -> !"없음".equals(option.getOptionValue()));
 
-            issuesByRoomId.computeIfAbsent(result.getRoomId(), ignored -> new HashMap<>())
-                .put(item.getItemName(), hasIssue);
+            issuesByRoomId.computeIfAbsent(result.getRoomId(), ignored -> new EnumMap<>(ChecklistIssueType.class))
+                .put(item.getIssueType(), hasIssue);
         }
 
         return roomIds.stream().distinct().collect(Collectors.toMap(
@@ -143,13 +148,13 @@ public class RoomCheckResultService {
             LinkedHashMap::new));
     }
 
-    private RoomIssuesSummaryDTO toIssuesSummary(Map<String, Boolean> issueMap) {
+    private RoomIssuesSummaryDTO toIssuesSummary(Map<ChecklistIssueType, Boolean> issueMap) {
         return new RoomIssuesSummaryDTO(
-            issueMap.getOrDefault("곰팡이", false),
-            issueMap.getOrDefault("누수 흔적", false),
-            issueMap.getOrDefault("벌레 흔적", false),
-            issueMap.getOrDefault("하수구/곰팡이 냄새", false),
-            issueMap.getOrDefault("습기 / 결로", false)
+            issueMap.getOrDefault(ChecklistIssueType.MOLD, false),
+            issueMap.getOrDefault(ChecklistIssueType.LEAK, false),
+            issueMap.getOrDefault(ChecklistIssueType.BUG, false),
+            issueMap.getOrDefault(ChecklistIssueType.DRAIN_SMELL, false),
+            issueMap.getOrDefault(ChecklistIssueType.CONDENSATION, false)
         );
     }
 }
