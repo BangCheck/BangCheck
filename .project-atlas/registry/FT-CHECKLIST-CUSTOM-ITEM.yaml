@@ -49,6 +49,8 @@ knownDefects:
 
 tests:
   - backend/src/test/java/com/room/backend/domain/checklist/service/ChecklistServiceTest.java
+  # BC-CHK-04 방어: itemName @NotBlank/@Size가 컨트롤러 진입 전에 400을 낸다.
+  - backend/src/test/java/com/room/backend/domain/checklist/dto/request/CustomItemCreateRequestTest.java
 
 sliceShapeNotes:
   - 추가와 삭제를 한 feature로 둔 근거는 같은 테이블의 수명주기를 함께
