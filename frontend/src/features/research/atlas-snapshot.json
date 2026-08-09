@@ -1,7 +1,7 @@
 {
   "generator": ".project-atlas/tools/pm_snapshot.py",
   "note": "생성물이다. 원천은 registry와 코드다. 직접 편집하지 않는다.",
-  "sourceDigest": "d023ad2307cb01a3e92ae4c03d84d689ec6bc5b9fb7c4967f868815a32d2624d",
+  "sourceDigest": "7d330754ffc84bcc39424913198aa3979be3d9f1b0446fc3a7f147ca66c8c95c",
   "pages": [
     {
       "page": "/",
@@ -880,7 +880,9 @@
               "lifecycle": "TRACKED"
             }
           ],
-          "tests": [],
+          "tests": [
+            "backend/src/test/java/com/room/backend/domain/checklist/dto/request/ChecklistSettingsRequestTest.java"
+          ],
           "front": {
             "path": "frontend/src/services/custom-checklist-service.ts:49",
             "state": "built"
