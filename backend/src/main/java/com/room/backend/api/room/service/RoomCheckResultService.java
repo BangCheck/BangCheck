@@ -139,14 +139,14 @@ public class RoomCheckResultService {
                 .filter(option -> option != null)
                 .toList();
 
-            RoomIssueStatus status = resolvedOptions.isEmpty()
+            RoomIssueStatus hasIssueStatus = resolvedOptions.isEmpty()
                 ? RoomIssueStatus.UNCHECKED
                 : resolvedOptions.stream().anyMatch(option -> !"없음".equals(option.getOptionValue()))
                     ? RoomIssueStatus.PRESENT
                     : RoomIssueStatus.NONE;
 
             issuesByRoomId.computeIfAbsent(result.getRoomId(), ignored -> new EnumMap<>(ChecklistIssueType.class))
-                .put(item.getIssueType(), status);
+                .put(item.getIssueType(), hasIssueStatus);
         }
 
         return roomIds.stream().distinct().collect(Collectors.toMap(
