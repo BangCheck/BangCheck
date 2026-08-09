@@ -64,7 +64,7 @@ public class ChecklistController {
     }
 
     @PostMapping("/items/custom")
-    public ResponseEntity<Void> addCustomItem(@RequestBody CustomItemCreateRequest request) {
+    public ResponseEntity<Void> addCustomItem(@Valid @RequestBody CustomItemCreateRequest request) {
         Long userId = SecurityUtil.getCurrentUserId();
         checklistService.addCustomItem(userId, request.getItemName());
         return ResponseEntity.status(201).build();
