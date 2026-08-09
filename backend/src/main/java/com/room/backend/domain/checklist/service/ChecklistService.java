@@ -169,7 +169,11 @@ public class ChecklistService {
 
     public void deleteCustomItem(Long userId, Long customItemId) {
         ChecklistItem item = checklistItemRepository.findById(customItemId)
-                .orElseThrow(() -> new IllegalArgumentException("항목을 찾을 수 없습니다"));
+                .orElseThrow(() -> new GeneralException(ChecklistErrorCode.CUSTOM_ITEM_NOT_FOUND));
+
+        if (item.isDeleted()) {
+            throw new GeneralException(ChecklistErrorCode.CUSTOM_ITEM_NOT_FOUND);
+        }
 
         if (!userId.equals(item.getOwnerUserId())) {
             throw new GeneralException(ChecklistErrorCode.CUSTOM_ITEM_FORBIDDEN);

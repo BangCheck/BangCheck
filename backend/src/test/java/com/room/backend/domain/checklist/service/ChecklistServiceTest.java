@@ -304,14 +304,31 @@ class ChecklistServiceTest {
     }
 
     @Test
-    @DisplayName("deleteCustomItem - 항목 없음")
+    @DisplayName("deleteCustomItem - 항목 없음 (BC-CHK-01: 404 정합)")
     void testDeleteCustomItemNotFound() {
         // Given
         when(checklistItemRepository.findById(10L))
                 .thenReturn(Optional.empty());
 
-        // When & Then
-        assertThrows(IllegalArgumentException.class, () ->
+        // When & Then: IllegalArgumentException 이 아니라 GeneralException 이 나오도록 정합
+        assertThrows(GeneralException.class, () ->
+                checklistService.deleteCustomItem(userId, 10L)
+        );
+    }
+
+    @Test
+    @DisplayName("deleteCustomItem - 이미 지운 항목 재삭제 (BC-CHK-05: 404 응답)")
+    void testDeleteCustomItemAlreadyDeleted() {
+        // Given: soft-delete 이미 완료된 항목
+        ChecklistItem alreadyGone = ChecklistItem.builder()
+                .id(10L).itemName("이미 지워짐").itemType(ItemType.CUSTOM).ownerUserId(userId).build();
+        alreadyGone.softDelete();
+
+        when(checklistItemRepository.findById(10L))
+                .thenReturn(Optional.of(alreadyGone));
+
+        // When & Then: 두 번째 삭제는 없는 항목처럼 404로 나가야 한다
+        assertThrows(GeneralException.class, () ->
                 checklistService.deleteCustomItem(userId, 10L)
         );
     }
