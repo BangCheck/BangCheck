@@ -327,7 +327,7 @@ defects:
       path: backend/src/main/java/com/room/backend/domain/checklist/service/ChecklistService.java
       symbol: deleteCustomItem
     relatedFeature: FT-CHECKLIST-CUSTOM-ITEM
-    disposition: NEEDS_PRODUCT_DECISION
+    disposition: FIX_PLANNED   # 이미 지운 것을 다시 지우는 요청은 404로 응답하기로 결정
     issue: 235
 
   - id: BC-CHK-06

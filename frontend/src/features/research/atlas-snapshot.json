@@ -1,7 +1,7 @@
 {
   "generator": ".project-atlas/tools/pm_snapshot.py",
   "note": "생성물이다. 원천은 registry와 코드다. 직접 편집하지 않는다.",
-  "sourceDigest": "7825da7aa30c982f310640ab8ea27489982e2fbfd5ff4e95a8e37637c02e07ca",
+  "sourceDigest": "d023ad2307cb01a3e92ae4c03d84d689ec6bc5b9fb7c4967f868815a32d2624d",
   "pages": [
     {
       "page": "/",
@@ -755,7 +755,7 @@
               "severity": "P3",
               "title": "커스텀 항목 삭제가 이미 지운 항목을 걸러내지 않는다",
               "detail": "다른 조회는 isDeleted=false 조건을 명시하는데 deleteCustomItem은 JpaRepository의 기본 findById를 써서 그 필터가 없다. 이미 소프트 삭제된 항목에 DELETE를 반복해도 404 없이 200이 나가고 deletedAt만 갱신된다. 보안 문제는 아니고 REST 의미의 불일치다.",
-              "disposition": "NEEDS_PRODUCT_DECISION",
+              "disposition": "FIX_PLANNED",
               "evidence": {
                 "path": "backend/src/main/java/com/room/backend/domain/checklist/service/ChecklistService.java",
                 "symbol": "deleteCustomItem",
