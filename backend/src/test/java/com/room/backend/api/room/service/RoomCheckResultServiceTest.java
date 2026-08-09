@@ -1,6 +1,6 @@
 package com.room.backend.api.room.service;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -18,6 +18,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.room.backend.api.room.dto.response.RoomIssuesSummaryDTO;
+import com.room.backend.api.room.dto.response.RoomIssueStatus;
 import com.room.backend.domain.checklist.entity.ChecklistItem;
 import com.room.backend.domain.checklist.entity.ChecklistOption;
 import com.room.backend.domain.checklist.entity.RoomCheckResult;
@@ -107,10 +108,10 @@ class RoomCheckResultServiceTest {
         Map<Long, RoomIssuesSummaryDTO> summaries =
             roomCheckResultService.getRoomIssuesSummaries(List.of(1L, 2L));
 
-        assertTrue(summaries.get(1L).isMold());
-        assertFalse(summaries.get(1L).isLeak());
-        assertFalse(summaries.get(2L).isMold());
-        assertFalse(summaries.get(2L).isLeak());
+        assertEquals(RoomIssueStatus.PRESENT, summaries.get(1L).getMold());
+        assertEquals(RoomIssueStatus.UNCHECKED, summaries.get(1L).getLeak());
+        assertEquals(RoomIssueStatus.UNCHECKED, summaries.get(2L).getMold());
+        assertEquals(RoomIssueStatus.NONE, summaries.get(2L).getLeak());
 
         verify(roomCheckResultRepository).findByRoomIdIn(List.of(1L, 2L));
         verify(checklistItemRepository).findAllById(List.of(10L, 20L));
@@ -139,9 +140,30 @@ class RoomCheckResultServiceTest {
 
         RoomIssuesSummaryDTO summary = roomCheckResultService.getRoomIssuesSummaries(List.of(1L)).get(1L);
 
-        assertFalse(summary.isMold());
-        assertFalse(summary.isLeak());
+        assertEquals(RoomIssueStatus.UNCHECKED, summary.getMold());
+        assertEquals(RoomIssueStatus.UNCHECKED, summary.getLeak());
         verify(roomCheckSelectedOptionRepository, never()).findByResultIdIn(List.of(101L));
+    }
+
+    @Test
+    @DisplayName("문제 항목에 선택한 옵션이 없으면 미확인으로 집계한다")
+    void getRoomIssuesSummaries_noSelectedOption_returnsUnchecked() {
+        RoomCheckResult result = result(101L, 1L, 10L);
+        ChecklistItem item = ChecklistItem.builder()
+            .id(10L)
+            .itemName("곰팡이")
+            .category(ChecklistCategory.PROBLEM)
+            .issueType(ChecklistIssueType.MOLD)
+            .itemType(ItemType.DEFAULT)
+            .build();
+
+        when(roomCheckResultRepository.findByRoomIdIn(List.of(1L))).thenReturn(List.of(result));
+        when(checklistItemRepository.findAllById(List.of(10L))).thenReturn(List.of(item));
+        when(roomCheckSelectedOptionRepository.findByResultIdIn(List.of(101L))).thenReturn(List.of());
+
+        RoomIssuesSummaryDTO summary = roomCheckResultService.getRoomIssuesSummaries(List.of(1L)).get(1L);
+
+        assertEquals(RoomIssueStatus.UNCHECKED, summary.getMold());
     }
 
     private RoomCheckResult result(Long resultId, Long roomId, Long itemId) {
