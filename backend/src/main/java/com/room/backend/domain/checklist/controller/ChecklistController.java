@@ -6,6 +6,7 @@ import com.room.backend.domain.checklist.dto.response.ChecklistItemResponse;
 import com.room.backend.domain.checklist.entity.enums.UserType;
 import com.room.backend.domain.checklist.service.ChecklistService;
 import com.room.backend.global.auth.util.SecurityUtil;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -56,7 +57,7 @@ public class ChecklistController {
     }
 
     @PostMapping("/items/settings")
-    public ResponseEntity<Void> saveSettings(@RequestBody ChecklistSettingsRequest request) {
+    public ResponseEntity<Void> saveSettings(@Valid @RequestBody ChecklistSettingsRequest request) {
         Long userId = SecurityUtil.getCurrentUserId();
         checklistService.saveSettings(userId, request.getDisabledItemIds());
         return ResponseEntity.ok().build();

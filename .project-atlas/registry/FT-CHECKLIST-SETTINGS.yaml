@@ -71,7 +71,9 @@ implementedBy:
 knownDefects:
   - BC-CHK-02
 
-tests: []   # 2026-08-04 main 기준 이 기능을 덮는 test 없음
+tests:
+  # BC-CHK-02 방어: 컨트롤러 진입 전에 @NotNull이 걸려 400으로 나가는지 검증한다.
+  - backend/src/test/java/com/room/backend/domain/checklist/dto/request/ChecklistSettingsRequestTest.java
 
 sliceShapeNotes:
   - 유형 선택(types)과 항목 on/off(settings)를 한 feature로 묶은 근거는
