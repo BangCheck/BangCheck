@@ -59,9 +59,11 @@ knownDefects:
   - BC-RPT-04
   - BC-RPT-05
 
-tests: []   # 2026-08-04 main 기준 이 기능을 덮는 test 없음.
-            # defects가 "계약 test RPT-06/RPT-07이 재현한다"고 적지만
-            # backend/src/test에 해당 파일이 없다 — 아직 작성 예정인 test다.
+tests:
+  # BC-RPT-04 방어: 알 수 없는 카테고리 이름이 400으로 나가는지 검증한다.
+  - backend/src/test/java/com/room/backend/api/report/service/ReportServiceTest.java
+# defects가 "계약 test RPT-06/RPT-07이 재현한다"고 적지만
+# backend/src/test에 해당 파일이 없다 — RPT-06/07은 별건(BC-RPT-02/03) 작업에서 추가 예정.
 
 sliceShapeNotes:
   - operation 하나만 owns 하는데도 별도 feature로 둔 근거는 defects.yaml의

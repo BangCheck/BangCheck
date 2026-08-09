@@ -1,7 +1,7 @@
 {
   "generator": ".project-atlas/tools/pm_snapshot.py",
   "note": "생성물이다. 원천은 registry와 코드다. 직접 편집하지 않는다.",
-  "sourceDigest": "4c389f4418f562ae19b510c5f5a1679afaaafb9f2a85d3b5ce7e3a47c98f3904",
+  "sourceDigest": "a0f48575de0cf34ac63714e78de16ccedf548c8d0d3d0ef3c508c65a036b3db7",
   "pages": [
     {
       "page": "/",
@@ -300,6 +300,64 @@
           }
         },
         {
+          "featureId": "FT-AUTH-SESSION-LIFECYCLE",
+          "title": "로그인 세션 갱신과 종료",
+          "owner": "@dlwldP",
+          "capability": "나를 식별하고 로그인 상태를 유지한다",
+          "operations": [
+            {
+              "operationId": "OP-AUTH-LOGOUT",
+              "route": "POST /api/v1/auth/logout",
+              "auth": "JWT",
+              "safety": "WRITE",
+              "frontend": "frontend/src/services/auth-service.ts:41"
+            }
+          ],
+          "defects": [
+            {
+              "id": "BC-AUTH-02",
+              "severity": "P2",
+              "title": "로그아웃이 서버 세션을 종료하지 않아 세션이 생존한다",
+              "detail": "MyPage.tsx의 handleLogout은 클라이언트 store만 정리하고 서버 세션 종료 (POST /api/v1/auth/logout)를 호출하지 않는다. 로그아웃 후에도 refresh_tokens 행과 HttpOnly 쿠키가 그대로 남아, 다음 401 발생 시 api.ts 인터셉터가 재발급에 성공한다. 화면은 로그아웃 상태를 보여주지만 서버 세션은 생존한다.",
+              "disposition": "FIX_PLANNED",
+              "evidence": {
+                "path": "frontend/src/features/mypage/MyPage.tsx",
+                "symbol": "handleLogout",
+                "line": null
+              },
+              "relatedFeature": "FT-AUTH-SESSION-LIFECYCLE",
+              "relatedStory": null,
+              "issue": 259,
+              "lifecycle": "TRACKED"
+            },
+            {
+              "id": "BC-DEPLOY-01",
+              "severity": "P1",
+              "title": "빈 env secret이 커밋된 .env.production을 덮어 프로덕션이 즉시 죽는다",
+              "detail": "deploy-frontend.yml이 빌드 스텝에 VITE_API_URL을 env로 주입하는데, 그 secret이 없으면 빈 문자열이 주입된다. Vite는 실제 환경변수를 .env 파일보다 우선하고 빈 값도 \"설정된 것\"으로 취급하므로, 커밋된 frontend/.env.production의 https://api.bangcheck.site 가 무시된다. 그러면 api.ts의 프로덕션 가드가 던져 번들이 즉시 죽고 사이트 전체가 백지가 된다. 2026-08-05 실제로 발생했다. 로컬 npm run build는 통과했는데 그것이 안전 신호가 아니었다 — 로컬은 환경변수를 걸지 않아 .env.production이 적용됐고 CI는 빈 값을 걸었다. 같은 명령이 두 환경에서 다른 값을 본다. secret을 채워 복구했으나 구조는 그대로다. secret이 지워지면 같은 일이 재현된다. .env.production이 이미 커밋돼 있으므로 workflow의 env 블록을 빼는 것이 옳다.",
+              "disposition": "FIX_PLANNED",
+              "evidence": {
+                "path": ".github/workflows/deploy-frontend.yml",
+                "symbol": "VITE_API_URL",
+                "line": 41
+              },
+              "relatedFeature": "FT-AUTH-SESSION-LIFECYCLE",
+              "relatedStory": null,
+              "issue": 222,
+              "lifecycle": "TRACKED"
+            }
+          ],
+          "tests": [],
+          "front": {
+            "path": "frontend/src/services/auth-service.ts:41",
+            "state": "built"
+          },
+          "back": {
+            "path": "backend/src/main/java/com/room/backend/api/auth/service/AuthService.java",
+            "state": "built"
+          }
+        },
+        {
           "featureId": "FT-ROOM-UPDATE",
           "title": "방과 체크리스트 수정",
           "owner": "@minwoo-l",
@@ -549,6 +607,64 @@
           },
           "back": {
             "path": "backend/src/main/java/com/room/backend/api/room/service/RoomService.java",
+            "state": "built"
+          }
+        },
+        {
+          "featureId": "FT-AUTH-SESSION-LIFECYCLE",
+          "title": "로그인 세션 갱신과 종료",
+          "owner": "@dlwldP",
+          "capability": "나를 식별하고 로그인 상태를 유지한다",
+          "operations": [
+            {
+              "operationId": "OP-AUTH-LOGOUT",
+              "route": "POST /api/v1/auth/logout",
+              "auth": "JWT",
+              "safety": "WRITE",
+              "frontend": "frontend/src/services/auth-service.ts:41"
+            }
+          ],
+          "defects": [
+            {
+              "id": "BC-AUTH-02",
+              "severity": "P2",
+              "title": "로그아웃이 서버 세션을 종료하지 않아 세션이 생존한다",
+              "detail": "MyPage.tsx의 handleLogout은 클라이언트 store만 정리하고 서버 세션 종료 (POST /api/v1/auth/logout)를 호출하지 않는다. 로그아웃 후에도 refresh_tokens 행과 HttpOnly 쿠키가 그대로 남아, 다음 401 발생 시 api.ts 인터셉터가 재발급에 성공한다. 화면은 로그아웃 상태를 보여주지만 서버 세션은 생존한다.",
+              "disposition": "FIX_PLANNED",
+              "evidence": {
+                "path": "frontend/src/features/mypage/MyPage.tsx",
+                "symbol": "handleLogout",
+                "line": null
+              },
+              "relatedFeature": "FT-AUTH-SESSION-LIFECYCLE",
+              "relatedStory": null,
+              "issue": 259,
+              "lifecycle": "TRACKED"
+            },
+            {
+              "id": "BC-DEPLOY-01",
+              "severity": "P1",
+              "title": "빈 env secret이 커밋된 .env.production을 덮어 프로덕션이 즉시 죽는다",
+              "detail": "deploy-frontend.yml이 빌드 스텝에 VITE_API_URL을 env로 주입하는데, 그 secret이 없으면 빈 문자열이 주입된다. Vite는 실제 환경변수를 .env 파일보다 우선하고 빈 값도 \"설정된 것\"으로 취급하므로, 커밋된 frontend/.env.production의 https://api.bangcheck.site 가 무시된다. 그러면 api.ts의 프로덕션 가드가 던져 번들이 즉시 죽고 사이트 전체가 백지가 된다. 2026-08-05 실제로 발생했다. 로컬 npm run build는 통과했는데 그것이 안전 신호가 아니었다 — 로컬은 환경변수를 걸지 않아 .env.production이 적용됐고 CI는 빈 값을 걸었다. 같은 명령이 두 환경에서 다른 값을 본다. secret을 채워 복구했으나 구조는 그대로다. secret이 지워지면 같은 일이 재현된다. .env.production이 이미 커밋돼 있으므로 workflow의 env 블록을 빼는 것이 옳다.",
+              "disposition": "FIX_PLANNED",
+              "evidence": {
+                "path": ".github/workflows/deploy-frontend.yml",
+                "symbol": "VITE_API_URL",
+                "line": 41
+              },
+              "relatedFeature": "FT-AUTH-SESSION-LIFECYCLE",
+              "relatedStory": null,
+              "issue": 222,
+              "lifecycle": "TRACKED"
+            }
+          ],
+          "tests": [],
+          "front": {
+            "path": "frontend/src/services/auth-service.ts:41",
+            "state": "built"
+          },
+          "back": {
+            "path": "backend/src/main/java/com/room/backend/api/auth/service/AuthService.java",
             "state": "built"
           }
         },
@@ -1047,6 +1163,64 @@
             "path": "backend/src/main/java/com/room/backend/api/room/service/RoomService.java",
             "state": "built"
           }
+        },
+        {
+          "featureId": "FT-AUTH-SESSION-LIFECYCLE",
+          "title": "로그인 세션 갱신과 종료",
+          "owner": "@dlwldP",
+          "capability": "나를 식별하고 로그인 상태를 유지한다",
+          "operations": [
+            {
+              "operationId": "OP-AUTH-LOGOUT",
+              "route": "POST /api/v1/auth/logout",
+              "auth": "JWT",
+              "safety": "WRITE",
+              "frontend": "frontend/src/services/auth-service.ts:41"
+            }
+          ],
+          "defects": [
+            {
+              "id": "BC-AUTH-02",
+              "severity": "P2",
+              "title": "로그아웃이 서버 세션을 종료하지 않아 세션이 생존한다",
+              "detail": "MyPage.tsx의 handleLogout은 클라이언트 store만 정리하고 서버 세션 종료 (POST /api/v1/auth/logout)를 호출하지 않는다. 로그아웃 후에도 refresh_tokens 행과 HttpOnly 쿠키가 그대로 남아, 다음 401 발생 시 api.ts 인터셉터가 재발급에 성공한다. 화면은 로그아웃 상태를 보여주지만 서버 세션은 생존한다.",
+              "disposition": "FIX_PLANNED",
+              "evidence": {
+                "path": "frontend/src/features/mypage/MyPage.tsx",
+                "symbol": "handleLogout",
+                "line": null
+              },
+              "relatedFeature": "FT-AUTH-SESSION-LIFECYCLE",
+              "relatedStory": null,
+              "issue": 259,
+              "lifecycle": "TRACKED"
+            },
+            {
+              "id": "BC-DEPLOY-01",
+              "severity": "P1",
+              "title": "빈 env secret이 커밋된 .env.production을 덮어 프로덕션이 즉시 죽는다",
+              "detail": "deploy-frontend.yml이 빌드 스텝에 VITE_API_URL을 env로 주입하는데, 그 secret이 없으면 빈 문자열이 주입된다. Vite는 실제 환경변수를 .env 파일보다 우선하고 빈 값도 \"설정된 것\"으로 취급하므로, 커밋된 frontend/.env.production의 https://api.bangcheck.site 가 무시된다. 그러면 api.ts의 프로덕션 가드가 던져 번들이 즉시 죽고 사이트 전체가 백지가 된다. 2026-08-05 실제로 발생했다. 로컬 npm run build는 통과했는데 그것이 안전 신호가 아니었다 — 로컬은 환경변수를 걸지 않아 .env.production이 적용됐고 CI는 빈 값을 걸었다. 같은 명령이 두 환경에서 다른 값을 본다. secret을 채워 복구했으나 구조는 그대로다. secret이 지워지면 같은 일이 재현된다. .env.production이 이미 커밋돼 있으므로 workflow의 env 블록을 빼는 것이 옳다.",
+              "disposition": "FIX_PLANNED",
+              "evidence": {
+                "path": ".github/workflows/deploy-frontend.yml",
+                "symbol": "VITE_API_URL",
+                "line": 41
+              },
+              "relatedFeature": "FT-AUTH-SESSION-LIFECYCLE",
+              "relatedStory": null,
+              "issue": 222,
+              "lifecycle": "TRACKED"
+            }
+          ],
+          "tests": [],
+          "front": {
+            "path": "frontend/src/services/auth-service.ts:41",
+            "state": "built"
+          },
+          "back": {
+            "path": "backend/src/main/java/com/room/backend/api/auth/service/AuthService.java",
+            "state": "built"
+          }
         }
       ]
     },
@@ -1201,6 +1375,64 @@
             "path": "backend/src/main/java/com/room/backend/api/room/service/RoomService.java",
             "state": "built"
           }
+        },
+        {
+          "featureId": "FT-AUTH-SESSION-LIFECYCLE",
+          "title": "로그인 세션 갱신과 종료",
+          "owner": "@dlwldP",
+          "capability": "나를 식별하고 로그인 상태를 유지한다",
+          "operations": [
+            {
+              "operationId": "OP-AUTH-LOGOUT",
+              "route": "POST /api/v1/auth/logout",
+              "auth": "JWT",
+              "safety": "WRITE",
+              "frontend": "frontend/src/services/auth-service.ts:41"
+            }
+          ],
+          "defects": [
+            {
+              "id": "BC-AUTH-02",
+              "severity": "P2",
+              "title": "로그아웃이 서버 세션을 종료하지 않아 세션이 생존한다",
+              "detail": "MyPage.tsx의 handleLogout은 클라이언트 store만 정리하고 서버 세션 종료 (POST /api/v1/auth/logout)를 호출하지 않는다. 로그아웃 후에도 refresh_tokens 행과 HttpOnly 쿠키가 그대로 남아, 다음 401 발생 시 api.ts 인터셉터가 재발급에 성공한다. 화면은 로그아웃 상태를 보여주지만 서버 세션은 생존한다.",
+              "disposition": "FIX_PLANNED",
+              "evidence": {
+                "path": "frontend/src/features/mypage/MyPage.tsx",
+                "symbol": "handleLogout",
+                "line": null
+              },
+              "relatedFeature": "FT-AUTH-SESSION-LIFECYCLE",
+              "relatedStory": null,
+              "issue": 259,
+              "lifecycle": "TRACKED"
+            },
+            {
+              "id": "BC-DEPLOY-01",
+              "severity": "P1",
+              "title": "빈 env secret이 커밋된 .env.production을 덮어 프로덕션이 즉시 죽는다",
+              "detail": "deploy-frontend.yml이 빌드 스텝에 VITE_API_URL을 env로 주입하는데, 그 secret이 없으면 빈 문자열이 주입된다. Vite는 실제 환경변수를 .env 파일보다 우선하고 빈 값도 \"설정된 것\"으로 취급하므로, 커밋된 frontend/.env.production의 https://api.bangcheck.site 가 무시된다. 그러면 api.ts의 프로덕션 가드가 던져 번들이 즉시 죽고 사이트 전체가 백지가 된다. 2026-08-05 실제로 발생했다. 로컬 npm run build는 통과했는데 그것이 안전 신호가 아니었다 — 로컬은 환경변수를 걸지 않아 .env.production이 적용됐고 CI는 빈 값을 걸었다. 같은 명령이 두 환경에서 다른 값을 본다. secret을 채워 복구했으나 구조는 그대로다. secret이 지워지면 같은 일이 재현된다. .env.production이 이미 커밋돼 있으므로 workflow의 env 블록을 빼는 것이 옳다.",
+              "disposition": "FIX_PLANNED",
+              "evidence": {
+                "path": ".github/workflows/deploy-frontend.yml",
+                "symbol": "VITE_API_URL",
+                "line": 41
+              },
+              "relatedFeature": "FT-AUTH-SESSION-LIFECYCLE",
+              "relatedStory": null,
+              "issue": 222,
+              "lifecycle": "TRACKED"
+            }
+          ],
+          "tests": [],
+          "front": {
+            "path": "frontend/src/services/auth-service.ts:41",
+            "state": "built"
+          },
+          "back": {
+            "path": "backend/src/main/java/com/room/backend/api/auth/service/AuthService.java",
+            "state": "built"
+          }
         }
       ]
     },
@@ -1325,6 +1557,64 @@
           },
           "back": {
             "path": "backend/src/main/java/com/room/backend/api/room/service/RoomService.java",
+            "state": "built"
+          }
+        },
+        {
+          "featureId": "FT-AUTH-SESSION-LIFECYCLE",
+          "title": "로그인 세션 갱신과 종료",
+          "owner": "@dlwldP",
+          "capability": "나를 식별하고 로그인 상태를 유지한다",
+          "operations": [
+            {
+              "operationId": "OP-AUTH-LOGOUT",
+              "route": "POST /api/v1/auth/logout",
+              "auth": "JWT",
+              "safety": "WRITE",
+              "frontend": "frontend/src/services/auth-service.ts:41"
+            }
+          ],
+          "defects": [
+            {
+              "id": "BC-AUTH-02",
+              "severity": "P2",
+              "title": "로그아웃이 서버 세션을 종료하지 않아 세션이 생존한다",
+              "detail": "MyPage.tsx의 handleLogout은 클라이언트 store만 정리하고 서버 세션 종료 (POST /api/v1/auth/logout)를 호출하지 않는다. 로그아웃 후에도 refresh_tokens 행과 HttpOnly 쿠키가 그대로 남아, 다음 401 발생 시 api.ts 인터셉터가 재발급에 성공한다. 화면은 로그아웃 상태를 보여주지만 서버 세션은 생존한다.",
+              "disposition": "FIX_PLANNED",
+              "evidence": {
+                "path": "frontend/src/features/mypage/MyPage.tsx",
+                "symbol": "handleLogout",
+                "line": null
+              },
+              "relatedFeature": "FT-AUTH-SESSION-LIFECYCLE",
+              "relatedStory": null,
+              "issue": 259,
+              "lifecycle": "TRACKED"
+            },
+            {
+              "id": "BC-DEPLOY-01",
+              "severity": "P1",
+              "title": "빈 env secret이 커밋된 .env.production을 덮어 프로덕션이 즉시 죽는다",
+              "detail": "deploy-frontend.yml이 빌드 스텝에 VITE_API_URL을 env로 주입하는데, 그 secret이 없으면 빈 문자열이 주입된다. Vite는 실제 환경변수를 .env 파일보다 우선하고 빈 값도 \"설정된 것\"으로 취급하므로, 커밋된 frontend/.env.production의 https://api.bangcheck.site 가 무시된다. 그러면 api.ts의 프로덕션 가드가 던져 번들이 즉시 죽고 사이트 전체가 백지가 된다. 2026-08-05 실제로 발생했다. 로컬 npm run build는 통과했는데 그것이 안전 신호가 아니었다 — 로컬은 환경변수를 걸지 않아 .env.production이 적용됐고 CI는 빈 값을 걸었다. 같은 명령이 두 환경에서 다른 값을 본다. secret을 채워 복구했으나 구조는 그대로다. secret이 지워지면 같은 일이 재현된다. .env.production이 이미 커밋돼 있으므로 workflow의 env 블록을 빼는 것이 옳다.",
+              "disposition": "FIX_PLANNED",
+              "evidence": {
+                "path": ".github/workflows/deploy-frontend.yml",
+                "symbol": "VITE_API_URL",
+                "line": 41
+              },
+              "relatedFeature": "FT-AUTH-SESSION-LIFECYCLE",
+              "relatedStory": null,
+              "issue": 222,
+              "lifecycle": "TRACKED"
+            }
+          ],
+          "tests": [],
+          "front": {
+            "path": "frontend/src/services/auth-service.ts:41",
+            "state": "built"
+          },
+          "back": {
+            "path": "backend/src/main/java/com/room/backend/api/auth/service/AuthService.java",
             "state": "built"
           }
         }
@@ -1670,6 +1960,64 @@
             "path": "backend/src/main/java/com/room/backend/api/room/service/RoomService.java",
             "state": "built"
           }
+        },
+        {
+          "featureId": "FT-AUTH-SESSION-LIFECYCLE",
+          "title": "로그인 세션 갱신과 종료",
+          "owner": "@dlwldP",
+          "capability": "나를 식별하고 로그인 상태를 유지한다",
+          "operations": [
+            {
+              "operationId": "OP-AUTH-LOGOUT",
+              "route": "POST /api/v1/auth/logout",
+              "auth": "JWT",
+              "safety": "WRITE",
+              "frontend": "frontend/src/services/auth-service.ts:41"
+            }
+          ],
+          "defects": [
+            {
+              "id": "BC-AUTH-02",
+              "severity": "P2",
+              "title": "로그아웃이 서버 세션을 종료하지 않아 세션이 생존한다",
+              "detail": "MyPage.tsx의 handleLogout은 클라이언트 store만 정리하고 서버 세션 종료 (POST /api/v1/auth/logout)를 호출하지 않는다. 로그아웃 후에도 refresh_tokens 행과 HttpOnly 쿠키가 그대로 남아, 다음 401 발생 시 api.ts 인터셉터가 재발급에 성공한다. 화면은 로그아웃 상태를 보여주지만 서버 세션은 생존한다.",
+              "disposition": "FIX_PLANNED",
+              "evidence": {
+                "path": "frontend/src/features/mypage/MyPage.tsx",
+                "symbol": "handleLogout",
+                "line": null
+              },
+              "relatedFeature": "FT-AUTH-SESSION-LIFECYCLE",
+              "relatedStory": null,
+              "issue": 259,
+              "lifecycle": "TRACKED"
+            },
+            {
+              "id": "BC-DEPLOY-01",
+              "severity": "P1",
+              "title": "빈 env secret이 커밋된 .env.production을 덮어 프로덕션이 즉시 죽는다",
+              "detail": "deploy-frontend.yml이 빌드 스텝에 VITE_API_URL을 env로 주입하는데, 그 secret이 없으면 빈 문자열이 주입된다. Vite는 실제 환경변수를 .env 파일보다 우선하고 빈 값도 \"설정된 것\"으로 취급하므로, 커밋된 frontend/.env.production의 https://api.bangcheck.site 가 무시된다. 그러면 api.ts의 프로덕션 가드가 던져 번들이 즉시 죽고 사이트 전체가 백지가 된다. 2026-08-05 실제로 발생했다. 로컬 npm run build는 통과했는데 그것이 안전 신호가 아니었다 — 로컬은 환경변수를 걸지 않아 .env.production이 적용됐고 CI는 빈 값을 걸었다. 같은 명령이 두 환경에서 다른 값을 본다. secret을 채워 복구했으나 구조는 그대로다. secret이 지워지면 같은 일이 재현된다. .env.production이 이미 커밋돼 있으므로 workflow의 env 블록을 빼는 것이 옳다.",
+              "disposition": "FIX_PLANNED",
+              "evidence": {
+                "path": ".github/workflows/deploy-frontend.yml",
+                "symbol": "VITE_API_URL",
+                "line": 41
+              },
+              "relatedFeature": "FT-AUTH-SESSION-LIFECYCLE",
+              "relatedStory": null,
+              "issue": 222,
+              "lifecycle": "TRACKED"
+            }
+          ],
+          "tests": [],
+          "front": {
+            "path": "frontend/src/services/auth-service.ts:41",
+            "state": "built"
+          },
+          "back": {
+            "path": "backend/src/main/java/com/room/backend/api/auth/service/AuthService.java",
+            "state": "built"
+          }
         }
       ]
     },
@@ -1847,6 +2195,64 @@
           },
           "back": {
             "path": "backend/src/main/java/com/room/backend/api/room/service/RoomService.java",
+            "state": "built"
+          }
+        },
+        {
+          "featureId": "FT-AUTH-SESSION-LIFECYCLE",
+          "title": "로그인 세션 갱신과 종료",
+          "owner": "@dlwldP",
+          "capability": "나를 식별하고 로그인 상태를 유지한다",
+          "operations": [
+            {
+              "operationId": "OP-AUTH-LOGOUT",
+              "route": "POST /api/v1/auth/logout",
+              "auth": "JWT",
+              "safety": "WRITE",
+              "frontend": "frontend/src/services/auth-service.ts:41"
+            }
+          ],
+          "defects": [
+            {
+              "id": "BC-AUTH-02",
+              "severity": "P2",
+              "title": "로그아웃이 서버 세션을 종료하지 않아 세션이 생존한다",
+              "detail": "MyPage.tsx의 handleLogout은 클라이언트 store만 정리하고 서버 세션 종료 (POST /api/v1/auth/logout)를 호출하지 않는다. 로그아웃 후에도 refresh_tokens 행과 HttpOnly 쿠키가 그대로 남아, 다음 401 발생 시 api.ts 인터셉터가 재발급에 성공한다. 화면은 로그아웃 상태를 보여주지만 서버 세션은 생존한다.",
+              "disposition": "FIX_PLANNED",
+              "evidence": {
+                "path": "frontend/src/features/mypage/MyPage.tsx",
+                "symbol": "handleLogout",
+                "line": null
+              },
+              "relatedFeature": "FT-AUTH-SESSION-LIFECYCLE",
+              "relatedStory": null,
+              "issue": 259,
+              "lifecycle": "TRACKED"
+            },
+            {
+              "id": "BC-DEPLOY-01",
+              "severity": "P1",
+              "title": "빈 env secret이 커밋된 .env.production을 덮어 프로덕션이 즉시 죽는다",
+              "detail": "deploy-frontend.yml이 빌드 스텝에 VITE_API_URL을 env로 주입하는데, 그 secret이 없으면 빈 문자열이 주입된다. Vite는 실제 환경변수를 .env 파일보다 우선하고 빈 값도 \"설정된 것\"으로 취급하므로, 커밋된 frontend/.env.production의 https://api.bangcheck.site 가 무시된다. 그러면 api.ts의 프로덕션 가드가 던져 번들이 즉시 죽고 사이트 전체가 백지가 된다. 2026-08-05 실제로 발생했다. 로컬 npm run build는 통과했는데 그것이 안전 신호가 아니었다 — 로컬은 환경변수를 걸지 않아 .env.production이 적용됐고 CI는 빈 값을 걸었다. 같은 명령이 두 환경에서 다른 값을 본다. secret을 채워 복구했으나 구조는 그대로다. secret이 지워지면 같은 일이 재현된다. .env.production이 이미 커밋돼 있으므로 workflow의 env 블록을 빼는 것이 옳다.",
+              "disposition": "FIX_PLANNED",
+              "evidence": {
+                "path": ".github/workflows/deploy-frontend.yml",
+                "symbol": "VITE_API_URL",
+                "line": 41
+              },
+              "relatedFeature": "FT-AUTH-SESSION-LIFECYCLE",
+              "relatedStory": null,
+              "issue": 222,
+              "lifecycle": "TRACKED"
+            }
+          ],
+          "tests": [],
+          "front": {
+            "path": "frontend/src/services/auth-service.ts:41",
+            "state": "built"
+          },
+          "back": {
+            "path": "backend/src/main/java/com/room/backend/api/auth/service/AuthService.java",
             "state": "built"
           }
         }

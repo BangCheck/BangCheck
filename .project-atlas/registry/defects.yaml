@@ -173,6 +173,7 @@ defects:
       symbol: buildRoomFieldItem
     relatedFeature: FT-REPORT-COMPARE
     disposition: FIX_PLANNED
+    issue: 281
 
   - id: BC-RPT-02
     severity: P1
@@ -187,6 +188,7 @@ defects:
       symbol: compareRooms
     relatedFeature: FT-REPORT-COMPARE
     disposition: FIX_PLANNED
+    issue: 280
 
   - id: BC-RPT-01
     severity: P2
@@ -212,6 +214,7 @@ defects:
       symbol: compareRooms
     relatedFeature: FT-REPORT-COMPARE
     disposition: FIX_PLANNED
+    issue: 279
 
   - id: BC-RPT-05
     severity: P2
