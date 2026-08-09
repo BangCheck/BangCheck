@@ -8,6 +8,7 @@ import { LogoutConfirmModal, LoginRequiredModal } from '@/components/ui/Modals';
 import { cn } from '@/lib/utils';
 import { ROUTES } from '@/lib/routes';
 import { GUEST_ROOM_LIMIT, ROOM_LIMIT } from '@/lib/constants';
+import { logoutServer } from '@/services/auth-service';
 
 function getInitial(nickname?: string, email?: string) {
   if (nickname && nickname.length > 0) return nickname.charAt(0);
@@ -37,10 +38,14 @@ export default function Header() {
     ? `방은 최대 ${ROOM_LIMIT}개까지 추가할 수 있어요`
     : `비로그인 한도(${GUEST_ROOM_LIMIT}개)에 도달했어요`;
 
-  const confirmLogout = () => {
-    logout();
-    setIsLogoutModalOpen(false);
-    navigate(ROUTES.HOME, { replace: true });
+  const confirmLogout = async () => {
+    try {
+      await logoutServer();
+    } finally {
+      logout();
+      setIsLogoutModalOpen(false);
+      navigate(ROUTES.HOME, { replace: true });
+    }
   };
 
   const userInitial = getInitial(user?.nickname, user?.email);

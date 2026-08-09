@@ -3,6 +3,7 @@ import { Icon } from '@iconify/react';
 import { useAuthStore } from '@/store/use-auth-store';
 import { ROUTES } from '@/lib/routes';
 import { useAtlasPreview } from '@/lib/use-atlas-preview';
+import { logoutServer } from '@/services/auth-service';
 
 /**
  * SCR-MYPAGE — 마이페이지 (canonical 모바일 노드 645:45715)
@@ -32,11 +33,13 @@ export default function MyPage() {
   const displayName = user?.nickname?.trim() || user?.email?.trim() || '';
   const initial = displayName ? displayName.charAt(0).toUpperCase() : '?';
 
-  const handleLogout = () => {
-    // TODO(api-spec A-4): 서버 세션 종료 POST /api/v1/auth/logout 미연동.
-    // components.md §449 갭 — 현재는 로컬 store 정리만 수행(refresh_token 만료 쿠키 처리 후속).
-    logout();
-    navigate(ROUTES.HOME);
+  const handleLogout = async () => {
+    try {
+      await logoutServer();
+    } finally {
+      logout();
+      navigate(ROUTES.HOME);
+    }
   };
 
   return (
