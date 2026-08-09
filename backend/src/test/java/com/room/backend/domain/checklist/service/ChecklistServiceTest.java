@@ -240,6 +240,28 @@ class ChecklistServiceTest {
     }
 
     @Test
+    @DisplayName("addCustomItem - softDelete된 항목은 한도에서 제외 (BC-CHK-07)")
+    void testAddCustomItemExcludesSoftDeleted() {
+        // Given: 사용자가 3개를 만들어 한도를 채웠고 그 중 하나를 삭제한 상태
+        ChecklistItem alive1 = ChecklistItem.builder()
+                .id(10L).itemName("살아있음1").itemType(ItemType.CUSTOM).ownerUserId(userId).build();
+        ChecklistItem alive2 = ChecklistItem.builder()
+                .id(11L).itemName("살아있음2").itemType(ItemType.CUSTOM).ownerUserId(userId).build();
+        ChecklistItem deleted = ChecklistItem.builder()
+                .id(12L).itemName("지워짐").itemType(ItemType.CUSTOM).ownerUserId(userId).build();
+        deleted.softDelete();
+
+        when(checklistItemRepository.findByItemType(ItemType.CUSTOM))
+                .thenReturn(List.of(alive1, alive2, deleted));
+
+        // When: 자리가 비었다고 여겨 새로 추가하면
+        checklistService.addCustomItem(userId, "새 항목");
+
+        // Then: 소프트 삭제분을 한도 계산에서 걸러 저장이 성공한다
+        verify(checklistItemRepository, times(1)).save(any(ChecklistItem.class));
+    }
+
+    @Test
     @DisplayName("deleteCustomItem - 소유자의 항목 삭제")
     void testDeleteCustomItem() {
         // Given

@@ -149,6 +149,7 @@ public class ChecklistService {
         List<ChecklistItem> customItems = checklistItemRepository.findByItemType(ItemType.CUSTOM)
                 .stream()
                 .filter(item -> userId.equals(item.getOwnerUserId()))
+                .filter(item -> !item.isDeleted())
                 .toList();
 
         if (customItems.size() >= MAX_CUSTOM_ITEMS) {
