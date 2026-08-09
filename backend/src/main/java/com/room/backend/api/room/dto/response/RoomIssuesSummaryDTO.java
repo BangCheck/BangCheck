@@ -4,13 +4,19 @@ import lombok.Getter;
 
 @Getter
 public class RoomIssuesSummaryDTO {
-    private final boolean mold;
-    private final boolean leak;
-    private final boolean bug;
-    private final boolean drainSmell;
-    private final boolean condensation;
+    private final RoomIssueStatus mold;
+    private final RoomIssueStatus leak;
+    private final RoomIssueStatus bug;
+    private final RoomIssueStatus drainSmell;
+    private final RoomIssueStatus condensation;
 
-    public RoomIssuesSummaryDTO(boolean mold, boolean leak, boolean bug, boolean drainSmell, boolean condensation) {
+    public RoomIssuesSummaryDTO(
+            RoomIssueStatus mold,
+            RoomIssueStatus leak,
+            RoomIssueStatus bug,
+            RoomIssueStatus drainSmell,
+            RoomIssueStatus condensation
+    ) {
         this.mold = mold;
         this.leak = leak;
         this.bug = bug;

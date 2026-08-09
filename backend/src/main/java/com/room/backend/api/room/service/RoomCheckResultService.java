@@ -9,6 +9,7 @@ import com.room.backend.domain.checklist.repository.ChecklistOptionRepository;
 import com.room.backend.domain.checklist.repository.RoomCheckResultRepository;
 import com.room.backend.domain.checklist.repository.RoomCheckSelectedOptionRepository;
 import com.room.backend.api.room.dto.response.RoomIssuesSummaryDTO;
+import com.room.backend.api.room.dto.response.RoomIssueStatus;
 import com.room.backend.domain.checklist.dto.request.RoomCheckAnswerRequestDTO;
 import com.room.backend.global.common.exception.ChecklistErrorCode;
 import com.room.backend.global.common.exception.GeneralException;
@@ -125,20 +126,27 @@ public class RoomCheckResultService {
         Map<Long, List<RoomCheckSelectedOption>> selectedOptionsByResultId = selectedOptions.stream()
             .collect(Collectors.groupingBy(RoomCheckSelectedOption::getResultId));
 
-        Map<Long, Map<ChecklistIssueType, Boolean>> issuesByRoomId = new HashMap<>();
+        Map<Long, Map<ChecklistIssueType, RoomIssueStatus>> issuesByRoomId = new HashMap<>();
         for (RoomCheckResult result : problemResults) {
             ChecklistItem item = itemsById.get(result.getItemId());
             if (item.getIssueType() == null) {
                 continue;
             }
-            boolean hasIssue = selectedOptionsByResultId.getOrDefault(result.getId(), List.of())
+            List<ChecklistOption> resolvedOptions = selectedOptionsByResultId
+                .getOrDefault(result.getId(), List.of())
                 .stream()
                 .map(selected -> optionsById.get(selected.getOptionId()))
                 .filter(option -> option != null)
-                .anyMatch(option -> !"없음".equals(option.getOptionValue()));
+                .toList();
+
+            RoomIssueStatus hasIssueStatus = resolvedOptions.isEmpty()
+                ? RoomIssueStatus.UNCHECKED
+                : resolvedOptions.stream().anyMatch(option -> !"없음".equals(option.getOptionValue()))
+                    ? RoomIssueStatus.PRESENT
+                    : RoomIssueStatus.NONE;
 
             issuesByRoomId.computeIfAbsent(result.getRoomId(), ignored -> new EnumMap<>(ChecklistIssueType.class))
-                .put(item.getIssueType(), hasIssue);
+                .put(item.getIssueType(), hasIssueStatus);
         }
 
         return roomIds.stream().distinct().collect(Collectors.toMap(
@@ -148,13 +156,13 @@ public class RoomCheckResultService {
             LinkedHashMap::new));
     }
 
-    private RoomIssuesSummaryDTO toIssuesSummary(Map<ChecklistIssueType, Boolean> issueMap) {
+    private RoomIssuesSummaryDTO toIssuesSummary(Map<ChecklistIssueType, RoomIssueStatus> issueMap) {
         return new RoomIssuesSummaryDTO(
-            issueMap.getOrDefault(ChecklistIssueType.MOLD, false),
-            issueMap.getOrDefault(ChecklistIssueType.LEAK, false),
-            issueMap.getOrDefault(ChecklistIssueType.BUG, false),
-            issueMap.getOrDefault(ChecklistIssueType.DRAIN_SMELL, false),
-            issueMap.getOrDefault(ChecklistIssueType.CONDENSATION, false)
+            issueMap.getOrDefault(ChecklistIssueType.MOLD, RoomIssueStatus.UNCHECKED),
+            issueMap.getOrDefault(ChecklistIssueType.LEAK, RoomIssueStatus.UNCHECKED),
+            issueMap.getOrDefault(ChecklistIssueType.BUG, RoomIssueStatus.UNCHECKED),
+            issueMap.getOrDefault(ChecklistIssueType.DRAIN_SMELL, RoomIssueStatus.UNCHECKED),
+            issueMap.getOrDefault(ChecklistIssueType.CONDENSATION, RoomIssueStatus.UNCHECKED)
         );
     }
 }

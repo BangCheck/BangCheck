@@ -164,7 +164,11 @@ export function mapApiRoomToRoom(item: RoomListItem): Room {
     price: '',
     tags: [],
     score: 0,
-    issues: { mold: false, leak: false, bug: false },
+    issues: item.issues ?? {
+      mold: 'UNCHECKED',
+      leak: 'UNCHECKED',
+      bug: 'UNCHECKED',
+    },
     createdAt: item.createdAt,
   };
 }

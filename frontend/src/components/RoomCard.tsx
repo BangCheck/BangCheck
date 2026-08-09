@@ -78,7 +78,7 @@ export default function RoomCard({
 
   const activeIssues = issues
     ? Object.entries(issues)
-        .filter(([, active]) => active)
+        .filter(([, status]) => status === 'PRESENT')
         .map(([key]) => ({ key, label: ISSUE_LABELS[key] || key }))
     : [];
 
