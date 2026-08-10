@@ -48,6 +48,7 @@ GEMINI.md
 .github/CODEOWNERS
 .github/copilot-instructions.md
 .github/workflows/protected-files.yml
+.github/workflows/compliance-guard.yml
 _wood/workflows/**
 _wood/agents/**
 _wood/team-roles.yaml
