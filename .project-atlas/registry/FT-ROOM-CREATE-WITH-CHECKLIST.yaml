@@ -56,7 +56,10 @@ knownDefects:
   - BC-ROOM-06
   - BC-SEC-01
 
-tests: []   # 2026-08-04 main 기준 이 기능을 덮는 test 없음
+tests:
+  # BC-REG-04 방어: geocoding 업스트림 4xx/5xx/timeout이 500으로 새지 않고
+  # 502·503으로 재매핑되는지 검증한다.
+  - backend/src/test/java/com/room/backend/global/geocoding/service/GeocodingServiceTest.java
 
 # 전환 준비 상태 — 컨트롤러를 붙이기 전에 갖춰야 할 것
 switchoverReadiness:
