@@ -71,12 +71,19 @@ def extract_paths(text: str) -> list[str]:
     return sorted(set(PATH_RE.findall(cleaned)))
 
 
-def is_safe(rel: str) -> bool:
-    """저장소 안의 실재하는 **파일**인가.
+def is_wellformed(rel: str) -> bool:
+    """저장소 안을 가리키는 **형태**인가. 실재 여부는 보지 않는다.
 
     `..` 를 정규화하기 전에 fnmatch 를 돌리면
     `frontend/../.project-atlas/tools/x.py` 가 frontend 로 배정된다 —
     실재 검사는 통과하는데 파트가 틀린다. 정규화를 먼저 한다.
+
+    왜 `is_safe` 에서 갈라 냈는가
+      파트 판정은 실재하는 파일만 근거로 삼아야 한다(지어낸 경로 위에 배정이
+      서면 안 된다). 그런데 열린 PR 과의 변경 파일 교집합에서는 실재 검사가
+      정반대로 작동한다 — PR 이 **새로 만드는** 파일은 지금 체크아웃에 없다.
+      두 쓰임이 형태 검사는 공유하고 실재 검사만 갈라져야 해서 여기서 나눈다.
+      다시 합치면 하드닝이 두 벌이 되고, 한쪽만 고쳐지는 날이 온다.
     """
     if rel.startswith("/") or "\\" in rel:
         return False
@@ -85,13 +92,22 @@ def is_safe(rel: str) -> bool:
         return False
     if not normalized.parts or normalized.parts[0] not in ROOTS:
         return False
-    target = (REPO_ROOT / normalized)
     try:
-        resolved = target.resolve()
+        resolved = (REPO_ROOT / normalized).resolve()
         resolved.relative_to(REPO_ROOT.resolve())
     except (OSError, ValueError):
         return False
-    return resolved.is_file()
+    return True
+
+
+def is_safe(rel: str) -> bool:
+    """저장소 안의 실재하는 **파일**인가. 파트 판정의 근거는 이것만 쓴다."""
+    if not is_wellformed(rel):
+        return False
+    try:
+        return (REPO_ROOT / PurePosixPath(rel)).resolve().is_file()
+    except OSError:
+        return False
 
 
 def gh(args: list[str], *, optional: bool = False) -> str:

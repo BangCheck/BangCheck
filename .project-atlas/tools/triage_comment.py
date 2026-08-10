@@ -3,9 +3,11 @@
 
 봇이 하는 것
   파트·담당자를 **제안**한다.
+  그 아래에 이 이슈와 이어진 이슈·PR 을 **제시**한다 (triage_relate.py).
 
 봇이 하지 않는 것 (교차검증 확정)
   registry·이슈 제목·본문·assignee·label 을 고치지 않는다.
+  이슈 링크(sub-issue·linked)를 걸지 않는다 — 관계도 코멘트로만 말한다.
   BC ID 를 제안하지 않는다 — registry 를 쓰지 않는 코멘트는 번호를 예약할
   원자적 정본이 아니다. 두 이슈가 동시에 열리면 같은 번호를 제안하게 된다.
   즉시 식별자는 GitHub 이슈 번호로 충분하다.
@@ -36,6 +38,7 @@ from pathlib import Path
 import yaml
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+import triage_relate as relate  # noqa: E402
 from triage_route import decide, extract_paths, gh, is_safe  # noqa: E402
 
 ATLAS_DIR = Path(__file__).resolve().parent.parent
@@ -93,14 +96,45 @@ def pick_mine(comments: list[dict], allowed: set[str]) -> dict | None:
 
 def fingerprint(v: dict) -> str:
     """판정이 실제로 달라졌는지 가리는 값. 시각은 넣지 않는다 —
-    재실행마다 바뀌면 모든 실행이 '정정'으로 기록된다."""
+    재실행마다 바뀌면 모든 실행이 '정정'으로 기록된다.
+
+    **관계는 넣지 않는다.** 같은 이유가 한 단계 더 나아간 자리다.
+    관계는 열린 PR 이 머지되면 바뀌는 휘발성 값이다. 지문에 넣으면 무관한 PR 이
+    하나 머지될 때마다 열린 이슈 전부의 지문이 흔들려 "분류 정정" 코멘트가
+    쏟아진다 — 배정은 하나도 안 바뀌었는데.
+    정정이 말해야 하는 것은 **누가 이걸 봐야 하는가가 달라졌다**는 사실뿐이다.
+    관계 변화는 코멘트 본문이 매 실행 PATCH 되면서 조용히 최신으로 유지된다.
+    관계를 되짚을 필요가 있을 때를 위해 토큰에 related/relatedStatus 로
+    **기록만** 남긴다 — 기록은 하되 정정을 유발하지 않는다.
+    """
     payload = json.dumps({k: v.get(k) for k in ("part", "assignee", "basis", "matched",
                                                 "routingVersion")},
                          sort_keys=True, ensure_ascii=False)
     return "sha256:" + hashlib.sha256(payload.encode()).hexdigest()[:16]
 
 
-def render(verdict: dict, routing: dict) -> str:
+def correction_body(diffs: list[str], routing_version: str) -> str:
+    """정정 코멘트 본문.
+
+    **표식을 단다.** 이 글도 봇이 저작한 것이라 관계 신호 ①(`#N` 언급)이
+    세면 안 된다. `triage_relate.is_bot_comment` 는 표식과 `login.endswith("[bot]")`
+    둘로 가리는데, 뒤엣것이 걸리는 것은 러너에서 GITHUB_TOKEN 으로 달았을
+    때뿐이다 — 2단은 Hermes 머신에서 **사람 토큰**으로 달아 안 걸린다.
+    지금 이 본문에 `#N` 이 없어 오염이 안 났을 뿐이라, 번호가 들어가는 날을
+    기다리지 않고 막는다.
+
+    표식은 `atlas-triage:v2 ` + JSON 이 아니므로 `pick_mine` 이 이 글을 갱신
+    대상으로 고르지 않는다 — 표식은 공유하되 갱신 대상은 갈라져 있다.
+    본문을 함수로 뺀 이유도 그것이다. main() 안에 있으면 이 두 성질을
+    테스트가 붙들 자리가 없다.
+    """
+    return ("<!-- atlas-triage:correction -->\n\n**분류 정정**\n\n"
+            + ("\n".join(diffs) if diffs else "- 근거로 쓴 경로가 달라졌습니다.")
+            + "\n\n최신 제안은 위 코멘트에 있습니다.\n\n"
+            + f"—\nAtlas Issue Triage · 규칙 `{routing_version}`")
+
+
+def render(verdict: dict, routing: dict, relation: dict | None = None) -> str:
     parts = routing["parts"]
     if verdict["part"]:
         part_label = parts.get(verdict["part"], verdict["part"])
@@ -117,6 +151,11 @@ def render(verdict: dict, routing: dict) -> str:
         "observedAt": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "fingerprint": fingerprint(verdict),
     }
+    if relation is not None:
+        # 지문 밖의 기록. 이 두 값은 어떤 비교에도 쓰이지 않는다 —
+        # fingerprint() 의 주석에 있는 이유 그대로다.
+        token["related"] = [r["number"] for r in relation["relations"]]
+        token["relatedStatus"] = relation["status"]
     out = [f"{TOKEN_OPEN}{json.dumps(token, ensure_ascii=False)} -->", "",
            "## 분류·배정 제안", "",
            f"- 파트: {part_label}",
@@ -147,9 +186,14 @@ def render(verdict: dict, routing: dict) -> str:
         out.append(f"- 참고: 본문의 경로 {len(verdict['pathsMissing'])}건이 저장소에 "
                    "실재하지 않아 근거에서 제외했습니다.")
 
+    # 관계는 파트 판정 **아래**에 붙는다. 위에 두면 팀원이 이 코멘트를 여는
+    # 이유("이건 누가 봐야 하나")가 곁다리에 밀린다.
+    if relation is not None:
+        out += relate.render_section(relation)
+
     out += ["", "—",
             f"Atlas Issue Triage · 규칙 `{verdict['routingVersion']}` · "
-            "자동 제안이며 배정을 실제로 바꾸지 않습니다."]
+            "자동 제안이며 배정·이슈 링크를 실제로 바꾸지 않습니다."]
     return "\n".join(out)
 
 
@@ -171,15 +215,28 @@ def main() -> int:
     verdict = decide(existing, routing)
     verdict.update({"routingVersion": routing["routingVersion"], "pathSource": source,
                     "pathsMissing": [p for p in paths if p not in existing]})
-    comment = render(verdict, routing)
+
+    api = relate.GhApi(slug)
 
     if args.dry_run:
-        print(comment)
+        # dry-run 도 읽기는 한다. 관계 신호 ①의 입력이 코멘트라 여기서도 받아야
+        # 렌더 결과가 실제 게시물과 같아진다 — 다르면 dry-run 이 리허설이 아니다.
+        relation = relate.gather(issue=args.issue, title=raw["title"],
+                                 body=raw.get("body") or "", paths=paths,
+                                 routing=routing, api=api)
+        print(render(verdict, routing, relation))
         return 0
 
     # 코멘트는 REST 로 읽는다 — `gh issue view --json comments` 는 GraphQL 노드 ID 를
     # 주는데 REST PATCH 는 숫자 ID 를 요구해 404 가 난다 (2026-08-05 실측).
+    #
+    # 렌더보다 먼저 읽는다. 갱신 대상을 고르는 데도 쓰고 관계 신호 ①에도 쓰는데,
+    # 두 번 읽으면 호출이 이슈마다 하나씩 는다.
     comments = json.loads(gh(["api", "--paginate", f"repos/{slug}/issues/{args.issue}/comments"]))
+    relation = relate.gather(issue=args.issue, title=raw["title"],
+                             body=raw.get("body") or "", paths=paths,
+                             routing=routing, api=api, comments=comments)
+    comment = render(verdict, routing, relation)
     # 허용 작성자는 저장소가 선언한다. `gh api user` 는 GITHUB_TOKEN 으로 403 이라
     # (앱 설치 토큰에 "현재 사용자"가 없다) 그 값만으로는 1단에서 아무도 못 고른다.
     allowed = set(routing.get("triageAuthors") or [])
@@ -212,11 +269,8 @@ def main() -> int:
             before, after = prev_token.get(key) or blank, verdict.get(key) or blank
             if before != after:
                 diffs.append(f"- {label}: `{before}` → `{after}`")
-        body = "**분류 정정**\n\n" + ("\n".join(diffs) if diffs else
-                                    "- 근거로 쓴 경로가 달라졌습니다.")
         gh(["issue", "comment", str(args.issue), "-R", slug, "--body",
-            body + "\n\n최신 제안은 위 코멘트에 있습니다.\n\n"
-            f"—\nAtlas Issue Triage · 규칙 `{verdict['routingVersion']}`"])
+            correction_body(diffs, verdict["routingVersion"])])
         print(f"#{args.issue} 정정 기록 — {len(diffs)}개 항목 변경")
     else:
         print(f"#{args.issue} {verdict['part'] or '미분류'} → 코멘트 갱신")
