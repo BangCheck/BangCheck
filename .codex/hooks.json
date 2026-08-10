@@ -1,0 +1,36 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash '/Users/jonghoPro/woo/00_project/08_BangCheck/.codex/hooks/protected-gate.sh'"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash '/Users/jonghoPro/woo/00_project/08_BangCheck/.codex/hooks/commit-guard.sh'"
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node '/Users/jonghoPro/woo/00_project/08_BangCheck/.codex/hooks/context-inject.mjs'"
+          }
+        ]
+      }
+    ]
+  }
+}
