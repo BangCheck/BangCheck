@@ -85,7 +85,7 @@ env:
 
 jobs:
   guard:
-    name: Verify Admin approval for protected file changes
+    name: Verify peer approval for protected file changes
     runs-on: ubuntu-latest
 
     steps:
@@ -179,12 +179,26 @@ jobs:
           # 명단을 못 읽으면 여기서 죽는다. `set -e` 로 스텝이 실패하고 job 이
           # 실패한다 — fail closed 다. "확인 못 했다"를 초록불로 적지 않는다.
           LOGINS=$(python3 - <<'PY'
-          import yaml
-          with open("base-team-roles.yaml", encoding="utf-8") as fh:
-              data = yaml.safe_load(fh) or {}
+          import sys, yaml
+          # 파싱 실패와 members 부재를 **다른 문장으로** 말한다.
+          # 2026-08-10 실측: base 의 team-roles.yaml 이 유효한 YAML 이 아니어서
+          # 이 스텝이 raw traceback 으로 죽었다. 게이트가 왜 막았는지 로그를
+          # 끝까지 읽어야 알 수 있으면, 막힌 사람은 게이트를 무시하게 된다.
+          try:
+              with open("base-team-roles.yaml", encoding="utf-8") as fh:
+                  data = yaml.safe_load(fh) or {}
+          except yaml.YAMLError as exc:
+              sys.exit(
+                  "base 브랜치의 _wood/team-roles.yaml 을 파싱하지 못했습니다.\n"
+                  f"  {str(exc).splitlines()[0]}\n"
+                  "승인 명단은 base 에서 읽습니다 — head 에서 읽으면 PR 이 자기를\n"
+                  "명단에 넣어 통과할 수 있기 때문입니다. 그래서 base 가 고쳐지기\n"
+                  "전에는 어떤 보호 파일 PR 도 통과할 수 없습니다(fail closed).\n"
+                  "먼저 base 의 team-roles.yaml 을 유효한 YAML 로 만드십시오."
+              )
           members = data.get("members") or {}
           if not isinstance(members, dict) or not members:
-              raise SystemExit("team-roles.yaml 의 members 를 읽지 못했다")
+              sys.exit("base 의 _wood/team-roles.yaml 에 members 가 없습니다.")
           print(",".join(sorted(members)))
           PY
           )
