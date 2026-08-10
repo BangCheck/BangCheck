@@ -125,6 +125,63 @@ triageAuthors:
   - "github-actions"
   - "Woo-JongHo"
 
+# ── 관계 탐지 (triage_relate.py) ──────────────────────────────
+#
+# 봇이 세는 신호는 넷뿐이고 전부 검증 가능한 사실이다.
+#   ① 이슈 본문·코멘트의 `#N`   ② 타임라인 역참조
+#   ③ 열린 PR 의 `closes #N`     ④ 이슈 경로 ∩ 열린 PR 변경 파일
+# 제목 유사도 같은 추정 신호는 넣지 않는다 — v1 이 그것으로 중복을 추정하다
+# 은퇴했다. 여기 값을 늘려서 추정 신호를 켤 수 있는 구멍도 두지 않았다.
+#
+# 이 블록을 고쳐도 routingVersion 은 올리지 않는다.
+#   routingVersion 은 **파트·담당자 판정**의 판본이다. 관계 탐지는 그 판정에
+#   손대지 않으므로, 여기를 고쳤다고 버전을 올리면 열린 이슈 전부에
+#   "분류 정정" 코멘트가 쏟아진다. 바뀐 것은 배정이 아니다.
+relate:
+  # 변경 파일을 대조할 열린 PR 상한. 넘으면 최근 갱신순으로 자르고
+  # **잘랐다는 사실을 코멘트에 적는다** — 조용히 자르면 "겹침 없음"이
+  # "안 봤음"과 구별되지 않는다.
+  maxOpenPullRequests: 40
+
+  # 코멘트에 적을 관계 상한. 열 몇 건을 나열하면 사람이 안 읽는다.
+  maxRelations: 8
+
+  # 한 PR 당 코멘트에 적을 겹친 경로 수. 나머지는 "외 N건"으로 접는다.
+  maxOverlapPathsShown: 3
+
+  # 교집합 근거로 세지 않는 공용 파일.
+  #
+  # `backend/build.gradle` 은 수십 PR 과 겹친다. 그런 파일이 걸리면 모든 이슈가
+  # 모든 PR 과 연관돼 보이고, 그 순간 이 섹션은 신호가 아니라 배경 소음이 된다.
+  # 담당이 바뀌면 rules 만 고치듯, 노이즈가 바뀌면 여기만 고친다.
+  sharedPaths:
+    - "backend/build.gradle"
+    - "backend/settings.gradle"
+    - "backend/gradle.properties"
+    - "backend/gradlew*"
+    - "frontend/package.json"
+    - "frontend/package-lock.json"
+    - "frontend/pnpm-lock.yaml"
+    - "frontend/vite.config.*"
+    - "frontend/tsconfig*.json"
+    - "frontend/eslint.config.*"
+    - "**/README.md"
+    - ".project-atlas/registry/**"
+
+  # 선언으로 다 못 잡는 몫. 열린 PR 중 이 수 이상이 건드린 경로는
+  # 그 시기의 공용 파일로 보고 근거에서 뺀다.
+  # 0 이면 끈다. 열린 PR 이 적을 때 너무 낮게 잡으면 진짜 겹침이 지워진다 —
+  # 지금 저장소의 열린 PR 이 한 자릿수라 5 로 둔다.
+  commonPathPrThreshold: 5
+
+  # PR 변경 파일 캐시 수명(초).
+  #
+  # 왜 캐시가 필요한가: 소급 적용은 이슈마다 triage_comment.py 를 **새 프로세스**로
+  # 띄운다(atlas-triage.yml 의 `for n in $numbers`). 캐시가 프로세스 안에 있으면
+  # 그 루프에서 한 번도 재사용되지 않아 열린 이슈 200건 × 열린 PR 40건 =
+  # 8,000 회 호출이 그대로 난다. 그래서 캐시는 파일이고, 키는 번호+head SHA 다.
+  cacheTtlSeconds: 900
+
 # ── 근거 ──────────────────────────────────────────────────────
 #
 # 2026-08-05 사용자 확정:
