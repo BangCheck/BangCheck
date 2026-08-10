@@ -53,4 +53,13 @@ implementedBy:
 knownDefects:
   - BC-AUTH-01
 
-tests: []   # 2026-08-03 기준 이 기능을 덮는 test 없음
+# 2026-08-10: 빈 배열이 낡아 있었다.
+#   OAuthStateServiceTest 는 PR #267(BC-AUTH-01 수정)에서 **같은 PR 로** 들어왔는데
+#   이 줄은 그대로였다. 잊은 것이 아니라 열 이유가 없었다 — 그 PR 은 결함 쪽
+#   (defects.yaml 의 disposition)만 보고 feature 파일은 보지 않았다.
+#
+#   게이트도 안 잡았다. SRC-01 은 "적힌 테스트 경로가 실재하는가"를 보지
+#   "실재하는 테스트가 적혀 있는가"를 보지 않는다 — 검사 방향이 한쪽뿐이다.
+#   registry → 코드는 지키고, 코드 → registry 는 아무도 안 본다.
+tests:
+  - backend/src/test/java/com/room/backend/global/auth/oauth/service/OAuthStateServiceTest.java

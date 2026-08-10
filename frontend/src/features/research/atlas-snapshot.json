@@ -1,7 +1,7 @@
 {
   "generator": ".project-atlas/tools/pm_snapshot.py",
   "note": "생성물이다. 원천은 registry와 코드다. 직접 편집하지 않는다.",
-  "sourceDigest": "a0f48575de0cf34ac63714e78de16ccedf548c8d0d3d0ef3c508c65a036b3db7",
+  "sourceDigest": "7ecdd21889f0c57b126dc4416850092af7433edc9847228664f72ac0b8b94172",
   "pages": [
     {
       "page": "/",
@@ -60,7 +60,9 @@
               "lifecycle": "TRACKED"
             }
           ],
-          "tests": [],
+          "tests": [
+            "backend/src/test/java/com/room/backend/global/auth/oauth/service/OAuthStateServiceTest.java"
+          ],
           "front": {
             "path": "frontend/src/services/auth-service.ts:27",
             "state": "built"
@@ -1276,7 +1278,9 @@
               "lifecycle": "TRACKED"
             }
           ],
-          "tests": [],
+          "tests": [
+            "backend/src/test/java/com/room/backend/global/auth/oauth/service/OAuthStateServiceTest.java"
+          ],
           "front": {
             "path": "frontend/src/services/auth-service.ts:5",
             "state": "built"
