@@ -492,6 +492,13 @@ export default function RoomsPage() {
                 key={room.id}
                 room={room}
                 onClick={(id) => navigate(ROUTES.CHECKLIST_DETAIL(id))}
+                // 주소가 있는 방에만 위치 아이콘을 준다 (#245).
+                //
+                // 지도는 `rooms.filter((r) => r.address)` 만 좌표로 바꾼다. 주소가 없는
+                // 방은 마커가 생길 수 없으므로, 아이콘을 주면 눌러서 지도로 넘어간 뒤
+                // **아무 일도 일어나지 않는다.** 왜 안 되는지 알 방법이 없는 것이
+                // 안 되는 것보다 나쁘다 — 갈 수 없는 곳으로 가는 문을 만들지 않는다.
+                onLocate={room.address ? (id) => navigate(`${ROUTES.MAP}?roomId=${encodeURIComponent(id)}`) : undefined}
                 onDelete={handleDeleteRoom}
               />
             ))}
