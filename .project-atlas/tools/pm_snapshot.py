@@ -192,6 +192,20 @@ def load_defects(features: dict[str, dict]) -> dict[str, list[dict]]:
     return {feature_id: list(items.values()) for feature_id, items in by_feature.items()}
 
 
+def unattached_defects() -> list[dict]:
+    """어느 feature 도 데려가지 않은 결함.
+
+    `load_defects` 가 세는 두 방향(relatedFeature · knownDefects) 중 어느 쪽으로도
+    걸리지 않은 것들이다. 그것을 다시 계산하지 않고 같은 함수를 지나게 해서,
+    "무엇이 feature 에 붙는가"의 판정이 두 벌이 되지 않게 한다.
+    """
+    raw = yaml.safe_load((ATLAS_DIR / "registry" / "defects.yaml").read_text(encoding="utf-8"))
+    all_ids = [d["id"] for d in ((raw or {}).get("defects") or []) if d.get("id")]
+    attached = {v["id"] for views in load_defects(load_features()).values() for v in views}
+    views = {d["id"]: defect_view(d) for d in ((raw or {}).get("defects") or []) if d.get("id")}
+    return [views[i] for i in all_ids if i not in attached]
+
+
 def defect_layer(view: dict) -> str | None:
     """결함이 관측된 레이어. evidence.path의 최상위 디렉터리만 근거로 삼는다.
 
@@ -305,6 +319,21 @@ def main() -> int:
         # "registry를 고치고 재생성을 잊었는가"를 판정한다.
         "sourceDigest": registry_digest(),
         "pages": pages,
+        # 어느 feature 도 데려가지 않은 결함. (2026-08-10)
+        #
+        # 이 배열이 없던 동안 그런 결함은 **사이트에서 통째로 사라졌다.** 화면이
+        # pages(=feature) 를 타고만 결함에 닿기 때문이다. BC-DB-01·BC-ARCH-01/02 가
+        # 그 상태로 있었고 아무도 몰랐다.
+        #
+        # #289 에서 BC-DEPLOY-01(P1)·BC-ATLAS-01 의 근거 없는 귀속을 지우자 그 둘도
+        # 같은 자리로 떨어졌고, 그제서야 빈틈이 드러났다 — 틀린 귀속이 빈틈을
+        # 가리고 있었던 것이다. 귀속을 지운 것은 옳지만, 지우면 안 보이게 되는
+        # 구조를 그대로 두면 "정직하게 안 보이는" 상태가 된다.
+        #
+        # 배포·마이그레이션·아키텍처처럼 제품 feature 가 소유하지 않는 결함은
+        # 앞으로도 생긴다. relatedFeature 는 schema 상 필수가 아니다 — 억지로
+        # 붙이는 대신 여기로 모은다.
+        "unattachedDefects": unattached_defects(),
         # 연결 규약이 아직 없다. 빈 값을 그대로 둬서 화면이 '없음'을 말하게 한다 —
         # 있는 척하는 것보다 비어 있는 게 낫다. Hermes가 채울 자리.
         "links": {"source": None, "byFeature": {}},
