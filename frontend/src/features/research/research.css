@@ -2869,6 +2869,16 @@
   letter-spacing: 0.14em;
 }
 
+/* 미귀속 결함에 P1 이 섞였을 때. `is-danger` 는 .research-rollup 과 .feature-chip
+   에만 정의돼 있어 이 뱃지에는 아무 효과가 없었다 — 아래 project-map 테마 규칙이
+   같은 색을 덮어쓰지 않도록 함께 선언한다. */
+.research-data-badge.is-danger,
+.project-map-shell .research-data-badge.is-danger {
+  border-color: #f0d3d8;
+  background: #fdf6f7;
+  color: #a3384a;
+}
+
 .research-open-canvas {
   display: inline-flex;
   align-items: center;

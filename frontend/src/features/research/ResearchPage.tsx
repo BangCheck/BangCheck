@@ -4,7 +4,12 @@ import { Link } from 'react-router-dom';
 import { ROUTES } from '@/lib/routes';
 import { useFocusTrap } from '@/lib/use-focus-trap';
 import { RESEARCH_NODES, STATUS_META } from './research-data';
-import { findSnapshotPage, rollupPage } from './atlas-snapshot';
+import {
+  findSnapshotPage,
+  rollupPage,
+  unattachedDefects,
+  unattachedP1Count as unattachedP1,
+} from './atlas-snapshot';
 import { useMapViewport } from './use-map-viewport';
 import { FeatureDashboard } from './components/FeatureDashboard';
 import { PageBriefBody } from './components/PageBriefBody';
@@ -104,6 +109,21 @@ export default function ProjectMapPage() {
 
         <div className="research-topbar-actions">
           <span className="research-data-badge">MOCK DATA / DEV ONLY</span>
+          {/* 어느 feature 도 데려가지 않은 결함. 이 뱃지가 없던 동안 그런 결함은
+              화면에 닿을 경로가 없어 통째로 안 보였다 — 배포·마이그레이션·아키텍처
+              결함이 그 상태였고, 그중 하나는 P1 이다. 0 건이면 아예 그리지 않는다:
+              늘 떠 있는 표시는 배경이 되어 아무것도 구별하지 못한다. */}
+          {unattachedDefects.length > 0 && (
+            <span
+              className={`research-data-badge${unattachedP1 > 0 ? ' is-danger' : ''}`}
+              title={unattachedDefects
+                .map((d) => `${d.id} (${d.severity}) ${d.title}`)
+                .join('\n')}
+            >
+              미귀속 결함 {unattachedDefects.length}
+              {unattachedP1 > 0 && ` · P1 ${unattachedP1}`}
+            </span>
+          )}
           <div className="research-theme-control">
             <button
               type="button"

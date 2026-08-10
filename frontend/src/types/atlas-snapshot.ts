@@ -84,5 +84,14 @@ export interface AtlasSnapshot {
    */
   sourceDigest: string;
   pages: AtlasSnapshotPage[];
+  /**
+   * 어느 feature 도 데려가지 않은 결함.
+   *
+   * 화면은 pages(=feature) 를 타고만 결함에 닿는다. 그래서 이 배열이 없던 동안
+   * 배포·마이그레이션·아키텍처처럼 제품 feature 가 소유하지 않는 결함은 사이트에서
+   * 통째로 사라져 있었다 — BC-DB-01·BC-ARCH-01/02 가 그 상태였고 아무도 몰랐다.
+   * #289 에서 근거 없는 귀속을 지우자 P1 하나가 같은 자리로 떨어지며 드러났다.
+   */
+  unattachedDefects: AtlasSnapshotDefect[];
   links: AtlasSnapshotLinks;
 }

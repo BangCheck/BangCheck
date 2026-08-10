@@ -26,6 +26,16 @@ export function findFeatureLinks(featureId: string | null) {
 
 export const hasLinkSource = snapshot.links.source !== null;
 
+/**
+ * 어느 feature 도 데려가지 않은 결함.
+ *
+ * `findSnapshotPage` 는 페이지를 타고만 결함에 닿으므로 이 결함들은 어느 페이지에서도
+ * 안 보인다. 별도 창구를 둬서 화면이 "없다"와 "못 본다"를 구별할 수 있게 한다.
+ * `?? []` — 이 필드가 생기기 전에 구워진 스냅샷이 남아 있어도 화면은 죽지 않는다.
+ */
+export const unattachedDefects = snapshot.unattachedDefects ?? [];
+export const unattachedP1Count = unattachedDefects.filter((d) => d.severity === 'P1').length;
+
 export interface PageRollup {
   featureCount: number;
   frontBuilt: number;
