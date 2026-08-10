@@ -327,33 +327,9 @@ jobs:
             );
 
       # ------------------------------------------------------------
-      # 7. Add "protected-files-modified" label for visibility
+      # 7. 라벨은 붙이지 않는다 (2026-08-10)
       # ------------------------------------------------------------
-      - name: Label PR
-        if: steps.match.outputs.has_protected == 'true'
-        uses: actions/github-script@v7
-        with:
-          script: |
-            try {
-              await github.rest.issues.addLabels({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: context.issue.number,
-                labels: ['protected-files-modified']
-              });
-            } catch (e) {
-              // Label might not exist yet — create it
-              await github.rest.issues.createLabel({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                name: 'protected-files-modified',
-                color: 'B60205',
-                description: 'PR modifies Admin-protected files (requires Admin approval)'
-              }).catch(() => {});
-              await github.rest.issues.addLabels({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: context.issue.number,
-                labels: ['protected-files-modified']
-              });
-            }
+      # 옛 판본은 `protected-files-modified` 를 붙였다. 그런데 같은 사실을
+      # 검사 이름·검사 상태·위 코멘트가 이미 말한다. 라벨은 네 번째 사본이고,
+      # 넷 중 유일하게 **왜 막혔는지를 말하지 못하는** 사본이었다.
+      # compliance-guard.yml 의 라벨도 같은 이유로 함께 걷었다.
