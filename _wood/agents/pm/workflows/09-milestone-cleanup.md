@@ -11,7 +11,7 @@
 ## Step 1 — Status Display
 
 ```bash
-REPO="SWYP-Backend/project"
+REPO="BangCheck/BangCheck"
 gh api repos/$REPO/milestones \
   --jq '.[] | "\(.title) | open:\(.open_issues) | closed:\(.closed_issues) | state:\(.state) | due:\(.due_on // "none")"'
 ```

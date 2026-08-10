@@ -180,7 +180,7 @@ Are there any blockers?
 ### 3-4. Send (after Y)
 
 ```bash
-gh issue comment 22 --repo SWYP-Backend/project --body "..."
+gh issue comment 22 --repo BangCheck/BangCheck --body "..."
 ```
 
 Return:

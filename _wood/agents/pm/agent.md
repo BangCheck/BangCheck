@@ -45,8 +45,8 @@ forbidden_actions:
   <step n="3">
     Quick attention check — count items needing PM action:
     ```bash
-    BLOCKER=$(gh issue list --repo SWYP-Backend/project --label "상태:블로킹" --state open --json number --jq length)
-    BUG=$(gh issue list --repo SWYP-Backend/project --label "유형:버그" --state open --json number --jq length)
+    BLOCKER=$(gh issue list --repo BangCheck/BangCheck --label "상태:블로킹" --state open --json number --jq length)
+    BUG=$(gh issue list --repo BangCheck/BangCheck --label "유형:버그" --state open --json number --jq length)
     ```
     Store as {attention_line}:
     - 0 items → "✅ No urgent items"

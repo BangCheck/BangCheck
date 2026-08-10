@@ -81,7 +81,7 @@ gh auth status || { echo "Not authenticated. Run: gh auth login"; exit 1; }
 # 2. Repo verification
 REPO=$(git remote get-url origin | sed -E 's|.*github.com[:/]([^/]+/[^/.]+).*|\1|')
 # 저장소 이름을 여기 박아두면 조직·저장소 rename 때마다 preflight가 통째로 죽는다.
-# 실제로 SWYP-Backend/project 로 굳어 있어 이 검사는 항상 실패했다.
+# 실제로 BangCheck/BangCheck 로 굳어 있어 이 검사는 항상 실패했다.
 [ -n "$REPO" ] || { echo "Cannot resolve repo"; exit 1; }
 
 # 3. User identification

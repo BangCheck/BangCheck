@@ -69,7 +69,7 @@ Confirmation:
 
 Execute:
 ```bash
-gh api repos/SWYP-Backend/project/milestones \
+gh api repos/BangCheck/BangCheck/milestones \
   -f title="{name}" \
   -f state="open" \
   -f due_on="{end_date}T23:59:59Z" \
@@ -94,7 +94,7 @@ Other options:
 ```
 
 ```bash
-gh api repos/SWYP-Backend/project/milestones/{number} -X PATCH -f state="closed"
+gh api repos/BangCheck/BangCheck/milestones/{number} -X PATCH -f state="closed"
 ```
 
 ---
@@ -102,7 +102,7 @@ gh api repos/SWYP-Backend/project/milestones/{number} -X PATCH -f state="closed"
 ## 📋 Case 5-C — Sprint List/Progress
 
 ```bash
-gh api repos/SWYP-Backend/project/milestones?state=all \
+gh api repos/BangCheck/BangCheck/milestones?state=all \
   --jq '.[] | {number, title, state, open_issues, closed_issues, due_on}'
 ```
 
@@ -120,7 +120,7 @@ Render:
 Close candidates show **"[⚠️ Close]"** action link.
 
 ```bash
-gh api repos/SWYP-Backend/project/milestones/{number} -X PATCH -f state="closed"
+gh api repos/BangCheck/BangCheck/milestones/{number} -X PATCH -f state="closed"
 ```
 
 ---

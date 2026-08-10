@@ -79,7 +79,7 @@ Scope that Quick Dev can handle:
 
 ```bash
 gh auth status
-git remote get-url origin | grep SWYP-Backend/project
+git remote get-url origin | grep BangCheck/BangCheck
 USER_LOGIN=$(gh api user --jq .login)
 ```
 
@@ -156,7 +156,7 @@ Is there an issue to link this change to?
 ### [2] Simple Issue Creation
 
 ```bash
-gh issue create --repo SWYP-Backend/project \
+gh issue create --repo BangCheck/BangCheck \
   --title "{user_description}" \
   --label "유형:{type},순위:{priority}" \
   --body "Quick fix — {user_description}

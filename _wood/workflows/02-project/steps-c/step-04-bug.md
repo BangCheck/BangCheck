@@ -60,7 +60,7 @@ Template:
 ```
 
 ```bash
-gh issue create --repo SWYP-Backend/project \
+gh issue create --repo BangCheck/BangCheck \
   --title "[bug] {title}" \
   --label "유형:버그,{priority}" \
   --body "{rendered}"
@@ -76,12 +76,12 @@ After registering a bug, if PM needs to be aware:
 # If priority is critical, mention @PM
 gh issue comment {new_bug_number} \
   --body "@{pm_github_login} Urgent review needed" \
-  --repo SWYP-Backend/project
+  --repo BangCheck/BangCheck
 
 # If my work is blocked by this bug, add blocking label to my issue
 gh issue edit {my_working_issue} \
   --add-label "상태:블로킹" \
-  --repo SWYP-Backend/project
+  --repo BangCheck/BangCheck
 ```
 
 PM's `04-daily-digest` automatically collects these signals.

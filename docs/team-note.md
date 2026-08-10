@@ -37,7 +37,7 @@ cd backend && ./gradlew bootRun
 | 채널 | 용도 |
 |------|------|
 | Discord (daily brief) | 매일 08:00 팀 브리핑 |
-| GitHub Issues (SWYP-Backend/BangCheck) | 버그·이슈·PR |
+| GitHub Issues (BangCheck/BangCheck) | 버그·이슈·PR |
 
 ## 브랜치 전략
 - `main` — 배포 기준

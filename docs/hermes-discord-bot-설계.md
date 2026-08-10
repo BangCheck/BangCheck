@@ -1,5 +1,27 @@
 # Hermes Agent 기반 BangCheck Atlas 튜닝 봇 — 1단계 조사·설계
 
+> **[2026-08-10 정정]** 이 문서의 저장소 슬러그 판정은 **틀렸다.**
+>
+> 아래에서 "답은 `SWYP-Backend/BangCheck`이고 Atlas marker가 틀렸다"고 결론 내렸으나,
+> 실측하면 반대다.
+>
+> ```
+> git remote get-url origin   → https://github.com/BangCheck/BangCheck.git
+> gh api orgs/SWYP-Backend    → 404.  그 조직은 존재하지 않는다
+> gh api repos/BangCheck/BangCheck → owner=BangCheck (Organization)
+> ```
+>
+> 정본은 `BangCheck/BangCheck` 이고 `.project-atlas/project.yaml` 이 처음부터 옳았다.
+> 이 문서의 §0.2 — *"`project.yaml`의 `repo`를 `SWYP-Backend/BangCheck`로 고친다"* — 를
+> **따르면 안 된다.** 그대로 하면 존재하지 않는 조직을 가리키게 된다.
+>
+> 판정이 뒤집힌 이유: 당시 근거로 삼은 것이 `_wood/context/current.yaml` 과
+> `_wood/team-roles.yaml` 이었는데 **그 둘이 낡은 쪽**이었다. 2026-08-10 에
+> 그 34개 파일을 실제 원격에 맞췄다.
+>
+> 아래 본문은 당시 판단의 기록으로 그대로 둔다 — 지우면 왜 틀렸는지가 사라진다.
+
+
 - 작성일: 2026-08-04
 - 단계: **1단계(조사·설계·안전한 준비)**. 코드 구현, Discord 앱 등록, 토큰 발급, config 변경은 **하지 않았다.**
 - 조사 대상: `hermes-agent` v0.17.0 (NousResearch), 코드 경로 `~/.hermes/hermes-agent/`
