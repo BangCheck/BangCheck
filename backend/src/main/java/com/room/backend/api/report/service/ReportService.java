@@ -45,9 +45,17 @@ public class ReportService {
                 .build();
     }
 
-    public CompareRoomResponseDTO compareRooms(CompareRoomRequestDTO requestDTO) {
+    public CompareRoomResponseDTO compareRooms(Long userId, CompareRoomRequestDTO requestDTO) {
         List<Long> roomIds = requestDTO.getRoomIds();
         List<String> categories = requestDTO.getCategories();
+
+        if (roomIds != null && !roomIds.isEmpty()) {
+            Set<Long> uniqueRoomIds = new LinkedHashSet<>(roomIds);
+            long ownedCount = roomRepository.countByIdInAndUserIdAndIsDeletedFalse(uniqueRoomIds, userId);
+            if (ownedCount != uniqueRoomIds.size()) {
+                throw new GeneralException(ReportErrorCode.FORBIDDEN_ROOM_ACCESS);
+            }
+        }
 
         List<CategoryGroupDTO> compareData = new ArrayList<>();
 

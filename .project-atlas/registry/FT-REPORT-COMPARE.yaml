@@ -16,7 +16,7 @@ owner: "@hajimeong"
 owns:
   - operationId: OP-REPORT-COMPARE
     route: "POST /api/v1/report/compare"
-    auth: JWT                     # 인증은 걸려 있다. 다만 인가(방 소유권)가 없다 — BC-RPT-02
+    auth: JWT                     # 인증 + 인가(방 소유권) 검증 — BC-RPT-02 해소 후
     safety:
       sideEffect: READ            # POST지만 쓰기가 아니다. 요청 본문이 큰 조회다
       writes: []
@@ -61,9 +61,11 @@ knownDefects:
 
 tests:
   # BC-RPT-04 방어: 알 수 없는 카테고리 이름이 400으로 나가는지 검증한다.
+  # BC-RPT-02 방어: 타인 소유 방이 섞이면 403, 중복 roomId dedupe도 함께 검증한다.
   - backend/src/test/java/com/room/backend/api/report/service/ReportServiceTest.java
 # defects가 "계약 test RPT-06/RPT-07이 재현한다"고 적지만
-# backend/src/test에 해당 파일이 없다 — RPT-06/07은 별건(BC-RPT-02/03) 작업에서 추가 예정.
+# backend/src/test에 해당 파일 이름 그대로는 없다 — ReportServiceTest가 통합해서 담고 있다.
+# RPT-07(BC-RPT-03 NPE)은 별건 작업에서 추가 예정.
 
 sliceShapeNotes:
   - operation 하나만 owns 하는데도 별도 feature로 둔 근거는 defects.yaml의
@@ -71,9 +73,9 @@ sliceShapeNotes:
     전부 이 operation에 몰려 있어 info와 수명주기가 다르다.
   - sideEffect를 READ로 둔 것은 HTTP 동사가 아니라 실제 효과로 판정한 결과다.
     POST인 이유는 roomIds·categories를 본문으로 받기 때문이지 상태를 바꿔서가 아니다.
-  - 이 feature의 가장 큰 위험은 안전 필드가 아니라 인가에 있다.
-    controller가 SecurityUtil.getCurrentUserId()로 userId를 구해 놓고
-    reportService.compareRooms(requestDTO)에 넘기지 않고 버린다(BC-RPT-02).
-    rerunSafe=true는 "안전하다"가 아니라 "반복 호출이 상태를 안 바꾼다"만 뜻한다.
+  - BC-RPT-02(인가 누락)는 controller→service 시그니처에 userId를 전달하고
+    countByIdInAndUserIdAndIsDeletedFalse로 dedupe한 roomIds를 일괄 검증해 403으로
+    잘라내는 방식으로 해소했다. rerunSafe=true는 여전히 "안전하다"가 아니라
+    "반복 호출이 상태를 안 바꾼다"만 뜻한다는 점은 그대로다.
   - 백엔드 비교 로직이 프런트에서 쓰이지 않는다는 사실은 리팩토링 순서에 직접 영향을 준다.
     소비자가 없으므로 BC-RPT-02~05를 고칠 때 응답 형태를 깨도 화면이 깨지지 않는다.

@@ -30,7 +30,7 @@ public class ReportController {
     public ResponseEntity<CompareRoomResponseDTO> compareRooms(
             @RequestBody CompareRoomRequestDTO requestDTO) {
         Long userId = SecurityUtil.getCurrentUserId();
-        CompareRoomResponseDTO response = reportService.compareRooms(requestDTO);
+        CompareRoomResponseDTO response = reportService.compareRooms(userId, requestDTO);
 
         return ResponseEntity.ok(response);
     }

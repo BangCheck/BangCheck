@@ -3,6 +3,7 @@ package com.room.backend.domain.room.repository;
 import com.room.backend.domain.room.entity.Room;
 import com.room.backend.domain.room.entity.enums.RentType;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -14,6 +15,7 @@ public interface RoomRepository extends JpaRepository<Room, Long> {
     List<Room> findByUserId(Long userId);
     int countByUserId(Long userId);
     int countByUserIdAndIsDeletedFalse(Long userId);
+    long countByIdInAndUserIdAndIsDeletedFalse(Collection<Long> ids, Long userId);
 
     @Query("""
         SELECT room FROM Room room
