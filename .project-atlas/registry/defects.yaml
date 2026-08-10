@@ -30,9 +30,9 @@ defects:
     evidence:
       path: backend/src/main/java/com/room/backend/global/geocoding/service/GeocodingService.java
       symbol: getCoordinates
-      line: 29
     relatedFeature: FT-ROOM-CREATE-WITH-CHECKLIST
     disposition: FIX_PLANNED
+    issue: 296
 
   - id: BC-REG-01
     severity: P2

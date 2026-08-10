@@ -1,7 +1,7 @@
 {
   "generator": ".project-atlas/tools/pm_snapshot.py",
   "note": "생성물이다. 원천은 registry와 코드다. 직접 편집하지 않는다.",
-  "sourceDigest": "09c2ba00b11a5c17695d41557dceb39e023e0d64aa852894611c5c889c8d5ffe",
+  "sourceDigest": "1f589059e393aad94645e139cdee40948f4fc7cc3c19816e84f63bcd44d0063f",
   "pages": [
     {
       "page": "/",
@@ -383,12 +383,12 @@
               "evidence": {
                 "path": "backend/src/main/java/com/room/backend/global/geocoding/service/GeocodingService.java",
                 "symbol": "getCoordinates",
-                "line": 29
+                "line": null
               },
               "relatedFeature": "FT-ROOM-CREATE-WITH-CHECKLIST",
               "relatedStory": null,
-              "issue": null,
-              "lifecycle": "OBSERVED"
+              "issue": 296,
+              "lifecycle": "TRACKED"
             }
           ],
           "tests": [],
@@ -646,12 +646,12 @@
               "evidence": {
                 "path": "backend/src/main/java/com/room/backend/global/geocoding/service/GeocodingService.java",
                 "symbol": "getCoordinates",
-                "line": 29
+                "line": null
               },
               "relatedFeature": "FT-ROOM-CREATE-WITH-CHECKLIST",
               "relatedStory": null,
-              "issue": null,
-              "lifecycle": "OBSERVED"
+              "issue": 296,
+              "lifecycle": "TRACKED"
             },
             {
               "id": "BC-REG-01",
@@ -734,7 +734,9 @@
               "lifecycle": "TRACKED"
             }
           ],
-          "tests": [],
+          "tests": [
+            "backend/src/test/java/com/room/backend/global/geocoding/service/GeocodingServiceTest.java"
+          ],
           "front": {
             "path": "frontend/src/services/room-service.ts:47",
             "state": "defect"
