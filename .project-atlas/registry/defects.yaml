@@ -187,13 +187,8 @@ defects:
       path: backend/src/main/java/com/room/backend/api/report/controller/ReportController.java
       symbol: compareRooms
     relatedFeature: FT-REPORT-COMPARE
-    disposition: FIXED
+    disposition: FIX_PLANNED
     issue: 280
-    fix: >
-      controller가 userId를 service에 전달하고, service 진입점에서 roomIds를
-      dedupe(LinkedHashSet) 후 RoomRepository.countByIdInAndUserIdAndIsDeletedFalse로
-      일괄 소유권 검증. 하나라도 타인 소유면 REPORT_403_ROOM_ACCESS(403). 회귀 방지
-      단위 테스트는 ReportServiceTest#testCompareRoomsForbiddenRoomAccess.
 
   - id: BC-RPT-01
     severity: P2
