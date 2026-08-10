@@ -150,3 +150,50 @@ export const CATEGORY_LABEL: Record<ChecklistCategory, string> = {
 export const CATEGORY_ORDER: ChecklistCategory[] = [
   'OPTION', 'INTERNAL_STATE', 'PROBLEM', 'SAFETY', 'CONVENIENCE', 'ENVIRONMENT',
 ];
+
+/**
+ * STEP3 '추가 항목'에서 보여줄 카테고리. 안전/보안이 빠져 있다. (BC-CHK-09 / #244)
+ *
+ * 2026-07-29 PM 확정이다. 안전/보안 8개는 전부 기본 항목이라 사용자가 끄고 켤
+ * 선택지가 아니었고, 카테고리로 두면 "고를 수 있는 것"처럼 보인다.
+ *
+ * CATEGORY_ORDER 와 갈라 둔 이유
+ *   CATEGORY_ORDER 는 여섯 카테고리의 **표시 순서**를 말한다. 여기서 SAFETY 를
+ *   빼면 그 뜻이 "STEP3 에서 보이는 것"으로 조용히 바뀌고, 다른 화면이 그 상수를
+ *   쓰기 시작하는 날 안전/보안이 이유 없이 사라진다.
+ */
+export const STEP3_CATEGORY_ORDER: ChecklistCategory[] =
+  CATEGORY_ORDER.filter((c) => c !== 'SAFETY');
+
+/**
+ * STEP2 맞춤 목록 — 그 유형의 추천 항목만. (BC-CHK-08 / #243)
+ *
+ * 왜 화면 밖에 있나
+ *   SettingsPage 안에 있을 때는 이 규칙을 검사할 방법이 없었다. 그 화면은
+ *   비로그인에서 `inert` + `pointer-events-none` 이고 로그인 경로는 백엔드를
+ *   요구해서, 규칙이 맞는지 확인하려면 사람이 눈으로 보는 수밖에 없었다.
+ *   규칙을 데이터 옆으로 꺼내면 브라우저 없이 검사된다.
+ */
+export function recommendedItemsFor(typeId: string): ChecklistItem[] {
+  // 첫자취형은 전체, 기본형은 기본 항목 — 두 유형은 TYPE_ITEM_MAP 이 비어 있고
+  // BE 가 목록을 정한다. 그 계약을 여기서도 그대로 따른다.
+  if (typeId === 'FIRST_TIMER') return CHECKLIST_ITEMS;
+  if (typeId === 'ESSENTIALS_ONLY') {
+    return CHECKLIST_ITEMS.filter((c) => BASE_ITEM_LABELS.includes(c.label));
+  }
+  const mappedIds = TYPE_ITEM_MAP[typeId] ?? [];
+  return CHECKLIST_ITEMS.filter((item) => mappedIds.includes(item.id));
+}
+
+/**
+ * STEP3 카테고리 — 안전/보안을 뺀 다섯, 각 카테고리는 **전체 항목**. (BC-CHK-09 / #244)
+ *
+ * 기본 항목을 걷어내지 않는다. 걷어내면 전 항목이 기본인 카테고리가 0 이 되어
+ * 화면에서 통째로 사라진다 — 기본 옵션 8개와 안전/보안 8개가 그렇게 없어졌었다.
+ */
+export function step3Categories(): Array<{ category: ChecklistCategory; label: string; items: ChecklistItem[] }> {
+  return STEP3_CATEGORY_ORDER.map((category) => {
+    const label = CATEGORY_LABEL[category];
+    return { category, label, items: CHECKLIST_ITEMS.filter((i) => i.category === label) };
+  });
+}

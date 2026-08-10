@@ -4,7 +4,11 @@ import { useAuthStore } from '@/store/use-auth-store';
 import { useAtlasPreview } from '@/lib/use-atlas-preview';
 import { cn } from '@/lib/utils';
 import { Spinner } from '@/components/ui/Spinner';
-import { USER_TYPES, CHECKLIST_ITEMS, TYPE_ITEM_MAP, CATEGORY_LABEL, CATEGORY_ORDER, BASE_ITEM_LABELS } from '@/features/customization/constants';
+import {
+  USER_TYPES,
+  recommendedItemsFor,
+  step3Categories,
+} from '@/features/customization/constants';
 import { UserTypeCard } from '@/features/customization/components/UserTypeCard';
 import { ChecklistItemToggle } from '@/features/customization/components/ChecklistItemToggle';
 import { useCustomization } from '@/features/customization/hooks/use-customization';
@@ -68,20 +72,11 @@ export default function SettingsPage() {
   // ── Derived / memoized ───────────────────────────────────
   const activeNamesSet = useMemo(() => new Set(activeItemNames), [activeItemNames]);
 
+  // 규칙은 constants 의 recommendedItemsFor 가 소유한다 — 화면 안에 두면 검사할
+  // 방법이 없다(이 화면은 비로그인에서 inert 이고 로그인 경로는 백엔드를 요구한다).
   const recommendedItems = useMemo(() => {
     if (selectedTypeIds.length === 0) return [];
-    const typeId = selectedTypeIds[0];
-    if (typeId === 'FIRST_TIMER') return CHECKLIST_ITEMS;
-    if (typeId === 'ESSENTIALS_ONLY') {
-      return CHECKLIST_ITEMS.filter((c) => BASE_ITEM_LABELS.includes(c.label));
-    }
-    // 스펙: STEP2 = BASE 15 + 유형 추천 (중복 제거, BASE 우선 정렬)
-    const baseItems = CHECKLIST_ITEMS.filter((c) => BASE_ITEM_LABELS.includes(c.label));
-    const mappedIds = TYPE_ITEM_MAP[typeId] ?? [];
-    const typeOnlyItems = CHECKLIST_ITEMS.filter(
-      (item) => mappedIds.includes(item.id) && !BASE_ITEM_LABELS.includes(item.label),
-    );
-    return [...baseItems, ...typeOnlyItems];
+    return recommendedItemsFor(selectedTypeIds[0]);
   }, [selectedTypeIds]);
 
   // ── Handlers ─────────────────────────────────────────────
@@ -341,64 +336,19 @@ export default function SettingsPage() {
                     </button>
                   </div>
 
-                  {/* 항목 영역 — 전체 체크리스트 보기 ON 시에만 노출 */}
+                  {/* 항목 영역 — 전체 체크리스트 보기 ON 시에만 노출
+                      기본 항목을 따로 떼어 내던 블록을 없앴다 (BC-CHK-09 / #244).
+                      아래 카테고리 안으로 되돌아가며, 이미 활성이라 선택된 상태로 보인다. */}
                   {(() => {
                     if (!isAllItemsVisible) return null;
-                    const baseVisibleLabels = BASE_ITEM_LABELS.filter((l) => activeNamesSet.has(l));
-                    if (baseVisibleLabels.length === 0) return null;
-                    return (
-                      <div className="pt-4 border-t border-bg-gray">
-                        <div className="space-y-4">
-                          <div className="flex items-center gap-2">
-                            <h4 className="text-[14px] font-bold text-text-main">기본 항목</h4>
-                            <span className="text-[14px] font-bold text-text-mute">
-                              {BASE_ITEM_LABELS.filter((l) => activeNamesSet.has(l)).length}/{BASE_ITEM_LABELS.length}
-                            </span>
-                          </div>
-                          <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
-                            {baseVisibleLabels.map((label) => {
-                              const constItem = CHECKLIST_ITEMS.find((c) => c.label === label);
-                              const icon = constItem ? (ItemIcons[constItem.id] || ItemIcons.default) : ItemIcons.default;
-                              const si = items.find((s) => s.itemName === label);
-                              return (
-                                <ChecklistItemToggle
-                                  key={label}
-                                  label={label}
-                                  icon={icon}
-                                  isActive={activeNamesSet.has(label)}
-                                  onToggle={() => {
-                                    if (isPending) return;
-                                    if (si) toggleItem(Number(si.id), label);
-                                    else toggleItemLocally(label);
-                                  }}
-                                />
-                              );
-                            })}
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })()}
-
-                  {(() => {
-                    if (!isAllItemsVisible) return null;
-                    const anyCategoryHasItems = CATEGORY_ORDER.some((cat) => {
-                      const catLabel = CATEGORY_LABEL[cat];
-                      const all = CHECKLIST_ITEMS
-                        .filter((i) => i.category === catLabel)
-                        .filter((i) => !BASE_ITEM_LABELS.includes(i.label));
+                    const anyCategoryHasItems = step3Categories().some(({ items: all }) => {
                       const visible = isAllItemsVisible ? all : all.filter((i) => activeNamesSet.has(i.label));
                       return visible.length > 0;
                     });
                     if (!anyCategoryHasItems) return null;
                     return (
                     <div className="pt-4 border-t border-bg-gray space-y-10">
-                      {CATEGORY_ORDER.map((cat) => {
-                        const catLabel = CATEGORY_LABEL[cat];
-                        // 기본 항목은 위에서 따로 렌더 → 비기본만 카테고리별로 표시
-                        const catConstItems = CHECKLIST_ITEMS
-                          .filter((i) => i.category === catLabel)
-                          .filter((i) => !BASE_ITEM_LABELS.includes(i.label));
+                      {step3Categories().map(({ category: cat, label: catLabel, items: catConstItems }) => {
                         if (catConstItems.length === 0) return null;
                         const visibleCatItems = isAllItemsVisible
                           ? catConstItems
