@@ -78,7 +78,12 @@ export default function ChecklistNewPage() {
     const derivedSafety = deriveSafetyFromAnswers(checklistItems, answers, safety);
     setInterior(derivedInterior);
     setSafety(derivedSafety);
-    const success = addGuestRoom({ basic, building, interior: derivedInterior, safety: derivedSafety, custom });
+    // answers 를 함께 넘긴다. 파생 섹션(interior/safety)은 카드 chip·score 용이고
+    // 원본이 아니다 — deriveSafetyFromAnswers 는 SAFETY·CONVENIENCE·ENVIRONMENT 를
+    // 아직 매핑하지 않아 그 답변들이 파생만으로는 남지 않는다 (BC-ROOM-06).
+    const success = addGuestRoom({
+      basic, building, interior: derivedInterior, safety: derivedSafety, custom, answers,
+    });
     if (!success) {
       setSubmitError(`비로그인 상태에서는 방을 ${GUEST_ROOM_LIMIT}개까지만 등록할 수 있어요.`);
       return;

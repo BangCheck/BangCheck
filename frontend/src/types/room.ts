@@ -60,6 +60,13 @@ export interface GuestRoomRaw {
   interior: import('./checklist').InteriorCheckData;
   safety: import('./checklist').SafetyLivingData;
   custom: import('./checklist').CustomMemoData;
+  // 화면이 실제로 수집하는 동적 항목의 답변. 위 다섯 섹션은 레거시 파생값이라
+  // 이것을 담지 못한다 — SAFETY·CONVENIENCE·ENVIRONMENT 카테고리는 어느 섹션으로도
+  // 매핑되지 않아 통째로 사라졌다 (BC-ROOM-06).
+  //
+  // optional 인 이유: 이 필드가 생기기 전에 저장된 localStorage 항목이 이미 있다.
+  // 필수로 두면 그 방들이 복원 시 깨진다. 읽는 쪽은 `?? {}` 로 받는다.
+  answers?: import('./checklist').ChecklistAnswers;
 }
 
 export interface PaginatedResponse<T> {
