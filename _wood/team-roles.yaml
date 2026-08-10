@@ -163,11 +163,19 @@ ownership:
 # ============================================================
 # PM can edit these paths but MUST create a PR for Admin review.
 # Direct push to main is NOT allowed for PM.
+# 2026-08-10: 이 파일은 유효한 YAML 이 아니었다.
+#   `pm_editable_paths` 는 시퀀스인데 그 안에 `pr_policy:` 매핑 키가 섞여 있어
+#   파서가 line 167 에서 죽었다. 아무도 몰랐던 이유는 아무도 파싱하지 않았기
+#   때문이다 — 훅은 sed 로, 워크플로는 이 값을 안 읽었다.
+#   #221 에서 승인 명단을 이 파일의 `members` 에서 읽기 시작하면서 드러났다.
+#   선언만 있고 읽는 쪽이 없으면 틀려도 티가 안 난다.
 pm_editable_paths:
   - "docs/spec/**"                    # Product spec (xlsx, md)
   - "_wood/templates/**"              # Issue templates
   - "_wood/workspace/_shared/**"      # Shared sprint-status, story template
-  pr_policy: "pr-required"            # PM edits require PR → Admin review → merge
+
+# PM edits require PR → Admin review → merge
+pm_edit_policy: "pr-required"
 
 # ============================================================
 # Role → Menu Mapping
