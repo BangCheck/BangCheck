@@ -1,10 +1,12 @@
 package com.room.backend.api.report.service;
 
 import com.room.backend.api.report.dto.request.CompareRoomRequestDTO;
+import com.room.backend.api.report.dto.response.CompareRoomResponseDTO;
 import com.room.backend.domain.checklist.repository.ChecklistItemRepository;
 import com.room.backend.domain.checklist.repository.ChecklistOptionRepository;
 import com.room.backend.domain.checklist.repository.RoomCheckResultRepository;
 import com.room.backend.domain.checklist.repository.RoomCheckSelectedOptionRepository;
+import com.room.backend.domain.room.entity.Room;
 import com.room.backend.domain.room.repository.RoomRepository;
 import com.room.backend.global.common.exception.GeneralException;
 import com.room.backend.global.common.exception.ReportErrorCode;
@@ -18,11 +20,16 @@ import org.springframework.http.HttpStatus;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -74,6 +81,57 @@ class ReportServiceTest {
 
         assertEquals(ReportErrorCode.FORBIDDEN_ROOM_ACCESS, ex.getErrorCode());
         assertEquals(HttpStatus.FORBIDDEN, ex.getErrorCode().getStatus());
+    }
+
+    @Test
+    @DisplayName("compareRooms - BASIC_INFO에 nullable enum/boolean이 섞여도 500 대신 정상 응답 (BC-RPT-03)")
+    void testCompareRoomsBasicInfoNullableFieldsDoNotThrow() {
+        Long roomId = 100L;
+        CompareRoomRequestDTO request = CompareRoomRequestDTO.builder()
+                .roomIds(List.of(roomId))
+                .categories(List.of("BASIC_INFO"))
+                .build();
+
+        when(roomRepository.countByIdInAndUserIdAndIsDeletedFalse(any(Collection.class), eq(USER_ID)))
+                .thenReturn(1L);
+
+        Room room = mock(Room.class);
+        lenient().when(room.getName()).thenReturn("테스트방");
+        lenient().when(room.getAddress()).thenReturn("서울 어딘가");
+        lenient().when(room.getRentType()).thenReturn(null);
+        lenient().when(room.getHasLoan()).thenReturn(null);
+        lenient().when(room.getCanRegisterAddress()).thenReturn(null);
+        when(roomRepository.findById(roomId)).thenReturn(Optional.of(room));
+
+        CompareRoomResponseDTO res = assertDoesNotThrow(
+                () -> reportService.compareRooms(USER_ID, request));
+        assertNotNull(res);
+        assertNotNull(res.getCompareData());
+    }
+
+    @Test
+    @DisplayName("compareRooms - BUILDING_INFO에 nullable enum/boolean이 섞여도 500 대신 정상 응답 (BC-RPT-03)")
+    void testCompareRoomsBuildingInfoNullableFieldsDoNotThrow() {
+        Long roomId = 101L;
+        CompareRoomRequestDTO request = CompareRoomRequestDTO.builder()
+                .roomIds(List.of(roomId))
+                .categories(List.of("BUILDING_INFO"))
+                .build();
+
+        when(roomRepository.countByIdInAndUserIdAndIsDeletedFalse(any(Collection.class), eq(USER_ID)))
+                .thenReturn(1L);
+
+        Room room = mock(Room.class);
+        lenient().when(room.getFloor()).thenReturn(3);
+        lenient().when(room.getBuildingType()).thenReturn(null);
+        lenient().when(room.getHasElevator()).thenReturn(null);
+        lenient().when(room.getDirection()).thenReturn(null);
+        when(roomRepository.findById(roomId)).thenReturn(Optional.of(room));
+
+        CompareRoomResponseDTO res = assertDoesNotThrow(
+                () -> reportService.compareRooms(USER_ID, request));
+        assertNotNull(res);
+        assertNotNull(res.getCompareData());
     }
 
     @Test

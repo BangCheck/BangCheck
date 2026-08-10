@@ -101,13 +101,13 @@ public class ReportService {
 
         items.add(buildRoomFieldItem("매물명", roomIds, room -> room.getName()));
         items.add(buildRoomFieldItem("주소", roomIds, room -> room.getAddress()));
-        items.add(buildRoomFieldItem("거래 유형", roomIds, room -> room.getRentType().name()));
+        items.add(buildRoomFieldItem("거래 유형", roomIds, room -> room.getRentType() != null ? room.getRentType().name() : null));
         items.add(buildRoomFieldItem("보증금(만원)", roomIds, room -> room.getDeposit() != null ? room.getDeposit().toString() : null));
         items.add(buildRoomFieldItem("월세(만원)", roomIds, room -> room.getMonthlyRent() != null ? room.getMonthlyRent().toString() : null));
         items.add(buildRoomFieldItem("관리비(만원)", roomIds, room -> room.getMaintenanceFee() != null ? room.getMaintenanceFee().toString() : null));
-        items.add(buildRoomFieldItem("융자 여부", roomIds, room -> room.getHasLoan().toString()));
+        items.add(buildRoomFieldItem("융자 여부", roomIds, room -> room.getHasLoan() != null ? room.getHasLoan().toString() : null));
         items.add(buildRoomFieldItem("융자 금액(만원)", roomIds, room -> room.getLoanAmount() != null ? room.getLoanAmount().toString() : null));
-        items.add(buildRoomFieldItem("전입 신고 가능여부", roomIds, room -> room.getCanRegisterAddress().toString()));
+        items.add(buildRoomFieldItem("전입 신고 가능여부", roomIds, room -> room.getCanRegisterAddress() != null ? room.getCanRegisterAddress().toString() : null));
         items.add(buildRoomFieldItem("입주가능일", roomIds, room -> room.getAvailableFrom() != null ? room.getAvailableFrom().toString() : null));
 
         return items.stream()
@@ -118,10 +118,10 @@ public class ReportService {
     private List<RoomCompareItemDTO> buildBuildingInfoItems(List<Long> roomIds) {
         List<RoomCompareItemDTO> items = new ArrayList<>();
 
-        items.add(buildRoomFieldItem("건물 유형", roomIds, room -> room.getBuildingType().name()));
+        items.add(buildRoomFieldItem("건물 유형", roomIds, room -> room.getBuildingType() != null ? room.getBuildingType().name() : null));
         items.add(buildRoomFieldItem("층수", roomIds, room -> room.getFloor() != null ? room.getFloor().toString() : null));
-        items.add(buildRoomFieldItem("엘리베이터", roomIds, room -> room.getHasElevator().toString()));
-        items.add(buildRoomFieldItem("방 방향", roomIds, room -> room.getDirection().getDescription()));
+        items.add(buildRoomFieldItem("엘리베이터", roomIds, room -> room.getHasElevator() != null ? room.getHasElevator().toString() : null));
+        items.add(buildRoomFieldItem("방 방향", roomIds, room -> room.getDirection() != null ? room.getDirection().getDescription() : null));
 
         return items.stream()
                 .filter(item -> !item.getRooms().isEmpty())
