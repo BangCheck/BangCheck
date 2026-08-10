@@ -19,7 +19,7 @@
 ## Step 1 — Select Page
 
 ```bash
-gh issue list --repo SWYP-Backend/project --label "유형:페이지" \
+gh issue list --repo BangCheck/BangCheck --label "유형:페이지" \
   --state open --json number,title,body --limit 20
 ```
 
@@ -98,7 +98,7 @@ gh issue view {page_num} --json body --jq .body > /tmp/body.md
 # AI finds the TC line in body and changes status
 # | TC-LOGIN-04 | ... | ⬜ | → | TC-LOGIN-04 | ... | ✅ |
 
-gh issue edit {page_num} --body "$(cat /tmp/body.md)" --repo SWYP-Backend/project
+gh issue edit {page_num} --body "$(cat /tmp/body.md)" --repo BangCheck/BangCheck
 ```
 
 ### 4-2. Fail (❌)

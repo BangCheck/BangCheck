@@ -25,7 +25,7 @@ Use variables already collected from the dashboard or step-03-render.
 If any variables are missing, supplement here:
 
 ```bash
-REPO="SWYP-Backend/project"
+REPO="BangCheck/BangCheck"
 
 # Blockers
 BLOCKER_ISSUES=$(gh issue list --repo $REPO --label "상태:블로킹" --state open \

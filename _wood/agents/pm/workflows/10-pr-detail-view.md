@@ -11,7 +11,7 @@
 ## Step 1 — PR Data Collection
 
 ```bash
-REPO="SWYP-Backend/project"
+REPO="BangCheck/BangCheck"
 
 ALL_PRS=$(gh pr list --repo $REPO --state open \
   --json number,title,author,labels,reviewRequests,reviews,body,createdAt,additions,deletions,changedFiles,headRefName,url \

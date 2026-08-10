@@ -6,7 +6,7 @@ version: ver1.1
 started: 2026-06-14
 focus: 사용성 개선 + API 핸들링 단위테스트
 
-repo: SWYP-Backend/BangCheck
+repo: BangCheck/BangCheck
 
 stack:
   fe: Vite + React 19        # NOT Next.js (D1 결정: 2026-05)

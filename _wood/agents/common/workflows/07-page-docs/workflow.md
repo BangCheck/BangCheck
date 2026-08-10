@@ -22,7 +22,7 @@ USER_LOGIN=$(gh api user --jq .login)
 ## Step 1 — List Existing Page Issues
 
 ```bash
-gh issue list --repo SWYP-Backend/BangCheck \
+gh issue list --repo BangCheck/BangCheck \
   --label "documentation" \
   --state open \
   --json number,title,labels \
@@ -78,10 +78,10 @@ Ask user: "어떤 페이지 이슈를 볼까요? (번호 또는 페이지명)"
 
 ```bash
 # By number
-gh issue view {number} --repo SWYP-Backend/BangCheck
+gh issue view {number} --repo BangCheck/BangCheck
 
 # By search
-gh issue list --repo SWYP-Backend/BangCheck \
+gh issue list --repo BangCheck/BangCheck \
   --label "documentation" \
   --search "{page_name}" \
   --json number,title \
@@ -96,7 +96,7 @@ Ask user: "이슈 번호와 업데이트할 항목을 알려주세요."
 
 1. Fetch current body:
 ```bash
-BODY=$(gh issue view {number} --repo SWYP-Backend/BangCheck --json body --jq .body)
+BODY=$(gh issue view {number} --repo BangCheck/BangCheck --json body --jq .body)
 ```
 
 2. Show current table to user.
@@ -110,7 +110,7 @@ BODY=$(gh issue view {number} --repo SWYP-Backend/BangCheck --json body --jq .bo
 
 5. On Y:
 ```bash
-gh issue edit {number} --repo SWYP-Backend/BangCheck --body "{updated_body}"
+gh issue edit {number} --repo BangCheck/BangCheck --body "{updated_body}"
 ```
 
 ---
@@ -134,7 +134,7 @@ Confirm before creating:
 On Y:
 ```bash
 gh issue create \
-  --repo SWYP-Backend/BangCheck \
+  --repo BangCheck/BangCheck \
   --title "[SCR-{PAGE}] 기능명세서 / API 명세서" \
   --label "documentation,프론트엔드" \
   --body "{filled_template}"

@@ -50,14 +50,14 @@ Number:
 ### Input A — Issue number
 
 ```bash
-gh issue view {N} --repo SWYP-Backend/project \
+gh issue view {N} --repo BangCheck/BangCheck \
   --json number,title,body,state,labels,assignees
 ```
 
 ### Input B — Active issue list
 
 ```bash
-gh issue list --repo SWYP-Backend/project \
+gh issue list --repo BangCheck/BangCheck \
   --milestone "$MILESTONE_NUM" --state open \
   --json number,title,assignees --limit 30
 ```

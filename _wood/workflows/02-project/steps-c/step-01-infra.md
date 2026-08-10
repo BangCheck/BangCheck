@@ -51,7 +51,7 @@ Create ONLY missing labels. Defined set:
 
 Command (skip existing):
 ```bash
-gh label create "{name}" --color "{color}" --description "{desc}" --repo SWYP-Backend/project 2>/dev/null || true
+gh label create "{name}" --color "{color}" --description "{desc}" --repo BangCheck/BangCheck 2>/dev/null || true
 ```
 
 ---
@@ -65,7 +65,7 @@ Please enter the first milestone name (default: Sprint 1):
 
 Create:
 ```bash
-gh api repos/SWYP-Backend/project/milestones \
+gh api repos/BangCheck/BangCheck/milestones \
   -f title="{name}" -f state="open" \
   -f description="SWYP — {name}"
 ```
@@ -76,12 +76,12 @@ gh api repos/SWYP-Backend/project/milestones \
 
 Check existing:
 ```bash
-gh project list --owner SWYP-Backend --format json
+gh project list --owner BangCheck --format json
 ```
 
 If none for SWYP:
 ```bash
-gh project create --owner SWYP-Backend --title "SWYP Room Checklist"
+gh project create --owner BangCheck --title "SWYP Room Checklist"
 ```
 
 Instruct user:

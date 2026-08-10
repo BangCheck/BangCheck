@@ -43,7 +43,7 @@ Cross-reference `application.yaml` `app.paths.*` for actual resolved paths.
 
 ```bash
 # Issues with BE label and open state
-gh issue list --repo SWYP-Backend/BangCheck \
+gh issue list --repo BangCheck/BangCheck \
   --label "백엔드" --state open \
   --json number,title | jq '.[] | {number, title}'
 ```

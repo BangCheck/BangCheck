@@ -54,7 +54,7 @@ forbidden_actions:
 
   <step n="4">Fetch and display assigned issue summary:
     ```bash
-    REPO="SWYP-Backend/BangCheck"
+    REPO="BangCheck/BangCheck"
     gh issue list --repo $REPO --assignee "$USER_LOGIN" --state open \
       --json number,title,labels,updatedAt --limit 10
     gh issue list --repo $REPO --assignee "$USER_LOGIN" \
