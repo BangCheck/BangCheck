@@ -285,6 +285,10 @@ export function DynamicOptionCards({
             <button
               key={opt}
               type="button"
+              // 이 버튼은 토글이다 — 누르면 선택되고 다시 누르면 해제된다.
+              // 선택 상태가 지금까지 클래스(border-2)로만 표현돼 스크린리더에는
+              // 아무 신호가 없었고, 테스트도 클래스를 읽어야 했다.
+              aria-pressed={active}
               onClick={() => onChange(active ? null : opt)}
               className={cn(
                 'flex items-center gap-1 sm:gap-2 lg:gap-3 p-2 sm:p-3 lg:p-4 rounded-[6px] transition-all cursor-pointer shadow-[0px_6px_8px_rgba(0,0,0,0.04)]',

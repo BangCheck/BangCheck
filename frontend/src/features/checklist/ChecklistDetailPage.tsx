@@ -9,6 +9,7 @@ import { useRoomDetail, useUpdateRoom, useDeleteRoom } from '@/features/rooms/ho
 import { useChecklistState } from './hooks/use-checklist-state';
 import { useChecklistItems } from './hooks/use-checklist-items';
 import { useSectionScroll } from './hooks/use-section-scroll';
+import { deriveInteriorFromAnswers, deriveSafetyFromAnswers } from './mappers';
 import { ChecklistPageHeader } from './components/ui/ChecklistPageHeader';
 import { ChecklistTabNav } from './components/ui/ChecklistTabNav';
 import { ChecklistSubmitFooter } from './components/ui/ChecklistSubmitFooter';
@@ -75,7 +76,11 @@ export default function ChecklistDetailPage() {
     setInterior(room.raw.interior);
     setSafety(room.raw.safety);
     setCustom(room.raw.custom);
-  }, [isLoggedIn, id, getGuestRoom, setBasic, setBuilding, setInterior, setSafety, setCustom]);
+    // 동적 항목은 answers 를 읽어 그려진다. 이것을 세팅하지 않으면 저장이 성공했어도
+    // 전부 미선택으로 보인다 (BC-ROOM-06).
+    // `?? {}` — 이 필드가 생기기 전에 저장된 방에는 answers 가 없다.
+    setAnswers(room.raw.answers ?? {});
+  }, [isLoggedIn, id, getGuestRoom, setBasic, setBuilding, setInterior, setSafety, setCustom, setAnswers]);
 
   const handleUpdate = async () => {
     if (!id || !basic.name.trim()) {
@@ -98,7 +103,14 @@ export default function ChecklistDetailPage() {
       return;
     }
 
-    const ok = updateGuestRoom(id, { basic, building, interior, safety, custom });
+    // 수정 경로도 생성 경로와 같은 모양이어야 한다.
+    // 동적 항목을 고치면 answers 만 바뀌고 interior/safety 는 그대로다 — 여기서
+    // 다시 파생하지 않으면 카드의 chip·score 가 편집 이전 값에 머문다.
+    const derivedInterior = deriveInteriorFromAnswers(checklistItems, answers, interior);
+    const derivedSafety = deriveSafetyFromAnswers(checklistItems, answers, safety);
+    const ok = updateGuestRoom(id, {
+      basic, building, interior: derivedInterior, safety: derivedSafety, custom, answers,
+    });
     if (!ok) {
       setSubmitError('수정에 실패했습니다. 방 정보를 찾을 수 없어요.');
       return;
