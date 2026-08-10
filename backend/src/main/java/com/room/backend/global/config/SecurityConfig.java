@@ -43,8 +43,6 @@ public class SecurityConfig {
                                 .requestMatchers(appPathProperties.getAuthBasePath()
                                                 + appPathProperties.getAuthOauthBasePath() + "/**")
                                 .permitAll()
-                                .requestMatchers(HttpMethod.POST, appPathProperties.getAuthBasePath() + "/guest")
-                                .permitAll()
 
                                 .requestMatchers("/oauth2/authorization/**").permitAll() // 추가
                                 .requestMatchers("/login/oauth2/code/**").permitAll() // 추가
