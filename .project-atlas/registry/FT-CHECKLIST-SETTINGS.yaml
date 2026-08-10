@@ -68,8 +68,16 @@ implementedBy:
   frontendEntry: frontend/src/features/customization/hooks/use-customization.ts#saveCurrentSettings
   switchedOver: false
 
+# 2026-08-10: defects.yaml 이 relatedFeature 로 이 feature 를 가리키는데
+#   여기 목록에는 없던 결함을 채웠다. 두 필드는 서로의 거울이 아니다 —
+#   relatedFeature 는 결함당 하나(주 귀속)이고 knownDefects 는 feature 가
+#   영향받는 결함 전부라 여러 feature 가 같은 ID 를 적는다. 다만 **주 귀속으로
+#   지목된 feature 가 그 결함을 모르고 있는 것**은 어느 쪽 해석으로도 맞지 않는다.
+#   REF-01 은 양쪽 다 "적힌 ID 가 정의돼 있는가"만 보고, 한쪽에만 적혀 있어도
+#   통과한다 — 그래서 드러나지 않았다.
 knownDefects:
   - BC-CHK-02
+  - BC-CHK-08
 
 tests:
   # BC-CHK-02 방어: 컨트롤러 진입 전에 @NotNull이 걸려 400으로 나가는지 검증한다.
