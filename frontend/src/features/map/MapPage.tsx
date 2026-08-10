@@ -489,8 +489,25 @@ export default function MapPage() {
     if (!targetRoomId || !mapReady || !mapInstanceRef.current) return;
 
     const targetRoom = rooms.find((room) => room.id === targetRoomId);
+
+    // 영영 도착할 수 없는 두 경우는 param 을 지워 대기 상태를 끝낸다.
+    //   1. 그 방이 없다 — 삭제됐거나 손으로 만든 URL 이다
+    //   2. 주소가 없다 — 아래 geocode 루프가 `rooms.filter(r => r.address)` 만
+    //      훑으므로 좌표가 생길 수 없다
+    // 지우지 않으면 roomId 가 URL 에 남아 이 effect 가 매 렌더 헛돈다.
+    // (목록의 위치 아이콘은 주소가 있을 때만 뜨므로 2 는 손으로 만든 URL 에서만 온다)
+    if (!targetRoom || !targetRoom.address) {
+      setSearchParams((current) => {
+        const next = new URLSearchParams(current);
+        next.delete('roomId');
+        return next;
+      }, { replace: true });
+      return;
+    }
+
+    // 아직 geocode 가 안 끝났을 수 있다 — param 을 남겨 두고 좌표가 채워지면 다시 돈다.
     const targetPosition = roomPositions[targetRoomId];
-    if (!targetRoom || !targetPosition) return;
+    if (!targetPosition) return;
 
     mapInstanceRef.current.setCenter(new window.naver.maps.LatLng(targetPosition.lat, targetPosition.lng));
     setSelectedRoomForRoute(targetRoom);
