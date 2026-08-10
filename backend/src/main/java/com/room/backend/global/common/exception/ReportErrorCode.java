@@ -4,7 +4,8 @@ import org.springframework.http.HttpStatus;
 
 public enum ReportErrorCode implements BaseErrorCode {
 
-    UNKNOWN_CATEGORY(HttpStatus.BAD_REQUEST, "REPORT_400_UNKNOWN_CATEGORY", "알 수 없는 카테고리 이름입니다.");
+    UNKNOWN_CATEGORY(HttpStatus.BAD_REQUEST, "REPORT_400_UNKNOWN_CATEGORY", "알 수 없는 카테고리 이름입니다."),
+    FORBIDDEN_ROOM_ACCESS(HttpStatus.FORBIDDEN, "REPORT_403_ROOM_ACCESS", "요청한 방에 대한 접근 권한이 없습니다.");
 
     private final HttpStatus status;
     private final String code;
