@@ -14,6 +14,7 @@
 22|realign checklist item type mapping|-389998292
 23|drop checklist item user type column|-268781951
 24|fix checklist item type classification|-100495127
+25|add checklist issue type|-17575840
 2|rename user id and add refresh tokens|616987860
 3|make email nullable|-1696195661
 4|add profile image url to users|1630049125
