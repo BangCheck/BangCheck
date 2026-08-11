@@ -14,7 +14,7 @@
 ### 1-1. Unassigned Issue List
 
 ```bash
-REPO="SWYP-Backend/project"
+REPO="BangCheck/BangCheck"
 
 UNASSIGNED=$(gh issue list --repo $REPO --state open \
   --json number,title,labels,url --limit 50 | \

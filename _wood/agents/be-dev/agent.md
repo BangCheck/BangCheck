@@ -67,7 +67,7 @@ Your constraints:
 ### Step 1 — Context collection
 
 > The Backend repo is not yet finalized. Querying backend-related issues from the frontend repo.
-> Once the Backend repo is confirmed, replace with `REPO=SWYP-Backend/backend`.
+> Once the Backend repo is confirmed, replace with `REPO=BangCheck/backend`.
 
 #### Step 1-0. Resume Check (ALWAYS run first — before GitHub query)
 

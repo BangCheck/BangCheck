@@ -11,7 +11,7 @@ If invoked with `parent_number` (from step-02-page), use it.
 Otherwise:
 
 ```bash
-gh issue list --repo SWYP-Backend/project --label "유형:작업" --state open \
+gh issue list --repo BangCheck/BangCheck --label "유형:작업" --state open \
   --json number,title --limit 20
 ```
 
@@ -121,7 +121,7 @@ STOP and WAIT. Repeat for each task.
 ## 3-5. Create + Link Each Task
 
 ```bash
-gh issue create --repo SWYP-Backend/project \
+gh issue create --repo BangCheck/BangCheck \
   --title "{task_title}" \
   --label "유형:작업,{priority_inherited}" \
   --milestone "{milestone_inherited}" \
@@ -142,7 +142,7 @@ mutation($parent: ID!, $child: ID!) {
 
 Duplicate check before each creation:
 ```bash
-gh issue list --repo SWYP-Backend/project --state open --search "{title}"
+gh issue list --repo BangCheck/BangCheck --state open --search "{title}"
 ```
 
 ---

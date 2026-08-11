@@ -33,10 +33,10 @@ policy:
 # Project Configuration (centrally managed — referenced by all agents/workflows)
 # ============================================================
 project:
-  primary_repo: "SWYP-Backend/BangCheck"  # current main repo
-  backend_repo: null                       # will be "SWYP-Backend/backend" once confirmed
+  primary_repo: "BangCheck/BangCheck"  # current main repo
+  backend_repo: null                       # will be "BangCheck/backend" once confirmed
   board:
-    owner: "SWYP-Backend"
+    owner: "BangCheck"
     number: 2
     id: "PVT_kwDOEFroms4BUmnd"            # from gh project view
     title: "SWYP Studio Checklist"

@@ -239,7 +239,7 @@ ID auto-assignment rules:
 
 ```bash
 # Update issue body
-gh issue edit {page_num} --body "$(cat /tmp/new_body.md)" --repo SWYP-Backend/project
+gh issue edit {page_num} --body "$(cat /tmp/new_body.md)" --repo BangCheck/BangCheck
 ```
 
 ---

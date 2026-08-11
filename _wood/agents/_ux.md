@@ -14,7 +14,7 @@ Always render issue/PR numbers as clickable markdown links:
 
 ```
 ❌ Bad:   "#5 Login Form UI"
-✅ Good:  "[#5 Login Form UI](https://github.com/SWYP-Backend/project/issues/5)"
+✅ Good:  "[#5 Login Form UI](https://github.com/BangCheck/BangCheck/issues/5)"
 ```
 
 Always render member names with profile links:

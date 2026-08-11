@@ -39,16 +39,16 @@ Required values before any `gh issue create`: `repo` (from `git remote get-url o
 **GitHub Projects board linking is MANDATORY after every issue creation:**
 ```bash
 # Store issue URL from gh issue create output, then:
-gh project item-add 2 --owner SWYP-Backend --url {issue-url}
+gh project item-add 2 --owner BangCheck --url {issue-url}
 ```
-Project: `2` (SWYP Checklist, owner: SWYP-Backend). Run this immediately after every `gh issue create`.
+Project: `2` (SWYP Checklist, owner: BangCheck). Run this immediately after every `gh issue create`.
 
 ---
 
 ## Pre-checks
 
 1. `gh auth status` — stop if not authenticated
-2. `git remote get-url origin` — resolve `{repo}` (e.g. `SWYP-Backend/project`)
+2. `git remote get-url origin` — resolve `{repo}` (e.g. `BangCheck/BangCheck`)
 3. Duplicate check — search for similar titles and warn
 
 ---
@@ -138,7 +138,7 @@ gh issue create --repo {repo} --title "[page] {title}" \
   --milestone "{milestone}" \
   --body "{body: description + task list + API + test cases + completion criteria}"
 # Capture the output URL, then immediately link to project board:
-gh project item-add 2 --owner SWYP-Backend --url {issue-url}
+gh project item-add 2 --owner BangCheck --url {issue-url}
 ```
 
 After creation: "Would you like to create individual task issues from the task list?" → if Y, batch create
@@ -156,7 +156,7 @@ gh issue create --repo {repo} --title "[task] {title}" \
   --milestone "{milestone}" \
   --body "Parent: #{parent}\n\n## Implementation Details\n{desc}\n\n## Completion Criteria\n- [ ] Feature works correctly\n- [ ] Code conventions followed"
 # Immediately link to project board:
-gh project item-add 2 --owner SWYP-Backend --url {issue-url}
+gh project item-add 2 --owner BangCheck --url {issue-url}
 ```
 
 After creation, automatically add issue number to parent checklist
@@ -177,7 +177,7 @@ Keyword-based priority recommendation:
 gh issue create --repo {repo} --title "[bug] {title}" \
   --body "{Steps to reproduce + expected/actual result + environment + screenshot}"
 # Immediately link to project board:
-gh project item-add 2 --owner SWYP-Backend --url {issue-url}
+gh project item-add 2 --owner BangCheck --url {issue-url}
 ```
 
 ---

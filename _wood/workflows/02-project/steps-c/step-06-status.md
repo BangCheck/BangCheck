@@ -27,7 +27,7 @@ Show current state, ask for new:
 gh issue edit {n} \
   --remove-label "{current_status}" \
   --add-label "{new_status}" \
-  --repo SWYP-Backend/project
+  --repo BangCheck/BangCheck
 ```
 
 Special handling:

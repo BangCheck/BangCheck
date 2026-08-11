@@ -21,15 +21,15 @@ Required: `gh auth`, correct repo, user role identified.
 
 ```bash
 # Labels
-gh label list --repo SWYP-Backend/project --json name --limit 100 --jq '.[].name'
+gh label list --repo BangCheck/BangCheck --json name --limit 100 --jq '.[].name'
 
 # Projects (GitHub milestones)
-gh api repos/SWYP-Backend/project/milestones \
+gh api repos/BangCheck/BangCheck/milestones \
   --jq '.[] | "\(.title)|\(.open_issues)|\(.closed_issues)|\(.state)"'
 
 # Issue summary
-gh issue list --repo SWYP-Backend/project --state open --json number,title,labels --limit 50
-gh issue list --repo SWYP-Backend/project --state closed --json number --limit 1 --jq length
+gh issue list --repo BangCheck/BangCheck --state open --json number,title,labels --limit 50
+gh issue list --repo BangCheck/BangCheck --state closed --json number --limit 1 --jq length
 ```
 
 ### Display (exact format)
