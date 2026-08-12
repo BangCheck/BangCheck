@@ -1,16 +1,16 @@
 {
   "generator": ".project-atlas/tools/pm_snapshot.py",
   "note": "생성물이다. 원천은 registry와 코드다. 직접 편집하지 않는다.",
-  "sourceDigest": "b74a93c7d367e1ab024bec3357605bd8d7e9e72863d2d6377b4477c6e882fdae",
+  "sourceDigest": "3913f4b758fe69dd6efd2809b8a78c622c4f910ebfb16a8db503f2c51d48586e",
   "pages": [
     {
       "page": "/",
-      "component": "frontend\\src\\features\\landing\\LandingPage.tsx",
+      "component": "frontend/src/features/landing/LandingPage.tsx",
       "features": []
     },
     {
       "page": "/auth/callback/:provider",
-      "component": "frontend\\src\\features\\auth\\AuthCallbackPage.tsx",
+      "component": "frontend/src/features/auth/AuthCallbackPage.tsx",
       "features": [
         {
           "featureId": "FT-AUTH-OAUTH-LOGIN",
@@ -23,7 +23,7 @@
               "route": "GET /api/v1/auth/oauth2/{}/callback",
               "auth": "PUBLIC",
               "safety": "EXTERNAL",
-              "frontend": "frontend\\src\\services\\auth-service.ts:27"
+              "frontend": "frontend/src/services/auth-service.ts:27"
             }
           ],
           "defects": [
@@ -64,7 +64,7 @@
             "backend/src/test/java/com/room/backend/global/auth/oauth/service/OAuthStateServiceTest.java"
           ],
           "front": {
-            "path": "frontend\\src\\services\\auth-service.ts:27",
+            "path": "frontend/src/services/auth-service.ts:27",
             "state": "built"
           },
           "back": {
@@ -76,7 +76,7 @@
     },
     {
       "page": "/checklist/:id",
-      "component": "frontend\\src\\features\\checklist\\ChecklistDetailPage.tsx",
+      "component": "frontend/src/features/checklist/ChecklistDetailPage.tsx",
       "features": [
         {
           "featureId": "FT-ROOM-DELETE",
@@ -89,13 +89,13 @@
               "route": "DELETE /api/v1/rooms/{}",
               "auth": "JWT",
               "safety": "WRITE",
-              "frontend": "frontend\\src\\services\\room-service.ts:29"
+              "frontend": "frontend/src/services/room-service.ts:29"
             }
           ],
           "defects": [],
           "tests": [],
           "front": {
-            "path": "frontend\\src\\services\\room-service.ts:29",
+            "path": "frontend/src/services/room-service.ts:29",
             "state": "built"
           },
           "back": {
@@ -114,7 +114,7 @@
               "route": "GET /api/checklist/items",
               "auth": "JWT",
               "safety": "READ",
-              "frontend": "frontend\\src\\services\\custom-checklist-service.ts:9"
+              "frontend": "frontend/src/services/custom-checklist-service.ts:9"
             }
           ],
           "defects": [
@@ -153,7 +153,7 @@
           ],
           "tests": [],
           "front": {
-            "path": "frontend\\src\\services\\custom-checklist-service.ts:9",
+            "path": "frontend/src/services/custom-checklist-service.ts:9",
             "state": "built"
           },
           "back": {
@@ -172,18 +172,37 @@
               "route": "GET /api/v1/address/search",
               "auth": "PUBLIC",
               "safety": "EXTERNAL",
-              "frontend": "frontend\\src\\services\\address-service.ts:11"
+              "frontend": "frontend/src/services/address-service.ts:11"
             }
           ],
-          "defects": [],
-          "tests": [],
+          "defects": [
+            {
+              "id": "BC-ADDR-01",
+              "severity": "P1",
+              "title": "juso.go.kr provider 오류가 미래핑으로 샌다",
+              "detail": "RestClient의 4xx·5xx·timeout을 잡지 않아 GlobalExceptionHandler의 마지막 분기에서 COMMON_500이 된다. 사용자는 원인을 알 수 없다. ver1.1 P1 silent-500-juso와 동일 항목. BC-REG-04(geocoding)와 같은 패턴.",
+              "disposition": "FIX_PLANNED",
+              "evidence": {
+                "path": "backend/src/main/java/com/room/backend/api/address/service/AddressSearchService.java",
+                "symbol": "getLegitAddress",
+                "line": null
+              },
+              "relatedFeature": "FT-ADDRESS-SEARCH",
+              "relatedStory": null,
+              "issue": 309,
+              "lifecycle": "TRACKED"
+            }
+          ],
+          "tests": [
+            "backend/src/test/java/com/room/backend/api/address/service/AddressSearchServiceTest.java"
+          ],
           "front": {
-            "path": "frontend\\src\\services\\address-service.ts:11",
+            "path": "frontend/src/services/address-service.ts:11",
             "state": "built"
           },
           "back": {
             "path": "backend/src/main/java/com/room/backend/api/address/service/AddressSearchService.java",
-            "state": "built"
+            "state": "defect"
           }
         },
         {
@@ -197,7 +216,7 @@
               "route": "GET /api/v1/rooms",
               "auth": "JWT",
               "safety": "READ",
-              "frontend": "frontend\\src\\services\\room-service.ts:19"
+              "frontend": "frontend/src/services/room-service.ts:19"
             }
           ],
           "defects": [
@@ -252,7 +271,7 @@
           ],
           "tests": [],
           "front": {
-            "path": "frontend\\src\\services\\room-service.ts:19",
+            "path": "frontend/src/services/room-service.ts:19",
             "state": "built"
           },
           "back": {
@@ -271,13 +290,13 @@
               "route": "GET /api/v1/rooms/{}",
               "auth": "JWT",
               "safety": "READ",
-              "frontend": "frontend\\src\\services\\room-service.ts:33"
+              "frontend": "frontend/src/services/room-service.ts:33"
             }
           ],
           "defects": [],
           "tests": [],
           "front": {
-            "path": "frontend\\src\\services\\room-service.ts:33",
+            "path": "frontend/src/services/room-service.ts:33",
             "state": "built"
           },
           "back": {
@@ -296,7 +315,7 @@
               "route": "POST /api/v1/auth/logout",
               "auth": "JWT",
               "safety": "WRITE",
-              "frontend": "frontend\\src\\services\\auth-service.ts:41"
+              "frontend": "frontend/src/services/auth-service.ts:41"
             }
           ],
           "defects": [
@@ -319,7 +338,7 @@
           ],
           "tests": [],
           "front": {
-            "path": "frontend\\src\\services\\auth-service.ts:41",
+            "path": "frontend/src/services/auth-service.ts:41",
             "state": "built"
           },
           "back": {
@@ -338,7 +357,7 @@
               "route": "PUT /api/v1/rooms/{}",
               "auth": "JWT",
               "safety": "WRITE",
-              "frontend": "frontend\\src\\services\\room-service.ts:64"
+              "frontend": "frontend/src/services/room-service.ts:64"
             }
           ],
           "defects": [
@@ -393,7 +412,7 @@
           ],
           "tests": [],
           "front": {
-            "path": "frontend\\src\\services\\room-service.ts:64",
+            "path": "frontend/src/services/room-service.ts:64",
             "state": "built"
           },
           "back": {
@@ -405,7 +424,7 @@
     },
     {
       "page": "/checklist/new",
-      "component": "frontend\\src\\features\\checklist\\ChecklistNewPage.tsx",
+      "component": "frontend/src/features/checklist/ChecklistNewPage.tsx",
       "features": [
         {
           "featureId": "FT-CHECKLIST-CATALOG",
@@ -418,7 +437,7 @@
               "route": "GET /api/checklist/items",
               "auth": "JWT",
               "safety": "READ",
-              "frontend": "frontend\\src\\services\\custom-checklist-service.ts:9"
+              "frontend": "frontend/src/services/custom-checklist-service.ts:9"
             }
           ],
           "defects": [
@@ -457,7 +476,7 @@
           ],
           "tests": [],
           "front": {
-            "path": "frontend\\src\\services\\custom-checklist-service.ts:9",
+            "path": "frontend/src/services/custom-checklist-service.ts:9",
             "state": "built"
           },
           "back": {
@@ -476,18 +495,37 @@
               "route": "GET /api/v1/address/search",
               "auth": "PUBLIC",
               "safety": "EXTERNAL",
-              "frontend": "frontend\\src\\services\\address-service.ts:11"
+              "frontend": "frontend/src/services/address-service.ts:11"
             }
           ],
-          "defects": [],
-          "tests": [],
+          "defects": [
+            {
+              "id": "BC-ADDR-01",
+              "severity": "P1",
+              "title": "juso.go.kr provider 오류가 미래핑으로 샌다",
+              "detail": "RestClient의 4xx·5xx·timeout을 잡지 않아 GlobalExceptionHandler의 마지막 분기에서 COMMON_500이 된다. 사용자는 원인을 알 수 없다. ver1.1 P1 silent-500-juso와 동일 항목. BC-REG-04(geocoding)와 같은 패턴.",
+              "disposition": "FIX_PLANNED",
+              "evidence": {
+                "path": "backend/src/main/java/com/room/backend/api/address/service/AddressSearchService.java",
+                "symbol": "getLegitAddress",
+                "line": null
+              },
+              "relatedFeature": "FT-ADDRESS-SEARCH",
+              "relatedStory": null,
+              "issue": 309,
+              "lifecycle": "TRACKED"
+            }
+          ],
+          "tests": [
+            "backend/src/test/java/com/room/backend/api/address/service/AddressSearchServiceTest.java"
+          ],
           "front": {
-            "path": "frontend\\src\\services\\address-service.ts:11",
+            "path": "frontend/src/services/address-service.ts:11",
             "state": "built"
           },
           "back": {
             "path": "backend/src/main/java/com/room/backend/api/address/service/AddressSearchService.java",
-            "state": "built"
+            "state": "defect"
           }
         },
         {
@@ -501,7 +539,7 @@
               "route": "GET /api/v1/rooms",
               "auth": "JWT",
               "safety": "READ",
-              "frontend": "frontend\\src\\services\\room-service.ts:19"
+              "frontend": "frontend/src/services/room-service.ts:19"
             }
           ],
           "defects": [
@@ -556,7 +594,7 @@
           ],
           "tests": [],
           "front": {
-            "path": "frontend\\src\\services\\room-service.ts:19",
+            "path": "frontend/src/services/room-service.ts:19",
             "state": "built"
           },
           "back": {
@@ -575,7 +613,7 @@
               "route": "POST /api/v1/auth/logout",
               "auth": "JWT",
               "safety": "WRITE",
-              "frontend": "frontend\\src\\services\\auth-service.ts:41"
+              "frontend": "frontend/src/services/auth-service.ts:41"
             }
           ],
           "defects": [
@@ -598,7 +636,7 @@
           ],
           "tests": [],
           "front": {
-            "path": "frontend\\src\\services\\auth-service.ts:41",
+            "path": "frontend/src/services/auth-service.ts:41",
             "state": "built"
           },
           "back": {
@@ -617,7 +655,7 @@
               "route": "POST /api/v1/rooms/check-results",
               "auth": "JWT",
               "safety": "WRITE",
-              "frontend": "frontend\\src\\services\\room-service.ts:47"
+              "frontend": "frontend/src/services/room-service.ts:47"
             }
           ],
           "defects": [
@@ -736,7 +774,7 @@
           ],
           "tests": [],
           "front": {
-            "path": "frontend\\src\\services\\room-service.ts:47",
+            "path": "frontend/src/services/room-service.ts:47",
             "state": "defect"
           },
           "back": {
@@ -748,7 +786,7 @@
     },
     {
       "page": "/custom",
-      "component": "frontend\\src\\features\\customization\\SettingsPage.tsx",
+      "component": "frontend/src/features/customization/SettingsPage.tsx",
       "features": [
         {
           "featureId": "FT-CHECKLIST-CUSTOM-ITEM",
@@ -761,14 +799,14 @@
               "route": "DELETE /api/checklist/items/custom/{}",
               "auth": "JWT",
               "safety": "WRITE",
-              "frontend": "frontend\\src\\services\\custom-checklist-service.ts:68"
+              "frontend": "frontend/src/services/custom-checklist-service.ts:68"
             },
             {
               "operationId": "OP-CHECKLIST-CUSTOM-ITEM-ADD",
               "route": "POST /api/checklist/items/custom",
               "auth": "JWT",
               "safety": "WRITE",
-              "frontend": "frontend\\src\\services\\custom-checklist-service.ts:63"
+              "frontend": "frontend/src/services/custom-checklist-service.ts:63"
             }
           ],
           "defects": [
@@ -858,7 +896,7 @@
             "backend/src/test/java/com/room/backend/domain/checklist/dto/request/CustomItemCreateRequestTest.java"
           ],
           "front": {
-            "path": "frontend\\src\\services\\custom-checklist-service.ts:68",
+            "path": "frontend/src/services/custom-checklist-service.ts:68",
             "state": "built"
           },
           "back": {
@@ -877,28 +915,28 @@
               "route": "DELETE /api/checklist/types/{}",
               "auth": "JWT",
               "safety": "WRITE",
-              "frontend": "frontend\\src\\services\\custom-checklist-service.ts:49"
+              "frontend": "frontend/src/services/custom-checklist-service.ts:49"
             },
             {
               "operationId": "OP-CHECKLIST-TYPES-LIST",
               "route": "GET /api/checklist/types",
               "auth": "JWT",
               "safety": "READ",
-              "frontend": "frontend\\src\\services\\custom-checklist-service.ts:38"
+              "frontend": "frontend/src/services/custom-checklist-service.ts:38"
             },
             {
               "operationId": "OP-CHECKLIST-SETTINGS-SAVE",
               "route": "POST /api/checklist/items/settings",
               "auth": "JWT",
               "safety": "WRITE",
-              "frontend": "frontend\\src\\services\\custom-checklist-service.ts:57"
+              "frontend": "frontend/src/services/custom-checklist-service.ts:57"
             },
             {
               "operationId": "OP-CHECKLIST-TYPE-SELECT",
               "route": "POST /api/checklist/types/{}",
               "auth": "JWT",
               "safety": "WRITE",
-              "frontend": "frontend\\src\\services\\custom-checklist-service.ts:44"
+              "frontend": "frontend/src/services/custom-checklist-service.ts:44"
             }
           ],
           "defects": [
@@ -939,7 +977,7 @@
             "backend/src/test/java/com/room/backend/domain/checklist/dto/request/ChecklistSettingsRequestTest.java"
           ],
           "front": {
-            "path": "frontend\\src\\services\\custom-checklist-service.ts:49",
+            "path": "frontend/src/services/custom-checklist-service.ts:49",
             "state": "built"
           },
           "back": {
@@ -958,14 +996,14 @@
               "route": "GET /api/checklist/items",
               "auth": "JWT",
               "safety": "READ",
-              "frontend": "frontend\\src\\services\\custom-checklist-service.ts:9"
+              "frontend": "frontend/src/services/custom-checklist-service.ts:9"
             },
             {
               "operationId": "OP-CHECKLIST-ITEMS-ALL",
               "route": "GET /api/checklist/items/all",
               "auth": "JWT",
               "safety": "READ",
-              "frontend": "frontend\\src\\services\\custom-checklist-service.ts:31"
+              "frontend": "frontend/src/services/custom-checklist-service.ts:31"
             }
           ],
           "defects": [
@@ -1004,7 +1042,7 @@
           ],
           "tests": [],
           "front": {
-            "path": "frontend\\src\\services\\custom-checklist-service.ts:9",
+            "path": "frontend/src/services/custom-checklist-service.ts:9",
             "state": "built"
           },
           "back": {
@@ -1023,7 +1061,7 @@
               "route": "GET /api/v1/rooms",
               "auth": "JWT",
               "safety": "READ",
-              "frontend": "frontend\\src\\services\\room-service.ts:19"
+              "frontend": "frontend/src/services/room-service.ts:19"
             }
           ],
           "defects": [
@@ -1078,7 +1116,7 @@
           ],
           "tests": [],
           "front": {
-            "path": "frontend\\src\\services\\room-service.ts:19",
+            "path": "frontend/src/services/room-service.ts:19",
             "state": "built"
           },
           "back": {
@@ -1097,7 +1135,7 @@
               "route": "POST /api/v1/auth/logout",
               "auth": "JWT",
               "safety": "WRITE",
-              "frontend": "frontend\\src\\services\\auth-service.ts:41"
+              "frontend": "frontend/src/services/auth-service.ts:41"
             }
           ],
           "defects": [
@@ -1120,7 +1158,7 @@
           ],
           "tests": [],
           "front": {
-            "path": "frontend\\src\\services\\auth-service.ts:41",
+            "path": "frontend/src/services/auth-service.ts:41",
             "state": "built"
           },
           "back": {
@@ -1132,7 +1170,7 @@
     },
     {
       "page": "/login",
-      "component": "frontend\\src\\features\\login\\LoginPage.tsx",
+      "component": "frontend/src/features/login/LoginPage.tsx",
       "features": [
         {
           "featureId": "FT-AUTH-OAUTH-LOGIN",
@@ -1145,7 +1183,7 @@
               "route": "GET /api/v1/auth/oauth2/{}",
               "auth": "PUBLIC",
               "safety": "READ",
-              "frontend": "frontend\\src\\services\\auth-service.ts:5"
+              "frontend": "frontend/src/services/auth-service.ts:5"
             }
           ],
           "defects": [
@@ -1186,7 +1224,7 @@
             "backend/src/test/java/com/room/backend/global/auth/oauth/service/OAuthStateServiceTest.java"
           ],
           "front": {
-            "path": "frontend\\src\\services\\auth-service.ts:5",
+            "path": "frontend/src/services/auth-service.ts:5",
             "state": "built"
           },
           "back": {
@@ -1205,7 +1243,7 @@
               "route": "GET /api/v1/rooms",
               "auth": "JWT",
               "safety": "READ",
-              "frontend": "frontend\\src\\services\\room-service.ts:19"
+              "frontend": "frontend/src/services/room-service.ts:19"
             }
           ],
           "defects": [
@@ -1260,7 +1298,7 @@
           ],
           "tests": [],
           "front": {
-            "path": "frontend\\src\\services\\room-service.ts:19",
+            "path": "frontend/src/services/room-service.ts:19",
             "state": "built"
           },
           "back": {
@@ -1279,7 +1317,7 @@
               "route": "POST /api/v1/auth/logout",
               "auth": "JWT",
               "safety": "WRITE",
-              "frontend": "frontend\\src\\services\\auth-service.ts:41"
+              "frontend": "frontend/src/services/auth-service.ts:41"
             }
           ],
           "defects": [
@@ -1302,7 +1340,7 @@
           ],
           "tests": [],
           "front": {
-            "path": "frontend\\src\\services\\auth-service.ts:41",
+            "path": "frontend/src/services/auth-service.ts:41",
             "state": "built"
           },
           "back": {
@@ -1314,12 +1352,12 @@
     },
     {
       "page": "/login-error",
-      "component": "frontend\\src\\features\\auth\\LoginErrorPage.tsx",
+      "component": "frontend/src/features/auth/LoginErrorPage.tsx",
       "features": []
     },
     {
       "page": "/map",
-      "component": "frontend\\src\\features\\map\\MapPage.tsx",
+      "component": "frontend/src/features/map/MapPage.tsx",
       "features": [
         {
           "featureId": "FT-DIRECTIONS-WALKING",
@@ -1332,13 +1370,13 @@
               "route": "GET /api/v1/directions/walking",
               "auth": "PUBLIC",
               "safety": "EXTERNAL",
-              "frontend": "frontend\\src\\services\\directions-service.ts:7"
+              "frontend": "frontend/src/services/directions-service.ts:7"
             }
           ],
           "defects": [],
           "tests": [],
           "front": {
-            "path": "frontend\\src\\services\\directions-service.ts:7",
+            "path": "frontend/src/services/directions-service.ts:7",
             "state": "built"
           },
           "back": {
@@ -1357,7 +1395,7 @@
               "route": "GET /api/v1/rooms",
               "auth": "JWT",
               "safety": "READ",
-              "frontend": "frontend\\src\\services\\room-service.ts:19"
+              "frontend": "frontend/src/services/room-service.ts:19"
             }
           ],
           "defects": [
@@ -1412,7 +1450,7 @@
           ],
           "tests": [],
           "front": {
-            "path": "frontend\\src\\services\\room-service.ts:19",
+            "path": "frontend/src/services/room-service.ts:19",
             "state": "built"
           },
           "back": {
@@ -1431,7 +1469,7 @@
               "route": "POST /api/v1/auth/logout",
               "auth": "JWT",
               "safety": "WRITE",
-              "frontend": "frontend\\src\\services\\auth-service.ts:41"
+              "frontend": "frontend/src/services/auth-service.ts:41"
             }
           ],
           "defects": [
@@ -1454,7 +1492,7 @@
           ],
           "tests": [],
           "front": {
-            "path": "frontend\\src\\services\\auth-service.ts:41",
+            "path": "frontend/src/services/auth-service.ts:41",
             "state": "built"
           },
           "back": {
@@ -1466,7 +1504,7 @@
     },
     {
       "page": "/my",
-      "component": "frontend\\src\\features\\mypage\\MyPage.tsx",
+      "component": "frontend/src/features/mypage/MyPage.tsx",
       "features": [
         {
           "featureId": "FT-ROOM-LIST",
@@ -1479,7 +1517,7 @@
               "route": "GET /api/v1/rooms",
               "auth": "JWT",
               "safety": "READ",
-              "frontend": "frontend\\src\\services\\room-service.ts:19"
+              "frontend": "frontend/src/services/room-service.ts:19"
             }
           ],
           "defects": [
@@ -1534,7 +1572,7 @@
           ],
           "tests": [],
           "front": {
-            "path": "frontend\\src\\services\\room-service.ts:19",
+            "path": "frontend/src/services/room-service.ts:19",
             "state": "built"
           },
           "back": {
@@ -1553,7 +1591,7 @@
               "route": "POST /api/v1/auth/logout",
               "auth": "JWT",
               "safety": "WRITE",
-              "frontend": "frontend\\src\\services\\auth-service.ts:41"
+              "frontend": "frontend/src/services/auth-service.ts:41"
             }
           ],
           "defects": [
@@ -1576,7 +1614,7 @@
           ],
           "tests": [],
           "front": {
-            "path": "frontend\\src\\services\\auth-service.ts:41",
+            "path": "frontend/src/services/auth-service.ts:41",
             "state": "built"
           },
           "back": {
@@ -1588,17 +1626,17 @@
     },
     {
       "page": "/project-map",
-      "component": "frontend\\src\\features\\research\\ResearchPage.tsx",
+      "component": "frontend/src/features/research/ResearchPage.tsx",
       "features": []
     },
     {
       "page": "/project-map/:pageId",
-      "component": "frontend\\src\\features\\project-atlas\\ProjectAtlasPage.tsx",
+      "component": "frontend/src/features/project-atlas/ProjectAtlasPage.tsx",
       "features": []
     },
     {
       "page": "/report",
-      "component": "frontend\\src\\features\\report\\ReportPage.tsx",
+      "component": "frontend/src/features/report/ReportPage.tsx",
       "features": [
         {
           "featureId": "FT-CHECKLIST-CATALOG",
@@ -1611,7 +1649,7 @@
               "route": "GET /api/checklist/items",
               "auth": "JWT",
               "safety": "READ",
-              "frontend": "frontend\\src\\services\\custom-checklist-service.ts:9"
+              "frontend": "frontend/src/services/custom-checklist-service.ts:9"
             }
           ],
           "defects": [
@@ -1650,7 +1688,7 @@
           ],
           "tests": [],
           "front": {
-            "path": "frontend\\src\\services\\custom-checklist-service.ts:9",
+            "path": "frontend/src/services/custom-checklist-service.ts:9",
             "state": "built"
           },
           "back": {
@@ -1669,7 +1707,7 @@
               "route": "GET /api/v1/rooms",
               "auth": "JWT",
               "safety": "READ",
-              "frontend": "frontend\\src\\services\\room-service.ts:19"
+              "frontend": "frontend/src/services/room-service.ts:19"
             }
           ],
           "defects": [
@@ -1724,7 +1762,7 @@
           ],
           "tests": [],
           "front": {
-            "path": "frontend\\src\\services\\room-service.ts:19",
+            "path": "frontend/src/services/room-service.ts:19",
             "state": "built"
           },
           "back": {
@@ -1743,13 +1781,13 @@
               "route": "GET /api/v1/rooms/{}",
               "auth": "JWT",
               "safety": "READ",
-              "frontend": "frontend\\src\\services\\room-service.ts:33"
+              "frontend": "frontend/src/services/room-service.ts:33"
             }
           ],
           "defects": [],
           "tests": [],
           "front": {
-            "path": "frontend\\src\\services\\room-service.ts:33",
+            "path": "frontend/src/services/room-service.ts:33",
             "state": "built"
           },
           "back": {
@@ -1768,7 +1806,7 @@
               "route": "POST /api/v1/auth/logout",
               "auth": "JWT",
               "safety": "WRITE",
-              "frontend": "frontend\\src\\services\\auth-service.ts:41"
+              "frontend": "frontend/src/services/auth-service.ts:41"
             }
           ],
           "defects": [
@@ -1791,7 +1829,7 @@
           ],
           "tests": [],
           "front": {
-            "path": "frontend\\src\\services\\auth-service.ts:41",
+            "path": "frontend/src/services/auth-service.ts:41",
             "state": "built"
           },
           "back": {
@@ -1803,7 +1841,7 @@
     },
     {
       "page": "/rooms",
-      "component": "frontend\\src\\features\\rooms\\pages\\RoomsPage.tsx",
+      "component": "frontend/src/features/rooms/pages/RoomsPage.tsx",
       "features": [
         {
           "featureId": "FT-ROOM-DELETE",
@@ -1816,13 +1854,13 @@
               "route": "DELETE /api/v1/rooms/{}",
               "auth": "JWT",
               "safety": "WRITE",
-              "frontend": "frontend\\src\\services\\room-service.ts:29"
+              "frontend": "frontend/src/services/room-service.ts:29"
             }
           ],
           "defects": [],
           "tests": [],
           "front": {
-            "path": "frontend\\src\\services\\room-service.ts:29",
+            "path": "frontend/src/services/room-service.ts:29",
             "state": "built"
           },
           "back": {
@@ -1841,7 +1879,7 @@
               "route": "GET /api/checklist/items",
               "auth": "JWT",
               "safety": "READ",
-              "frontend": "frontend\\src\\services\\custom-checklist-service.ts:9"
+              "frontend": "frontend/src/services/custom-checklist-service.ts:9"
             }
           ],
           "defects": [
@@ -1880,7 +1918,7 @@
           ],
           "tests": [],
           "front": {
-            "path": "frontend\\src\\services\\custom-checklist-service.ts:9",
+            "path": "frontend/src/services/custom-checklist-service.ts:9",
             "state": "built"
           },
           "back": {
@@ -1899,7 +1937,7 @@
               "route": "GET /api/v1/rooms",
               "auth": "JWT",
               "safety": "READ",
-              "frontend": "frontend\\src\\services\\room-service.ts:19"
+              "frontend": "frontend/src/services/room-service.ts:19"
             }
           ],
           "defects": [
@@ -1954,7 +1992,7 @@
           ],
           "tests": [],
           "front": {
-            "path": "frontend\\src\\services\\room-service.ts:19",
+            "path": "frontend/src/services/room-service.ts:19",
             "state": "built"
           },
           "back": {
@@ -1973,7 +2011,7 @@
               "route": "POST /api/v1/auth/logout",
               "auth": "JWT",
               "safety": "WRITE",
-              "frontend": "frontend\\src\\services\\auth-service.ts:41"
+              "frontend": "frontend/src/services/auth-service.ts:41"
             }
           ],
           "defects": [
@@ -1996,7 +2034,7 @@
           ],
           "tests": [],
           "front": {
-            "path": "frontend\\src\\services\\auth-service.ts:41",
+            "path": "frontend/src/services/auth-service.ts:41",
             "state": "built"
           },
           "back": {
