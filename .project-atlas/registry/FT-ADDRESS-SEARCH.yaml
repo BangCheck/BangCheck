@@ -32,9 +32,13 @@ implementedBy:
   frontendEntry: frontend/src/services/address-service.ts#searchAddress
   switchedOver: false
 
-knownDefects: []
+knownDefects:
+  - BC-ADDR-01
 
-tests: []   # 2026-08-04 main 기준 이 기능을 덮는 test 없음
+tests:
+  # BC-ADDR-01 방어: juso.go.kr 4xx/5xx/timeout이 500으로 새지 않고
+  # 502·503으로 재매핑되는지 검증한다.
+  - backend/src/test/java/com/room/backend/api/address/service/AddressSearchServiceTest.java
 
 sliceShapeNotes:
   - 외부 API 의존이라 우리 DB 스키마와 무관하게 바뀐다.
