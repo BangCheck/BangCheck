@@ -39,8 +39,12 @@ class CookieProviderTest {
         assertNotEquals("None", cookie.getSameSite(), "SameSite=None은 교차 사이트 전송을 허용한다");
     }
 
+    // 덮어쓰기 자체는 SameSite와 무관하다 — 브라우저가 기존 쿠키를 교체하는 기준은
+    // (name, domain, path) 뿐이다(RFC 6265bis 저장 모델). 그러니 이 테스트는 기능
+    // 요건이 아니라 드리프트 방지다. 발급과 만료가 갈라져 있으면 다음에 속성을
+    // 바꿀 때 한쪽만 바뀌고, 그 어긋남은 아무 신호 없이 남는다.
     @Test
-    @DisplayName("만료 쿠키의 SameSite도 Lax다 — 발급/만료 속성이 어긋나면 브라우저가 덮어쓰지 않는다")
+    @DisplayName("만료 쿠키의 SameSite도 Lax다 — 발급과 갈라지면 이후 변경에서 한쪽만 바뀐다")
     void expireRefreshTokenCookie_sameSiteIsLax() {
         ResponseCookie cookie = cookieProvider.expireRefreshTokenCookie();
 
