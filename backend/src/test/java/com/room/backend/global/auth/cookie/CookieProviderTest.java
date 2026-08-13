@@ -74,23 +74,4 @@ class CookieProviderTest {
         assertTrue(cookie.isSecure());
     }
 
-    // SameSite=Lax는 등록가능도메인이 같아야 정상 흐름이 깨지지 않는다. 배포 출처가
-    // bangcheck.site / api.bangcheck.site 라는 전제가 이 방어의 근거이므로, 그 전제를
-    // 테스트로 고정해 둔다 — FE가 다른 사이트로 옮겨가면 여기서 먼저 걸린다.
-    @Test
-    @DisplayName("Lax 전제 고정: FE·API 출처의 등록가능도메인이 같다")
-    void sameSiteLaxPremise_frontendAndApiShareRegistrableDomain() {
-        String frontendHost = "bangcheck.site";
-        String apiHost = "api.bangcheck.site";
-
-        assertEquals(registrableDomain(frontendHost), registrableDomain(apiHost));
-    }
-
-    private static String registrableDomain(String host) {
-        String[] labels = host.split("\\.");
-        if (labels.length < 2) {
-            return host;
-        }
-        return labels[labels.length - 2] + "." + labels[labels.length - 1];
-    }
 }

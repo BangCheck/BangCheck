@@ -23,7 +23,7 @@ public class CookieProvider {
     //
     // 주의: Lax는 쿠키의 "전송"만 제한하고 "저장"은 막지 않는다. OAuth callback이
     // 쿠키를 심는 로그인 CSRF는 이 변경으로 닫히지 않으며, state를 개시 브라우저에
-    // 묶어야 한다 — 별도 이슈에서 다룬다.
+    // 묶어야 한다 — #313에서 다룬다.
     private static final String REFRESH_TOKEN_COOKIE = "refresh_token";
     private static final String SAME_SITE = "Lax";
 
