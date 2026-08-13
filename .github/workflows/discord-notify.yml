@@ -99,5 +99,15 @@ jobs:
               }]
             }')
 
-          curl -sS -H "Content-Type: application/json" \
-               -X POST -d "$PAYLOAD" "$DISCORD_WEBHOOK"
+          # curl 은 HTTP 4xx/5xx 에도 종료 코드 0 을 낸다 (--fail 미지정 시).
+          # webhook URL 이 만료·삭제·오타이거나 Discord 가 429 를 걸어도 그냥
+          # 통과해 알림이 조용히 사라진다 — 이 워크플로 자체가 silent-500 이 된다.
+          # 상태 코드를 명시적으로 판정한다. 본문도 함께 남겨 원인 파악을 돕는다.
+          HTTP=$(curl -sS -o /tmp/discord-resp -w '%{http_code}' \
+                 -H "Content-Type: application/json" \
+                 -X POST -d "$PAYLOAD" "$DISCORD_WEBHOOK")
+          if [ "$HTTP" -ge 300 ]; then
+            echo "Discord 전송 실패: HTTP $HTTP"
+            cat /tmp/discord-resp || true
+            exit 1
+          fi
