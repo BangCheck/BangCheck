@@ -36,6 +36,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import subprocess
 import sys
 from pathlib import Path
 
@@ -51,6 +52,99 @@ DEFAULT_OUT = REPO_ROOT / "frontend/src/features/research/atlas-snapshot.json"
 
 
 REGISTRY_DIR = ATLAS_DIR / "registry"
+
+
+def github_json(*args: str):
+    """gh CLI가 돌려준 JSON. 실패하면 스냅샷을 만들지 않는다."""
+    result = subprocess.run(
+        ["gh", *args],
+        cwd=REPO_ROOT,
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    return json.loads(result.stdout)
+
+
+def lifecycle_by_issue(
+    issue_numbers: set[int],
+    issues: list[dict],
+    pull_requests: list[dict],
+) -> dict[int, str]:
+    """GitHub의 closing 관계와 PR 상태에서 이슈별 lifecycle을 파생한다."""
+    issues_by_number = {issue["number"]: issue for issue in issues}
+    prs_by_number = {pr["number"]: pr for pr in pull_requests}
+    lifecycle = {}
+
+    for issue_number in issue_numbers:
+        issue = issues_by_number.get(issue_number)
+        if issue is None:
+            raise RuntimeError(f"GitHub issue #{issue_number}를 조회 결과에서 찾지 못했습니다.")
+
+        linked_prs = []
+        for reference in issue.get("closedByPullRequestsReferences") or []:
+            pr_number = reference["number"]
+            pr = prs_by_number.get(pr_number)
+            if pr is None:
+                raise RuntimeError(f"GitHub PR #{pr_number}를 조회 결과에서 찾지 못했습니다.")
+            linked_prs.append(pr)
+
+        if issue.get("state") == "CLOSED" and any(pr.get("mergedAt") for pr in linked_prs):
+            lifecycle[issue_number] = "RESOLVED"
+        elif issue.get("state") == "OPEN" and any(pr.get("state") == "OPEN" for pr in linked_prs):
+            lifecycle[issue_number] = "IN_PROGRESS"
+        else:
+            lifecycle[issue_number] = "TRACKED"
+
+    return lifecycle
+
+
+def load_github_lifecycles(defects: list[dict]) -> dict[int, str]:
+    """registry의 이슈만 GitHub 상태와 연결한다. 추측이나 실패 fallback은 없다."""
+    issue_numbers = {
+        issue
+        for defect in defects
+        if isinstance((issue := defect.get("issue")), int)
+        and not isinstance(issue, bool)
+        and issue > 0
+    }
+    if not issue_numbers:
+        return {}
+
+    project = yaml.safe_load((ATLAS_DIR / "project.yaml").read_text(encoding="utf-8"))
+    repo = project["repo"]
+    issues = github_json(
+        "issue", "list", "--repo", repo, "--state", "all", "--limit", "1000",
+        "--json", "number,state,closedByPullRequestsReferences",
+    )
+    pull_requests = github_json(
+        "pr", "list", "--repo", repo, "--state", "all", "--limit", "1000",
+        "--json", "number,state,mergedAt",
+    )
+    prs_by_number = {pr["number"]: pr for pr in pull_requests}
+    issues_by_number = {issue["number"]: issue for issue in issues}
+    for issue_number in issue_numbers:
+        pages = github_json(
+            "api", "--paginate", "--slurp",
+            f"repos/{repo}/issues/{issue_number}/timeline",
+        )
+        references = issues_by_number.get(issue_number, {}).setdefault(
+            "closedByPullRequestsReferences",
+            [],
+        )
+        referenced_numbers = {reference["number"] for reference in references}
+        for event in (item for page in pages for item in page):
+            source = (event.get("source") or {}).get("issue") or {}
+            pr_number = source.get("number")
+            if (
+                event.get("event") == "cross-referenced"
+                and source.get("pull_request")
+                and pr_number in prs_by_number
+                and pr_number not in referenced_numbers
+            ):
+                references.append({"number": pr_number})
+                referenced_numbers.add(pr_number)
+    return lifecycle_by_issue(issue_numbers, issues, pull_requests)
 
 
 def registry_digest() -> str:
@@ -108,7 +202,7 @@ def load_features() -> dict[str, dict]:
     return features
 
 
-def defect_lifecycle(defect: dict) -> str:
+def defect_lifecycle(defect: dict, github_lifecycles: dict[int, str] | None = None) -> str:
     """결함이 어디까지 왔는가.
 
         OBSERVED    관측만 됨. 이슈가 없다
@@ -116,10 +210,8 @@ def defect_lifecycle(defect: dict) -> str:
         IN_PROGRESS 그 이슈에 PR이 열림
         RESOLVED    그 PR이 머지됨
 
-    사람이 적는 값은 defects.yaml의 `issue` 하나뿐이다. 나머지 셋은 그 번호에서
-    파생돼야 하는데 지금은 이슈↔PR을 읽어올 원천이 없다 — links.source가 null인 것과
-    같은 이유다. 그래서 여기서는 issue 유무까지만 답하고, PR·머지는 추측하지 않는다.
-    추측해서 IN_PROGRESS를 만들면 그 화면을 근거로 "고치는 중"이라는 잘못된 판단이 나온다.
+    사람이 적는 값은 defects.yaml의 `issue` 하나뿐이다. 나머지 셋은 GitHub의
+    closing 관계와 PR 상태에서 파생한다. 제목·본문의 번호는 연결로 취급하지 않는다.
 
     truthiness로 판정하지 않는 이유
       `if defect.get("issue")`는 `issue: 0`을 "이슈 없음"으로 흘린다. 0은 유효한
@@ -131,10 +223,12 @@ def defect_lifecycle(defect: dict) -> str:
     """
     issue = defect.get("issue")
     tracked = isinstance(issue, int) and not isinstance(issue, bool) and issue > 0
-    return "TRACKED" if tracked else "OBSERVED"
+    if not tracked:
+        return "OBSERVED"
+    return (github_lifecycles or {}).get(issue, "TRACKED")
 
 
-def defect_view(defect: dict) -> dict:
+def defect_view(defect: dict, github_lifecycles: dict[int, str] | None = None) -> dict:
     """화면이 결함 하나에 대해 묻는 전부.
 
     detail과 evidence를 싣는 이유: "무엇이 문제인가"만으로는 아무도 확인하러 갈 수 없다.
@@ -156,11 +250,14 @@ def defect_view(defect: dict) -> dict:
         "relatedFeature": defect.get("relatedFeature"),
         "relatedStory": defect.get("relatedStory"),
         "issue": defect.get("issue"),
-        "lifecycle": defect_lifecycle(defect),
+        "lifecycle": defect_lifecycle(defect, github_lifecycles),
     }
 
 
-def load_defects(features: dict[str, dict]) -> dict[str, list[dict]]:
+def load_defects(
+    features: dict[str, dict],
+    github_lifecycles: dict[int, str] | None = None,
+) -> dict[str, list[dict]]:
     """featureId → 그 기능에 걸린 결함들.
 
     소속의 원천이 둘이다.
@@ -174,7 +271,11 @@ def load_defects(features: dict[str, dict]) -> dict[str, list[dict]]:
     페이지 단위 집계는 그래서 ID로 다시 dedupe해야 한다 — 소비자 쪽 rollupPage의 책임이다.
     """
     raw = yaml.safe_load((ATLAS_DIR / "registry" / "defects.yaml").read_text(encoding="utf-8"))
-    views = {d["id"]: defect_view(d) for d in ((raw or {}).get("defects") or []) if d.get("id")}
+    views = {
+        d["id"]: defect_view(d, github_lifecycles)
+        for d in ((raw or {}).get("defects") or [])
+        if d.get("id")
+    }
 
     by_feature: dict[str, dict[str, dict]] = {}
     for defect_id, view in views.items():
@@ -192,7 +293,7 @@ def load_defects(features: dict[str, dict]) -> dict[str, list[dict]]:
     return {feature_id: list(items.values()) for feature_id, items in by_feature.items()}
 
 
-def unattached_defects() -> list[dict]:
+def unattached_defects(github_lifecycles: dict[int, str] | None = None) -> list[dict]:
     """어느 feature 도 데려가지 않은 결함.
 
     `load_defects` 가 세는 두 방향(relatedFeature · knownDefects) 중 어느 쪽으로도
@@ -201,8 +302,16 @@ def unattached_defects() -> list[dict]:
     """
     raw = yaml.safe_load((ATLAS_DIR / "registry" / "defects.yaml").read_text(encoding="utf-8"))
     all_ids = [d["id"] for d in ((raw or {}).get("defects") or []) if d.get("id")]
-    attached = {v["id"] for views in load_defects(load_features()).values() for v in views}
-    views = {d["id"]: defect_view(d) for d in ((raw or {}).get("defects") or []) if d.get("id")}
+    attached = {
+        view["id"]
+        for views in load_defects(load_features(), github_lifecycles).values()
+        for view in views
+    }
+    views = {
+        d["id"]: defect_view(d, github_lifecycles)
+        for d in ((raw or {}).get("defects") or [])
+        if d.get("id")
+    }
     return [views[i] for i in all_ids if i not in attached]
 
 
@@ -243,7 +352,9 @@ def main() -> int:
     args = parser.parse_args()
 
     registry = load_features()
-    defects_by_feature = load_defects(registry)
+    raw_defects = yaml.safe_load((REGISTRY_DIR / "defects.yaml").read_text(encoding="utf-8"))
+    github_lifecycles = load_github_lifecycles((raw_defects or {}).get("defects") or [])
+    defects_by_feature = load_defects(registry, github_lifecycles)
     pages = []
 
     for page in pagemap.build():
@@ -333,7 +444,7 @@ def main() -> int:
         # 배포·마이그레이션·아키텍처처럼 제품 feature 가 소유하지 않는 결함은
         # 앞으로도 생긴다. relatedFeature 는 schema 상 필수가 아니다 — 억지로
         # 붙이는 대신 여기로 모은다.
-        "unattachedDefects": unattached_defects(),
+        "unattachedDefects": unattached_defects(github_lifecycles),
         # 연결 규약이 아직 없다. 빈 값을 그대로 둬서 화면이 '없음'을 말하게 한다 —
         # 있는 척하는 것보다 비어 있는 게 낫다. Hermes가 채울 자리.
         "links": {"source": None, "byFeature": {}},

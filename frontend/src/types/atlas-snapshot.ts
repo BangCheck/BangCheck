@@ -11,7 +11,7 @@ export type AtlasLayerState = 'built' | 'defect' | 'absent';
 
 /**
  * 결함 생애주기. 사람이 적는 값은 defects.yaml의 issue 하나뿐이고
- * 나머지는 그 번호에서 파생된다 — 지금은 이슈↔PR 원천이 없어 OBSERVED/TRACKED까지만 나온다.
+ * 나머지는 GitHub의 closing 관계와 PR 상태에서 파생된다.
  */
 export type AtlasDefectLifecycle = 'OBSERVED' | 'TRACKED' | 'IN_PROGRESS' | 'RESOLVED';
 
