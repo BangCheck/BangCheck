@@ -53,7 +53,22 @@ public class AddressSearchService {
             throw new GeneralException(AddressSearchErrorCode.PROVIDER_UNAVAILABLE);
         }
 
-        if (response == null || response.getResults() == null || response.getResults().getJuso() == null) {
+        if (response == null || response.getResults() == null || response.getResults().getCommon() == null) {
+            log.warn("juso.go.kr returned a malformed response");
+            throw new GeneralException(AddressSearchErrorCode.PROVIDER_ERROR);
+        }
+
+        JusoApiResponseDTO.Common common = response.getResults().getCommon();
+        if (!"0".equals(common.getErrorCode())) {
+            log.warn(
+                    "juso.go.kr returned application error {}: {}",
+                    common.getErrorCode(),
+                    common.getErrorMessage()
+            );
+            throw new GeneralException(AddressSearchErrorCode.PROVIDER_ERROR);
+        }
+
+        if (response.getResults().getJuso() == null) {
             return Collections.emptyList();
         }
 

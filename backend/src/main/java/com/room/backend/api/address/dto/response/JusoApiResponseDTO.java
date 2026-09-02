@@ -9,7 +9,14 @@ public class JusoApiResponseDTO {
     
     @Getter 
     public static class Results{
+        private Common common;
         private List<Juso> juso;
+    }
+
+    @Getter
+    public static class Common {
+        private String errorCode;
+        private String errorMessage;
     }
 
     @Getter

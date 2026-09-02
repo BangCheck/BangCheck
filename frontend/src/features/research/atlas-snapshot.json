@@ -1,7 +1,7 @@
 {
   "generator": ".project-atlas/tools/pm_snapshot.py",
   "note": "생성물이다. 원천은 registry와 코드다. 직접 편집하지 않는다.",
-  "sourceDigest": "3913f4b758fe69dd6efd2809b8a78c622c4f910ebfb16a8db503f2c51d48586e",
+  "sourceDigest": "8e139677864859b4c6d1924fcb6a97ff95460dd2f0df2f533952b404f5756e21",
   "pages": [
     {
       "page": "/",
@@ -180,7 +180,7 @@
               "id": "BC-ADDR-01",
               "severity": "P1",
               "title": "juso.go.kr provider 오류가 미래핑으로 샌다",
-              "detail": "RestClient의 4xx·5xx·timeout을 잡지 않아 GlobalExceptionHandler의 마지막 분기에서 COMMON_500이 된다. 사용자는 원인을 알 수 없다. ver1.1 P1 silent-500-juso와 동일 항목. BC-REG-04(geocoding)와 같은 패턴.",
+              "detail": "HTTP 4xx·5xx·timeout은 재매핑하지만 juso.go.kr은 잘못된 승인키도 HTTP 200과 results.common.errorCode E0001로 응답한다. 이 본문 오류를 확인하지 않으면 성공한 빈 검색 결과로 숨는다. ver1.1 P1 silent-500-juso와 동일 항목.",
               "disposition": "FIX_PLANNED",
               "evidence": {
                 "path": "backend/src/main/java/com/room/backend/api/address/service/AddressSearchService.java",
@@ -503,7 +503,7 @@
               "id": "BC-ADDR-01",
               "severity": "P1",
               "title": "juso.go.kr provider 오류가 미래핑으로 샌다",
-              "detail": "RestClient의 4xx·5xx·timeout을 잡지 않아 GlobalExceptionHandler의 마지막 분기에서 COMMON_500이 된다. 사용자는 원인을 알 수 없다. ver1.1 P1 silent-500-juso와 동일 항목. BC-REG-04(geocoding)와 같은 패턴.",
+              "detail": "HTTP 4xx·5xx·timeout은 재매핑하지만 juso.go.kr은 잘못된 승인키도 HTTP 200과 results.common.errorCode E0001로 응답한다. 이 본문 오류를 확인하지 않으면 성공한 빈 검색 결과로 숨는다. ver1.1 P1 silent-500-juso와 동일 항목.",
               "disposition": "FIX_PLANNED",
               "evidence": {
                 "path": "backend/src/main/java/com/room/backend/api/address/service/AddressSearchService.java",
