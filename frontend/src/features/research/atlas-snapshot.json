@@ -41,7 +41,7 @@
               "relatedFeature": "FT-AUTH-OAUTH-LOGIN",
               "relatedStory": null,
               "issue": 255,
-              "lifecycle": "TRACKED"
+              "lifecycle": "RESOLVED"
             },
             {
               "id": "BC-AUTH-90",
@@ -57,7 +57,7 @@
               "relatedFeature": "FT-AUTH-OAUTH-LOGIN",
               "relatedStory": null,
               "issue": 256,
-              "lifecycle": "TRACKED"
+              "lifecycle": "RESOLVED"
             }
           ],
           "tests": [
@@ -148,7 +148,7 @@
               "relatedFeature": "FT-CHECKLIST-CATALOG",
               "relatedStory": null,
               "issue": 244,
-              "lifecycle": "TRACKED"
+              "lifecycle": "RESOLVED"
             }
           ],
           "tests": [],
@@ -190,7 +190,7 @@
               "relatedFeature": "FT-ADDRESS-SEARCH",
               "relatedStory": null,
               "issue": 309,
-              "lifecycle": "TRACKED"
+              "lifecycle": "RESOLVED"
             }
           ],
           "tests": [
@@ -234,7 +234,7 @@
               "relatedFeature": "FT-ROOM-LIST",
               "relatedStory": null,
               "issue": 230,
-              "lifecycle": "TRACKED"
+              "lifecycle": "RESOLVED"
             },
             {
               "id": "BC-LIST-02",
@@ -250,7 +250,7 @@
               "relatedFeature": "FT-ROOM-LIST",
               "relatedStory": null,
               "issue": 239,
-              "lifecycle": "TRACKED"
+              "lifecycle": "RESOLVED"
             },
             {
               "id": "BC-LIST-03",
@@ -266,7 +266,7 @@
               "relatedFeature": "FT-ROOM-LIST",
               "relatedStory": null,
               "issue": 240,
-              "lifecycle": "TRACKED"
+              "lifecycle": "RESOLVED"
             }
           ],
           "tests": [],
@@ -333,7 +333,7 @@
               "relatedFeature": "FT-AUTH-SESSION-LIFECYCLE",
               "relatedStory": null,
               "issue": 259,
-              "lifecycle": "TRACKED"
+              "lifecycle": "RESOLVED"
             }
           ],
           "tests": [],
@@ -407,7 +407,7 @@
               "relatedFeature": "FT-ROOM-CREATE-WITH-CHECKLIST",
               "relatedStory": null,
               "issue": 296,
-              "lifecycle": "TRACKED"
+              "lifecycle": "RESOLVED"
             }
           ],
           "tests": [],
@@ -471,7 +471,7 @@
               "relatedFeature": "FT-CHECKLIST-CATALOG",
               "relatedStory": null,
               "issue": 244,
-              "lifecycle": "TRACKED"
+              "lifecycle": "RESOLVED"
             }
           ],
           "tests": [],
@@ -513,7 +513,7 @@
               "relatedFeature": "FT-ADDRESS-SEARCH",
               "relatedStory": null,
               "issue": 309,
-              "lifecycle": "TRACKED"
+              "lifecycle": "RESOLVED"
             }
           ],
           "tests": [
@@ -557,7 +557,7 @@
               "relatedFeature": "FT-ROOM-LIST",
               "relatedStory": null,
               "issue": 230,
-              "lifecycle": "TRACKED"
+              "lifecycle": "RESOLVED"
             },
             {
               "id": "BC-LIST-02",
@@ -573,7 +573,7 @@
               "relatedFeature": "FT-ROOM-LIST",
               "relatedStory": null,
               "issue": 239,
-              "lifecycle": "TRACKED"
+              "lifecycle": "RESOLVED"
             },
             {
               "id": "BC-LIST-03",
@@ -589,7 +589,7 @@
               "relatedFeature": "FT-ROOM-LIST",
               "relatedStory": null,
               "issue": 240,
-              "lifecycle": "TRACKED"
+              "lifecycle": "RESOLVED"
             }
           ],
           "tests": [],
@@ -631,7 +631,7 @@
               "relatedFeature": "FT-AUTH-SESSION-LIFECYCLE",
               "relatedStory": null,
               "issue": 259,
-              "lifecycle": "TRACKED"
+              "lifecycle": "RESOLVED"
             }
           ],
           "tests": [],
@@ -689,7 +689,7 @@
               "relatedFeature": "FT-ROOM-CREATE-WITH-CHECKLIST",
               "relatedStory": null,
               "issue": 296,
-              "lifecycle": "TRACKED"
+              "lifecycle": "RESOLVED"
             },
             {
               "id": "BC-REG-01",
@@ -769,7 +769,7 @@
               "relatedFeature": "FT-ROOM-CREATE-WITH-CHECKLIST",
               "relatedStory": null,
               "issue": 241,
-              "lifecycle": "TRACKED"
+              "lifecycle": "RESOLVED"
             }
           ],
           "tests": [],
@@ -824,7 +824,7 @@
               "relatedFeature": "FT-CHECKLIST-CUSTOM-ITEM",
               "relatedStory": null,
               "issue": 231,
-              "lifecycle": "TRACKED"
+              "lifecycle": "RESOLVED"
             },
             {
               "id": "BC-CHK-04",
@@ -840,7 +840,7 @@
               "relatedFeature": "FT-CHECKLIST-CUSTOM-ITEM",
               "relatedStory": null,
               "issue": 234,
-              "lifecycle": "TRACKED"
+              "lifecycle": "RESOLVED"
             },
             {
               "id": "BC-CHK-05",
@@ -856,7 +856,7 @@
               "relatedFeature": "FT-CHECKLIST-CUSTOM-ITEM",
               "relatedStory": null,
               "issue": 235,
-              "lifecycle": "TRACKED"
+              "lifecycle": "RESOLVED"
             },
             {
               "id": "BC-CHK-06",
@@ -872,7 +872,7 @@
               "relatedFeature": "FT-CHECKLIST-CUSTOM-ITEM",
               "relatedStory": null,
               "issue": 236,
-              "lifecycle": "TRACKED"
+              "lifecycle": "RESOLVED"
             },
             {
               "id": "BC-CHK-07",
@@ -888,7 +888,7 @@
               "relatedFeature": "FT-CHECKLIST-CUSTOM-ITEM",
               "relatedStory": null,
               "issue": 242,
-              "lifecycle": "TRACKED"
+              "lifecycle": "RESOLVED"
             }
           ],
           "tests": [
@@ -954,7 +954,7 @@
               "relatedFeature": "FT-CHECKLIST-SETTINGS",
               "relatedStory": null,
               "issue": 232,
-              "lifecycle": "TRACKED"
+              "lifecycle": "RESOLVED"
             },
             {
               "id": "BC-CHK-08",
@@ -970,7 +970,7 @@
               "relatedFeature": "FT-CHECKLIST-SETTINGS",
               "relatedStory": null,
               "issue": 243,
-              "lifecycle": "TRACKED"
+              "lifecycle": "RESOLVED"
             }
           ],
           "tests": [
@@ -1037,7 +1037,7 @@
               "relatedFeature": "FT-CHECKLIST-CATALOG",
               "relatedStory": null,
               "issue": 244,
-              "lifecycle": "TRACKED"
+              "lifecycle": "RESOLVED"
             }
           ],
           "tests": [],
@@ -1079,7 +1079,7 @@
               "relatedFeature": "FT-ROOM-LIST",
               "relatedStory": null,
               "issue": 230,
-              "lifecycle": "TRACKED"
+              "lifecycle": "RESOLVED"
             },
             {
               "id": "BC-LIST-02",
@@ -1095,7 +1095,7 @@
               "relatedFeature": "FT-ROOM-LIST",
               "relatedStory": null,
               "issue": 239,
-              "lifecycle": "TRACKED"
+              "lifecycle": "RESOLVED"
             },
             {
               "id": "BC-LIST-03",
@@ -1111,7 +1111,7 @@
               "relatedFeature": "FT-ROOM-LIST",
               "relatedStory": null,
               "issue": 240,
-              "lifecycle": "TRACKED"
+              "lifecycle": "RESOLVED"
             }
           ],
           "tests": [],
@@ -1153,7 +1153,7 @@
               "relatedFeature": "FT-AUTH-SESSION-LIFECYCLE",
               "relatedStory": null,
               "issue": 259,
-              "lifecycle": "TRACKED"
+              "lifecycle": "RESOLVED"
             }
           ],
           "tests": [],
@@ -1201,7 +1201,7 @@
               "relatedFeature": "FT-AUTH-OAUTH-LOGIN",
               "relatedStory": null,
               "issue": 255,
-              "lifecycle": "TRACKED"
+              "lifecycle": "RESOLVED"
             },
             {
               "id": "BC-AUTH-90",
@@ -1217,7 +1217,7 @@
               "relatedFeature": "FT-AUTH-OAUTH-LOGIN",
               "relatedStory": null,
               "issue": 256,
-              "lifecycle": "TRACKED"
+              "lifecycle": "RESOLVED"
             }
           ],
           "tests": [
@@ -1261,7 +1261,7 @@
               "relatedFeature": "FT-ROOM-LIST",
               "relatedStory": null,
               "issue": 230,
-              "lifecycle": "TRACKED"
+              "lifecycle": "RESOLVED"
             },
             {
               "id": "BC-LIST-02",
@@ -1277,7 +1277,7 @@
               "relatedFeature": "FT-ROOM-LIST",
               "relatedStory": null,
               "issue": 239,
-              "lifecycle": "TRACKED"
+              "lifecycle": "RESOLVED"
             },
             {
               "id": "BC-LIST-03",
@@ -1293,7 +1293,7 @@
               "relatedFeature": "FT-ROOM-LIST",
               "relatedStory": null,
               "issue": 240,
-              "lifecycle": "TRACKED"
+              "lifecycle": "RESOLVED"
             }
           ],
           "tests": [],
@@ -1335,7 +1335,7 @@
               "relatedFeature": "FT-AUTH-SESSION-LIFECYCLE",
               "relatedStory": null,
               "issue": 259,
-              "lifecycle": "TRACKED"
+              "lifecycle": "RESOLVED"
             }
           ],
           "tests": [],
@@ -1413,7 +1413,7 @@
               "relatedFeature": "FT-ROOM-LIST",
               "relatedStory": null,
               "issue": 230,
-              "lifecycle": "TRACKED"
+              "lifecycle": "RESOLVED"
             },
             {
               "id": "BC-LIST-02",
@@ -1429,7 +1429,7 @@
               "relatedFeature": "FT-ROOM-LIST",
               "relatedStory": null,
               "issue": 239,
-              "lifecycle": "TRACKED"
+              "lifecycle": "RESOLVED"
             },
             {
               "id": "BC-LIST-03",
@@ -1445,7 +1445,7 @@
               "relatedFeature": "FT-ROOM-LIST",
               "relatedStory": null,
               "issue": 240,
-              "lifecycle": "TRACKED"
+              "lifecycle": "RESOLVED"
             }
           ],
           "tests": [],
@@ -1487,7 +1487,7 @@
               "relatedFeature": "FT-AUTH-SESSION-LIFECYCLE",
               "relatedStory": null,
               "issue": 259,
-              "lifecycle": "TRACKED"
+              "lifecycle": "RESOLVED"
             }
           ],
           "tests": [],
@@ -1535,7 +1535,7 @@
               "relatedFeature": "FT-ROOM-LIST",
               "relatedStory": null,
               "issue": 230,
-              "lifecycle": "TRACKED"
+              "lifecycle": "RESOLVED"
             },
             {
               "id": "BC-LIST-02",
@@ -1551,7 +1551,7 @@
               "relatedFeature": "FT-ROOM-LIST",
               "relatedStory": null,
               "issue": 239,
-              "lifecycle": "TRACKED"
+              "lifecycle": "RESOLVED"
             },
             {
               "id": "BC-LIST-03",
@@ -1567,7 +1567,7 @@
               "relatedFeature": "FT-ROOM-LIST",
               "relatedStory": null,
               "issue": 240,
-              "lifecycle": "TRACKED"
+              "lifecycle": "RESOLVED"
             }
           ],
           "tests": [],
@@ -1609,7 +1609,7 @@
               "relatedFeature": "FT-AUTH-SESSION-LIFECYCLE",
               "relatedStory": null,
               "issue": 259,
-              "lifecycle": "TRACKED"
+              "lifecycle": "RESOLVED"
             }
           ],
           "tests": [],
@@ -1683,7 +1683,7 @@
               "relatedFeature": "FT-CHECKLIST-CATALOG",
               "relatedStory": null,
               "issue": 244,
-              "lifecycle": "TRACKED"
+              "lifecycle": "RESOLVED"
             }
           ],
           "tests": [],
@@ -1725,7 +1725,7 @@
               "relatedFeature": "FT-ROOM-LIST",
               "relatedStory": null,
               "issue": 230,
-              "lifecycle": "TRACKED"
+              "lifecycle": "RESOLVED"
             },
             {
               "id": "BC-LIST-02",
@@ -1741,7 +1741,7 @@
               "relatedFeature": "FT-ROOM-LIST",
               "relatedStory": null,
               "issue": 239,
-              "lifecycle": "TRACKED"
+              "lifecycle": "RESOLVED"
             },
             {
               "id": "BC-LIST-03",
@@ -1757,7 +1757,7 @@
               "relatedFeature": "FT-ROOM-LIST",
               "relatedStory": null,
               "issue": 240,
-              "lifecycle": "TRACKED"
+              "lifecycle": "RESOLVED"
             }
           ],
           "tests": [],
@@ -1824,7 +1824,7 @@
               "relatedFeature": "FT-AUTH-SESSION-LIFECYCLE",
               "relatedStory": null,
               "issue": 259,
-              "lifecycle": "TRACKED"
+              "lifecycle": "RESOLVED"
             }
           ],
           "tests": [],
@@ -1913,7 +1913,7 @@
               "relatedFeature": "FT-CHECKLIST-CATALOG",
               "relatedStory": null,
               "issue": 244,
-              "lifecycle": "TRACKED"
+              "lifecycle": "RESOLVED"
             }
           ],
           "tests": [],
@@ -1955,7 +1955,7 @@
               "relatedFeature": "FT-ROOM-LIST",
               "relatedStory": null,
               "issue": 230,
-              "lifecycle": "TRACKED"
+              "lifecycle": "RESOLVED"
             },
             {
               "id": "BC-LIST-02",
@@ -1971,7 +1971,7 @@
               "relatedFeature": "FT-ROOM-LIST",
               "relatedStory": null,
               "issue": 239,
-              "lifecycle": "TRACKED"
+              "lifecycle": "RESOLVED"
             },
             {
               "id": "BC-LIST-03",
@@ -1987,7 +1987,7 @@
               "relatedFeature": "FT-ROOM-LIST",
               "relatedStory": null,
               "issue": 240,
-              "lifecycle": "TRACKED"
+              "lifecycle": "RESOLVED"
             }
           ],
           "tests": [],
@@ -2029,7 +2029,7 @@
               "relatedFeature": "FT-AUTH-SESSION-LIFECYCLE",
               "relatedStory": null,
               "issue": 259,
-              "lifecycle": "TRACKED"
+              "lifecycle": "RESOLVED"
             }
           ],
           "tests": [],
@@ -2108,7 +2108,7 @@
       "relatedFeature": null,
       "relatedStory": null,
       "issue": 222,
-      "lifecycle": "TRACKED"
+      "lifecycle": "RESOLVED"
     },
     {
       "id": "BC-ATLAS-01",

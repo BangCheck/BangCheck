@@ -163,7 +163,6 @@ export function PageBriefBody({
 
   const defects = collectDefects(features);
   // 해결된 결함은 기본으로 접는다 — 지금 봐야 하는 것은 아직 열려 있는 것이다.
-  // 현재 RESOLVED가 0건이라 토글이 안 보이는 게 정상이며, 그건 데이터의 사실이지 미구현이 아니다.
   const openDefects = defects.filter((defect) => defect.lifecycle !== 'RESOLVED');
   const resolvedDefects = defects.filter((defect) => defect.lifecycle === 'RESOLVED');
 
