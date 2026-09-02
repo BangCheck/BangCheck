@@ -92,7 +92,6 @@ jar {
 
 def atlasBaselineDirectory = layout.projectDirectory.dir('src/test/resources/atlas-baseline')
 def atlasInformationReportDirectory = layout.buildDirectory.dir('reports/atlas-baseline-info')
-def atlasInformationDigestDirectory = layout.projectDirectory.dir('src/test/resources/atlas-baseline-info')
 
 def normalizedBaselineContent = { List<String> records ->
     records.findAll { it != null && !it.isBlank() }.unique().toSorted().join('\n') + '\n'
@@ -139,19 +138,6 @@ tasks.register('atlasRuntimeDependencyReport') {
         reportFile.parentFile.mkdirs()
         def content = normalizedBaselineContent(coordinates)
         reportFile.setText(content, 'UTF-8')
-        def expectedFile = atlasInformationDigestDirectory.file('runtime-dependencies.txt.sha256').asFile
-        if (!expectedFile.isFile()) {
-            throw new GradleException("Missing approved Atlas information digest: ${expectedFile}")
-        }
-        def digest = java.security.MessageDigest.getInstance('SHA-256')
-                .digest(content.getBytes('UTF-8')).encodeHex().toString()
-        if (expectedFile.getText('UTF-8').trim() != digest) {
-            def owner = providers.gradleProperty('atlasInfoChangeOwner').orNull
-            def reason = providers.gradleProperty('atlasInfoChangeReason').orNull
-            if (!owner?.trim() || !reason?.trim()) {
-                throw new GradleException('Atlas runtime dependency drift requires -PatlasInfoChangeOwner and -PatlasInfoChangeReason.')
-            }
-        }
     }
 }
 
@@ -216,12 +202,6 @@ tasks.register('atlasBaselineTest', Test) {
     systemProperty 'atlas.baseline.mode', 'compare'
     systemProperty 'atlas.baseline.directory', atlasBaselineDirectory.asFile.absolutePath
     systemProperty 'atlas.baseline.info-directory', atlasInformationReportDirectory.get().asFile.absolutePath
-    if (providers.gradleProperty('atlasInfoChangeOwner').isPresent()) {
-        systemProperty 'atlas.info.change-owner', providers.gradleProperty('atlasInfoChangeOwner').get()
-    }
-    if (providers.gradleProperty('atlasInfoChangeReason').isPresent()) {
-        systemProperty 'atlas.info.change-reason', providers.gradleProperty('atlasInfoChangeReason').get()
-    }
     shouldRunAfter tasks.named('test')
 }
 

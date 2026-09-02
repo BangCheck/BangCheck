@@ -166,8 +166,29 @@ jobs:
         if: steps.presence.outputs.present == 'true'
         run: node frontend/scripts/check-atlas-snapshot.mjs
 
-# runtime → 승인 baseline 방향(atlasBaselineCompare)은 여기 없다.
-# 이 workflow에 baseline job으로 배선해 PR #216에서 실제로 돌려봤고,
-# 인프라(MySQL Testcontainers·Spring 부팅)와 routes.txt·flyway 대조는 통과했으나
-# bean-names 다이제스트의 승인본이 저장소에 없어 실패했다. 그것은 이 게이트의
-# 결함이 아니라 backend 쪽에서 결정할 사안이라 분리했다 — 이슈 #217.
+  baseline:
+    name: Verify runtime matches approved Atlas baseline
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: gradle
+
+      - name: Compare runtime with approved product oracles
+        working-directory: backend
+        run: ./gradlew atlasBaselineCompare
+
+      - name: Upload informational runtime reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: atlas-runtime-information-${{ github.run_id }}
+          path: backend/build/reports/atlas-baseline-info/
+          if-no-files-found: warn

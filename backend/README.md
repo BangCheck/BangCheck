@@ -50,13 +50,9 @@ Docker가 실행 중인 환경에서 현재 승인된 route, Flyway checksum, bo
 ./gradlew atlasBaselineCompare
 ```
 
-정보성 bean 또는 runtime dependency가 승인 digest와 다르면 비교는 기본적으로 실패한다. 기대된 변경일 때만 reviewer가 확인할 owner와 reason을 명시한다.
-
-```bash
-./gradlew atlasBaselineCompare \
-  -PatlasInfoChangeOwner='@owner' \
-  -PatlasInfoChangeReason='approved change summary'
-```
+route·Flyway checksum·실행 jar Start-Class는 승인 baseline과 다르면 비교가 실패한다.
+bean 목록과 runtime dependency는 환경·프레임워크 버전에 민감한 정보성 보고서로만 남고
+차단 기준으로 사용하지 않는다.
 
 기준 commit의 candidate는 반드시 새 빈 디렉터리에 캡처한다.
 

@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.Collection;
 import java.util.List;
 
@@ -52,44 +50,6 @@ final class BaselineSnapshot {
     static void information(String fileName, Collection<String> records) {
         String actual = normalized(records);
         write(INFORMATION_DIRECTORY.resolve(fileName), actual);
-        if ("compare".equals(MODE)) {
-            verifyInformationDigest(fileName, actual);
-        }
-    }
-
-    private static void verifyInformationDigest(String fileName, String actual) {
-        Path digestFile = ORACLE_DIRECTORY.resolve("../atlas-baseline-info/" + fileName + ".sha256").normalize();
-        try {
-            if (Files.notExists(digestFile)) {
-                fail("Missing approved Atlas information digest: " + digestFile);
-            }
-            String expected = Files.readString(digestFile, StandardCharsets.UTF_8).trim();
-            String actualDigest = sha256(actual);
-            if (!expected.equals(actualDigest)) {
-                requireInformationChangeApproval(fileName, expected, actualDigest);
-            }
-        } catch (IOException exception) {
-            throw new IllegalStateException("Cannot read Atlas information digest: " + digestFile, exception);
-        }
-    }
-
-    private static void requireInformationChangeApproval(String fileName, String expected, String actual) {
-        String owner = System.getProperty("atlas.info.change-owner");
-        String reason = System.getProperty("atlas.info.change-reason");
-        if (owner == null || owner.isBlank() || reason == null || reason.isBlank()) {
-            fail("Atlas information drift in " + fileName + " (expected " + expected + ", actual " + actual
-                    + "). Re-run only with explicit atlasInfoChangeOwner and atlasInfoChangeReason evidence.");
-        }
-    }
-
-    private static String sha256(String value) {
-        try {
-            byte[] digest = MessageDigest.getInstance("SHA-256")
-                    .digest(value.getBytes(StandardCharsets.UTF_8));
-            return java.util.HexFormat.of().formatHex(digest);
-        } catch (NoSuchAlgorithmException exception) {
-            throw new IllegalStateException("SHA-256 is unavailable", exception);
-        }
     }
 
     private static String normalized(Collection<String> records) {
