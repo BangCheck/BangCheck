@@ -102,7 +102,7 @@ Assignee:
 ## 2-6. Duplicate Check
 
 ```bash
-gh issue list --repo SWYP-Backend/project --state open --search "{title}" --json number,title --limit 5
+gh issue list --repo BangCheck/BangCheck --state open --search "{title}" --json number,title --limit 5
 ```
 
 If similar exists:
@@ -152,7 +152,7 @@ Other options:
 
 Create:
 ```bash
-gh issue create --repo SWYP-Backend/project \
+gh issue create --repo BangCheck/BangCheck \
   --title "{title}" \
   --label "{priority}" \
   --milestone "{milestone}" \

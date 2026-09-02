@@ -44,7 +44,7 @@ echo "     sudo mysql_secure_installation"
 echo "[6/9] BangCheck 저장소 clone 중..."
 cd ~
 if [ ! -d "BangCheck" ]; then
-  git clone https://github.com/SWYP-Backend/BangCheck.git
+  git clone https://github.com/BangCheck/BangCheck.git
   cd BangCheck
 else
   cd BangCheck

@@ -8,7 +8,7 @@
 ## PR-1. Find PRs Without Reviewers
 
 ```bash
-gh pr list --repo SWYP-Backend/project --state open \
+gh pr list --repo BangCheck/BangCheck --state open \
   --json number,title,author,reviewRequests \
   --jq '.[] | select(.reviewRequests | length == 0)'
 ```
@@ -40,7 +40,7 @@ Reviewer GitHub login:
 ```
 
 ```bash
-gh pr edit {pr_number} --add-reviewer "{login}" --repo SWYP-Backend/project
+gh pr edit {pr_number} --add-reviewer "{login}" --repo BangCheck/BangCheck
 ```
 
 ```

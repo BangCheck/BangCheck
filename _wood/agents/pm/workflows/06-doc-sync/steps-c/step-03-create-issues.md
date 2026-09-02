@@ -338,7 +338,7 @@ gh api repos/$REPO/issues/{parent}/sub_issues \
 ### Start/End Date Setting (GitHub Project Board)
 
 ```bash
-ITEM_ID=$(gh project item-list 2 --owner SWYP-Backend --format json \
+ITEM_ID=$(gh project item-list 2 --owner BangCheck --format json \
   --jq ".items[] | select(.content.number == {issue_number}) | .id")
 
 gh project item-edit \
